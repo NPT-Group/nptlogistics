@@ -9,9 +9,21 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.983.0",
+    "@aws-sdk/s3-request-presigner": "^3.983.0",
+    "@azure/identity": "^4.13.0",
+    "@blocknote/core": "^0.46.2",
+    "@blocknote/mantine": "^0.46.2",
+    "@blocknote/react": "^0.46.2",
+    "@emotion/react": "^11.14.0",
+    "@mantine/core": "^8.3.14",
+    "@mantine/hooks": "^8.3.14",
+    "mongoose": "^9.1.6",
     "next": "16.1.6",
+    "next-auth": "^4.24.13",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
