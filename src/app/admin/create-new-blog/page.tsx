@@ -1,8 +1,14 @@
+// src/app/admin/create-new-blog/page.tsx
 "use client";
 
 import * as React from "react";
-import BlockNote from "@/components/BlockNote";
+import dynamic from "next/dynamic";
 import type { PartialBlock } from "@blocknote/core";
+
+const BlockNote = dynamic(() => import("@/components/BlockNote"), {
+  ssr: false,
+  loading: () => <div className="rounded-xl border p-4 text-sm text-gray-500">Loading editor…</div>,
+});
 
 export default function Home() {
   const [doc, setDoc] = React.useState<PartialBlock[] | null>(null);

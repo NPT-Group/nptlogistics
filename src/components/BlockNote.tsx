@@ -1,3 +1,4 @@
+// src/components/BlockNote.tsx
 "use client";
 
 import "@mantine/core/styles.css";
