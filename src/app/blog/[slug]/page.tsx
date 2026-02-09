@@ -31,7 +31,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     throw e;
   }
 
-  const commentsPromise = ssrApiFetch<{ data: { items: any[]; meta: any } }>(`/api/v1/blog/${encodeURIComponent(slug)}/comments?page=1&pageSize=200&sortBy=createdAt&sortDir=desc`);
+  // Comments: SSR only the first page (match client pagination defaults)
+  const COMMENTS_PAGE_SIZE = 10;
+  const commentsPromise = ssrApiFetch<{ data: { items: any[]; meta: any } }>(`/api/v1/blog/${encodeURIComponent(slug)}/comments?page=1&pageSize=${COMMENTS_PAGE_SIZE}&sortBy=createdAt&sortDir=desc`);
 
   // Related articles: same first category (if available), exclude current slug
   const firstCategoryId = Array.isArray(post?.categoryIds) && post.categoryIds.length ? String(post.categoryIds[0]) : null;
@@ -54,5 +56,5 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   const [commentsRes, relatedRes] = await Promise.all([commentsPromise, relatedPromise]);
 
-  return <BlogPostClient slug={slug} initialPost={post} initialComments={commentsRes.data.items} initialRelated={relatedRes.data.items} />;
+  return <BlogPostClient slug={slug} initialPost={post} initialComments={commentsRes.data.items} initialCommentsMeta={commentsRes.data.meta} initialRelated={relatedRes.data.items} />;
 }

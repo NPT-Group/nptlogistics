@@ -6,8 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import type { PartialBlock } from "@blocknote/core";
-import { ArrowLeft, Calendar, Clock, User2 } from "lucide-react";
-import { publicCreateComment, publicFetchComments } from "@/lib/utils/blog/publicBlogApi";
+import { ArrowLeft, Calendar, Clock, User2, ChevronLeft, ChevronRight } from "lucide-react";
+import { publicCountView, publicCreateComment, publicFetchComments } from "@/lib/utils/blog/publicBlogApi";
 
 const BlockNote = dynamic(() => import("@/components/BlockNote"), { ssr: false });
 
@@ -20,10 +20,42 @@ function fmtDate(d?: any) {
   }
 }
 
-export default function BlogPostClient({ slug, initialPost, initialComments, initialRelated = [] }: { slug: string; initialPost: any; initialComments: any[]; initialRelated?: any[] }) {
+function safeInt(v: any, fallback: number) {
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+export default function BlogPostClient({
+  slug,
+  initialPost,
+  initialComments,
+  initialRelated = [],
+  initialCommentsMeta,
+}: {
+  slug: string;
+  initialPost: any;
+  initialComments: any[];
+  initialRelated?: any[];
+  // If your SSR page isn’t passing this yet, we still work (we’ll fetch meta on mount).
+  initialCommentsMeta?: any;
+}) {
   const router = useRouter();
+
+  // ----- COMMENTS PAGINATION STATE -----
+  const DEFAULT_PAGE_SIZE = 10;
+
   const [comments, setComments] = React.useState<any[]>(initialComments ?? []);
+  const [commentsMeta, setCommentsMeta] = React.useState<any>(initialCommentsMeta ?? null);
+
+  const [commentsPage, setCommentsPage] = React.useState<number>(safeInt(initialCommentsMeta?.page, 1));
+  const [pageSize, setPageSize] = React.useState<number>(safeInt(initialCommentsMeta?.pageSize, DEFAULT_PAGE_SIZE));
+
+  const [commentsBusy, setCommentsBusy] = React.useState(false);
+
+  // ----- RELATED -----
   const [related, setRelated] = React.useState<any[]>(initialRelated ?? []);
+
+  // ----- COMMENT FORM -----
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [comment, setComment] = React.useState("");
@@ -32,10 +64,46 @@ export default function BlogPostClient({ slug, initialPost, initialComments, ini
 
   const bannerUrl = initialPost?.bannerImage?.url ?? null;
 
-  async function refresh() {
-    const data = await publicFetchComments(slug);
-    setComments(data.items);
+  // Helpers derived from meta (supports both “totalPages/hasPrev/hasNext” or “total”)
+  const totalPages = React.useMemo(() => {
+    const m = commentsMeta ?? {};
+    if (typeof m.totalPages === "number") return m.totalPages;
+    const total = typeof m.total === "number" ? m.total : undefined;
+    const ps = typeof m.pageSize === "number" ? m.pageSize : pageSize;
+    if (typeof total === "number" && ps > 0) return Math.max(1, Math.ceil(total / ps));
+    return 1;
+  }, [commentsMeta, pageSize]);
+
+  const hasPrev = React.useMemo(() => {
+    const m = commentsMeta ?? {};
+    if (typeof m.hasPrev === "boolean") return m.hasPrev;
+    return commentsPage > 1;
+  }, [commentsMeta, commentsPage]);
+
+  const hasNext = React.useMemo(() => {
+    const m = commentsMeta ?? {};
+    if (typeof m.hasNext === "boolean") return m.hasNext;
+    return commentsPage < totalPages;
+  }, [commentsMeta, commentsPage, totalPages]);
+
+  async function fetchComments(page: number, nextPageSize = pageSize) {
+    setCommentsBusy(true);
+    try {
+      const data = await publicFetchComments(slug, { page, pageSize: nextPageSize, sortBy: "createdAt", sortDir: "desc" });
+      setComments(data.items ?? []);
+      setCommentsMeta(data.meta ?? null);
+      setCommentsPage(page);
+      setPageSize(nextPageSize);
+    } finally {
+      setCommentsBusy(false);
+    }
   }
+
+  // Ensure we have meta even if SSR didn’t provide it (and avoid 200-size fetch)
+  React.useEffect(() => {
+    if (commentsMeta) return;
+    fetchComments(1, DEFAULT_PAGE_SIZE).catch(() => {});
+  }, [slug]);
 
   async function submit() {
     setErr(null);
@@ -45,7 +113,10 @@ export default function BlogPostClient({ slug, initialPost, initialComments, ini
       setName("");
       setEmail("");
       setComment("");
-      await refresh();
+
+      // After posting, jump to page 1 to show newest comment (since sort desc)
+      await fetchComments(1, pageSize);
+
       router.refresh();
     } catch (e: any) {
       setErr(e?.message || "Failed to post comment");
@@ -76,7 +147,29 @@ export default function BlogPostClient({ slug, initialPost, initialComments, ini
       setRelated(items.slice(0, 3));
     }
     run();
-  }, [slug]);
+  }, [slug]); // keep as you had
+
+  // Count views once per tab session
+  React.useEffect(() => {
+    // only count if the post is present + published
+    if (!slug) return;
+    if (initialPost?.status && String(initialPost.status) !== "PUBLISHED") return;
+
+    const key = `npt_blog_viewed:${slug}`;
+    try {
+      if (typeof window === "undefined") return;
+
+      // sessionStorage = once per tab session (good UX, avoids inflating on back/forward)
+      const already = window.sessionStorage.getItem(key);
+      if (already) return;
+
+      window.sessionStorage.setItem(key, "1");
+      publicCountView(slug);
+    } catch {
+      // if storage blocked, fall back to counting (rare)
+      publicCountView(slug);
+    }
+  }, [slug]); // intentionally only on slug change
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-white">
@@ -134,52 +227,124 @@ export default function BlogPostClient({ slug, initialPost, initialComments, ini
 
             {/* COMMENTS */}
             <div className="mt-8 rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm">
-              <div className="text-lg font-semibold text-slate-900">Comments</div>
+              <div className="flex items-center justify-between">
+                <div className="text-lg font-semibold text-slate-900">Comments</div>
+
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  {commentsMeta?.total ? <span>{commentsMeta.total} total</span> : null}
+                  {commentsBusy ? <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1">Loading…</span> : null}
+                </div>
+              </div>
 
               {err ? <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{err}</div> : null}
 
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name *"
-                  className="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-4 focus:ring-slate-900/5"
-                />
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email (optional)"
-                  className="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-4 focus:ring-slate-900/5"
-                />
+              {/* Form */}
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600">Name *</label>
+                    <input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:ring-4 focus:ring-slate-900/5"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600">Email (optional)</label>
+                    <input
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@company.com"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:ring-4 focus:ring-slate-900/5"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-3">
+                  <label className="mb-1 block text-xs font-medium text-slate-600">Comment</label>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Write a comment…"
+                    rows={3}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:ring-4 focus:ring-slate-900/5"
+                  />
+                </div>
+
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <div className="text-xs text-slate-500">Be respectful. Your comment appears immediately.</div>
+
+                  <button
+                    disabled={busy || !name.trim() || !comment.trim()}
+                    onClick={submit}
+                    className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50"
+                  >
+                    {busy ? "Posting…" : "Post"}
+                  </button>
+                </div>
               </div>
 
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Write a comment…"
-                rows={4}
-                className="mt-3 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-4 focus:ring-slate-900/5"
-              />
+              {/* Thread */}
+              <div className="mt-6">
+                {comments.length ? (
+                  <>
+                    <div className="divide-y divide-slate-200">
+                      {comments.map((c) => {
+                        const initial = (c?.name?.trim?.()?.[0] || "U").toUpperCase();
+                        return (
+                          <div key={String(c.id)} className="py-4">
+                            <div className="flex items-start gap-3">
+                              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">{initial}</div>
 
-              <button
-                disabled={busy || !name.trim() || !comment.trim()}
-                onClick={submit}
-                className="mt-3 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50"
-              >
-                Post comment
-              </button>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                  <div className="text-sm font-semibold text-slate-900">{c.name}</div>
+                                  <div className="text-xs text-slate-500">•</div>
+                                  <div className="text-xs text-slate-500">{c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}</div>
+                                </div>
 
-              <div className="mt-6 space-y-3">
-                {comments.map((c) => (
-                  <div key={String(c.id)} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="text-sm font-semibold text-slate-900">{c.name}</div>
-                      <div className="shrink-0 text-xs text-slate-500">{c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}</div>
+                                <div className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{c.comment}</div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                    <div className="mt-2 whitespace-pre-wrap text-sm text-slate-700">{c.comment}</div>
-                  </div>
-                ))}
-                {!comments.length ? <div className="text-sm text-slate-500">No comments yet.</div> : null}
+
+                    {/* Pagination */}
+                    <div className="mt-6 flex items-center justify-center">
+                      <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 shadow-sm">
+                        <button
+                          type="button"
+                          disabled={commentsBusy || !hasPrev}
+                          onClick={() => fetchComments(Math.max(1, commentsPage - 1))}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 disabled:opacity-40"
+                          aria-label="Previous page"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+
+                        <div className="px-2 text-xs text-slate-600">
+                          Page <span className="font-semibold text-slate-900">{commentsPage}</span> of <span className="font-semibold text-slate-900">{totalPages}</span>
+                        </div>
+
+                        <button
+                          type="button"
+                          disabled={commentsBusy || !hasNext}
+                          onClick={() => fetchComments(commentsPage + 1)}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 disabled:opacity-40"
+                          aria-label="Next page"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-4 text-sm text-slate-500">No comments yet. Be the first to share your thoughts.</div>
+                )}
               </div>
             </div>
           </div>
@@ -210,7 +375,7 @@ export default function BlogPostClient({ slug, initialPost, initialComments, ini
                 <div className="mt-3 divide-y divide-slate-200">
                   {related.slice(0, 3).map((p: any) => (
                     <Link key={String(p.id)} href={`/blog/${encodeURIComponent(p.slug)}`} className="block py-3 transition hover:opacity-80">
-                      <div className="text-sm font-semibold text-slate-900 line-clamp-2">{p.title}</div>
+                      <div className="line-clamp-2 text-sm font-semibold text-slate-900">{p.title}</div>
                       <div className="mt-1 text-xs text-slate-500">{fmtDate(p.publishedAt)}</div>
                     </Link>
                   ))}
