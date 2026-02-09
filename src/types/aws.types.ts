@@ -3,43 +3,20 @@ import { EFileMimeType } from "./shared.types";
 
 /** High-level “bucket namespaces” you can extend any time. */
 export enum ES3Namespace {
-  BLOGS = "blogs",
+  BLOG_POSTS = "blog-posts",
 }
 
 /**
  * Logical folder fragments (NO namespace or IDs).
- * Reusable across namespaces.
- *
- * These align with onboarding sections: government IDs, bank docs,
- * employment history, declaration/signature, and generated PDFs.
+ * For NPT Logistics, we currently only support blog media uploads.
  */
 export enum ES3Folder {
-  // Government IDs (India / Canada / US)
-  GOV_AADHAAR = "government-ids/aadhaar",
-  GOV_PAN = "government-ids/pan",
-  GOV_PASSPORT = "government-ids/passport",
-  GOV_DRIVERS_LICENSE = "government-ids/drivers-license",
-  GOV_SIN = "government-ids/sin",
-  GOV_SSN = "government-ids/ssn",
-  GOV_PR_CARD = "government-ids/pr-card",
-  GOV_GREEN_CARD = "government-ids/green-card",
-  GOV_WORK_PERMIT = "government-ids/work-permit",
-
-  // Bank & payment details
-  BANK_VOID_CHEQUE = "bank/void-cheque",
-  BANK_DIRECT_DEPOSIT = "bank/direct-deposit",
-  BANK_VOID_CHEQUE_OR_DEPOSIT_SLIP = "bank/void-cheque-or-deposit-slip",
-
-  // Education & employment
-  EDUCATION = "education",
-  EMPLOYMENT_CERTIFICATES = "employment/certificates",
-
-  // Declaration & signature (final step)
-  DECLARATION_SIGNATURE = "declaration/signature",
+  BLOG_MEDIA_IMAGES = "media/images",
+  BLOG_MEDIA_VIDEOS = "media/videos",
 }
 
 export interface IPresignRequest {
-  /** Top-level namespace (e.g., "onboardings"). */
+  /** Top-level namespace (e.g., "blogs"). */
   namespace: ES3Namespace;
 
   /** Folder fragment (no namespace/id inside). */
@@ -48,14 +25,14 @@ export interface IPresignRequest {
   /** Optional client-suggested filename (server still appends a UUID). */
   filename?: string;
 
-  /** Content-Type (e.g., "image/jpeg", "application/pdf"). */
+  /** Content-Type (e.g., "image/jpeg", "video/mp4"). */
   mimeType: EFileMimeType;
 
   /**
-   * Optional entity id (e.g., onboardingId).
+   * Optional entity id (e.g., blogPostId).
    * Typical shapes (server-side convention):
-   *  - with id:    onboardings/{namespace}/{docId}/{folder}/{file}
-   *  - without id: onboardings/{namespace}/{folder}/{file}
+   *  - with id:    temp-files/blogs/{docId}/{folder}/{file}
+   *  - without id: temp-files/blogs/{folder}/{file}
    */
   docId?: string;
 

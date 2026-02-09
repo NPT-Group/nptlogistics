@@ -1,17 +1,57 @@
 // src/types/shared.types.ts
 
 export enum EFileMimeType {
+  // Images
   JPEG = "image/jpeg",
   JPG = "image/jpg",
   PNG = "image/png",
+  WEBP = "image/webp",
+
+  // Videos (blog media)
+  MP4 = "video/mp4",
+  WEBM = "video/webm",
+  MOV = "video/quicktime",
+
+  // Documents (kept for reuse elsewhere)
   PDF = "application/pdf",
   DOC = "application/msword",
   DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 }
 
 /**
- * Generic file asset stored in S3 (images, PDFs, docs, etc.).
- * Optional metadata enables better validation/UX but is not required.
+ * Canonical MIME → file extension map.
+ * Single source of truth for S3 keys, uploads, downloads, and validation.
+ */
+export const MIME_TO_EXT_MAP: Record<EFileMimeType, string> = {
+  // Images
+  [EFileMimeType.JPEG]: "jpeg",
+  [EFileMimeType.JPG]: "jpg",
+  [EFileMimeType.PNG]: "png",
+  [EFileMimeType.WEBP]: "webp",
+
+  // Videos
+  [EFileMimeType.MP4]: "mp4",
+  [EFileMimeType.WEBM]: "webm",
+  [EFileMimeType.MOV]: "mov",
+
+  // Documents
+  [EFileMimeType.PDF]: "pdf",
+  [EFileMimeType.DOC]: "doc",
+  [EFileMimeType.DOCX]: "docx",
+};
+
+/** Grouped helpers (reusable everywhere) */
+export const IMAGE_MIME_TYPES: readonly EFileMimeType[] = [EFileMimeType.JPEG, EFileMimeType.JPG, EFileMimeType.PNG, EFileMimeType.WEBP];
+
+export const VIDEO_MIME_TYPES: readonly EFileMimeType[] = [EFileMimeType.MP4, EFileMimeType.WEBM, EFileMimeType.MOV];
+
+/** Runtime helpers */
+export const isImageMime = (mt?: string) => typeof mt === "string" && mt.toLowerCase().startsWith("image/");
+
+export const isVideoMime = (mt?: string) => typeof mt === "string" && mt.toLowerCase().startsWith("video/");
+
+/**
+ * Generic file asset stored in S3.
  */
 export type IFileAsset = {
   url: string;
@@ -20,19 +60,6 @@ export type IFileAsset = {
   sizeBytes?: number;
   originalName?: string;
 };
-
-/** Runtime helper */
-export const isImageMime = (mt?: string) => typeof mt === "string" && mt.toLowerCase().startsWith("image/");
-
-/**
- * Subsidiaries for NPT onboarding.
- * Used across dashboard, onboarding, and PDFs.
- */
-export enum ESubsidiary {
-  INDIA = "IN",
-  CANADA = "CA",
-  USA = "US",
-}
 
 /**
  * Geolocation data structure.
@@ -44,16 +71,4 @@ export interface IGeoLocation {
   timezone?: string;
   latitude?: number; // GPS latitude
   longitude?: number; // GPS longitude
-}
-
-/**
- * Common residential address structure (current address).
- */
-export interface IResidentialAddress {
-  addressLine1: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  fromDate: Date | string; // ISO
-  toDate: Date | string; // ISO
 }

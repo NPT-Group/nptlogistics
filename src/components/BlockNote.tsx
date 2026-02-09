@@ -8,39 +8,71 @@ import { BlockNoteView } from "@blocknote/mantine";
 import { useCreateBlockNote } from "@blocknote/react";
 import type { PartialBlock } from "@blocknote/core";
 import { MantineProvider } from "@mantine/core";
+import type { UploadResult } from "@/lib/utils/s3Helper";
 
 type Props = {
-  initialContent?: PartialBlock[]; // JSON from DB
+  initialContent?: PartialBlock[];
   onChange?: (doc: PartialBlock[]) => void;
   editable?: boolean;
+
+  /**
+   * Upload handler must return full UploadResult.
+   * BlockNote will use result.url to render, and will inject result into block props.
+   */
+  uploadFile?: (file: File) => Promise<UploadResult>;
 };
 
-async function uploadToYourServer(file: File): Promise<string> {
-  const form = new FormData();
-  form.append("file", file);
+function injectAssetsIntoBlocks(blocks: PartialBlock[], urlToAsset: Map<string, UploadResult>): PartialBlock[] {
+  const walk = (b: PartialBlock[]): PartialBlock[] =>
+    b.map((block) => {
+      const next: PartialBlock = {
+        ...block,
+        props: { ...(block.props as any) },
+        children: Array.isArray((block as any).children) ? walk((block as any).children) : [],
+      };
 
-  const res = await fetch("/api/uploads", { method: "POST", body: form });
-  if (!res.ok) throw new Error("Upload failed");
+      // BlockNote media blocks typically store URL on props.url
+      const props: any = next.props || {};
+      const url: string | undefined = typeof props.url === "string" ? props.url : undefined;
 
-  const data = (await res.json()) as { url: string };
-  return data.url; // must be a public URL that the editor can load
+      // Inject full asset shape if we have it and it's not already present
+      if (url && !props.asset) {
+        const asset = urlToAsset.get(url);
+        if (asset) {
+          props.asset = asset;
+          next.props = props;
+        }
+      }
+
+      return next;
+    });
+
+  return walk(blocks);
 }
 
-export default function BlockNote({ initialContent, onChange, editable = true }: Props) {
+export default function BlockNote({ initialContent, onChange, editable = true, uploadFile }: Props) {
+  // Cache uploaded assets by URL so we can inject the full shape back into JSON
+  const urlToAssetRef = React.useRef<Map<string, UploadResult>>(new Map());
+
   const editor = useCreateBlockNote({
     initialContent: initialContent ?? undefined,
     uploadFile: async (file) => {
-      return await uploadToYourServer(file);
+      if (!uploadFile) {
+        throw new Error("Uploads are disabled (no uploadFile handler provided).");
+      }
+      const result = await uploadFile(file);
+      urlToAssetRef.current.set(result.url, result);
+      return result.url; // BlockNote requires a URL string
     },
-    // BlockNote already includes the demo-style “+” inserter + 6-dot handle UI.
   });
 
   React.useEffect(() => {
     if (!onChange) return;
 
     const unsubscribe = editor.onChange(() => {
-      // Persistable JSON (store this in your DB)
-      onChange(editor.document as PartialBlock[]);
+      const raw = editor.document as PartialBlock[];
+      const withAssets = injectAssetsIntoBlocks(raw, urlToAssetRef.current);
+      onChange(withAssets);
     });
 
     return () => unsubscribe();
@@ -48,7 +80,6 @@ export default function BlockNote({ initialContent, onChange, editable = true }:
 
   return (
     <MantineProvider defaultColorScheme="light">
-      {/* Scope wrapper: helpful if you later need scoped CSS overrides */}
       <div className="bn-scope">
         <div
           style={{
