@@ -75,7 +75,6 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative">
-        {/* trigger */}
         <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
           <motion.div
             className={cn(
