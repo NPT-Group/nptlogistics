@@ -23,8 +23,10 @@
     "next": "16.1.6",
     "next-auth": "^4.24.13",
     "react": "19.2.3",
+    "react-chatbot-kit": "^2.2.2",
     "react-dom": "19.2.3",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

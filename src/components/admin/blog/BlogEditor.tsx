@@ -1,3 +1,4 @@
+// src/components/admin/blog/BlogEditor.tsx
 "use client";
 
 import * as React from "react";
@@ -149,7 +150,8 @@ export default function BlogEditor(props: Props) {
   const [categorySearch, setCategorySearch] = React.useState("");
 
   const [saving, setSaving] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<{ message: string; nonce: number } | null>(null);
+  const errorRef = React.useRef<HTMLDivElement | null>(null);
 
   const baselineRef = React.useRef<string>("");
 
@@ -195,8 +197,18 @@ export default function BlogEditor(props: Props) {
   }
 
   React.useEffect(() => {
-    refreshCategories().catch((e) => setError(e?.message || "Failed to load categories"));
+    refreshCategories().catch((e) => setError({ message: e?.message || "Failed to load categories", nonce: Date.now() }));
   }, []);
+
+  React.useEffect(() => {
+    if (!error) return;
+    // next frame ensures the DOM is painted before scrolling
+    requestAnimationFrame(() => {
+      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      // optional: focus for accessibility / consistent positioning
+      errorRef.current?.focus?.();
+    });
+  }, [error?.nonce]);
 
   async function onCreateCategory(name: string) {
     const created = await adminCreateCategory(name);
@@ -248,7 +260,7 @@ export default function BlogEditor(props: Props) {
       await fn(payload);
       markSavedNow();
     } catch (e: any) {
-      setError(e?.message || "Failed to save.");
+      setError({ message: e?.message || "Failed to save.", nonce: Date.now() });
     } finally {
       setSaving(false);
     }
@@ -317,12 +329,15 @@ export default function BlogEditor(props: Props) {
               </button>
             </div>
           </div>
-
           <div className="mt-4 lg:hidden">
             <ChangePill saving={saving} isDirty={isDirty} />
           </div>
 
-          {error ? <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
+          {error ? (
+            <div ref={errorRef} tabIndex={-1} className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error.message}
+            </div>
+          ) : null}
         </div>
 
         {/* Main */}

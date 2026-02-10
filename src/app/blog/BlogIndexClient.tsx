@@ -5,6 +5,9 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Calendar, Clock, Search, ArrowRight, Tag } from "lucide-react";
+import Image from "next/image";
+import GuidedChatbot from "@/lib/chatbot/GuidedChatbot";
+import { useChatActionsStore } from "@/lib/chatbot/chatActions.store";
 
 type CategoryItem = {
   id: string;
@@ -26,9 +29,10 @@ function fmtDate(d?: any) {
   }
 }
 
-function BannerImg({ url, alt, className }: { url?: string | null; alt: string; className?: string }) {
+function BannerImg({ url, alt, className, priority, sizes }: { url?: string | null; alt: string; className?: string; priority?: boolean; sizes?: string }) {
   if (!url) return <div className={cx("bg-gray-100", className)} />;
-  return <img src={url} alt={alt} className={cx("h-full w-full object-cover", className)} loading="lazy" />;
+
+  return <Image src={url} alt={alt} fill priority={priority} sizes={sizes} className={cx("object-cover", className)} />;
 }
 
 export default function BlogIndexClient({
@@ -71,6 +75,19 @@ export default function BlogIndexClient({
 
   const featuredBannerUrl = featured ? (typeof featured.bannerImage === "string" ? featured.bannerImage : (featured.bannerImage?.url ?? null)) : null;
 
+  const lastCommand = useChatActionsStore((s) => s.lastCommand);
+
+  React.useEffect(() => {
+    if (!lastCommand) return;
+    if (lastCommand.type !== "scrollTo") return;
+
+    const id = lastCommand.payload?.anchorId;
+    if (!id) return;
+
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [lastCommand]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-white">
       {/* HERO */}
@@ -79,7 +96,7 @@ export default function BlogIndexClient({
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800" />
           <div className="absolute inset-0 opacity-30">
-            <img src="/images/blog-banner.jpg" alt="Blog banner" className="h-full w-full object-cover" loading="eager" />
+            <Image src="/images/blog-banner.jpg" alt="Blog banner" fill priority className="object-cover" />
           </div>
 
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/55 to-slate-950/15" />
@@ -127,9 +144,7 @@ export default function BlogIndexClient({
                 className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/5 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.6)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/10"
               >
                 <div className="relative h-56 sm:h-64">
-                  <div className="absolute inset-0">
-                    <BannerImg url={featuredBannerUrl} alt={featured.title ?? "Featured post"} className="h-full w-full" />
-                  </div>
+                  <BannerImg url={featuredBannerUrl} alt={featured.title ?? "Featured post"} className="h-full w-full" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent" />
                   <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
@@ -222,7 +237,7 @@ export default function BlogIndexClient({
                     className="group overflow-hidden rounded-[28px] border border-slate-200/70 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
                   >
                     <div className="relative h-44 overflow-hidden bg-slate-100">
-                      <BannerImg url={bannerUrl} alt={p.title ?? "Post banner"} />
+                      <BannerImg url={bannerUrl} alt={p.title ?? "Post banner"} sizes="(min-width: 640px) 50vw, 100vw" />
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-slate-950/10 to-transparent opacity-70 transition group-hover:opacity-90" />
                       <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
                         <div className="absolute inset-0 ring-2 ring-slate-900/10" />
@@ -357,6 +372,7 @@ export default function BlogIndexClient({
           </aside>
         </div>
       </div>
+      <GuidedChatbot />
     </div>
   );
 }

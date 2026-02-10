@@ -1,0 +1,33 @@
+"use client";
+
+import React from "react";
+import { START_REPLIES } from "../knowledgeBase";
+
+export default function StartWidget(props: any) {
+  const { actionProvider } = props;
+
+  const onPick = (intent: string) => {
+    switch (intent) {
+      case "GET_QUOTE":
+        return actionProvider.startQuote();
+      case "SERVICES_HELP":
+        return actionProvider.startServicesHelp();
+      case "GENERAL_FAQ":
+        return actionProvider.searchFaq("services"); // placeholder behavior
+      case "HUMAN_CONTACT":
+        return actionProvider.showContact();
+      default:
+        return actionProvider.startOver();
+    }
+  };
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {START_REPLIES.map((r) => (
+        <button key={r.intent} onClick={() => onPick(r.intent)} className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50" type="button">
+          {r.label}
+        </button>
+      ))}
+    </div>
+  );
+}

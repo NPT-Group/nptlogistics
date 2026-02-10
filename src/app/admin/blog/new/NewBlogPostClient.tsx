@@ -1,3 +1,4 @@
+// src/app/admin/blog/new/NewBlogPostClient.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
