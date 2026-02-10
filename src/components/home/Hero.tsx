@@ -75,6 +75,7 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative">
+        {/* trigger */}
         <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
           <motion.div
             className={cn(
@@ -105,7 +106,7 @@ export function Hero() {
               variants={fadeUp}
               transition={{ duration: reduceMotion ? 0 : 0.5, ease: "easeOut" }}
               className={cn(
-                "max-w-4xl font-bold text-white leading-[1.05]",
+                "max-w-4xl leading-[1.05] font-bold text-white",
                 "text-4xl sm:text-5xl lg:text-6xl",
               )}
             >
