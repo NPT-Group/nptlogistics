@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { START_REPLIES } from "../knowledgeBase";
 
 export default function StartWidget(props: any) {

@@ -103,9 +103,7 @@ export default function GuidedChatbot() {
         </div>
 
         {/* Body */}
-        <div className="h-[520px]">
-          <Chatbot config={botConfig as any} messageParser={MessageParser as any} actionProvider={ActionProvider as any} placeholderText="Type your message…" />
-        </div>
+        <Chatbot config={botConfig as any} messageParser={MessageParser as any} actionProvider={ActionProvider as any} placeholderText="Type your message…" />
       </div>
 
       {/* Launcher cluster (only when closed) */}

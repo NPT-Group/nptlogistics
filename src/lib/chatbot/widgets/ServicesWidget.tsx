@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 export default function ServicesWidget(props: any) {
   const { actionProvider } = props;
 

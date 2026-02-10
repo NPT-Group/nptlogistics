@@ -7,7 +7,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Calendar, Clock, Search, ArrowRight, Tag } from "lucide-react";
 import Image from "next/image";
 import GuidedChatbot from "@/lib/chatbot/GuidedChatbot";
-import { useChatActionsStore } from "@/lib/chatbot/chatActions.store";
 
 type CategoryItem = {
   id: string;
@@ -74,19 +73,6 @@ export default function BlogIndexClient({
   }
 
   const featuredBannerUrl = featured ? (typeof featured.bannerImage === "string" ? featured.bannerImage : (featured.bannerImage?.url ?? null)) : null;
-
-  const lastCommand = useChatActionsStore((s) => s.lastCommand);
-
-  React.useEffect(() => {
-    if (!lastCommand) return;
-    if (lastCommand.type !== "scrollTo") return;
-
-    const id = lastCommand.payload?.anchorId;
-    if (!id) return;
-
-    const el = document.getElementById(id);
-    el?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [lastCommand]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-white">

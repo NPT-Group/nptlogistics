@@ -44,34 +44,6 @@ body {
   padding-right: 12px !important;
 }
 
-/* --- Remove extra whitespace at bottom and tighten layout --- */
-.react-chatbot-kit-chat-inner-container {
-  height: 100% !important;
-  border-radius: 0 !important; /* we already have rounded outer shell */
-}
-
-.react-chatbot-kit-chat-message-container {
-  margin: 0 !important;
-  padding: 12px !important;
-  padding-bottom: 8px !important;
-}
-
-.react-chatbot-kit-chat-input-container {
-  margin: 0 !important;
-  padding: 10px 12px !important;
-  border-top: 1px solid #e5e7eb !important;
-}
-
 .react-chatbot-kit-chat-input {
-  margin: 0 !important;
-}
-
-.react-chatbot-kit-chat-btn-send {
-  margin: 0 !important;
-}
-
-/* Some builds wrap input area with extra spacing */
-.react-chatbot-kit-chat-footer {
-  margin: 0 !important;
-  padding: 0 !important;
+  border-bottom-left-radius: 15px !important;
 }

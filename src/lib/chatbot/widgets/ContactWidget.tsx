@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { CONTACT_INFO } from "../knowledgeBase";
 
 export default function ContactWidget() {
