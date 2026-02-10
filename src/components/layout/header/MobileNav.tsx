@@ -225,7 +225,6 @@ export function MobileNav() {
                   <Dialog.Description>Mobile navigation menu</Dialog.Description>
                 </VisuallyHidden>
 
-                {/* ✅ Fixed-height header row so it never “jumps” */}
                 <div className="h-16 border-b border-[color:var(--color-nav-border)] px-5">
                   <div className="flex h-16 items-center justify-between">
                     <Link
@@ -237,10 +236,9 @@ export function MobileNav() {
                       <Image
                         src="/brand/NPTlogo.png"
                         alt="NPT Logistics"
-                        width={0}
-                        height={0}
-                        sizes="100vw"
-                        className="h-auto w-[70px] object-contain sm:w-[90px]"
+                        width={220}
+                        height={80}
+                        className="h-auto w-[70px] object-contain sm:w-[90px] md:w-[110px]"
                         priority
                       />
                     </Link>
@@ -249,7 +247,7 @@ export function MobileNav() {
                       <button
                         type="button"
                         className={cn(
-                          // ✅ same size/shape as hamburger to prevent perceived shifting
+                          // same size/shape as hamburger to prevent perceived shifting
                           "inline-flex h-10 w-10 items-center justify-center rounded-full",
                           "text-[color:var(--color-nav-text)]",
                           "hover:bg-white/10",
@@ -280,7 +278,7 @@ export function MobileNav() {
                         onClick={closeAll}
                         className={cn(
                           "inline-flex h-11 items-center justify-center rounded-xl border px-4 text-sm font-semibold",
-                          "border-white/15",
+                          "border border-[color:var(--color-nav-border)]",
                           "text-white hover:bg-white/10",
                           focusRingNav,
                         )}
@@ -293,7 +291,7 @@ export function MobileNav() {
                         onClick={closeAll}
                         className={cn(
                           "inline-flex h-11 items-center justify-center rounded-xl border px-4 text-sm font-semibold",
-                          "border-white/15",
+                          "border border-[color:var(--color-nav-border)]",
                           "text-white hover:bg-white/10",
                           focusRingNav,
                         )}

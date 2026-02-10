@@ -22,7 +22,7 @@ export function SiteHeader() {
         "shadow-[0_1px_0_rgba(255,255,255,0.04)]",
       )}
     >
-      <Container>
+      <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo (NO hover background) */}
           <Link
@@ -33,9 +33,8 @@ export function SiteHeader() {
             <Image
               src="/brand/NPTlogo.png"
               alt="NPT Logistics"
-              width={0}
-              height={0}
-              sizes="100vw"
+              width={220}
+              height={80}
               className="h-auto w-[70px] object-contain sm:w-[90px] md:w-[110px]"
               priority
             />

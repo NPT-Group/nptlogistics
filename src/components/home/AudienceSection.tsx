@@ -1,133 +1,133 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/layout/Container";
-import { Section } from "@/components/layout/Section";
 import { cn } from "@/lib/cn";
-import { PackageSearch, Radar, Briefcase } from "lucide-react";
 
-const AUDIENCES = [
-  {
-    title: "I’m Shipping Freight",
-    description: "Explore shipping solutions for your freight, lanes, and requirements.",
-    href: "/solutions",
-    cta: "View Solutions",
-    icon: PackageSearch,
-  },
-  {
-    title: "Track an Existing Shipment",
-    description: "Check the latest status updates and shipment progress in real time.",
-    href: "/tracking",
-    cta: "Track Shipment",
-    icon: Radar,
-  },
-  {
-    title: "I Want to Work at NPT",
-    description: "View open driver and corporate opportunities across the network.",
-    href: "/careers",
-    cta: "View Jobs",
-    icon: Briefcase,
-  },
-] as const;
+const glassCard = cn(
+  "relative overflow-hidden rounded-2xl",
+  "border border-white/60 bg-white/[0.32] backdrop-blur-xl",
+  "shadow-[0_8px_32px_rgba(15,23,42,0.06),0_0_0_1px_rgba(255,255,255,0.4)_inset]",
+  "transition duration-300 ease-out",
+  "hover:-translate-y-1 hover:bg-white/45 hover:shadow-[0_20px_50px_rgba(15,23,42,0.1),0_0_0_1px_rgba(255,255,255,0.5)_inset] hover:border-white/70",
+);
+
+const cardLink = cn(
+  "mt-6 inline-flex items-center gap-2 rounded-lg py-2 pr-2.5 pl-3 -ml-3 text-sm font-semibold",
+  "text-[color:var(--color-brand-600)]",
+  "bg-[color:var(--color-brand-600)]/8",
+  "hover:bg-[color:var(--color-brand-600)]/14",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--audience-bg)]",
+  "[&>.arrow]:inline-block [&>.arrow]:transition-all [&>.arrow]:duration-300 [&>.arrow]:ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+  "[&:hover>.arrow]:translate-x-1.5 [&:hover>.arrow]:scale-110 [&:hover>.arrow]:opacity-100 [&>.arrow]:opacity-75",
+);
 
 export function AudienceSection() {
-  const reduceMotion = useReducedMotion();
-
   return (
-    <Section>
-      <div className="relative">
-        {/* This “bridge” background is what makes the site feel less dark right after the hero */}
-        <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-          {/* soft light wash */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.06] via-white/[0.03] to-transparent" />
-          {/* subtle spotlight */}
-          <div className="absolute top-0 left-1/2 h-[420px] w-[900px] -translate-x-1/2 rounded-full bg-white/[0.06] blur-3xl" />
-          {/* gentle top divider line */}
-          <div className="absolute top-0 right-0 left-0 h-px bg-white/10" />
+    <section
+      className={cn(
+        "relative overflow-hidden bg-[color:var(--audience-bg)]",
+        "py-12 sm:py-16",
+      )}
+    >
+      {/* Very subtle warmth — soft red tint from top, barely there */}
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-0",
+          "bg-[radial-gradient(800px_600px_at_80%_100%,rgba(220,38,38,0.06),transparent_50%)]",
+        )}
+        aria-hidden="true"
+      />
+
+      <Container>
+        <div className="relative mx-auto max-w-4xl text-center">
+          <div className="mx-auto mb-3 h-[2px] w-14 bg-[color:var(--color-brand-600)]/90" />
+
+          <div className="text-xs font-semibold tracking-wide text-[color:var(--audience-muted)]">
+            Choose your path
+          </div>
+
+          <h2 className="mt-3 text-3xl font-semibold text-[color:var(--audience-text)] sm:text-4xl">
+            Get the right answer fast, from a team built to execute.
+          </h2>
+
+          {/* Proof line: > reads as "more than" — minimal and confident */}
+          <p className="mt-4 flex flex-wrap items-center justify-center gap-x-1 gap-y-1 text-sm text-[color:var(--audience-muted)] sm:text-base">
+            <span className="font-medium text-[color:var(--audience-text)]">
+              <span className="font-semibold tabular-nums text-[color:var(--color-brand-600)]">
+                &gt;250k
+              </span>{" "}
+              loads moved
+            </span>
+            <span className="text-[color:var(--audience-muted)]/40" aria-hidden>
+              ·
+            </span>
+            <span className="font-medium text-[color:var(--audience-text)]">
+              <span className="font-semibold tabular-nums text-[color:var(--color-brand-600)]">
+                98%
+              </span>{" "}
+              on time
+            </span>
+            <span className="text-[color:var(--audience-muted)]/40" aria-hidden>
+              ·
+            </span>
+            <span className="font-medium text-[color:var(--audience-text)]">
+              <span className="font-semibold tabular-nums text-[color:var(--color-brand-600)]">
+                &gt;25k
+              </span>{" "}
+              cross border shipments
+            </span>
+          </p>
         </div>
 
-        <Container>
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.35 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-            className="py-10 sm:py-12"
-          >
-            <div className="grid gap-4 md:grid-cols-3 md:gap-6">
-              {AUDIENCES.map((item, idx) => {
-                const Icon = item.icon;
-
-                return (
-                  <motion.div
-                    key={item.title}
-                    initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-                    whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.35 }}
-                    transition={{
-                      duration: 0.45,
-                      ease: "easeOut",
-                      delay: reduceMotion ? 0 : idx * 0.06,
-                    }}
-                    className={cn(
-                      "group relative overflow-hidden rounded-2xl",
-                      "border border-white/10 bg-white/[0.05] backdrop-blur",
-                      "shadow-[0_10px_30px_rgba(0,0,0,0.35)]",
-                      "transition",
-                      "hover:border-white/15 hover:bg-white/[0.075]",
-                      "focus-within:ring-2 focus-within:ring-[var(--color-brand-600)] focus-within:ring-offset-2 focus-within:ring-offset-black/40",
-                    )}
-                  >
-                    {/* subtle hover sheen */}
-                    <div
-                      className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                      aria-hidden="true"
-                    >
-                      <div className="absolute -top-24 -left-24 h-56 w-56 rounded-full bg-white/[0.10] blur-2xl" />
-                      <div className="absolute -right-24 -bottom-24 h-56 w-56 rounded-full bg-[var(--color-brand-600)]/[0.10] blur-2xl" />
-                    </div>
-
-                    <div className="relative p-6">
-                      <div className="flex items-start gap-4">
-                        <div
-                          className={cn(
-                            "flex h-11 w-11 items-center justify-center rounded-xl",
-                            "border border-white/10 bg-white/[0.06]",
-                            "text-white/90",
-                          )}
-                          aria-hidden="true"
-                        >
-                          <Icon className="h-5 w-5" />
-                        </div>
-
-                        <div className="min-w-0">
-                          <h3 className="text-base font-semibold text-white">{item.title}</h3>
-                          <p className="mt-1 text-sm leading-relaxed text-white/75">
-                            {item.description}
-                          </p>
-
-                          <Link
-                            href={item.href}
-                            className={cn(
-                              "mt-4 inline-flex items-center gap-2 text-sm font-medium",
-                              "text-white underline-offset-4",
-                              "hover:underline",
-                              "focus:outline-none",
-                            )}
-                          >
-                            {item.cta} <span aria-hidden>→</span>
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
+        <div className="relative mt-8 grid gap-4 lg:grid-cols-3">
+          {[
+            {
+              title: "I'm Shipping Freight",
+              description:
+                "Find the right service for your lane, timeline, and requirements with a fast response.",
+              href: "/#core-solutions",
+              label: "Explore Solutions",
+            },
+            {
+              title: "I Need Tracking or Status",
+              description:
+                "Get shipment status and updates with a clear path to the right team when you need help.",
+              href: "/tracking",
+              label: "Track Shipment",
+            },
+            {
+              title: "I Want to Work at NPT",
+              description:
+                "View open roles and join a team built on safety, discipline, and operational excellence.",
+              href: "/careers/jobs",
+              label: "View Jobs",
+            },
+          ].map((card) => (
+            <div key={card.href} className={glassCard}>
+              {/* Subtle red tint bottom-right for elegant glass */}
+              <div
+                className="absolute inset-0 rounded-2xl bg-gradient-to-br from-transparent via-transparent to-[color:var(--color-brand-500)]/10 pointer-events-none"
+                aria-hidden
+              />
+              <div className="relative z-10 p-6">
+                <div className="text-lg font-semibold text-[color:var(--audience-text)]">
+                  {card.title}
+                </div>
+                <p className="mt-2 text-sm leading-relaxed text-[color:var(--audience-muted)]">
+                  {card.description}
+                </p>
+                <Link href={card.href} className={cardLink}>
+                  {card.label}
+                  <span aria-hidden className="arrow">
+                    →
+                  </span>
+                </Link>
+              </div>
             </div>
-          </motion.div>
-        </Container>
-      </div>
-    </Section>
+          ))}
+        </div>
+      </Container>
+    </section>
   );
 }

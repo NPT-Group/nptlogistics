@@ -1,9 +1,10 @@
 @import "./styles/theme.css";
 @import "tailwindcss";
 
+/* Prevent horizontal overflow and scrollbar; clip is stricter than hidden (no scroll container). */
 html {
   overflow-x: clip;
 }
 body {
-  overflow-x: visible;
+  overflow-x: clip;
 }

@@ -2,12 +2,8 @@
 
 import React from "react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { cn } from "@/lib/cn";
 import { NAV } from "@/config/navigation";
 import { DesktopRichDropdown, SolutionsMegaMenu } from "@/components/layout/header/NavMenuParts";
-
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-panel-ring)] focus-visible:ring-offset-0";
 
 export function DesktopNav() {
   const [value, setValue] = React.useState<string>("");
@@ -45,7 +41,7 @@ export function DesktopNav() {
         delayDuration={0}
         skipDelayDuration={0}
       >
-        <NavigationMenu.List className="flex items-center gap-1">
+        <NavigationMenu.List className="flex items-center gap-3">
           <SolutionsMegaMenu
             valueKey="solutions"
             value={value}
@@ -81,17 +77,6 @@ export function DesktopNav() {
             cancelClose={cancelClose}
           />
         </NavigationMenu.List>
-
-        <NavigationMenu.Viewport
-          className={cn(
-            "fixed top-16 right-0 left-0 z-50",
-            "origin-top-center perspective",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out data-[state=open]:fade-in",
-          )}
-        />
-
-        <span className={cn("sr-only", focusRing)} />
       </NavigationMenu.Root>
     </div>
   );

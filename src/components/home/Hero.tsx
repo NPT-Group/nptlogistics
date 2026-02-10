@@ -9,43 +9,30 @@ const VIDEO_DESKTOP = "/hero/hero-desktop.mp4";
 const VIDEO_MOBILE = "/hero/hero-mobile.mp4";
 const POSTER = "/hero/hero-poster.png";
 
+const focusRing =
+  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-black/40";
+
 export function Hero() {
   const reduceMotion = useReducedMotion();
 
   const stagger: Variants = reduceMotion
-    ? {
-        hidden: { opacity: 1 },
-        show: { opacity: 1 },
-      }
-    : {
-        hidden: {},
-        show: {
-          transition: { staggerChildren: 0.08, delayChildren: 0.05 },
-        },
-      };
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.06 } } };
 
   const fadeUp: Variants = reduceMotion
-    ? {
-        hidden: { opacity: 1, y: 0 },
-        show: { opacity: 1, y: 0 },
-      }
-    : {
-        hidden: { opacity: 0, y: 10 },
-        show: { opacity: 1, y: 0 },
-      };
+    ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } }
+    : { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
 
   return (
     <section className="relative overflow-hidden">
       {/* Background media */}
       <div className="absolute inset-0">
-        {/* Poster fallback ALWAYS exists */}
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${POSTER})` }}
           aria-hidden="true"
         />
 
-        {/* Desktop video */}
         <video
           className="absolute inset-0 hidden h-full w-full object-cover md:block"
           autoPlay
@@ -59,7 +46,6 @@ export function Hero() {
           <source src={VIDEO_DESKTOP} type="video/mp4" />
         </video>
 
-        {/* Mobile video */}
         <video
           className="absolute inset-0 block h-full w-full object-cover md:hidden"
           autoPlay
@@ -73,27 +59,28 @@ export function Hero() {
           <source src={VIDEO_MOBILE} type="video/mp4" />
         </video>
 
-        {/* Cinematic overlays */}
-        <div className="absolute inset-0 bg-black/25" aria-hidden="true" />
+        {/* Overlays */}
+        <div className="absolute inset-0 bg-black/35" aria-hidden="true" />
         <div
-          className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-black/10"
+          className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-black/15"
           aria-hidden="true"
         />
+
+        {/* Bottom fade into site background — shorter so more video shows */}
         <div
-          className="absolute inset-0 bg-black/30 [mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_100%)]"
+          className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-[color:var(--color-surface-0)]"
           aria-hidden="true"
         />
       </div>
 
       {/* Content */}
       <div className="relative">
-        <Container>
+        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
           <motion.div
             className={cn(
-              "relative z-10",
-              "min-h-[calc(100svh-64px)]",
-              "flex flex-col justify-center",
-              "py-16 sm:py-20",
+              "relative z-10 flex flex-col justify-center",
+              "min-h-[82svh] md:min-h-[78svh]",
+              "pt-14 pb-24 sm:pt-20 sm:pb-28 lg:pt-24",
             )}
             initial="hidden"
             animate="show"
@@ -104,34 +91,46 @@ export function Hero() {
               variants={fadeUp}
               transition={{ duration: reduceMotion ? 0 : 0.35, ease: "easeOut" }}
               className={cn(
-                "mb-4 inline-flex w-fit items-center gap-2 rounded-full",
-                "border border-white/20 bg-white/10 px-3 py-1 text-xs text-white",
+                "mb-5 inline-flex w-fit items-center gap-2 rounded-full",
+                "border border-white/18 bg-white/10 px-3 py-1 text-xs text-white",
                 "backdrop-blur",
               )}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-brand-600)]" />
-              Asset-based trucking • North America
+              <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-600)]" />
+              Asset based trucking across North America
             </motion.span>
 
             {/* Headline */}
             <motion.h1
               variants={fadeUp}
-              transition={{ duration: reduceMotion ? 0 : 0.45, ease: "easeOut" }}
-              className="max-w-2xl text-4xl leading-tight font-semibold text-white sm:text-5xl lg:text-6xl"
+              transition={{ duration: reduceMotion ? 0 : 0.5, ease: "easeOut" }}
+              className={cn(
+                "max-w-4xl font-bold text-white leading-[1.05]",
+                "text-4xl sm:text-5xl lg:text-6xl",
+              )}
             >
-              Reliable freight solutions
-              <br className="hidden sm:block" /> across North America
+              North America moves fast.
+              <br className="hidden sm:block" />
+              Your freight should too.
             </motion.h1>
 
-            {/* Subcopy */}
-            <motion.p
+            {/* Subtext with left accent — no box, clean bar + type only */}
+            <motion.div
               variants={fadeUp}
               transition={{ duration: reduceMotion ? 0 : 0.45, ease: "easeOut" }}
-              className="mt-4 max-w-xl text-base text-white/80 sm:text-lg"
+              className="mt-5 max-w-2xl"
             >
-              Truckload, LTL, intermodal, and cross-border shipping built on compliance, visibility,
-              and execution.
-            </motion.p>
+              <p
+                className={cn(
+                  "border-l-2 border-[color:var(--color-brand-500)] pl-5",
+                  "text-base text-pretty text-white/90 sm:text-lg",
+                  "leading-relaxed tracking-wide",
+                )}
+              >
+                Truckload, LTL, intermodal, and cross border shipping with proactive updates,
+                compliance first execution, and clear handoffs from pickup to delivery.
+              </p>
+            </motion.div>
 
             {/* CTAs */}
             <motion.div
@@ -140,46 +139,48 @@ export function Hero() {
               className="mt-8 flex flex-wrap items-center gap-3"
             >
               <Link
-                href="/quote"
+                href="/contact"
                 className={cn(
-                  "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-medium",
-                  "bg-white text-black hover:bg-white/90",
-                  "focus-visible:ring-2 focus-visible:ring-[var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:ring-offset-black/40 focus-visible:outline-none",
+                  "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold",
+                  "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",
+                  "shadow-sm shadow-black/25",
+                  focusRing,
                 )}
               >
-                Request a Quote
+                Contact Us
               </Link>
 
               <Link
-                href="/#core-solutions"
+                href="/#solutions"
                 className={cn(
-                  "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-medium",
-                  "border border-white/20 bg-white/10 text-white hover:bg-white/15",
+                  "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold",
+                  "border border-white/22 bg-white/10 text-white hover:bg-white/15",
                   "backdrop-blur",
-                  "focus-visible:ring-2 focus-visible:ring-[var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:ring-offset-black/40 focus-visible:outline-none",
+                  focusRing,
                 )}
               >
                 Our Services
               </Link>
             </motion.div>
 
-            {/* Value props */}
+            {/* Micro trust strip (3 items max) */}
             <motion.div
               variants={fadeUp}
               transition={{ duration: reduceMotion ? 0 : 0.45, ease: "easeOut" }}
-              className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-white/70"
+              className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-white/75"
+              aria-label="Key capabilities"
             >
               <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
-                Canada ↔ USA coverage
+                <span className="h-1.5 w-1.5 rounded-full bg-white/55" />
+                Canada USA Mexico coverage
               </div>
               <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
-                24/7 dispatch support
+                <span className="h-1.5 w-1.5 rounded-full bg-white/55" />
+                Dispatch support day and night
               </div>
               <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
-                Real-time visibility
+                <span className="h-1.5 w-1.5 rounded-full bg-white/55" />
+                Real time shipment visibility
               </div>
             </motion.div>
           </motion.div>
