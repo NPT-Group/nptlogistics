@@ -12,6 +12,7 @@ const footerLink = cn(
 );
 
 /** Flatten solution categories into a short list of primary links for footer */
+
 function getSolutionsFooterLinks() {
   const links: { label: string; href: string }[] = [
     { label: "View all solutions", href: "/#solutions" },
@@ -36,10 +37,7 @@ export function SiteFooter() {
       )}
     >
       {/* Gradient orbs — visible warmth top-right and bottom-left */}
-      <div
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-        aria-hidden="true"
-      >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div
           className={cn(
             "absolute -top-20 -right-20 h-72 w-72 rounded-full",
@@ -79,7 +77,7 @@ export function SiteFooter() {
         <div className="grid gap-8 sm:gap-10 lg:grid-cols-5 lg:gap-8">
           {/* Solutions */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-footer-text)]/90">
+            <h3 className="text-xs font-semibold tracking-wider text-[color:var(--color-footer-text)]/90 uppercase">
               Solutions
             </h3>
             <ul className="mt-4 space-y-2.5">
@@ -102,7 +100,7 @@ export function SiteFooter() {
 
           {/* Industries */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-footer-text)]/90">
+            <h3 className="text-xs font-semibold tracking-wider text-[color:var(--color-footer-text)]/90 uppercase">
               Industries
             </h3>
             <ul className="mt-4 space-y-2.5">
@@ -123,7 +121,7 @@ export function SiteFooter() {
 
           {/* Company */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-footer-text)]/90">
+            <h3 className="text-xs font-semibold tracking-wider text-[color:var(--color-footer-text)]/90 uppercase">
               Company
             </h3>
             <ul className="mt-4 space-y-2.5">
@@ -139,7 +137,7 @@ export function SiteFooter() {
 
           {/* Careers */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-footer-text)]/90">
+            <h3 className="text-xs font-semibold tracking-wider text-[color:var(--color-footer-text)]/90 uppercase">
               Careers
             </h3>
             <ul className="mt-4 space-y-2.5">
@@ -155,7 +153,7 @@ export function SiteFooter() {
 
           {/* Quick actions */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-footer-text)]/90">
+            <h3 className="text-xs font-semibold tracking-wider text-[color:var(--color-footer-text)]/90 uppercase">
               Quick actions
             </h3>
             <ul className="mt-4 space-y-2.5">
@@ -175,7 +173,7 @@ export function SiteFooter() {
                   className={cn(
                     "inline-flex text-sm font-semibold text-[color:var(--color-brand-500)]",
                     "hover:text-[color:var(--color-brand-500)]",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-footer-bg)]",
+                    "focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-footer-bg)] focus-visible:outline-none",
                   )}
                 >
                   Request a Quote →
@@ -198,7 +196,7 @@ export function SiteFooter() {
               className={cn(
                 "text-sm font-semibold text-[color:var(--color-footer-text)]",
                 "hover:text-[color:var(--color-footer-hover)]",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-footer-bg)]",
+                "focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-footer-bg)] focus-visible:outline-none",
               )}
             >
               NPT Logistics
