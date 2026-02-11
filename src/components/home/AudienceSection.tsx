@@ -141,7 +141,7 @@ export function AudienceSection() {
           </p>
         </div>
 
-        <div className="relative mt-8 grid gap-4 lg:grid-cols-3">
+        <div className="relative mt-8 grid gap-4 min-[680px]:grid-cols-2 lg:grid-cols-3">
           {[
             {
               title: "I'm Shipping Freight",
@@ -165,20 +165,20 @@ export function AudienceSection() {
               label: "View Jobs",
             },
           ].map((card) => (
-            <div key={card.href} className={glassCard}>
+            <div key={card.href} className={cn(glassCard, "h-full")}>
               {/* Subtle red tint bottom-right for elegant glass */}
               <div
                 className="absolute inset-0 rounded-2xl bg-gradient-to-br from-transparent via-transparent to-[color:var(--color-brand-500)]/10 pointer-events-none"
                 aria-hidden
               />
-              <div className="relative z-10 p-6">
+              <div className="relative z-10 flex h-full flex-col p-6">
                 <div className="text-lg font-semibold text-[color:var(--audience-text)]">
                   {card.title}
                 </div>
                 <p className="mt-2 text-sm leading-relaxed text-[color:var(--audience-muted)]">
                   {card.description}
                 </p>
-                <Link href={card.href} className={cardLink}>
+                <Link href={card.href} className={cn(cardLink, "mt-auto pt-6")}>
                   {card.label}
                   <span aria-hidden className="arrow">
                     →

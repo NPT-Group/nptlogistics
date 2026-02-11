@@ -260,7 +260,7 @@ function ServiceCard({
     <Link
       href={card.href}
       className={cn(
-        "group relative inline-block h-[360px] w-full max-w-[400px] overflow-hidden rounded-[24px] transition-all duration-500 sm:h-[390px] sm:rounded-[30px] lg:h-[400px]",
+        "group relative inline-block h-[360px] w-full max-w-[400px] overflow-hidden rounded-[24px] transition-all duration-500 sm:h-[390px] sm:rounded-[30px] min-[680px]:h-[372px] md:h-[372px] lg:h-[400px]",
         isFourGridCategory && "lg:h-[350px] lg:max-w-none",
         "shadow-[4px_4px_24px_rgba(0,0,0,0.24)] sm:shadow-[5px_5px_30px_rgba(0,0,0,0.3)]",
         "hover:shadow-[5px_5px_40px_rgba(0,0,0,0.35)]",
@@ -274,14 +274,14 @@ function ServiceCard({
           alt=""
           fill
           className="object-cover transition-transform duration-700 ease-out md:group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, 400px"
+          sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 400px"
         />
       </div>
 
       {/* hero-description-bk equivalent - exact skew shape */}
       <div
         className={cn(
-          "absolute top-[54%] left-[-6px] h-[66%] w-[110%] rounded-[24px] sm:top-[55%] sm:left-[-5px] sm:h-[65%] sm:w-[108%] sm:rounded-[30px]",
+          "absolute top-[54%] left-[-6px] h-[66%] w-[110%] rounded-[24px] sm:top-[55%] sm:left-[-5px] sm:h-[65%] sm:w-[108%] sm:rounded-[30px] min-[680px]:top-[56%] min-[680px]:h-[63%] md:top-[56%] md:h-[63%]",
           isFourGridCategory && "lg:top-[56%] lg:h-[63%]",
           "[transform:skew(19deg,-9deg)] transition-transform duration-500 ease-out",
           "group-hover:[transform:skew(0deg,0deg)]",
@@ -294,7 +294,7 @@ function ServiceCard({
       {/* hero-logo equivalent */}
       <div
         className={cn(
-          "absolute top-[60%] left-5 h-12 w-12 -translate-y-1/2 overflow-hidden rounded-lg bg-white shadow-[4px_4px_22px_rgba(0,0,0,0.5)] sm:left-[30px] sm:h-14 sm:w-14 sm:rounded-xl sm:shadow-[5px_5px_30px_rgba(0,0,0,0.65)]",
+          "absolute top-[60%] left-5 h-12 w-12 -translate-y-1/2 overflow-hidden rounded-lg bg-white shadow-[4px_4px_22px_rgba(0,0,0,0.5)] sm:left-[30px] sm:h-14 sm:w-14 sm:rounded-xl sm:shadow-[5px_5px_30px_rgba(0,0,0,0.65)] min-[680px]:top-[59%] min-[680px]:left-4 min-[680px]:h-11 min-[680px]:w-11 min-[680px]:rounded-lg md:top-[59%] md:left-4 md:h-11 md:w-11 md:rounded-lg",
           isFourGridCategory && "lg:top-[59%] lg:left-4 lg:h-10 lg:w-10 lg:rounded-lg",
         )}
       >
@@ -306,19 +306,19 @@ function ServiceCard({
       {/* Content safety zone: everything stays inside skew region */}
       <div
         className={cn(
-          "absolute top-[56%] right-5 bottom-[12%] left-5 grid grid-rows-[auto_1fr_auto] gap-y-2 text-white sm:top-[58%] sm:right-[30px] sm:bottom-[10%] sm:left-[30px] sm:gap-y-2.5",
+          "absolute top-[56%] right-5 bottom-[12%] left-5 grid grid-rows-[auto_1fr_auto] gap-y-2 text-white sm:top-[58%] sm:right-[30px] sm:bottom-[10%] sm:left-[30px] sm:gap-y-2.5 min-[680px]:top-[58%] min-[680px]:right-4 min-[680px]:bottom-[8%] min-[680px]:left-4 min-[680px]:gap-y-2 md:top-[58%] md:right-4 md:bottom-[8%] md:left-4 md:gap-y-2",
           isFourGridCategory && "lg:top-[58%] lg:right-4 lg:bottom-[8%] lg:left-4 lg:gap-y-2",
         )}
       >
         <div
           className={cn(
-            "min-h-[80px] pl-[88px] sm:min-h-[92px] sm:pl-[120px]",
+            "min-h-[80px] pl-[88px] sm:min-h-[92px] sm:pl-[120px] min-[680px]:min-h-[72px] min-[680px]:pl-[72px] md:min-h-[72px] md:pl-[72px]",
             isFourGridCategory && "lg:min-h-[72px] lg:pl-[72px]",
           )}
         >
           <p
             className={cn(
-              "[display:-webkit-box] overflow-hidden text-[18px] leading-tight font-extrabold text-white [-webkit-box-orient:vertical] [-webkit-line-clamp:2] sm:text-[20px]",
+              "[display:-webkit-box] overflow-hidden text-[18px] leading-tight font-extrabold text-white [-webkit-box-orient:vertical] [-webkit-line-clamp:2] sm:text-[20px] min-[680px]:text-[16px] md:text-[16px]",
               isFourGridCategory && "lg:text-[16px]",
             )}
           >
@@ -326,7 +326,7 @@ function ServiceCard({
           </p>
           <p
             className={cn(
-              "mt-1 [display:-webkit-box] overflow-hidden text-[13px] leading-snug font-semibold text-white/95 [-webkit-box-orient:vertical] [-webkit-line-clamp:2] sm:text-[14px]",
+              "mt-1 [display:-webkit-box] overflow-hidden text-[13px] leading-snug font-semibold text-white/95 [-webkit-box-orient:vertical] [-webkit-line-clamp:2] sm:text-[14px] min-[680px]:text-[11px] min-[680px]:leading-snug md:text-[11px] md:leading-snug",
               isFourGridCategory && "lg:text-[11px] lg:leading-snug",
             )}
           >
@@ -338,7 +338,7 @@ function ServiceCard({
           {card.bestFor && (
             <p
               className={cn(
-                "truncate text-[12px] font-semibold text-white/95 sm:pr-2 sm:text-[13px]",
+                "truncate text-[12px] font-semibold text-white/95 sm:pr-2 sm:text-[13px] min-[680px]:text-[10px] md:text-[10px]",
                 isFourGridCategory && "lg:text-[10px]",
               )}
             >
@@ -347,7 +347,7 @@ function ServiceCard({
           )}
           <span
             className={cn(
-              "inline-flex h-10 w-fit min-w-[112px] shrink-0 items-center justify-center gap-2 border border-white px-4 text-[13px] font-semibold text-white sm:ml-2 sm:h-11 sm:w-[106px] sm:min-w-0 sm:px-4 sm:text-[14px]",
+              "inline-flex h-10 w-fit min-w-[112px] shrink-0 items-center justify-center gap-2 border border-white px-4 text-[13px] font-semibold text-white sm:ml-2 sm:h-11 sm:w-[106px] sm:min-w-0 sm:px-4 sm:text-[14px] min-[680px]:h-9 min-[680px]:w-[84px] min-[680px]:px-2.5 min-[680px]:text-[12px] md:h-9 md:w-[84px] md:px-2.5 md:text-[12px]",
               isFourGridCategory && "lg:h-9 lg:w-[84px] lg:px-2.5 lg:text-[12px]",
               "transition-all duration-300 group-hover:gap-2.5 hover:bg-white/10",
               "[&>.arrow]:inline-block [&>.arrow]:transition-all [&>.arrow]:duration-300 [&>.arrow]:ease-[cubic-bezier(0.34,1.56,0.64,1)]",
@@ -510,6 +510,7 @@ function CategorySection({
             className={cn(
               "grid justify-items-center gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-3",
               isFourGridCategory && "lg:grid-cols-4 lg:gap-5",
+              "min-[680px]:grid-cols-2 min-[680px]:gap-6",
             )}
           >
             {data.cards.map((card, cardIndex) => (
