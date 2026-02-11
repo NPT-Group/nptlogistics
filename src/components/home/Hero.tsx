@@ -79,7 +79,7 @@ export function Hero() {
           <motion.div
             className={cn(
               "relative z-10 flex flex-col justify-center",
-              "min-h-[82svh] md:min-h-[78svh]",
+              "min-h-[85svh] md:min-h-[80svh]",
               "pt-14 pb-24 sm:pt-20 sm:pb-28 lg:pt-24",
             )}
             initial="hidden"
@@ -176,7 +176,7 @@ export function Hero() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-white/55" />
-                Dispatch support day and night
+                24/7 dispatch support
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-white/55" />

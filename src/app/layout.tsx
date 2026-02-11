@@ -2,11 +2,12 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SolutionsHashScroll } from "@/components/layout/SolutionsHashScroll";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nptlogistics.com"), // change later if needed
   title: {
-    default: "NPT Logistics",
+    default: "NPT Logistics|Flatbed, Dry Van, RGN & Shipmemt Trucking Solutions",
     template: "%s | NPT Logistics",
   },
   description:
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-dvh bg-[color:var(--color-surface-0)] text-[color:var(--color-text)]">
+        <SolutionsHashScroll />
         <SiteHeader />
         <div className="overflow-x-clip">
           {children}

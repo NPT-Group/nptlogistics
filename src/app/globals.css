@@ -4,6 +4,7 @@
 /* Prevent horizontal overflow and scrollbar; clip is stricter than hidden (no scroll container). */
 html {
   overflow-x: clip;
+  scroll-behavior: smooth;
 }
 body {
   overflow-x: clip;

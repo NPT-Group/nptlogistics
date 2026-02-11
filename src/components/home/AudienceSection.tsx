@@ -1,6 +1,8 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
+import { useInView } from "framer-motion";
 import { Container } from "@/components/layout/Container";
 import { cn } from "@/lib/cn";
 
@@ -21,6 +23,63 @@ const cardLink = cn(
   "[&>.arrow]:inline-block [&>.arrow]:transition-all [&>.arrow]:duration-300 [&>.arrow]:ease-[cubic-bezier(0.34,1.56,0.64,1)]",
   "[&:hover>.arrow]:translate-x-1.5 [&:hover>.arrow]:scale-110 [&:hover>.arrow]:opacity-100 [&>.arrow]:opacity-75",
 );
+
+/** Animated number that counts from 0 to target when scrolled into view */
+function AnimatedStat({
+  target,
+  prefix = "",
+  suffix = "",
+  decimals = 0,
+  className,
+}: {
+  target: number;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
+  className?: string;
+}) {
+  const ref = React.useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const [displayValue, setDisplayValue] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!isInView) return;
+
+    const duration = 1000; // 1 second - fast and smooth
+    const startTime = Date.now();
+    const startValue = 0;
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic for smooth deceleration
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = startValue + (target - startValue) * eased;
+
+      if (decimals === 0) {
+        setDisplayValue(Math.floor(current));
+      } else {
+        setDisplayValue(Number(current.toFixed(decimals)));
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setDisplayValue(target);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [isInView, target, decimals]);
+
+  return (
+    <span ref={ref} className={className}>
+      {prefix}
+      {displayValue.toLocaleString()}
+      {suffix}
+    </span>
+  );
+}
 
 export function AudienceSection() {
   return (
@@ -55,7 +114,8 @@ export function AudienceSection() {
           <p className="mt-4 flex flex-wrap items-center justify-center gap-x-1 gap-y-1 text-sm text-[color:var(--audience-muted)] sm:text-base">
             <span className="font-medium text-[color:var(--audience-text)]">
               <span className="font-semibold tabular-nums text-[color:var(--color-brand-600)]">
-                &gt;250k
+                &gt;
+                <AnimatedStat target={250} suffix="k" />
               </span>{" "}
               loads moved
             </span>
@@ -64,7 +124,7 @@ export function AudienceSection() {
             </span>
             <span className="font-medium text-[color:var(--audience-text)]">
               <span className="font-semibold tabular-nums text-[color:var(--color-brand-600)]">
-                98%
+                <AnimatedStat target={98} suffix="%" />
               </span>{" "}
               on time
             </span>
@@ -73,7 +133,8 @@ export function AudienceSection() {
             </span>
             <span className="font-medium text-[color:var(--audience-text)]">
               <span className="font-semibold tabular-nums text-[color:var(--color-brand-600)]">
-                &gt;25k
+                &gt;
+                <AnimatedStat target={25} suffix="k" />
               </span>{" "}
               cross border shipments
             </span>
@@ -86,7 +147,7 @@ export function AudienceSection() {
               title: "I'm Shipping Freight",
               description:
                 "Find the right service for your lane, timeline, and requirements with a fast response.",
-              href: "/#core-solutions",
+              href: "/#solutions",
               label: "Explore Solutions",
             },
             {

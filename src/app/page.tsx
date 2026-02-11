@@ -1,11 +1,5 @@
-import { Hero } from "@/components/home/Hero";
-import { AudienceSection } from "@/components/home/AudienceSection";
+import { HomePageContent } from "@/components/home/HomePageContent";
 
 export default function HomePage() {
-  return (
-    <>
-      <Hero />
-      <AudienceSection />
-    </>
-  );
+  return <HomePageContent />;
 }

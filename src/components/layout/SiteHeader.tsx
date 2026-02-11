@@ -31,11 +31,11 @@ export function SiteHeader() {
             aria-label="NPT Logistics home"
           >
             <Image
-              src="/brand/NPTlogo.png"
+              src="/brand/NPTlogo2.png"
               alt="NPT Logistics"
               width={220}
               height={80}
-              className="h-auto w-[70px] object-contain sm:w-[90px] md:w-[110px]"
+              className="h-auto w-[50px] object-contain sm:w-[50px] md:w-[50px]"
               priority
             />
           </Link>
