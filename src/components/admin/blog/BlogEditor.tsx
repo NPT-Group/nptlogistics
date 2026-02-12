@@ -1,12 +1,11 @@
-// src/components/admin/blog/BlogEditor.tsx
 "use client";
 
 import * as React from "react";
 import dynamic from "next/dynamic";
 import type { PartialBlock } from "@blocknote/core";
 
-import type { BlockNoteDocJSON, IBlogCategory, IBlogPost } from "@/types/blogPost.types";
-import type { IFileAsset } from "@/types/shared.types";
+import type { IBlogCategory, IBlogPost } from "@/types/blogPost.types";
+import type { BlockNoteDocJSON, IFileAsset } from "@/types/shared.types";
 
 import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { IMAGE_MIME_TYPES, VIDEO_MIME_TYPES } from "@/types/shared.types";
@@ -15,11 +14,24 @@ import { uploadToS3Presigned, type UploadResult } from "@/lib/utils/s3Helper";
 import BlogPostSidebar from "@/components/admin/blog/BlogPostSidebar";
 import { adminCreateCategory, adminFetchCategories } from "@/lib/utils/blog/adminBlogApi";
 import { cn } from "@/lib/utils/cn";
-import { ArrowLeft, ExternalLink, FileText } from "lucide-react";
+import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
+
+import { ConfirmModal, type ConfirmTone } from "@/components/admin/ui/ConfirmModal";
+import { SoftButton } from "@/components/admin/ui/Buttons";
+import { ExternalLink, FileText, AlertTriangle } from "lucide-react";
 
 const BlockNote = dynamic(() => import("@/components/BlockNote"), {
   ssr: false,
-  loading: () => <div className="rounded-3xl border border-gray-200 bg-white p-5 text-sm text-gray-500 shadow-sm">Loading editor…</div>,
+  loading: () => (
+    <div
+      className={cn(
+        "rounded-3xl border p-5 text-sm shadow-[var(--dash-shadow)]",
+        "border-[var(--dash-border)] bg-[var(--dash-surface)] text-[var(--dash-muted)]",
+      )}
+    >
+      Loading editor…
+    </div>
+  ),
 });
 
 type SubmitPayload = {
@@ -42,7 +54,19 @@ type Props = {
   backHref: string;
   onBack: () => void;
 
-  initial?: Partial<Pick<IBlogPost, "title" | "slug" | "excerpt" | "body" | "bannerImage" | "categoryIds" | "publishedAt" | "status">>;
+  initial?: Partial<
+    Pick<
+      IBlogPost,
+      | "title"
+      | "slug"
+      | "excerpt"
+      | "body"
+      | "bannerImage"
+      | "categoryIds"
+      | "publishedAt"
+      | "status"
+    >
+  >;
 
   onSavePrimary: (payload: SubmitPayload) => Promise<void>;
   onSaveSecondary: (payload: SubmitPayload) => Promise<void>;
@@ -72,18 +96,22 @@ function fileToAsset(r: UploadResult): IFileAsset {
 
 async function uploadBlogMediaToTemp(file: File): Promise<UploadResult> {
   const mt = (file.type || "").toLowerCase();
-  const folder = mt.startsWith("image/") ? ES3Folder.BLOG_MEDIA_IMAGES : mt.startsWith("video/") ? ES3Folder.BLOG_MEDIA_VIDEOS : null;
+  const folder = mt.startsWith("image/")
+    ? ES3Folder.MEDIA_IMAGES
+    : mt.startsWith("video/")
+      ? ES3Folder.MEDIA_VIDEOS
+      : null;
 
   if (!folder) throw new Error(`Unsupported upload type: ${file.type || "(missing mime type)"}`);
 
-  const allowedMimeTypes = folder === ES3Folder.BLOG_MEDIA_IMAGES ? IMAGE_MIME_TYPES : VIDEO_MIME_TYPES;
+  const allowedMimeTypes = folder === ES3Folder.MEDIA_IMAGES ? IMAGE_MIME_TYPES : VIDEO_MIME_TYPES;
 
   return uploadToS3Presigned({
     file,
     namespace: ES3Namespace.BLOG_POSTS,
     folder,
     allowedMimeTypes,
-    maxSizeMB: folder === ES3Folder.BLOG_MEDIA_VIDEOS ? 250 : 25,
+    maxSizeMB: folder === ES3Folder.MEDIA_VIDEOS ? 250 : 25,
   });
 }
 
@@ -93,7 +121,7 @@ async function uploadBannerToTemp(file: File): Promise<IFileAsset> {
   const up = await uploadToS3Presigned({
     file,
     namespace: ES3Namespace.BLOG_POSTS,
-    folder: ES3Folder.BLOG_MEDIA_IMAGES,
+    folder: ES3Folder.MEDIA_IMAGES,
     allowedMimeTypes: IMAGE_MIME_TYPES,
     maxSizeMB: 10,
   });
@@ -102,32 +130,62 @@ async function uploadBannerToTemp(file: File): Promise<IFileAsset> {
 }
 
 function ChangePill({ saving, isDirty }: { saving: boolean; isDirty: boolean }) {
-  const base = "rounded-full border px-3 py-1 text-xs shadow-sm";
+  const { resolvedTheme } = useAdminTheme();
+  const isDark = resolvedTheme === "dark";
+
+  const base = "rounded-full border px-3 py-1 text-xs font-medium shadow-[var(--dash-shadow)]/10";
+
   if (saving) {
     return (
-      <div className={cn(base, "border-gray-200 bg-white text-gray-600")}>
-        <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-gray-400" />
+      <div
+        className={cn(
+          base,
+          isDark
+            ? "border-white/10 bg-white/5 text-white/70"
+            : "border-gray-200 bg-gray-100 text-gray-700",
+        )}
+      >
+        <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-current opacity-70" />
         Saving…
       </div>
     );
   }
+
   if (isDirty) {
     return (
-      <div className={cn(base, "border-amber-200 bg-amber-50 text-amber-700")}>
-        <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
+      <div
+        className={cn(
+          base,
+          isDark
+            ? "border-amber-400/25 bg-amber-400/15 text-amber-100"
+            : "border-amber-300 bg-amber-100 text-amber-800",
+        )}
+      >
+        <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-current opacity-80" />
         Unsaved changes
       </div>
     );
   }
+
   return (
-    <div className={cn(base, "border-emerald-200 bg-emerald-50 text-emerald-700")}>
-      <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+    <div
+      className={cn(
+        base,
+        isDark
+          ? "border-emerald-400/25 bg-emerald-400/15 text-emerald-100"
+          : "border-emerald-300 bg-emerald-100 text-emerald-800",
+      )}
+    >
+      <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-current opacity-80" />
       All changes saved
     </div>
   );
 }
 
 export default function BlogEditor(props: Props) {
+  const { resolvedTheme } = useAdminTheme();
+  const isDark = resolvedTheme === "dark";
+
   const [doc, setDoc] = React.useState<PartialBlock[] | null>((props.initial?.body as any) ?? null);
 
   const [title, setTitle] = React.useState(props.initial?.title ?? "");
@@ -140,18 +198,34 @@ export default function BlogEditor(props: Props) {
     const d = new Date(v);
     if (isNaN(d.getTime())) return "";
     const pad = (n: number) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(
+      d.getMinutes(),
+    )}`;
   });
 
-  const [bannerImage, setBannerImage] = React.useState<IFileAsset | undefined>(props.initial?.bannerImage as any);
+  const [bannerImage, setBannerImage] = React.useState<IFileAsset | undefined>(
+    props.initial?.bannerImage as any,
+  );
 
   const [categories, setCategories] = React.useState<IBlogCategory[]>([]);
-  const [categoryIds, setCategoryIds] = React.useState<string[]>(Array.isArray(props.initial?.categoryIds) ? (props.initial!.categoryIds as any).map(String) : []);
+  const [categoryIds, setCategoryIds] = React.useState<string[]>(
+    Array.isArray(props.initial?.categoryIds)
+      ? (props.initial!.categoryIds as any).map(String)
+      : [],
+  );
   const [categorySearch, setCategorySearch] = React.useState("");
 
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState<{ message: string; nonce: number } | null>(null);
   const errorRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Danger confirm modal
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const confirmActionRef = React.useRef<null | (() => Promise<void>)>(null);
+  const [confirmTone, setConfirmTone] = React.useState<ConfirmTone>("danger");
+  const [confirmTitle, setConfirmTitle] = React.useState("");
+  const [confirmDesc, setConfirmDesc] = React.useState<React.ReactNode>(null);
+  const [confirmLabel, setConfirmLabel] = React.useState("Confirm");
 
   const baselineRef = React.useRef<string>("");
 
@@ -197,15 +271,15 @@ export default function BlogEditor(props: Props) {
   }
 
   React.useEffect(() => {
-    refreshCategories().catch((e) => setError({ message: e?.message || "Failed to load categories", nonce: Date.now() }));
+    refreshCategories().catch((e) =>
+      setError({ message: e?.message || "Failed to load categories", nonce: Date.now() }),
+    );
   }, []);
 
   React.useEffect(() => {
     if (!error) return;
-    // next frame ensures the DOM is painted before scrolling
     requestAnimationFrame(() => {
       errorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      // optional: focus for accessibility / consistent positioning
       errorRef.current?.focus?.();
     });
   }, [error?.nonce]);
@@ -213,7 +287,9 @@ export default function BlogEditor(props: Props) {
   async function onCreateCategory(name: string) {
     const created = await adminCreateCategory(name);
     await refreshCategories();
-    setCategoryIds((prev) => (prev.includes(String(created.id)) ? prev : [...prev, String(created.id)]));
+    setCategoryIds((prev) =>
+      prev.includes(String(created.id)) ? prev : [...prev, String(created.id)],
+    );
   }
 
   async function onPickBanner(file: File) {
@@ -266,101 +342,173 @@ export default function BlogEditor(props: Props) {
     }
   }
 
-  async function runDanger() {
+  function confirmDanger() {
     if (!props.onDanger) return;
 
     const title = props.dangerConfirmTitle ?? "Archive this post?";
-    const body = props.dangerConfirmBody ?? "This will archive the post and remove it from public listings. You can publish again later to restore it.";
+    const body =
+      props.dangerConfirmBody ??
+      "This will archive the post and remove it from public listings. You can publish again later to restore it.";
 
-    const ok = window.confirm(`${title}\n\n${body}`);
-    if (!ok) return;
+    confirmActionRef.current = async () => {
+      await runAction(props.onDanger!);
+    };
 
-    await runAction(props.onDanger);
+    setConfirmTone("danger");
+    setConfirmTitle(title);
+    setConfirmDesc(body);
+    setConfirmLabel(props.dangerLabel ?? "Archive");
+    setConfirmOpen(true);
   }
 
   const publishAtEnabled = props.secondaryActionKind === "PUBLISH";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-white">
+    <div className="min-h-screen bg-[var(--dash-bg)]">
+      {/* subtle admin backdrop */}
+      <div
+        aria-hidden
+        className={cn(
+          "pointer-events-none fixed inset-0 -z-10",
+          isDark
+            ? "bg-[radial-gradient(1200px_600px_at_10%_0%,rgba(220,38,38,0.14),transparent_55%),radial-gradient(900px_500px_at_90%_10%,rgba(255,255,255,0.06),transparent_55%)]"
+            : "bg-[radial-gradient(1100px_520px_at_10%_0%,rgba(220,38,38,0.08),transparent_55%),radial-gradient(900px_480px_at_90%_10%,rgba(15,23,42,0.06),transparent_55%)]",
+        )}
+      />
+
+      <ConfirmModal
+        open={confirmOpen}
+        tone={confirmTone}
+        title={confirmTitle}
+        description={confirmDesc}
+        confirmLabel={confirmLabel}
+        busy={saving}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          const act = confirmActionRef.current;
+          setConfirmOpen(false);
+          if (!act) return;
+          act().catch((e: any) =>
+            setError({ message: e?.message || "Failed.", nonce: Date.now() }),
+          );
+        }}
+      />
+
       <div className="mx-auto max-w-7xl px-6 py-6">
         {/* Header */}
-        <div className="mb-6 rounded-3xl border border-gray-200/70 bg-white/75 p-5 shadow-sm backdrop-blur">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gray-900 text-white shadow-sm">
-                <FileText className="h-5 w-5" />
+        <div
+          className={cn(
+            "mb-6 rounded-3xl border shadow-[var(--dash-shadow)]",
+            "border-[var(--dash-border)] bg-[var(--dash-surface)]",
+          )}
+        >
+          <div className="p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-3">
+                <div
+                  className={cn(
+                    "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border",
+                    "border-[var(--dash-border)] bg-[var(--dash-bg)] text-[var(--dash-text)]",
+                  )}
+                >
+                  <FileText className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate text-2xl font-semibold tracking-tight text-[var(--dash-text)]">
+                    {props.headerTitle}
+                  </div>
+                  {props.headerSubtitle ? (
+                    <div className="mt-1 truncate text-sm text-[var(--dash-muted)]">
+                      {props.headerSubtitle}
+                    </div>
+                  ) : null}
+                </div>
               </div>
-              <div className="min-w-0">
-                <div className="truncate text-2xl font-semibold tracking-tight text-gray-900">{props.headerTitle}</div>
-                {props.headerSubtitle ? <div className="mt-1 truncate text-sm text-gray-500">{props.headerSubtitle}</div> : null}
+
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="hidden lg:block">
+                  <ChangePill saving={saving} isDirty={isDirty} />
+                </div>
+
+                {props.previewUrl ? (
+                  <SoftButton
+                    icon={<ExternalLink className="h-4 w-4" />}
+                    label="Preview"
+                    disabled={saving}
+                    onClick={() => window.open(props.previewUrl!, "_blank", "noopener,noreferrer")}
+                  />
+                ) : null}
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="hidden lg:block">
-                <ChangePill saving={saving} isDirty={isDirty} />
-              </div>
+            <div className="mt-4 lg:hidden">
+              <ChangePill saving={saving} isDirty={isDirty} />
+            </div>
 
-              {props.previewUrl ? (
-                <button
-                  type="button"
-                  onClick={() => window.open(props.previewUrl!, "_blank", "noopener,noreferrer")}
-                  className={cn(
-                    "inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition",
-                    "hover:bg-gray-50 hover:shadow focus:outline-none focus:ring-4 focus:ring-gray-900/5",
-                  )}
-                  title="Preview public page"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Preview
-                </button>
-              ) : null}
-
-              <button
-                type="button"
-                onClick={props.onBack}
+            {error ? (
+              <div
+                ref={errorRef}
+                tabIndex={-1}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition",
-                  "hover:bg-gray-50 hover:shadow focus:outline-none focus:ring-4 focus:ring-gray-900/5",
+                  "mt-4 flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm",
+                  isDark
+                    ? "border-red-500/25 bg-red-600/15 text-red-50"
+                    : "border-red-200 bg-red-50 text-red-900",
                 )}
               >
-                <ArrowLeft className="h-4 w-4" />
-                Back to list
-              </button>
-            </div>
+                <AlertTriangle className="mt-0.5 h-4 w-4" />
+                <div className="flex-1">{error.message}</div>
+              </div>
+            ) : null}
           </div>
-          <div className="mt-4 lg:hidden">
-            <ChangePill saving={saving} isDirty={isDirty} />
-          </div>
-
-          {error ? (
-            <div ref={errorRef} tabIndex={-1} className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {error.message}
-            </div>
-          ) : null}
         </div>
 
         {/* Main */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_390px]">
           {/* Editor */}
-          <section className="overflow-hidden rounded-3xl border border-gray-200/70 bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-gray-200/70 bg-gradient-to-b from-gray-50/80 to-white px-5 py-4">
+          <section
+            className={cn(
+              "overflow-hidden rounded-3xl border shadow-[var(--dash-shadow)]",
+              "border-[var(--dash-border)] bg-[var(--dash-surface)]",
+            )}
+          >
+            <div
+              className={cn(
+                "flex items-center justify-between border-b px-5 py-4",
+                "border-[var(--dash-border)] bg-[var(--dash-surface)]",
+              )}
+            >
               <div>
-                <div className="text-sm font-semibold text-gray-900">Content</div>
-                <div className="mt-0.5 text-xs text-gray-500">Use “+” in the editor to add blocks.</div>
+                <div className="text-sm font-semibold text-[var(--dash-text)]">Content</div>
+                <div className="mt-0.5 text-xs text-[var(--dash-muted)]">
+                  Use “+” in the editor to add blocks.
+                </div>
               </div>
             </div>
 
             <div className="p-5">
-              <div className="rounded-2xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/5">
+              <div
+                className={cn(
+                  "rounded-3xl border shadow-[var(--dash-shadow)]/12",
+                  "border-[var(--dash-border)] bg-[var(--dash-bg)]",
+                )}
+              >
                 <div className="p-4">
-                  <BlockNote onChange={setDoc} uploadFile={uploadBlogMediaToTemp} initialContent={doc ?? undefined} />
+                  <BlockNote
+                    onChange={setDoc}
+                    uploadFile={uploadBlogMediaToTemp}
+                    initialContent={doc ?? undefined}
+                  />
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-                <span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1">Tip: ⌘/Ctrl + K for links</span>
-                <span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1">Paste images/videos to upload</span>
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-[var(--dash-muted)]">
+                <span className="rounded-full border border-[var(--dash-border)] bg-[var(--dash-bg)] px-2.5 py-1">
+                  Tip: ⌘/Ctrl + K for links
+                </span>
+                <span className="rounded-full border border-[var(--dash-border)] bg-[var(--dash-bg)] px-2.5 py-1">
+                  Paste images/videos to upload
+                </span>
               </div>
             </div>
           </section>
@@ -393,7 +541,7 @@ export default function BlogEditor(props: Props) {
             onSecondary={() => runAction(props.onSaveSecondary)}
             dangerLabel={props.dangerLabel}
             dangerDisabled={props.dangerDisabled}
-            onDanger={props.onDanger ? runDanger : undefined}
+            onDanger={props.onDanger ? confirmDanger : undefined}
           />
         </div>
       </div>

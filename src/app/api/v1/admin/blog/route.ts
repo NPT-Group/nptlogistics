@@ -5,18 +5,33 @@ import connectDB from "@/lib/utils/connectDB";
 import { errorResponse, successResponse } from "@/lib/utils/apiResponse";
 import { guard } from "@/lib/utils/auth/authUtils";
 import { parseJsonBody } from "@/lib/utils/reqParser";
-import { parseBool, parseIsoDate, inclusiveEndOfDay, parseEnumParam, parsePagination, parseSort, buildMeta, rx } from "@/lib/utils/queryUtils";
+import {
+  parseBool,
+  parseIsoDate,
+  inclusiveEndOfDay,
+  parseEnumParam,
+  parsePagination,
+  parseSort,
+  buildMeta,
+  rx,
+} from "@/lib/utils/queryUtils";
 import { trim } from "@/lib/utils/stringUtils";
 
 import { BlogPostModel } from "@/mongoose/models/BlogPost";
 import { BlogCategoryModel } from "@/mongoose/models/BlogCategory";
 import { BlogCommentModel } from "@/mongoose/models/BlogComment";
 
-import type { IBlogAuthor, IBlogPost, BlockNoteDocJSON } from "@/types/blogPost.types";
+import type { IBlogAuthor, IBlogPost } from "@/types/blogPost.types";
 import { EBlogStatus } from "@/types/blogPost.types";
-import type { IFileAsset } from "@/types/shared.types";
+import type { BlockNoteDocJSON, IFileAsset } from "@/types/shared.types";
 
-import { ensureUniqueSlug, calcReadingTimeMinutesFromBlockNote, finalizeBlogPostAssetsAllOrNothing, normalizePublishFields, deleteAllBlogPostAssets } from "@/lib/utils/blog/blogPostUtils";
+import {
+  ensureUniqueSlug,
+  calcReadingTimeMinutesFromBlockNote,
+  finalizeBlogPostAssetsAllOrNothing,
+  normalizePublishFields,
+  deleteAllBlogPostAssets,
+} from "@/lib/utils/blog/blogPostUtils";
 
 /* -------------------------------------------------------------------------- */
 /* Optional list mapper                                                       */
@@ -55,20 +70,26 @@ export const GET = async (req: NextRequest) => {
     const sp = url.searchParams;
 
     const q = trim(sp.get("q"));
-    const status = parseEnumParam(sp.get("status"), Object.values(EBlogStatus) as readonly EBlogStatus[], "status");
+    const status = parseEnumParam(
+      sp.get("status"),
+      Object.values(EBlogStatus) as readonly EBlogStatus[],
+      "status",
+    );
 
     const publishedOnly = parseBool(sp.get("publishedOnly")) ?? null;
     const categoryId = trim(sp.get("categoryId"));
     const authorId = trim(sp.get("authorId"));
 
     const allowedDateFields = ["created", "updated", "published"] as const;
-    const dateField = parseEnumParam(sp.get("dateField"), allowedDateFields, "dateField") ?? "created";
+    const dateField =
+      parseEnumParam(sp.get("dateField"), allowedDateFields, "dateField") ?? "created";
 
     const fromRaw = sp.get("from");
     const toRaw = sp.get("to");
 
     const fromDate = parseIsoDate(fromRaw);
-    if (fromRaw && !fromDate) return errorResponse(400, "Invalid 'from' date. Expected ISO format.");
+    if (fromRaw && !fromDate)
+      return errorResponse(400, "Invalid 'from' date. Expected ISO format.");
 
     const toParsed = parseIsoDate(toRaw);
     if (toRaw && !toParsed) return errorResponse(400, "Invalid 'to' date. Expected ISO format.");
@@ -77,8 +98,20 @@ export const GET = async (req: NextRequest) => {
 
     const { page, limit, skip } = parsePagination(sp.get("page"), sp.get("pageSize"), 100);
 
-    const allowedSortKeys = ["createdAt", "updatedAt", "publishedAt", "title", "status", "viewCount"] as const;
-    const { sortBy, sortDir } = parseSort(sp.get("sortBy"), sp.get("sortDir"), allowedSortKeys, "createdAt");
+    const allowedSortKeys = [
+      "createdAt",
+      "updatedAt",
+      "publishedAt",
+      "title",
+      "status",
+      "viewCount",
+    ] as const;
+    const { sortBy, sortDir } = parseSort(
+      sp.get("sortBy"),
+      sp.get("sortDir"),
+      allowedSortKeys,
+      "createdAt",
+    );
 
     const includeBody = parseBool(sp.get("includeBody")) ?? false;
     const includeComments = parseBool(sp.get("includeComments")) ?? false;
@@ -109,7 +142,10 @@ export const GET = async (req: NextRequest) => {
         published: "publishedAt",
       };
       const field = fieldMap[dateField];
-      filter[field] = { ...(fromDate ? { $gte: fromDate } : {}), ...(toDate ? { $lte: toDate } : {}) };
+      filter[field] = {
+        ...(fromDate ? { $gte: fromDate } : {}),
+        ...(toDate ? { $lte: toDate } : {}),
+      };
     }
 
     const projection: any = {
@@ -158,7 +194,9 @@ export const GET = async (req: NextRequest) => {
           createdAt: c?.createdAt,
           updatedAt: c?.updatedAt,
         }));
-        (base as any).categoryIds = (base as any).categoryIds.map((c: any) => c?._id?.toString?.() ?? String(c));
+        (base as any).categoryIds = (base as any).categoryIds.map(
+          (c: any) => c?._id?.toString?.() ?? String(c),
+        );
       }
 
       return base;
@@ -228,7 +266,9 @@ export const POST = async (req: NextRequest) => {
     }
 
     const requestedSlug = trim(body?.slug);
-    const slug = requestedSlug ? await ensureUniqueSlug(requestedSlug) : await ensureUniqueSlug(title);
+    const slug = requestedSlug
+      ? await ensureUniqueSlug(requestedSlug)
+      : await ensureUniqueSlug(title);
 
     const status: EBlogStatus = body?.status ?? EBlogStatus.DRAFT;
 
@@ -245,10 +285,13 @@ export const POST = async (req: NextRequest) => {
 
     const author: IBlogAuthor = { id: user.id, name: user.name, email: user.email };
 
-    const categoryIds = Array.isArray(body?.categoryIds) ? body.categoryIds.map((x) => String(x)).filter(Boolean) : undefined;
+    const categoryIds = Array.isArray(body?.categoryIds)
+      ? body.categoryIds.map((x) => String(x)).filter(Boolean)
+      : undefined;
     if (categoryIds?.length) {
       const count = await BlogCategoryModel.countDocuments({ _id: { $in: categoryIds } });
-      if (count !== categoryIds.length) return errorResponse(400, "One or more categoryIds are invalid");
+      if (count !== categoryIds.length)
+        return errorResponse(400, "One or more categoryIds are invalid");
     }
 
     const now = new Date();
@@ -333,7 +376,10 @@ export const DELETE = async (req: NextRequest) => {
     // Best-effort S3 delete
     for (const p of posts) {
       try {
-        await deleteAllBlogPostAssets({ body: (p as any).body, bannerImage: (p as any).bannerImage });
+        await deleteAllBlogPostAssets({
+          body: (p as any).body,
+          bannerImage: (p as any).bannerImage,
+        });
       } catch (e) {
         console.warn("Failed to delete assets for post:", (p as any)?._id?.toString?.(), e);
       }

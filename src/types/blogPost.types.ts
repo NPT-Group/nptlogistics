@@ -1,14 +1,8 @@
 // src/types/blog.types.ts
 
 import { ObjectId } from "mongoose";
-import type { IFileAsset } from "./shared.types";
+import type { BlockNoteDocJSON, IFileAsset } from "./shared.types";
 import { IBlogComment } from "./blogComment.types";
-
-/**
- * BlockNote document JSON.
- * Keep it flexible because BlockNote schema can evolve with plugins/blocks.
- */
-export type BlockNoteDocJSON = Record<string, any>;
 
 /** Publish lifecycle */
 export enum EBlogStatus {

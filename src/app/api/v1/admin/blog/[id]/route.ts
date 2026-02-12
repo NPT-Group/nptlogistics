@@ -10,9 +10,9 @@ import { trim } from "@/lib/utils/stringUtils";
 import { BlogPostModel } from "@/mongoose/models/BlogPost";
 import { BlogCommentModel } from "@/mongoose/models/BlogComment";
 
-import type { IBlogAuthor, BlockNoteDocJSON } from "@/types/blogPost.types";
+import type { IBlogAuthor } from "@/types/blogPost.types";
 import { EBlogStatus } from "@/types/blogPost.types";
-import type { IFileAsset } from "@/types/shared.types";
+import type { BlockNoteDocJSON, IFileAsset } from "@/types/shared.types";
 
 import {
   ensureUniqueSlug,
@@ -22,7 +22,10 @@ import {
   cleanupRemovedAssets,
   deleteAllBlogPostAssets,
 } from "@/lib/utils/blog/blogPostUtils";
-import { normalizeCategoryIdStrings, splitExistingCategoryIds } from "@/lib/utils/blog/blogCategoryUtils";
+import {
+  normalizeCategoryIdStrings,
+  splitExistingCategoryIds,
+} from "@/lib/utils/blog/blogCategoryUtils";
 
 /* -------------------------------------------------------------------------- */
 /* GET /api/v1/admin/blog/:id                                                 */
@@ -37,13 +40,17 @@ export const GET = async (_req: NextRequest, ctx: { params: Promise<{ id: string
     const post = await BlogPostModel.findById(id).lean();
     if (!post) return errorResponse(404, "Blog post not found");
 
-    const ids = Array.isArray((post as any).categoryIds) ? (post as any).categoryIds.map((x: any) => String(x)) : [];
+    const ids = Array.isArray((post as any).categoryIds)
+      ? (post as any).categoryIds.map((x: any) => String(x))
+      : [];
     const { existingIds, missingIds } = await splitExistingCategoryIds(ids);
 
     return successResponse(200, "Blog post", {
       blogPost: { ...post, id: post?._id?.toString?.() ?? id },
       // help admin UI show a warning; does NOT mutate post
-      ...(missingIds.length ? { missingCategoryIds: missingIds, existingCategoryIds: existingIds } : {}),
+      ...(missingIds.length
+        ? { missingCategoryIds: missingIds, existingCategoryIds: existingIds }
+        : {}),
     });
   } catch (error) {
     return errorResponse(error);
@@ -92,12 +99,16 @@ export const PATCH = async (req: NextRequest, ctx: { params: Promise<{ id: strin
     if (body?.title != null && !nextTitle) return errorResponse(400, "title cannot be empty");
 
     const incomingDoc = (body?.body ?? body?.content) as BlockNoteDocJSON | undefined;
-    if ((body?.body != null || body?.content != null) && (!incomingDoc || typeof incomingDoc !== "object")) {
+    if (
+      (body?.body != null || body?.content != null) &&
+      (!incomingDoc || typeof incomingDoc !== "object")
+    ) {
       return errorResponse(400, "content/body must be valid BlockNote JSON");
     }
 
     const requestedSlug = body?.slug != null ? trim(body.slug) : undefined;
-    if (requestedSlug === "") return errorResponse(400, "slug cannot be empty (omit it to auto-generate)");
+    if (requestedSlug === "")
+      return errorResponse(400, "slug cannot be empty (omit it to auto-generate)");
 
     if (nextTitle != null) existing.title = nextTitle;
     if (body?.excerpt !== undefined) existing.excerpt = trim(body.excerpt ?? undefined);
@@ -120,7 +131,9 @@ export const PATCH = async (req: NextRequest, ctx: { params: Promise<{ id: strin
         const split = await splitExistingCategoryIds(requestedIds);
         missingCategoryIds = split.missingIds;
 
-        (existing as any).categoryIds = split.existingIds.length ? (split.existingIds as any) : undefined;
+        (existing as any).categoryIds = split.existingIds.length
+          ? (split.existingIds as any)
+          : undefined;
       } else {
         // explicit empty array => clear categories
         (existing as any).categoryIds = undefined;
@@ -142,11 +155,15 @@ export const PATCH = async (req: NextRequest, ctx: { params: Promise<{ id: strin
     }
 
     // enforce invariants AFTER all updates
-    (existing as any).publishedAt = normalizePublishFields((existing as any).status, nextPublishedAt);
+    (existing as any).publishedAt = normalizePublishFields(
+      (existing as any).status,
+      nextPublishedAt,
+    );
 
     // Body/banner updates (and finalization)
     const nextBody = incomingDoc ?? ((existing as any).body as any);
-    const nextBanner = body?.bannerImage !== undefined ? body.bannerImage : ((existing as any).bannerImage as any);
+    const nextBanner =
+      body?.bannerImage !== undefined ? body.bannerImage : ((existing as any).bannerImage as any);
 
     const postId = existing._id.toString();
     const finalized = await finalizeBlogPostAssetsAllOrNothing({
@@ -161,7 +178,9 @@ export const PATCH = async (req: NextRequest, ctx: { params: Promise<{ id: strin
     (existing as any).bannerImage = finalized.bannerImage as any;
 
     // reading time always server-side
-    (existing as any).readingTimeMinutes = calcReadingTimeMinutesFromBlockNote((existing as any).body);
+    (existing as any).readingTimeMinutes = calcReadingTimeMinutesFromBlockNote(
+      (existing as any).body,
+    );
 
     // last edited
     const editor: IBlogAuthor = { id: user.id, name: user.name, email: user.email };
@@ -174,7 +193,10 @@ export const PATCH = async (req: NextRequest, ctx: { params: Promise<{ id: strin
 
     // Best-effort: delete assets removed from body/banner by the update
     try {
-      const afterSnapshot = { body: (existing as any).body, bannerImage: (existing as any).bannerImage };
+      const afterSnapshot = {
+        body: (existing as any).body,
+        bannerImage: (existing as any).bannerImage,
+      };
       await cleanupRemovedAssets(beforeSnapshot, afterSnapshot);
     } catch (e) {
       console.warn("Asset cleanup (removed assets) failed:", e);
@@ -212,7 +234,10 @@ export const DELETE = async (_req: NextRequest, ctx: { params: Promise<{ id: str
 
     // Best-effort S3 delete
     try {
-      await deleteAllBlogPostAssets({ body: (post as any).body, bannerImage: (post as any).bannerImage });
+      await deleteAllBlogPostAssets({
+        body: (post as any).body,
+        bannerImage: (post as any).bannerImage,
+      });
     } catch (e) {
       console.warn("Failed to delete S3 assets for post:", id, e);
     }

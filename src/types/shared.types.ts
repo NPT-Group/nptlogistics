@@ -41,14 +41,25 @@ export const MIME_TO_EXT_MAP: Record<EFileMimeType, string> = {
 };
 
 /** Grouped helpers (reusable everywhere) */
-export const IMAGE_MIME_TYPES: readonly EFileMimeType[] = [EFileMimeType.JPEG, EFileMimeType.JPG, EFileMimeType.PNG, EFileMimeType.WEBP];
+export const IMAGE_MIME_TYPES: readonly EFileMimeType[] = [
+  EFileMimeType.JPEG,
+  EFileMimeType.JPG,
+  EFileMimeType.PNG,
+  EFileMimeType.WEBP,
+];
 
-export const VIDEO_MIME_TYPES: readonly EFileMimeType[] = [EFileMimeType.MP4, EFileMimeType.WEBM, EFileMimeType.MOV];
+export const VIDEO_MIME_TYPES: readonly EFileMimeType[] = [
+  EFileMimeType.MP4,
+  EFileMimeType.WEBM,
+  EFileMimeType.MOV,
+];
 
 /** Runtime helpers */
-export const isImageMime = (mt?: string) => typeof mt === "string" && mt.toLowerCase().startsWith("image/");
+export const isImageMime = (mt?: string) =>
+  typeof mt === "string" && mt.toLowerCase().startsWith("image/");
 
-export const isVideoMime = (mt?: string) => typeof mt === "string" && mt.toLowerCase().startsWith("video/");
+export const isVideoMime = (mt?: string) =>
+  typeof mt === "string" && mt.toLowerCase().startsWith("video/");
 
 /**
  * Generic file asset stored in S3.
@@ -72,3 +83,9 @@ export interface IGeoLocation {
   latitude?: number; // GPS latitude
   longitude?: number; // GPS longitude
 }
+
+/**
+ * BlockNote document JSON.
+ * Keep it flexible because BlockNote schema can evolve with plugins/blocks.
+ */
+export type BlockNoteDocJSON = Record<string, any>;

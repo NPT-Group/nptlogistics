@@ -1,11 +1,11 @@
+// src/app/layout.tsx
+import SessionWrapper from "@/components/ui/SessionWrapper";
 import "./globals.css";
 import type { Metadata } from "next";
-import { SiteHeader } from "@/components/layout/SiteHeader";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { SolutionsHashScroll } from "@/components/layout/SolutionsHashScroll";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nptlogistics.com"), // change later if needed
+  metadataBase: new URL("https://nptlogistics.com"),
   title: {
     default: "NPT Logistics|Flatbed, Dry Van, RGN & Shipmemt Trucking Solutions",
     template: "%s | NPT Logistics",
@@ -25,7 +25,6 @@ export const metadata: Metadata = {
   authors: [{ name: "NPT Logistics" }],
   creator: "NPT Logistics",
   publisher: "NPT Logistics",
-
   openGraph: {
     type: "website",
     siteName: "NPT Logistics",
@@ -33,16 +32,8 @@ export const metadata: Metadata = {
     description:
       "Reliable freight solutions across North America. Truckload, LTL, intermodal, and cross-border shipping built on compliance and execution.",
     url: "https://nptlogistics.com",
-    images: [
-      {
-        url: "/og-image.png", // placeholder for now
-        width: 1200,
-        height: 630,
-        alt: "NPT Logistics",
-      },
-    ],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "NPT Logistics" }],
   },
-
   twitter: {
     card: "summary_large_image",
     title: "NPT Logistics",
@@ -52,16 +43,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies();
+  const mode = cookieStore.get("npt.admin.theme.mode")?.value; // light | dark | system
+
+  // Only force a theme when user explicitly chose light/dark.
+  const adminTheme = mode === "dark" ? "dark" : mode === "light" ? "light" : undefined;
+
   return (
-    <html lang="en">
-      <body className="min-h-dvh bg-[color:var(--color-surface-0)] text-[color:var(--color-text)]">
-        <SolutionsHashScroll />
-        <SiteHeader />
-        <div className="overflow-x-clip">
-          {children}
-          <SiteFooter />
-        </div>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      {...(adminTheme ? { "data-admin-theme": adminTheme } : {})}
+    >
+      <body className="min-h-dvh">
+        <SessionWrapper>{children}</SessionWrapper>
       </body>
     </html>
   );

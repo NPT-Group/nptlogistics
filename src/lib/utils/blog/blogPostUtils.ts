@@ -1,11 +1,20 @@
 // src/lib/utils/blog/blogPostUtils.ts
-import { EBlogStatus, type BlockNoteDocJSON } from "@/types/blogPost.types";
-import type { IFileAsset } from "@/types/shared.types";
+import { EBlogStatus } from "@/types/blogPost.types";
+import type { BlockNoteDocJSON, IFileAsset } from "@/types/shared.types";
 import { ES3Folder, ES3Namespace } from "@/types/aws.types";
 
 import { BlogPostModel } from "@/mongoose/models/BlogPost";
 import { slugify } from "@/lib/utils/stringUtils";
-import { makeEntityFinalPrefix, isTempKey, keyJoin, publicUrlForKey, moveS3Object, collectS3KeysDeep, deleteS3Objects, diffS3KeysToDelete } from "@/lib/utils/s3Helper";
+import {
+  makeEntityFinalPrefix,
+  isTempKey,
+  keyJoin,
+  publicUrlForKey,
+  moveS3Object,
+  collectS3KeysDeep,
+  deleteS3Objects,
+  diffS3KeysToDelete,
+} from "@/lib/utils/s3Helper";
 
 /* -------------------------------------------------------------------------- */
 /* Slug                                                                       */
@@ -38,7 +47,10 @@ export async function ensureUniqueSlug(base: string): Promise<string> {
  * - PUBLISHED: publishedAt must exist (defaults to now if missing)
  * - ARCHIVED: keep publishedAt as historical (do not auto-clear)
  */
-export function normalizePublishFields(status: EBlogStatus, publishedAt?: Date | null): Date | undefined {
+export function normalizePublishFields(
+  status: EBlogStatus,
+  publishedAt?: Date | null,
+): Date | undefined {
   if (status === EBlogStatus.DRAFT) return undefined;
 
   if (status === EBlogStatus.PUBLISHED) {
@@ -102,18 +114,24 @@ export function calcReadingTimeMinutesFromBlockNote(body: BlockNoteDocJSON): num
 type MovePair = { fromKey: string; toKey: string };
 
 function isFileAssetLike(v: any): v is IFileAsset {
-  return v && typeof v === "object" && typeof v.s3Key === "string" && typeof v.url === "string" && typeof v.mimeType === "string";
+  return (
+    v &&
+    typeof v === "object" &&
+    typeof v.s3Key === "string" &&
+    typeof v.url === "string" &&
+    typeof v.mimeType === "string"
+  );
 }
 
 function guessBlogMediaFolder(asset: IFileAsset): ES3Folder | string {
   const mt = (asset.mimeType || "").toLowerCase();
 
-  if (mt.startsWith("image/")) return ES3Folder.BLOG_MEDIA_IMAGES;
-  if (mt.startsWith("video/")) return ES3Folder.BLOG_MEDIA_VIDEOS;
+  if (mt.startsWith("image/")) return ES3Folder.MEDIA_IMAGES;
+  if (mt.startsWith("video/")) return ES3Folder.MEDIA_VIDEOS;
 
   const k = (asset.s3Key || "").toLowerCase();
-  if (k.includes("/media/images/")) return ES3Folder.BLOG_MEDIA_IMAGES;
-  if (k.includes("/media/videos/")) return ES3Folder.BLOG_MEDIA_VIDEOS;
+  if (k.includes("/media/images/")) return ES3Folder.MEDIA_IMAGES;
+  if (k.includes("/media/videos/")) return ES3Folder.MEDIA_VIDEOS;
 
   return "media";
 }
@@ -129,7 +147,15 @@ async function rollbackMoves(moves: MovePair[]) {
   }
 }
 
-async function finalizeTempAssetsDeep<T>({ input, postId, moved }: { input: T; postId: string; moved: MovePair[] }): Promise<T> {
+async function finalizeTempAssetsDeep<T>({
+  input,
+  postId,
+  moved,
+}: {
+  input: T;
+  postId: string;
+  moved: MovePair[];
+}): Promise<T> {
   const cache = new Map<string, IFileAsset>(); // tempKey -> finalized asset
   const seen = new Set<object>();
 
@@ -190,7 +216,11 @@ async function finalizeTempAssetsDeep<T>({ input, postId, moved }: { input: T; p
  * - deep-finalizes any IFileAsset-like objects inside BlockNote JSON
  * - returns updated { bannerImage, body } plus an internal rollback plan
  */
-export async function finalizeBlogPostAssetsAllOrNothing(args: { postId: string; body: BlockNoteDocJSON; bannerImage?: IFileAsset }): Promise<{
+export async function finalizeBlogPostAssetsAllOrNothing(args: {
+  postId: string;
+  body: BlockNoteDocJSON;
+  bannerImage?: IFileAsset;
+}): Promise<{
   body: BlockNoteDocJSON;
   bannerImage?: IFileAsset;
   movedCount: number;

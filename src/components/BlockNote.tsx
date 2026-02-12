@@ -1,4 +1,3 @@
-// src/components/BlockNote.tsx
 "use client";
 
 import "@mantine/core/styles.css";
@@ -9,20 +8,19 @@ import { useCreateBlockNote } from "@blocknote/react";
 import type { PartialBlock } from "@blocknote/core";
 import { MantineProvider } from "@mantine/core";
 import type { UploadResult } from "@/lib/utils/s3Helper";
+import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
 
 type Props = {
   initialContent?: PartialBlock[];
   onChange?: (doc: PartialBlock[]) => void;
   editable?: boolean;
-
-  /**
-   * Upload handler must return full UploadResult.
-   * BlockNote will use result.url to render, and will inject result into block props.
-   */
   uploadFile?: (file: File) => Promise<UploadResult>;
 };
 
-function injectAssetsIntoBlocks(blocks: PartialBlock[], urlToAsset: Map<string, UploadResult>): PartialBlock[] {
+function injectAssetsIntoBlocks(
+  blocks: PartialBlock[],
+  urlToAsset: Map<string, UploadResult>,
+): PartialBlock[] {
   const walk = (b: PartialBlock[]): PartialBlock[] =>
     b.map((block) => {
       const next: PartialBlock = {
@@ -31,11 +29,9 @@ function injectAssetsIntoBlocks(blocks: PartialBlock[], urlToAsset: Map<string, 
         children: Array.isArray((block as any).children) ? walk((block as any).children) : [],
       };
 
-      // BlockNote media blocks typically store URL on props.url
       const props: any = next.props || {};
       const url: string | undefined = typeof props.url === "string" ? props.url : undefined;
 
-      // Inject full asset shape if we have it and it's not already present
       if (url && !props.asset) {
         const asset = urlToAsset.get(url);
         if (asset) {
@@ -50,19 +46,24 @@ function injectAssetsIntoBlocks(blocks: PartialBlock[], urlToAsset: Map<string, 
   return walk(blocks);
 }
 
-export default function BlockNote({ initialContent, onChange, editable = true, uploadFile }: Props) {
-  // Cache uploaded assets by URL so we can inject the full shape back into JSON
+export default function BlockNote({
+  initialContent,
+  onChange,
+  editable = true,
+  uploadFile,
+}: Props) {
+  const { resolvedTheme } = useAdminTheme();
+  const isDark = resolvedTheme === "dark";
+
   const urlToAssetRef = React.useRef<Map<string, UploadResult>>(new Map());
 
   const editor = useCreateBlockNote({
     initialContent: initialContent ?? undefined,
     uploadFile: async (file) => {
-      if (!uploadFile) {
-        throw new Error("Uploads are disabled (no uploadFile handler provided).");
-      }
+      if (!uploadFile) throw new Error("Uploads are disabled (no uploadFile handler provided).");
       const result = await uploadFile(file);
       urlToAssetRef.current.set(result.url, result);
-      return result.url; // BlockNote requires a URL string
+      return result.url;
     },
   });
 
@@ -82,14 +83,13 @@ export default function BlockNote({ initialContent, onChange, editable = true, u
     <MantineProvider defaultColorScheme="light">
       <div className="bn-scope">
         <div
+          className="rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12"
           style={{
-            borderRadius: 16,
-            border: "1px solid rgba(0,0,0,0.08)",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.06)",
-            background: "white",
-            padding: 18,
+            borderColor: "var(--dash-border)",
+            background: isDark ? "rgba(255,255,255,0.04)" : "white",
           }}
         >
+          {/* Keep BlockNote itself on light theme for CSS stability */}
           <BlockNoteView editor={editor} editable={editable} theme="light" />
         </div>
       </div>

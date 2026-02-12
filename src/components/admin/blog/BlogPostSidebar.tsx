@@ -4,7 +4,25 @@ import * as React from "react";
 import type { IBlogCategory } from "@/types/blogPost.types";
 import type { IFileAsset } from "@/types/shared.types";
 import { cn } from "@/lib/utils/cn";
-import { Settings2, Type, Link2, AlignLeft, CalendarClock, Image as ImageIcon, Tags, Plus, Trash2, Upload, Save, Rocket, Archive, Search, Check } from "lucide-react";
+import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
+import { Checkbox } from "@/components/admin/ui/Checkbox";
+import { SoftButton } from "@/components/admin/ui/Buttons";
+import {
+  Settings2,
+  Type,
+  Link2,
+  AlignLeft,
+  CalendarClock,
+  Image as ImageIcon,
+  Tags,
+  Plus,
+  Trash2,
+  Upload,
+  Save,
+  Rocket,
+  Archive,
+  Search,
+} from "lucide-react";
 
 type Props = {
   title: string;
@@ -44,22 +62,27 @@ type Props = {
 
   dangerLabel?: string;
   dangerDisabled?: boolean;
-  onDanger?: () => Promise<void>;
+  onDanger?: () => void;
 };
 
-const inputBase =
-  "w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition " + "focus:border-gray-300 focus:ring-4 focus:ring-gray-900/5";
+const inputBase = cn(
+  "w-full rounded-2xl border px-3 py-2 text-sm outline-none transition",
+  "border-[var(--dash-border)] bg-[var(--dash-bg)] text-[var(--dash-text)] placeholder:text-[var(--dash-muted)]",
+  "focus-visible:ring-2 focus-visible:ring-[var(--dash-red-soft)]",
+);
 
-const softCard = "rounded-2xl border border-gray-200/70 bg-white shadow-sm";
-const sectionTitle = "flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500";
+const softCard = cn(
+  "rounded-3xl border shadow-[var(--dash-shadow)]/14",
+  "border-[var(--dash-border)] bg-[var(--dash-surface)]",
+);
 
 function Divider() {
-  return <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />;
+  return <div className="h-px w-full bg-[var(--dash-border)]/80" />;
 }
 
 function SectionHeader({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className={sectionTitle}>
+    <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--dash-muted)] uppercase">
       {icon}
       <span>{label}</span>
     </div>
@@ -67,6 +90,9 @@ function SectionHeader({ icon, label }: { icon: React.ReactNode; label: string }
 }
 
 export default function BlogPostSidebar(props: Props) {
+  const { resolvedTheme } = useAdminTheme();
+  const isDark = resolvedTheme === "dark";
+
   const [newCatName, setNewCatName] = React.useState("");
 
   const filteredCats = React.useMemo(() => {
@@ -76,7 +102,8 @@ export default function BlogPostSidebar(props: Props) {
   }, [props.categories, props.categorySearch]);
 
   function toggleCategory(id: string) {
-    if (props.categoryIds.includes(id)) props.setCategoryIds(props.categoryIds.filter((x) => x !== id));
+    if (props.categoryIds.includes(id))
+      props.setCategoryIds(props.categoryIds.filter((x) => x !== id));
     else props.setCategoryIds([...props.categoryIds, id]);
   }
 
@@ -90,16 +117,33 @@ export default function BlogPostSidebar(props: Props) {
   const showDanger = !!props.dangerLabel && !!props.onDanger;
 
   return (
-    <aside className="sticky top-6 h-[calc(100vh-3rem)] overflow-auto rounded-3xl border border-gray-200/70 bg-white/75 shadow-sm backdrop-blur">
+    <aside
+      className={cn(
+        "sticky top-6 h-[calc(100vh-3rem)] overflow-auto rounded-3xl border shadow-[var(--dash-shadow)]",
+        "border-[var(--dash-border)] bg-[var(--dash-surface)]",
+      )}
+    >
       {/* top bar */}
-      <div className="sticky top-0 z-10 border-b border-gray-200/70 bg-white/80 px-5 py-4 backdrop-blur">
+      <div
+        className={cn(
+          "sticky top-0 z-10 border-b px-5 py-4 backdrop-blur",
+          "border-[var(--dash-border)] bg-[var(--dash-surface)]/80",
+        )}
+      >
         <div className="flex items-center gap-3">
-          <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-900 text-white shadow-sm">
+          <div
+            className={cn(
+              "inline-flex h-10 w-10 items-center justify-center rounded-2xl border",
+              "border-[var(--dash-border)] bg-[var(--dash-bg)] text-[var(--dash-text)]",
+            )}
+          >
             <Settings2 className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-sm font-semibold text-gray-900">Post settings</div>
-            <div className="mt-0.5 text-xs text-gray-500">Details, banner, categories.</div>
+            <div className="text-sm font-semibold text-[var(--dash-text)]">Post settings</div>
+            <div className="mt-0.5 text-xs text-[var(--dash-muted)]">
+              Details, banner, categories.
+            </div>
           </div>
         </div>
       </div>
@@ -110,25 +154,43 @@ export default function BlogPostSidebar(props: Props) {
           <SectionHeader icon={<Type className="h-4 w-4" />} label="Basics" />
           <div className="mt-3 space-y-4">
             <div>
-              <div className="mb-1 flex items-center gap-2 text-xs font-medium text-gray-500">
+              <div className="mb-1 flex items-center gap-2 text-xs font-medium text-[var(--dash-muted)]">
                 <Type className="h-3.5 w-3.5" /> Title
               </div>
-              <input value={props.title} onChange={(e) => props.setTitle(e.target.value)} placeholder="Post title" className={inputBase} />
+              <input
+                value={props.title}
+                onChange={(e) => props.setTitle(e.target.value)}
+                placeholder="Post title"
+                className={inputBase}
+              />
             </div>
 
             <div>
-              <div className="mb-1 flex items-center gap-2 text-xs font-medium text-gray-500">
+              <div className="mb-1 flex items-center gap-2 text-xs font-medium text-[var(--dash-muted)]">
                 <Link2 className="h-3.5 w-3.5" /> Slug
               </div>
-              <input value={props.slug} onChange={(e) => props.setSlug(e.target.value)} placeholder="auto-generated if empty" className={inputBase} />
-              <div className="mt-1 text-[11px] text-gray-400">Leave blank to generate from title.</div>
+              <input
+                value={props.slug}
+                onChange={(e) => props.setSlug(e.target.value)}
+                placeholder="auto-generated if empty"
+                className={inputBase}
+              />
+              <div className="mt-1 text-[11px] text-[var(--dash-muted)]">
+                Leave blank to generate from title.
+              </div>
             </div>
 
             <div>
-              <div className="mb-1 flex items-center gap-2 text-xs font-medium text-gray-500">
+              <div className="mb-1 flex items-center gap-2 text-xs font-medium text-[var(--dash-muted)]">
                 <AlignLeft className="h-3.5 w-3.5" /> Excerpt
               </div>
-              <textarea value={props.excerpt} onChange={(e) => props.setExcerpt(e.target.value)} placeholder="Short summary (optional)" rows={4} className={cn(inputBase, "resize-none")} />
+              <textarea
+                value={props.excerpt}
+                onChange={(e) => props.setExcerpt(e.target.value)}
+                placeholder="Short summary (optional)"
+                rows={4}
+                className={cn(inputBase, "resize-none")}
+              />
             </div>
           </div>
         </section>
@@ -137,7 +199,9 @@ export default function BlogPostSidebar(props: Props) {
         <section className={cn(softCard, "p-4")}>
           <SectionHeader icon={<CalendarClock className="h-4 w-4" />} label="Publishing" />
           <div className="mt-3">
-            <div className="mb-1 text-xs font-medium text-gray-500">Publish at (optional)</div>
+            <div className="mb-1 text-xs font-medium text-[var(--dash-muted)]">
+              Publish at (optional)
+            </div>
             <input
               type="datetime-local"
               value={props.publishedAt}
@@ -145,14 +209,27 @@ export default function BlogPostSidebar(props: Props) {
               className={cn(inputBase, !props.publishAtEnabled ? "opacity-60" : "")}
               disabled={!props.publishAtEnabled}
             />
-            <div className="mt-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-[12px] text-gray-600">
+            <div
+              className={cn(
+                "mt-2 rounded-2xl border px-3 py-2 text-[12px]",
+                "border-[var(--dash-border)] bg-[var(--dash-bg)] text-[var(--dash-muted)]",
+              )}
+            >
               {props.publishAtEnabled ? (
                 <>
-                  Used only when you click <span className="font-medium text-gray-800">{props.secondaryLabel}</span>.
+                  Used only when you click{" "}
+                  <span className="font-semibold text-[var(--dash-text)]">
+                    {props.secondaryLabel}
+                  </span>
+                  .
                 </>
               ) : (
                 <>
-                  Disabled because <span className="font-medium text-gray-800">{props.secondaryLabel}</span> does not use a publish date.
+                  Disabled because{" "}
+                  <span className="font-semibold text-[var(--dash-text)]">
+                    {props.secondaryLabel}
+                  </span>{" "}
+                  does not use a publish date.
                 </>
               )}
             </div>
@@ -166,33 +243,46 @@ export default function BlogPostSidebar(props: Props) {
           <div className="mt-3">
             {props.bannerImage?.url ? (
               <div className="space-y-3">
-                <div className="overflow-hidden rounded-2xl border border-gray-200">
-                  <img src={props.bannerImage.url} alt="banner" className="h-44 w-full object-cover" />
+                <div className="overflow-hidden rounded-3xl border border-[var(--dash-border)]">
+                  <img
+                    src={props.bannerImage.url}
+                    alt="banner"
+                    className="h-44 w-full object-cover"
+                  />
                 </div>
 
-                <button
-                  type="button"
+                <SoftButton
+                  icon={<Trash2 className="h-4 w-4" />}
+                  label="Remove banner"
+                  disabled={props.saving}
                   onClick={props.onRemoveBanner}
-                  className={cn(
-                    "inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition",
-                    "hover:bg-gray-50 hover:shadow focus:outline-none focus:ring-4 focus:ring-gray-900/5",
-                  )}
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Remove banner
-                </button>
+                />
               </div>
             ) : (
-              <label className="group block cursor-pointer rounded-2xl border border-dashed border-gray-300 bg-gradient-to-b from-gray-50 to-white p-4 text-sm text-gray-600 transition hover:border-gray-400">
+              <label
+                className={cn(
+                  "group block cursor-pointer rounded-3xl border border-dashed p-4 text-sm transition",
+                  "border-[var(--dash-border)] bg-[var(--dash-bg)] text-[var(--dash-muted)] hover:bg-[var(--dash-surface-2)]",
+                )}
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2 font-medium text-gray-800">
+                    <div className="flex items-center gap-2 font-semibold text-[var(--dash-text)]">
                       <Upload className="h-4 w-4" />
                       Upload banner
                     </div>
-                    <div className="mt-1 text-xs text-gray-500">PNG/JPG/WebP. Recommended wide image.</div>
+                    <div className="mt-1 text-xs text-[var(--dash-muted)]">
+                      PNG/JPG/WebP. Recommended wide image.
+                    </div>
                   </div>
-                  <div className="shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-700 shadow-sm transition group-hover:shadow">Choose</div>
+                  <div
+                    className={cn(
+                      "shrink-0 rounded-2xl border px-3 py-1.5 text-xs shadow-[var(--dash-shadow)]/12 transition",
+                      "border-[var(--dash-border)] bg-[var(--dash-surface)] text-[var(--dash-text)] group-hover:bg-[var(--dash-surface-2)]",
+                    )}
+                  >
+                    Choose
+                  </div>
                 </div>
 
                 <input
@@ -216,11 +306,21 @@ export default function BlogPostSidebar(props: Props) {
           <SectionHeader icon={<Tags className="h-4 w-4" />} label="Categories" />
 
           <div className="relative mt-3">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <input value={props.categorySearch} onChange={(e) => props.setCategorySearch(e.target.value)} placeholder="Search categories…" className={cn(inputBase, "pl-9")} />
+            <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[var(--dash-muted)]" />
+            <input
+              value={props.categorySearch}
+              onChange={(e) => props.setCategorySearch(e.target.value)}
+              placeholder="Search categories…"
+              className={cn(inputBase, "pl-9")}
+            />
           </div>
 
-          <div className="mt-3 max-h-48 overflow-auto rounded-2xl border border-gray-200 bg-gray-50 p-2">
+          <div
+            className={cn(
+              "mt-3 max-h-48 overflow-auto rounded-3xl border p-2",
+              "border-[var(--dash-border)] bg-[var(--dash-bg)]",
+            )}
+          >
             {filteredCats.length ? (
               <div className="space-y-1">
                 {filteredCats.map((c) => {
@@ -228,41 +328,55 @@ export default function BlogPostSidebar(props: Props) {
                   const checked = props.categoryIds.includes(id);
 
                   return (
-                    <button
-                      type="button"
+                    <div
                       key={id}
-                      onClick={() => toggleCategory(id)}
-                      className={cn("flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left text-sm transition", checked ? "bg-white shadow-sm ring-1 ring-gray-900/5" : "hover:bg-white/70")}
+                      className={cn(
+                        "flex items-center gap-2 rounded-2xl px-2.5 py-2 transition",
+                        checked ? "bg-[var(--dash-surface)]" : "hover:bg-[var(--dash-surface-2)]",
+                      )}
                     >
-                      <span
-                        className={cn(
-                          "inline-flex h-5 w-5 items-center justify-center rounded-md border transition",
-                          checked ? "border-gray-900 bg-gray-900 text-white" : "border-gray-300 bg-white text-transparent",
-                        )}
+                      <Checkbox
+                        checked={checked}
+                        onChange={() => toggleCategory(id)}
+                        label={`Category ${c.name}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => toggleCategory(id)}
+                        className="flex min-w-0 flex-1 items-center gap-2 text-left"
                       >
-                        <Check className="h-3.5 w-3.5" />
-                      </span>
-                      <span className="text-gray-800">{c.name}</span>
-                      <span className="ml-auto text-[11px] text-gray-400">{c.slug}</span>
-                    </button>
+                        <span className="truncate text-sm font-medium text-[var(--dash-text)]">
+                          {c.name}
+                        </span>
+                        <span className="ml-auto shrink-0 text-[11px] text-[var(--dash-muted)]">
+                          {c.slug}
+                        </span>
+                      </button>
+                    </div>
                   );
                 })}
               </div>
             ) : (
-              <div className="p-3 text-sm text-gray-500">No categories found.</div>
+              <div className="p-3 text-sm text-[var(--dash-muted)]">No categories found.</div>
             )}
           </div>
 
           <Divider />
 
           <div className="mt-3 flex gap-2">
-            <input value={newCatName} onChange={(e) => setNewCatName(e.target.value)} placeholder="New category name" className={inputBase} />
+            <input
+              value={newCatName}
+              onChange={(e) => setNewCatName(e.target.value)}
+              placeholder="New category name"
+              className={inputBase}
+            />
             <button
               type="button"
               onClick={createCategory}
               className={cn(
-                "inline-flex shrink-0 items-center gap-2 rounded-xl bg-gray-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition",
-                "hover:bg-gray-800 hover:shadow focus:outline-none focus:ring-4 focus:ring-gray-900/10",
+                "inline-flex shrink-0 items-center gap-2 rounded-2xl px-3 py-2 text-sm font-semibold transition",
+                "bg-[var(--dash-red)] text-white hover:brightness-110",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dash-red-soft)]",
               )}
             >
               <Plus className="h-4 w-4" />
@@ -281,12 +395,13 @@ export default function BlogPostSidebar(props: Props) {
               disabled={props.saving}
               onClick={props.onPrimary}
               className={cn(
-                "inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 shadow-sm transition",
-                "hover:bg-gray-50 hover:shadow focus:outline-none focus:ring-4 focus:ring-gray-900/5",
+                "inline-flex w-full items-center justify-center gap-2 rounded-2xl border px-3 py-2 text-sm font-semibold transition",
+                "border-[var(--dash-border)] bg-[var(--dash-surface)] text-[var(--dash-text)] hover:bg-[var(--dash-surface-2)]",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dash-red-soft)]",
                 "disabled:opacity-50",
               )}
             >
-              <Save className="h-4 w-4" />
+              <Save className="h-4 w-4 text-[var(--dash-muted)]" />
               {props.primaryLabel}
             </button>
 
@@ -295,8 +410,9 @@ export default function BlogPostSidebar(props: Props) {
               disabled={props.saving || props.secondaryDisabled}
               onClick={props.onSecondary}
               className={cn(
-                "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-gray-900 to-gray-800 px-3 py-2 text-sm font-semibold text-white shadow-sm transition",
-                "hover:shadow-md focus:outline-none focus:ring-4 focus:ring-gray-900/10",
+                "inline-flex w-full items-center justify-center gap-2 rounded-2xl px-3 py-2 text-sm font-semibold transition",
+                "bg-[var(--dash-red)] text-white hover:brightness-110",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dash-red-soft)]",
                 "disabled:opacity-50",
               )}
             >
@@ -312,15 +428,20 @@ export default function BlogPostSidebar(props: Props) {
                   disabled={props.saving || props.dangerDisabled}
                   onClick={() => props.onDanger?.()}
                   className={cn(
-                    "inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 shadow-sm transition",
-                    "hover:bg-red-100 hover:shadow focus:outline-none focus:ring-4 focus:ring-red-500/10",
+                    "inline-flex w-full items-center justify-center gap-2 rounded-2xl px-3 py-2 text-sm font-semibold transition",
+                    isDark
+                      ? "border border-red-500/25 bg-red-600/15 text-red-50 hover:bg-red-600/20"
+                      : "border border-red-200 bg-red-50 text-red-900 hover:bg-red-100",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/30",
                     "disabled:opacity-50",
                   )}
                 >
                   <Archive className="h-4 w-4" />
                   {props.dangerLabel}
                 </button>
-                <div className="pt-1 text-center text-[11px] text-gray-400">Archived posts won’t show publicly.</div>
+                <div className="pt-1 text-center text-[11px] text-[var(--dash-muted)]">
+                  Archived posts won’t show publicly.
+                </div>
               </>
             ) : null}
           </div>
