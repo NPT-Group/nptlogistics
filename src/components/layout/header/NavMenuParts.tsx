@@ -63,12 +63,20 @@ function Icon({ name }: { name?: NavLink["icon"] }) {
   );
 }
 
-function MenuLink({ href, label, description, icon, children }: NavLink) {
+function MenuLink({
+  href,
+  label,
+  description,
+  icon,
+  children,
+  onNavigate,
+}: NavLink & { onNavigate?: () => void }) {
   return (
     <div className="rounded-xl">
       <NavigationMenu.Link asChild>
         <Link
           href={href}
+          onClick={onNavigate}
           className={cn(
             "group block cursor-pointer rounded-2xl p-3 transition",
             "border border-transparent",
@@ -110,6 +118,7 @@ function MenuLink({ href, label, description, icon, children }: NavLink) {
             <NavigationMenu.Link key={child.href} asChild>
               <Link
                 href={child.href}
+                onClick={onNavigate}
                 className={cn(
                   "group block cursor-pointer rounded-xl px-3 py-2 text-sm transition",
                   "text-[color:var(--color-menu-muted)]",
@@ -180,13 +189,15 @@ const NavTrigger = React.forwardRef<
     label: string;
     onMouseEnter: () => void;
     onFocus: () => void;
+    onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   }
->(function NavTrigger({ label, onMouseEnter, onFocus }, ref) {
+>(function NavTrigger({ label, onMouseEnter, onFocus, onClick }, ref) {
   return (
     <NavigationMenu.Trigger
       ref={ref}
       onMouseEnter={onMouseEnter}
       onFocus={onFocus}
+      onClick={onClick}
       className={cn(
         "inline-flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition",
         "text-[color:var(--color-nav-text)] hover:text-[color:var(--color-nav-text)]",
@@ -213,12 +224,16 @@ export function SolutionsMegaMenu({
   openMenu,
   scheduleClose,
   cancelClose,
+  closeMenu,
+  onPrimaryAction,
 }: {
   valueKey: string;
   value: string;
   openMenu: (v: string) => void;
   scheduleClose: () => void;
   cancelClose: () => void;
+  closeMenu: () => void;
+  onPrimaryAction: () => void;
 }) {
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const [triggerRect, setTriggerRect] = React.useState<TriggerRect>(null);
@@ -252,6 +267,12 @@ export function SolutionsMegaMenu({
         label={NAV.solutions.label}
         onMouseEnter={() => openMenu(valueKey)}
         onFocus={() => openMenu(valueKey)}
+        onClick={(event) => {
+          // Trigger click should navigate, not toggle menu open/close.
+          event.preventDefault();
+          event.stopPropagation();
+          onPrimaryAction();
+        }}
       />
 
       <NavigationMenu.Content
@@ -274,6 +295,7 @@ export function SolutionsMegaMenu({
                 <div className="mt-auto pt-6">
                   <Link
                     href={NAV.solutions.intro.ctaHref}
+                    onClick={closeMenu}
                     className={cn(
                       "inline-flex cursor-pointer items-center gap-2 text-sm font-semibold",
                       "text-[color:var(--color-menu-accent)] hover:text-[color:var(--color-menu-accent-hover)]",
@@ -295,7 +317,7 @@ export function SolutionsMegaMenu({
                       </div>
                       <div className="grid gap-2">
                         {cat.links.map((l) => (
-                          <MenuLink key={l.href} {...l} />
+                          <MenuLink key={l.href} {...l} onNavigate={closeMenu} />
                         ))}
                       </div>
                     </div>
@@ -317,6 +339,7 @@ export function DesktopRichDropdown({
   openMenu,
   scheduleClose,
   cancelClose,
+  closeMenu,
 }: {
   valueKey: string;
   section: typeof NAV.industries | typeof NAV.company | typeof NAV.careers;
@@ -324,6 +347,7 @@ export function DesktopRichDropdown({
   openMenu: (v: string) => void;
   scheduleClose: () => void;
   cancelClose: () => void;
+  closeMenu: () => void;
 }) {
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const [triggerRect, setTriggerRect] = React.useState<TriggerRect>(null);
@@ -359,6 +383,7 @@ export function DesktopRichDropdown({
         label={section.label}
         onMouseEnter={() => openMenu(valueKey)}
         onFocus={() => openMenu(valueKey)}
+        onClick={() => openMenu(valueKey)}
       />
 
       <NavigationMenu.Content
@@ -381,6 +406,7 @@ export function DesktopRichDropdown({
                 <div className="mt-auto pt-6">
                   <Link
                     href={section.intro.ctaHref}
+                    onClick={closeMenu}
                     className={cn(
                       "inline-flex cursor-pointer items-center gap-2 text-sm font-semibold",
                       "text-[color:var(--color-menu-accent)] hover:text-[color:var(--color-menu-accent-hover)]",
@@ -400,7 +426,7 @@ export function DesktopRichDropdown({
                       key={l.href}
                       className={cn(isCareers && i === 2 && "col-span-2")}
                     >
-                      <MenuLink {...l} />
+                      <MenuLink {...l} onNavigate={closeMenu} />
                     </div>
                   ))}
                 </div>

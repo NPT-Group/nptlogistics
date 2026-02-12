@@ -101,7 +101,7 @@ export const NAV = {
             description: "Cross-border execution + global modes as needed.",
             icon: "globe",
             children: [
-              { label: "Canada ↔ USA", href: "/services/cross-border#canada-usa" },
+              { label: "Canada ↔ USA", href: "/services/cross-border#canada-us" },
               { label: "Mexico Cross-Border", href: "/services/cross-border#mexico" },
               { label: "Ocean Freight", href: "/services/cross-border#ocean" },
               { label: "Air Freight", href: "/services/cross-border#air" },

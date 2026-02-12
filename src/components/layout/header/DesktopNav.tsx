@@ -2,12 +2,15 @@
 
 import React from "react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
+import { usePathname, useRouter } from "next/navigation";
 import { NAV } from "@/config/navigation";
 import { DesktopRichDropdown, SolutionsMegaMenu } from "@/components/layout/header/NavMenuParts";
 
 export function DesktopNav() {
   const [value, setValue] = React.useState<string>("");
   const closeTimer = React.useRef<number | null>(null);
+  const pathname = usePathname();
+  const router = useRouter();
 
   const openMenu = React.useCallback((v: string) => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
@@ -23,6 +26,32 @@ export function DesktopNav() {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
   }, []);
 
+  const closeMenu = React.useCallback(() => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    setValue("");
+  }, []);
+
+  React.useEffect(() => {
+    closeMenu();
+  }, [pathname, closeMenu]);
+
+  const navigateToSolutions = React.useCallback(() => {
+    closeMenu();
+
+    if (pathname === "/") {
+      const section = document.getElementById("solutions");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (window.location.hash !== "#solutions") {
+          window.history.replaceState(null, "", "#solutions");
+        }
+        return;
+      }
+    }
+
+    router.push("/#solutions");
+  }, [closeMenu, pathname, router]);
+
   React.useEffect(() => {
     return () => {
       if (closeTimer.current) window.clearTimeout(closeTimer.current);
@@ -37,7 +66,10 @@ export function DesktopNav() {
     >
       <NavigationMenu.Root
         value={value}
-        onValueChange={setValue}
+        onValueChange={(nextValue) => {
+          if (closeTimer.current) window.clearTimeout(closeTimer.current);
+          setValue(nextValue);
+        }}
         delayDuration={0}
         skipDelayDuration={0}
       >
@@ -48,6 +80,8 @@ export function DesktopNav() {
             openMenu={openMenu}
             scheduleClose={scheduleClose}
             cancelClose={cancelClose}
+            closeMenu={closeMenu}
+            onPrimaryAction={navigateToSolutions}
           />
 
           <DesktopRichDropdown
@@ -57,6 +91,7 @@ export function DesktopNav() {
             openMenu={openMenu}
             scheduleClose={scheduleClose}
             cancelClose={cancelClose}
+            closeMenu={closeMenu}
           />
 
           <DesktopRichDropdown
@@ -66,6 +101,7 @@ export function DesktopNav() {
             openMenu={openMenu}
             scheduleClose={scheduleClose}
             cancelClose={cancelClose}
+            closeMenu={closeMenu}
           />
 
           <DesktopRichDropdown
@@ -75,6 +111,7 @@ export function DesktopNav() {
             openMenu={openMenu}
             scheduleClose={scheduleClose}
             cancelClose={cancelClose}
+            closeMenu={closeMenu}
           />
         </NavigationMenu.List>
       </NavigationMenu.Root>
