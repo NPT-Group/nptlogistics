@@ -10,6 +10,7 @@ import {
   WHY_NPT_CARDS,
   WHY_NPT_DESKTOP_CARD_IDS,
   WHY_NPT_LOGISTICS_ORBIT_MARKERS,
+  WHY_NPT_MOBILE_CARD_IDS,
   WHY_NPT_SECTION,
   WHY_NPT_TOKENS,
   type WhyNptCard,
@@ -17,6 +18,9 @@ import {
 
 const DESKTOP_ORBIT_CARDS = WHY_NPT_CARDS.filter((card) =>
   WHY_NPT_DESKTOP_CARD_IDS.includes(card.id),
+);
+const MOBILE_STACK_CARDS = WHY_NPT_CARDS.filter((card) =>
+  WHY_NPT_MOBILE_CARD_IDS.includes(card.id),
 );
 
 function clamp(n: number, min: number, max: number) {
@@ -475,7 +479,7 @@ export function WhyNPTOrbit() {
               />
             </div>
 
-            {WHY_NPT_CARDS.map((card) => {
+            {MOBILE_STACK_CARDS.map((card) => {
               const Icon = card.icon;
 
               return (

@@ -127,6 +127,12 @@ export const WHY_NPT_DESKTOP_CARD_IDS: WhyNptCardId[] = [
   "xborder",
 ];
 
+export const WHY_NPT_MOBILE_CARD_IDS: WhyNptCardId[] = [
+  "execution",
+  "visibility",
+  "xborder",
+];
+
 export const WHY_NPT_LOGISTICS_ORBIT_MARKERS: WhyNptOrbitMarker[] = [
   { icon: Truck, angleDeg: -18, ringScale: 1.02 },
   { icon: TrainFront, angleDeg: 46, ringScale: 1.0 },

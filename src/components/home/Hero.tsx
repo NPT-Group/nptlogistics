@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/components/layout/Container";
@@ -14,6 +15,42 @@ const focusRing =
 
 export function Hero() {
   const reduceMotion = useReducedMotion();
+  const desktopVideoRef = React.useRef<HTMLVideoElement | null>(null);
+  const mobileVideoRef = React.useRef<HTMLVideoElement | null>(null);
+  const [desktopVideoState, setDesktopVideoState] = React.useState<"loading" | "ready" | "failed">(
+    "loading",
+  );
+  const [mobileVideoState, setMobileVideoState] = React.useState<"loading" | "ready" | "failed">(
+    "loading",
+  );
+
+  const markDesktopReady = React.useCallback(() => setDesktopVideoState("ready"), []);
+  const markMobileReady = React.useCallback(() => setMobileVideoState("ready"), []);
+  const markDesktopFailed = React.useCallback(() => setDesktopVideoState("failed"), []);
+  const markMobileFailed = React.useCallback(() => setMobileVideoState("failed"), []);
+
+  // Watchdog: some browsers can fail silently on bad src.
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const el = desktopVideoRef.current;
+      if (!el || desktopVideoState !== "loading") return;
+      if (el.error || el.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+        setDesktopVideoState("failed");
+      }
+    }, 2500);
+    return () => window.clearTimeout(timer);
+  }, [desktopVideoState]);
+
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const el = mobileVideoRef.current;
+      if (!el || mobileVideoState !== "loading") return;
+      if (el.error || el.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+        setMobileVideoState("failed");
+      }
+    }, 2500);
+    return () => window.clearTimeout(timer);
+  }, [mobileVideoState]);
 
   const stagger: Variants = reduceMotion
     ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
@@ -27,37 +64,50 @@ export function Hero() {
     <section className="relative overflow-hidden">
       {/* Background media */}
       <div className="absolute inset-0">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${POSTER})` }}
-          aria-hidden="true"
-        />
+        {desktopVideoState === "failed" ? (
+          <div
+            className="absolute inset-0 hidden bg-cover bg-center md:block"
+            style={{ backgroundImage: `url(${POSTER})` }}
+            aria-hidden="true"
+          />
+        ) : null}
+        {mobileVideoState === "failed" ? (
+          <div
+            className="absolute inset-0 block bg-cover bg-center md:hidden"
+            style={{ backgroundImage: `url(${POSTER})` }}
+            aria-hidden="true"
+          />
+        ) : null}
 
         <video
+          ref={desktopVideoRef}
           className="absolute inset-0 hidden h-full w-full object-cover md:block"
           autoPlay
           muted
           loop
           playsInline
           preload="metadata"
-          poster={POSTER}
           disablePictureInPicture
-        >
-          <source src={VIDEO_DESKTOP} type="video/mp4" />
-        </video>
+          onLoadedData={markDesktopReady}
+          onCanPlay={markDesktopReady}
+          onError={markDesktopFailed}
+          src={VIDEO_DESKTOP}
+        />
 
         <video
+          ref={mobileVideoRef}
           className="absolute inset-0 block h-full w-full object-cover md:hidden"
           autoPlay
           muted
           loop
           playsInline
           preload="metadata"
-          poster={POSTER}
           disablePictureInPicture
-        >
-          <source src={VIDEO_MOBILE} type="video/mp4" />
-        </video>
+          onLoadedData={markMobileReady}
+          onCanPlay={markMobileReady}
+          onError={markMobileFailed}
+          src={VIDEO_MOBILE}
+        />
 
         {/* Overlays */}
         <div className="absolute inset-0 bg-black/35" aria-hidden="true" />
