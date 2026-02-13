@@ -1,5 +1,5 @@
-import type { IBlogCategory, IBlogPost, EBlogStatus, BlockNoteDocJSON } from "@/types/blogPost.types";
-import type { IFileAsset } from "@/types/shared.types";
+import type { IBlogCategory, IBlogPost, EBlogStatus } from "@/types/blogPost.types";
+import type { BlockNoteDocJSON, IFileAsset } from "@/types/shared.types";
 
 export async function adminFetchCategories(q?: string): Promise<IBlogCategory[]> {
   const sp = new URLSearchParams();
@@ -54,7 +54,10 @@ export async function adminFetchPostById(id: string): Promise<IBlogPost> {
 
 export type AdminUpdatePostPayload = Partial<AdminCreatePostPayload>;
 
-export async function adminUpdatePost(id: string, payload: AdminUpdatePostPayload): Promise<IBlogPost> {
+export async function adminUpdatePost(
+  id: string,
+  payload: AdminUpdatePostPayload,
+): Promise<IBlogPost> {
   const res = await fetch(`/api/v1/admin/blog/${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -70,7 +73,10 @@ export async function adminUpdatePost(id: string, payload: AdminUpdatePostPayloa
 /* Status action endpoints                                                    */
 /* -------------------------------------------------------------------------- */
 
-export async function adminPublishPost(id: string, publishedAt?: string | Date | null): Promise<IBlogPost> {
+export async function adminPublishPost(
+  id: string,
+  publishedAt?: string | Date | null,
+): Promise<IBlogPost> {
   const res = await fetch(`/api/v1/admin/blog/${encodeURIComponent(id)}/publish`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -86,14 +92,18 @@ export async function adminPublishPost(id: string, publishedAt?: string | Date |
 }
 
 export async function adminUnpublishPost(id: string): Promise<IBlogPost> {
-  const res = await fetch(`/api/v1/admin/blog/${encodeURIComponent(id)}/unpublish`, { method: "POST" });
+  const res = await fetch(`/api/v1/admin/blog/${encodeURIComponent(id)}/unpublish`, {
+    method: "POST",
+  });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json?.message || "Failed to unpublish blog post");
   return adminFetchPostById(id);
 }
 
 export async function adminArchivePost(id: string): Promise<IBlogPost> {
-  const res = await fetch(`/api/v1/admin/blog/${encodeURIComponent(id)}/archive`, { method: "POST" });
+  const res = await fetch(`/api/v1/admin/blog/${encodeURIComponent(id)}/archive`, {
+    method: "POST",
+  });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json?.message || "Failed to archive blog post");
   return adminFetchPostById(id);
@@ -115,7 +125,10 @@ export async function adminBulkDeletePosts(ids: string[]): Promise<void> {
   if (!res.ok) throw new Error(json?.message || "Failed to bulk delete posts");
 }
 
-export async function adminUpdateCategory(id: string, payload: { name?: string; slug?: string; description?: string | null }): Promise<any> {
+export async function adminUpdateCategory(
+  id: string,
+  payload: { name?: string; slug?: string; description?: string | null },
+): Promise<any> {
   const res = await fetch(`/api/v1/admin/blog/categories/${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -127,13 +140,17 @@ export async function adminUpdateCategory(id: string, payload: { name?: string; 
 }
 
 export async function adminDeleteCategory(id: string): Promise<void> {
-  const res = await fetch(`/api/v1/admin/blog/categories/${encodeURIComponent(id)}`, { method: "DELETE" });
+  const res = await fetch(`/api/v1/admin/blog/categories/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json?.message || "Failed to delete category");
 }
 
 export async function adminDeleteComment(id: string): Promise<void> {
-  const res = await fetch(`/api/v1/admin/blog/comments/${encodeURIComponent(id)}`, { method: "DELETE" });
+  const res = await fetch(`/api/v1/admin/blog/comments/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json?.message || "Failed to delete comment");
 }

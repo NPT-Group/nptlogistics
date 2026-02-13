@@ -1,24 +1,26 @@
+// src/components/admin/jobs/JobEditor.tsx
 "use client";
 
 import * as React from "react";
 import dynamic from "next/dynamic";
 import type { PartialBlock } from "@blocknote/core";
 
-import type { IBlogCategory, IBlogPost } from "@/types/blogPost.types";
+import { cn } from "@/lib/utils/cn";
+import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
+import { ConfirmModal, type ConfirmTone } from "@/components/admin/ui/ConfirmModal";
+import { SoftButton } from "@/components/admin/ui/Buttons";
+
 import type { BlockNoteDocJSON, IFileAsset } from "@/types/shared.types";
+import type { IJobPosting, JobLocation, JobCompensation } from "@/types/jobPosting.types";
+import { EWorkplaceType, EEmploymentType, EJobPostingStatus } from "@/types/jobPosting.types";
 
 import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { IMAGE_MIME_TYPES, VIDEO_MIME_TYPES } from "@/types/shared.types";
 import { uploadToS3Presigned, type UploadResult } from "@/lib/utils/s3Helper";
 
-import BlogPostSidebar from "@/components/admin/blog/BlogPostSidebar";
-import { adminCreateCategory, adminFetchCategories } from "@/lib/utils/blog/adminBlogApi";
-import { cn } from "@/lib/utils/cn";
-import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
-
-import { ConfirmModal, type ConfirmTone } from "@/components/admin/ui/ConfirmModal";
-import { SoftButton } from "@/components/admin/ui/Buttons";
-import { ExternalLink, FileText, AlertTriangle } from "lucide-react";
+import JobPostingSidebar from "./JobPostingSidebar";
+import { AlertTriangle, Briefcase, ExternalLink } from "lucide-react";
+import { getAllowedJobActions } from "@/lib/utils/jobs/jobStatusTransitions";
 
 const BlockNote = dynamic(() => import("@/components/BlockNote"), {
   ssr: false,
@@ -34,17 +36,11 @@ const BlockNote = dynamic(() => import("@/components/BlockNote"), {
   ),
 });
 
-type SubmitPayload = {
-  title: string;
-  slug?: string;
-  excerpt?: string | null;
-  body: BlockNoteDocJSON;
-  bannerImage?: IFileAsset;
-  categoryIds?: string[];
-  publishedAt?: string | Date | null;
+type SubmitPayload = Partial<IJobPosting> & {
+  description: BlockNoteDocJSON;
 };
 
-type SecondaryActionKind = "PUBLISH" | "UNPUBLISH";
+type SecondaryActionKind = "PUBLISH" | "CLOSE";
 
 type Props = {
   mode: "create" | "edit";
@@ -54,25 +50,15 @@ type Props = {
   backHref: string;
   onBack: () => void;
 
-  initial?: Partial<
-    Pick<
-      IBlogPost,
-      | "title"
-      | "slug"
-      | "excerpt"
-      | "body"
-      | "bannerImage"
-      | "categoryIds"
-      | "publishedAt"
-      | "status"
-    >
-  >;
+  initial?: Partial<IJobPosting>;
 
   onSavePrimary: (payload: SubmitPayload) => Promise<void>;
   onSaveSecondary: (payload: SubmitPayload) => Promise<void>;
+
   primaryLabel: string;
   secondaryLabel: string;
   secondaryActionKind: SecondaryActionKind;
+
   secondaryDisabled?: boolean;
 
   dangerLabel?: string;
@@ -94,7 +80,7 @@ function fileToAsset(r: UploadResult): IFileAsset {
   };
 }
 
-async function uploadBlogMediaToTemp(file: File): Promise<UploadResult> {
+async function uploadJobsMediaToTemp(file: File): Promise<UploadResult> {
   const mt = (file.type || "").toLowerCase();
   const folder = mt.startsWith("image/")
     ? ES3Folder.MEDIA_IMAGES
@@ -108,19 +94,20 @@ async function uploadBlogMediaToTemp(file: File): Promise<UploadResult> {
 
   return uploadToS3Presigned({
     file,
-    namespace: ES3Namespace.BLOG_POSTS,
+    namespace: ES3Namespace.JOBS,
     folder,
     allowedMimeTypes,
     maxSizeMB: folder === ES3Folder.MEDIA_VIDEOS ? 250 : 25,
   });
 }
 
-async function uploadBannerToTemp(file: File): Promise<IFileAsset> {
-  if (!file.type.toLowerCase().startsWith("image/")) throw new Error("Banner must be an image.");
+async function uploadCoverToTemp(file: File): Promise<IFileAsset> {
+  if (!file.type.toLowerCase().startsWith("image/"))
+    throw new Error("Cover image must be an image.");
 
   const up = await uploadToS3Presigned({
     file,
-    namespace: ES3Namespace.BLOG_POSTS,
+    namespace: ES3Namespace.JOBS,
     folder: ES3Folder.MEDIA_IMAGES,
     allowedMimeTypes: IMAGE_MIME_TYPES,
     maxSizeMB: 10,
@@ -132,7 +119,6 @@ async function uploadBannerToTemp(file: File): Promise<IFileAsset> {
 function ChangePill({ saving, isDirty }: { saving: boolean; isDirty: boolean }) {
   const { resolvedTheme } = useAdminTheme();
   const isDark = resolvedTheme === "dark";
-
   const base = "rounded-full border px-3 py-1 text-xs font-medium shadow-[var(--dash-shadow)]/10";
 
   if (saving) {
@@ -182,44 +168,96 @@ function ChangePill({ saving, isDirty }: { saving: boolean; isDirty: boolean }) 
   );
 }
 
-export default function BlogEditor(props: Props) {
+export default function JobEditor(props: Props) {
   const { resolvedTheme } = useAdminTheme();
   const isDark = resolvedTheme === "dark";
 
-  const [doc, setDoc] = React.useState<PartialBlock[] | null>((props.initial?.body as any) ?? null);
+  const currentStatus = (props.initial?.status as EJobPostingStatus | undefined) ?? undefined;
+  const { canPublish, canClose, canArchive } = getAllowedJobActions(currentStatus);
+
+  const isRepublish =
+    currentStatus === EJobPostingStatus.ARCHIVED || currentStatus === EJobPostingStatus.CLOSED;
+
+  // Determine if the secondary action is allowed based on its kind:
+  const secondaryAllowed =
+    props.secondaryActionKind === "PUBLISH"
+      ? !!canPublish
+      : props.secondaryActionKind === "CLOSE"
+        ? !!canClose
+        : true;
+
+  const effectiveSecondaryDisabled = !!props.secondaryDisabled || !secondaryAllowed;
+
+  const effectiveSecondaryLabel =
+    props.secondaryActionKind === "PUBLISH"
+      ? isRepublish
+        ? "Republish"
+        : props.secondaryLabel
+      : props.secondaryLabel;
+
+  // Danger (archive) only when allowed
+  const showArchiveDanger = !!props.onDanger && !!props.dangerLabel && !!canArchive;
+  const effectiveDangerDisabled = !!props.dangerDisabled || !canArchive;
+
+  const [doc, setDoc] = React.useState<PartialBlock[] | null>(
+    (props.initial?.description as any) ?? null,
+  );
 
   const [title, setTitle] = React.useState(props.initial?.title ?? "");
   const [slug, setSlug] = React.useState(props.initial?.slug ?? "");
-  const [excerpt, setExcerpt] = React.useState((props.initial?.excerpt as any) ?? "");
+  const [department, setDepartment] = React.useState(props.initial?.department ?? "");
+  const [workplaceType, setWorkplaceType] = React.useState<string>(
+    String(props.initial?.workplaceType ?? EWorkplaceType.ONSITE),
+  );
+  const [employmentType, setEmploymentType] = React.useState<string>(
+    String(props.initial?.employmentType ?? EEmploymentType.FULL_TIME),
+  );
+  const [numberOfOpenings, setNumberOfOpenings] = React.useState<number>(
+    Number(props.initial?.numberOfOpenings ?? 1),
+  );
 
-  const [publishedAt, setPublishedAt] = React.useState(() => {
-    const v = props.initial?.publishedAt as any;
-    if (!v) return "";
-    const d = new Date(v);
-    if (isNaN(d.getTime())) return "";
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(
-      d.getMinutes(),
-    )}`;
+  const [summary, setSummary] = React.useState(props.initial?.summary ?? "");
+  const [tags, setTags] = React.useState((props.initial?.tags ?? []).join(", "));
+
+  const [allowApplications, setAllowApplications] = React.useState<boolean>(
+    props.initial?.allowApplications ?? true,
+  );
+
+  const [locationsText, setLocationsText] = React.useState<string>(() => {
+    const locs = Array.isArray(props.initial?.locations) ? props.initial!.locations : [];
+    return locs.map((l) => l.label).join("\n");
   });
 
-  const [bannerImage, setBannerImage] = React.useState<IFileAsset | undefined>(
-    props.initial?.bannerImage as any,
+  const [coverImage, setCoverImage] = React.useState<IFileAsset | undefined>(
+    props.initial?.coverImage as any,
   );
 
-  const [categories, setCategories] = React.useState<IBlogCategory[]>([]);
-  const [categoryIds, setCategoryIds] = React.useState<string[]>(
-    Array.isArray(props.initial?.categoryIds)
-      ? (props.initial!.categoryIds as any).map(String)
-      : [],
+  const [compCurrency, setCompCurrency] = React.useState(
+    props.initial?.compensation?.currency ?? "CAD",
   );
-  const [categorySearch, setCategorySearch] = React.useState("");
+  const [compMin, setCompMin] = React.useState<string>(
+    props.initial?.compensation?.min != null ? String(props.initial?.compensation?.min) : "",
+  );
+  const [compMax, setCompMax] = React.useState<string>(
+    props.initial?.compensation?.max != null ? String(props.initial?.compensation?.max) : "",
+  );
+  const [compInterval, setCompInterval] = React.useState<string>(
+    props.initial?.compensation?.interval ?? "YEAR",
+  );
+  const [compNote, setCompNote] = React.useState(props.initial?.compensation?.note ?? "");
+  const [compPublic, setCompPublic] = React.useState<boolean>(
+    props.initial?.compensation?.isPublic ?? false,
+  );
+
+  const [benefitsText, setBenefitsText] = React.useState<string>(() =>
+    (props.initial?.benefitsPreview ?? []).join("\n"),
+  );
 
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState<{ message: string; nonce: number } | null>(null);
   const errorRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Danger confirm modal
+  // Danger confirm
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmActionRef = React.useRef<null | (() => Promise<void>)>(null);
   const [confirmTone, setConfirmTone] = React.useState<ConfirmTone>("danger");
@@ -233,21 +271,40 @@ export default function BlogEditor(props: Props) {
     return JSON.stringify({
       title,
       slug,
-      excerpt,
-      publishedAt,
-      bannerImage: bannerImage
-        ? {
-            url: bannerImage.url,
-            s3Key: bannerImage.s3Key,
-            mimeType: bannerImage.mimeType,
-            sizeBytes: bannerImage.sizeBytes,
-            originalName: bannerImage.originalName,
-          }
-        : null,
-      categoryIds: [...categoryIds].sort(),
+      department,
+      workplaceType,
+      employmentType,
+      numberOfOpenings,
+      summary,
+      tags,
+      allowApplications,
+      locationsText,
+      coverImage: coverImage ? { url: coverImage.url, s3Key: coverImage.s3Key } : null,
+      compensation: { compCurrency, compMin, compMax, compInterval, compNote, compPublic },
+      benefitsText,
       doc: doc ?? null,
     });
-  }, [title, slug, excerpt, publishedAt, bannerImage, categoryIds, doc]);
+  }, [
+    title,
+    slug,
+    department,
+    workplaceType,
+    employmentType,
+    numberOfOpenings,
+    summary,
+    tags,
+    allowApplications,
+    locationsText,
+    coverImage,
+    compCurrency,
+    compMin,
+    compMax,
+    compInterval,
+    compNote,
+    compPublic,
+    benefitsText,
+    doc,
+  ]);
 
   const [isDirty, setIsDirty] = React.useState(false);
 
@@ -265,66 +322,93 @@ export default function BlogEditor(props: Props) {
     setIsDirty(false);
   }
 
-  async function refreshCategories() {
-    const items = await adminFetchCategories();
-    setCategories(items);
-  }
-
-  React.useEffect(() => {
-    refreshCategories().catch((e) =>
-      setError({ message: e?.message || "Failed to load categories", nonce: Date.now() }),
-    );
-  }, []);
-
   React.useEffect(() => {
     if (!error) return;
     requestAnimationFrame(() => {
       errorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      errorRef.current?.focus?.();
+      (errorRef.current as any)?.focus?.();
     });
   }, [error?.nonce]);
 
-  async function onCreateCategory(name: string) {
-    const created = await adminCreateCategory(name);
-    await refreshCategories();
-    setCategoryIds((prev) =>
-      prev.includes(String(created.id)) ? prev : [...prev, String(created.id)],
-    );
-  }
-
-  async function onPickBanner(file: File) {
+  async function onPickCover(file: File) {
     setError(null);
-    const asset = await uploadBannerToTemp(file);
-    setBannerImage(asset);
+    const asset = await uploadCoverToTemp(file);
+    setCoverImage(asset);
   }
 
-  function onRemoveBanner() {
-    setBannerImage(undefined);
+  function onRemoveCover() {
+    setCoverImage(undefined);
   }
 
   function coerceBody(): BlockNoteDocJSON {
     return (doc ?? []) as unknown as BlockNoteDocJSON;
   }
 
-  function publishedAtToApiValue(): string | null {
-    const v = publishedAt?.trim();
-    if (!v) return null;
-    return v;
+  function parseLocations(): JobLocation[] {
+    const lines = locationsText
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+
+    if (!lines.length) throw new Error("At least one location is required.");
+    return lines.map((label) => ({ label }));
+  }
+
+  function parseTags(): string[] | undefined {
+    const out = tags
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+    return out.length ? out : undefined;
+  }
+
+  function buildCompensation(): JobCompensation | undefined {
+    const min = compMin.trim() ? Number(compMin) : undefined;
+    const max = compMax.trim() ? Number(compMax) : undefined;
+
+    if (compCurrency.trim() || min != null || max != null || compNote.trim()) {
+      return {
+        currency: compCurrency.trim() || undefined,
+        min: Number.isFinite(min as any) ? min : undefined,
+        max: Number.isFinite(max as any) ? max : undefined,
+        interval: (compInterval as any) || undefined,
+        note: compNote.trim() || undefined,
+        isPublic: !!compPublic,
+      };
+    }
+    return undefined;
+  }
+
+  function parseBenefits(): string[] | undefined {
+    const out = benefitsText
+      .split("\n")
+      .map((x) => x.trim())
+      .filter(Boolean);
+    return out.length ? out : undefined;
   }
 
   function buildPayload(): SubmitPayload {
     const t = title.trim();
     if (!t) throw new Error("Title is required.");
-    if (!doc) throw new Error("Body is required.");
+    if (!doc) throw new Error("Description is required.");
+    if (!Number.isFinite(numberOfOpenings) || numberOfOpenings < 1)
+      throw new Error("Openings must be at least 1.");
 
     return {
       title: t,
       slug: slug.trim() || undefined,
-      excerpt: excerpt.trim() || undefined,
-      body: coerceBody(),
-      bannerImage,
-      categoryIds: categoryIds.length ? categoryIds : undefined,
-      publishedAt: publishedAtToApiValue(),
+      department: department.trim() || undefined,
+      workplaceType: workplaceType as any,
+      employmentType: employmentType as any,
+      numberOfOpenings,
+      locations: parseLocations(),
+      summary: summary.trim() || undefined,
+      tags: parseTags(),
+      description: coerceBody(),
+      coverImage,
+      compensation: buildCompensation(),
+      benefitsPreview: parseBenefits(),
+      allowApplications,
     };
   }
 
@@ -344,15 +428,14 @@ export default function BlogEditor(props: Props) {
 
   function confirmDanger() {
     if (!props.onDanger) return;
+    if (!canArchive) return;
 
-    const title = props.dangerConfirmTitle ?? "Archive this post?";
+    const title = props.dangerConfirmTitle ?? "Archive this job?";
     const body =
       props.dangerConfirmBody ??
-      "This will archive the post and remove it from public listings. You can publish again later to restore it.";
+      "This will archive the posting and remove it from public listings.";
 
-    confirmActionRef.current = async () => {
-      await runAction(props.onDanger!);
-    };
+    confirmActionRef.current = async () => runAction(props.onDanger!);
 
     setConfirmTone("danger");
     setConfirmTitle(title);
@@ -361,11 +444,8 @@ export default function BlogEditor(props: Props) {
     setConfirmOpen(true);
   }
 
-  const publishAtEnabled = props.secondaryActionKind === "PUBLISH";
-
   return (
     <div className="min-h-screen bg-[var(--dash-bg)]">
-      {/* subtle admin backdrop */}
       <div
         aria-hidden
         className={cn(
@@ -411,7 +491,7 @@ export default function BlogEditor(props: Props) {
                     "border-[var(--dash-border)] bg-[var(--dash-bg)] text-[var(--dash-text)]",
                   )}
                 >
-                  <FileText className="h-5 w-5" />
+                  <Briefcase className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
                   <div className="truncate text-2xl font-semibold tracking-tight text-[var(--dash-text)]">
@@ -464,7 +544,7 @@ export default function BlogEditor(props: Props) {
         </div>
 
         {/* Main */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_390px]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_410px]">
           {/* Editor */}
           <section
             className={cn(
@@ -479,9 +559,9 @@ export default function BlogEditor(props: Props) {
               )}
             >
               <div>
-                <div className="text-sm font-semibold text-[var(--dash-text)]">Content</div>
+                <div className="text-sm font-semibold text-[var(--dash-text)]">Description</div>
                 <div className="mt-0.5 text-xs text-[var(--dash-muted)]">
-                  Use “+” in the editor to add blocks.
+                  Use “+” to add blocks. Paste images/videos to upload.
                 </div>
               </div>
             </div>
@@ -496,57 +576,64 @@ export default function BlogEditor(props: Props) {
                 <div className="p-4">
                   <BlockNote
                     onChange={setDoc}
-                    uploadFile={uploadBlogMediaToTemp}
+                    uploadFile={uploadJobsMediaToTemp}
                     initialContent={doc ?? undefined}
-                    chrome={{
-                      borderColor: "var(--dash-border)",
-                      background: isDark ? "rgba(255,255,255,0.04)" : "white",
-                      className: "rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12",
-                    }}
                   />
                 </div>
-              </div>
-
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-[var(--dash-muted)]">
-                <span className="rounded-full border border-[var(--dash-border)] bg-[var(--dash-bg)] px-2.5 py-1">
-                  Tip: ⌘/Ctrl + K for links
-                </span>
-                <span className="rounded-full border border-[var(--dash-border)] bg-[var(--dash-bg)] px-2.5 py-1">
-                  Paste images/videos to upload
-                </span>
               </div>
             </div>
           </section>
 
           {/* Sidebar */}
-          <BlogPostSidebar
+          <JobPostingSidebar
             title={title}
             setTitle={setTitle}
             slug={slug}
             setSlug={setSlug}
-            excerpt={excerpt}
-            setExcerpt={setExcerpt}
-            publishedAt={publishedAt}
-            setPublishedAt={setPublishedAt}
-            publishAtEnabled={publishAtEnabled}
-            bannerImage={bannerImage}
-            onPickBanner={onPickBanner}
-            onRemoveBanner={onRemoveBanner}
-            categories={categories}
-            categoryIds={categoryIds}
-            setCategoryIds={setCategoryIds}
-            categorySearch={categorySearch}
-            setCategorySearch={setCategorySearch}
-            onCreateCategory={onCreateCategory}
+            department={department}
+            setDepartment={setDepartment}
+            workplaceType={workplaceType}
+            setWorkplaceType={setWorkplaceType}
+            employmentType={employmentType}
+            setEmploymentType={setEmploymentType}
+            numberOfOpenings={numberOfOpenings}
+            setNumberOfOpenings={setNumberOfOpenings}
+            locationsText={locationsText}
+            setLocationsText={setLocationsText}
+            summary={summary}
+            setSummary={setSummary}
+            tags={tags}
+            setTags={setTags}
+            allowApplications={allowApplications}
+            setAllowApplications={setAllowApplications}
+            coverImage={coverImage}
+            onPickCover={onPickCover}
+            onRemoveCover={onRemoveCover}
+            compCurrency={compCurrency}
+            setCompCurrency={setCompCurrency}
+            compMin={compMin}
+            setCompMin={setCompMin}
+            compMax={compMax}
+            setCompMax={setCompMax}
+            compInterval={compInterval}
+            setCompInterval={setCompInterval}
+            compNote={compNote}
+            setCompNote={setCompNote}
+            compPublic={compPublic}
+            setCompPublic={setCompPublic}
+            benefitsText={benefitsText}
+            setBenefitsText={setBenefitsText}
             saving={saving}
             primaryLabel={props.primaryLabel}
-            secondaryLabel={props.secondaryLabel}
-            secondaryDisabled={props.secondaryDisabled}
+            secondaryLabel={effectiveSecondaryLabel}
+            secondaryDisabled={effectiveSecondaryDisabled}
             onPrimary={() => runAction(props.onSavePrimary)}
             onSecondary={() => runAction(props.onSaveSecondary)}
-            dangerLabel={props.dangerLabel}
-            dangerDisabled={props.dangerDisabled}
-            onDanger={props.onDanger ? confirmDanger : undefined}
+            dangerLabel={showArchiveDanger ? props.dangerLabel : undefined}
+            dangerDisabled={effectiveDangerDisabled}
+            onDanger={showArchiveDanger ? confirmDanger : undefined}
+            secondaryActionKind={props.secondaryActionKind}
+            status={currentStatus}
           />
         </div>
       </div>

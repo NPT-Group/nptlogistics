@@ -18,6 +18,10 @@ export const POST = async (_req: NextRequest, ctx: { params: Promise<{ id: strin
     const job = await JobPostingModel.findById(id);
     if (!job) return errorResponse(404, "Job posting not found");
 
+    if ((job as any).status === EJobPostingStatus.PUBLISHED) {
+      return errorResponse(409, "Job is already published");
+    }
+
     (job as any).status = EJobPostingStatus.PUBLISHED;
     (job as any).publishedAt = (job as any).publishedAt ?? new Date();
     (job as any).closedAt = undefined;

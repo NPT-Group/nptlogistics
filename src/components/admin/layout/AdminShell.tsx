@@ -71,7 +71,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             { href: "/admin/blog/categories", label: "Categories", Icon: Tags },
           ],
         },
-        { href: "/admin/jobs", label: "Job postings", Icon: Briefcase },
+        {
+          href: "/admin/jobs",
+          label: "Jobs",
+          Icon: Briefcase,
+          children: [
+            { href: "/admin/jobs", label: "All postings", Icon: FolderTree },
+            { href: "/admin/jobs/new", label: "New posting", Icon: PlusCircle },
+            { href: "/admin/jobs/applications", label: "Applications", Icon: MessageSquareText },
+          ],
+        },
       ],
     },
     {
@@ -175,7 +184,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                         <div className="mt-1 space-y-0.5">
                           {item.children!.map((child) => {
                             const childActive =
-                              child.href === "/admin/blog"
+                              child.href === "/admin/blog" || child.href === "/admin/jobs"
                                 ? isExactPath(pathname, child.href)
                                 : isPathActive(pathname, child.href);
 

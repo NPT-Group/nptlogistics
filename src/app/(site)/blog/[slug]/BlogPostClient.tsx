@@ -7,14 +7,22 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import type { PartialBlock } from "@blocknote/core";
 import { ArrowLeft, Calendar, Clock, User2, ChevronLeft, ChevronRight } from "lucide-react";
-import { publicCountView, publicCreateComment, publicFetchComments } from "@/lib/utils/blog/publicBlogApi";
+import {
+  publicCountView,
+  publicCreateComment,
+  publicFetchComments,
+} from "@/lib/utils/blog/publicBlogApi";
 
 const BlockNote = dynamic(() => import("@/components/BlockNote"), { ssr: false });
 
 function fmtDate(d?: any) {
   if (!d) return "";
   try {
-    return new Date(d).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    return new Date(d).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   } catch {
     return "";
   }
@@ -47,8 +55,12 @@ export default function BlogPostClient({
   const [comments, setComments] = React.useState<any[]>(initialComments ?? []);
   const [commentsMeta, setCommentsMeta] = React.useState<any>(initialCommentsMeta ?? null);
 
-  const [commentsPage, setCommentsPage] = React.useState<number>(safeInt(initialCommentsMeta?.page, 1));
-  const [pageSize, setPageSize] = React.useState<number>(safeInt(initialCommentsMeta?.pageSize, DEFAULT_PAGE_SIZE));
+  const [commentsPage, setCommentsPage] = React.useState<number>(
+    safeInt(initialCommentsMeta?.page, 1),
+  );
+  const [pageSize, setPageSize] = React.useState<number>(
+    safeInt(initialCommentsMeta?.pageSize, DEFAULT_PAGE_SIZE),
+  );
 
   const [commentsBusy, setCommentsBusy] = React.useState(false);
 
@@ -89,7 +101,12 @@ export default function BlogPostClient({
   async function fetchComments(page: number, nextPageSize = pageSize) {
     setCommentsBusy(true);
     try {
-      const data = await publicFetchComments(slug, { page, pageSize: nextPageSize, sortBy: "createdAt", sortDir: "desc" });
+      const data = await publicFetchComments(slug, {
+        page,
+        pageSize: nextPageSize,
+        sortBy: "createdAt",
+        sortDir: "desc",
+      });
       setComments(data.items ?? []);
       setCommentsMeta(data.meta ?? null);
       setCommentsPage(page);
@@ -177,7 +194,13 @@ export default function BlogPostClient({
       <div className="relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-slate-950" />
-          {bannerUrl ? <img src={bannerUrl} alt="Post banner" className="h-full w-full object-cover opacity-40" /> : null}
+          {bannerUrl ? (
+            <img
+              src={bannerUrl}
+              alt="Post banner"
+              className="h-full w-full object-cover opacity-40"
+            />
+          ) : null}
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/65 to-slate-950/25" />
         </div>
 
@@ -192,7 +215,9 @@ export default function BlogPostClient({
             </Link>
           </div>
 
-          <h1 className="mt-5 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">{initialPost?.title}</h1>
+          <h1 className="mt-5 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            {initialPost?.title}
+          </h1>
 
           <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/80">
             {initialPost?.author?.name ? <span>By {initialPost.author.name}</span> : null}
@@ -218,10 +243,17 @@ export default function BlogPostClient({
           {/* LEFT */}
           <div>
             <div className="rounded-[28px] border border-slate-200/70 bg-white p-7 shadow-sm">
-              {initialPost?.excerpt ? <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">{initialPost.excerpt}</div> : null}
+              {initialPost?.excerpt ? (
+                <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                  {initialPost.excerpt}
+                </div>
+              ) : null}
 
               <div className="prose max-w-none">
-                <BlockNote editable={false} initialContent={(initialPost.body as PartialBlock[]) ?? []} />
+                <BlockNote
+                  editable={false}
+                  initialContent={(initialPost.body as PartialBlock[]) ?? []}
+                />
               </div>
             </div>
 
@@ -232,11 +264,19 @@ export default function BlogPostClient({
 
                 <div className="flex items-center gap-2 text-xs text-slate-500">
                   {commentsMeta?.total ? <span>{commentsMeta.total} total</span> : null}
-                  {commentsBusy ? <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1">Loading…</span> : null}
+                  {commentsBusy ? (
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1">
+                      Loading…
+                    </span>
+                  ) : null}
                 </div>
               </div>
 
-              {err ? <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{err}</div> : null}
+              {err ? (
+                <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {err}
+                </div>
+              ) : null}
 
               {/* Form */}
               <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
@@ -247,17 +287,19 @@ export default function BlogPostClient({
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Your name"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:ring-4 focus:ring-slate-900/5"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 transition outline-none placeholder:text-slate-400 focus:ring-4 focus:ring-slate-900/5"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600">Email (optional)</label>
+                    <label className="mb-1 block text-xs font-medium text-slate-600">
+                      Email (optional)
+                    </label>
                     <input
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@company.com"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:ring-4 focus:ring-slate-900/5"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 transition outline-none placeholder:text-slate-400 focus:ring-4 focus:ring-slate-900/5"
                     />
                   </div>
                 </div>
@@ -269,12 +311,14 @@ export default function BlogPostClient({
                     onChange={(e) => setComment(e.target.value)}
                     placeholder="Write a comment…"
                     rows={3}
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:ring-4 focus:ring-slate-900/5"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 transition outline-none placeholder:text-slate-400 focus:ring-4 focus:ring-slate-900/5"
                   />
                 </div>
 
                 <div className="mt-3 flex items-center justify-between gap-3">
-                  <div className="text-xs text-slate-500">Be respectful. Your comment appears immediately.</div>
+                  <div className="text-xs text-slate-500">
+                    Be respectful. Your comment appears immediately.
+                  </div>
 
                   <button
                     disabled={busy || !name.trim() || !comment.trim()}
@@ -296,16 +340,24 @@ export default function BlogPostClient({
                         return (
                           <div key={String(c.id)} className="py-4">
                             <div className="flex items-start gap-3">
-                              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">{initial}</div>
+                              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">
+                                {initial}
+                              </div>
 
                               <div className="min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                  <div className="text-sm font-semibold text-slate-900">{c.name}</div>
+                                  <div className="text-sm font-semibold text-slate-900">
+                                    {c.name}
+                                  </div>
                                   <div className="text-xs text-slate-500">•</div>
-                                  <div className="text-xs text-slate-500">{c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}</div>
+                                  <div className="text-xs text-slate-500">
+                                    {c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}
+                                  </div>
                                 </div>
 
-                                <div className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{c.comment}</div>
+                                <div className="mt-1 text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
+                                  {c.comment}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -327,7 +379,8 @@ export default function BlogPostClient({
                         </button>
 
                         <div className="px-2 text-xs text-slate-600">
-                          Page <span className="font-semibold text-slate-900">{commentsPage}</span> of <span className="font-semibold text-slate-900">{totalPages}</span>
+                          Page <span className="font-semibold text-slate-900">{commentsPage}</span>{" "}
+                          of <span className="font-semibold text-slate-900">{totalPages}</span>
                         </div>
 
                         <button
@@ -343,7 +396,9 @@ export default function BlogPostClient({
                     </div>
                   </>
                 ) : (
-                  <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-4 text-sm text-slate-500">No comments yet. Be the first to share your thoughts.</div>
+                  <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-4 text-sm text-slate-500">
+                    No comments yet. Be the first to share your thoughts.
+                  </div>
                 )}
               </div>
             </div>
@@ -361,9 +416,16 @@ export default function BlogPostClient({
                     <User2 className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-slate-900">{initialPost?.author?.name ?? "Author"}</div>
-                    <div className="mt-1 text-xs text-slate-500">{initialPost?.author?.email ?? ""}</div>
-                    <div className="mt-3 text-sm text-slate-600">Logistics professional sharing insights on transportation, cross-border supply chains, and operational excellence.</div>
+                    <div className="text-sm font-semibold text-slate-900">
+                      {initialPost?.author?.name ?? "Author"}
+                    </div>
+                    <div className="mt-1 text-xs text-slate-500">
+                      {initialPost?.author?.email ?? ""}
+                    </div>
+                    <div className="mt-3 text-sm text-slate-600">
+                      Logistics professional sharing insights on transportation, cross-border supply
+                      chains, and operational excellence.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -374,12 +436,20 @@ export default function BlogPostClient({
 
                 <div className="mt-3 divide-y divide-slate-200">
                   {related.slice(0, 3).map((p: any) => (
-                    <Link key={String(p.id)} href={`/blog/${encodeURIComponent(p.slug)}`} className="block py-3 transition hover:opacity-80">
-                      <div className="line-clamp-2 text-sm font-semibold text-slate-900">{p.title}</div>
+                    <Link
+                      key={String(p.id)}
+                      href={`/blog/${encodeURIComponent(p.slug)}`}
+                      className="block py-3 transition hover:opacity-80"
+                    >
+                      <div className="line-clamp-2 text-sm font-semibold text-slate-900">
+                        {p.title}
+                      </div>
                       <div className="mt-1 text-xs text-slate-500">{fmtDate(p.publishedAt)}</div>
                     </Link>
                   ))}
-                  {!related.length ? <div className="py-3 text-sm text-slate-500">No related articles.</div> : null}
+                  {!related.length ? (
+                    <div className="py-3 text-sm text-slate-500">No related articles.</div>
+                  ) : null}
                 </div>
               </div>
             </div>

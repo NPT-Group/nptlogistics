@@ -1,3 +1,4 @@
+// src/components/BlockNote.tsx
 "use client";
 
 import "@mantine/core/styles.css";
@@ -8,13 +9,31 @@ import { useCreateBlockNote } from "@blocknote/react";
 import type { PartialBlock } from "@blocknote/core";
 import { MantineProvider } from "@mantine/core";
 import type { UploadResult } from "@/lib/utils/s3Helper";
-import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
 
 type Props = {
   initialContent?: PartialBlock[];
   onChange?: (doc: PartialBlock[]) => void;
   editable?: boolean;
+
+  /**
+   * Upload handler must return full UploadResult.
+   * BlockNote will use result.url to render, and we'll inject result into block props.
+   */
   uploadFile?: (file: File) => Promise<UploadResult>;
+
+  /**
+   * Optional wrapper styling overrides (admin can pass these; public pages can ignore).
+   */
+  chrome?: {
+    /** Outer wrapper class for the editor container */
+    className?: string;
+    /** Inline styles for the editor container */
+    style?: React.CSSProperties;
+    /** Border color (inline) */
+    borderColor?: string;
+    /** Background color (inline) */
+    background?: string;
+  };
 };
 
 function injectAssetsIntoBlocks(
@@ -32,14 +51,22 @@ function injectAssetsIntoBlocks(
       const props: any = next.props || {};
       const url: string | undefined = typeof props.url === "string" ? props.url : undefined;
 
+      // If we have a url and no asset yet, inject it (your existing behavior)
       if (url && !props.asset) {
         const asset = urlToAsset.get(url);
         if (asset) {
           props.asset = asset;
-          next.props = props;
         }
       }
 
+      // if asset exists and has a better URL, ensure props.url matches it
+      if (props.asset && typeof props.asset.url === "string" && props.asset.url) {
+        if (typeof props.url !== "string" || props.url !== props.asset.url) {
+          props.url = props.asset.url;
+        }
+      }
+
+      next.props = props;
       return next;
     });
 
@@ -51,10 +78,8 @@ export default function BlockNote({
   onChange,
   editable = true,
   uploadFile,
+  chrome,
 }: Props) {
-  const { resolvedTheme } = useAdminTheme();
-  const isDark = resolvedTheme === "dark";
-
   const urlToAssetRef = React.useRef<Map<string, UploadResult>>(new Map());
 
   const editor = useCreateBlockNote({
@@ -79,14 +104,18 @@ export default function BlockNote({
     return () => unsubscribe();
   }, [editor, onChange]);
 
+  const borderColor = chrome?.borderColor ?? "var(--dash-border)";
+  const background = chrome?.background ?? "white";
+
   return (
     <MantineProvider defaultColorScheme="light">
       <div className="bn-scope">
         <div
-          className="rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12"
+          className={chrome?.className ?? "rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12"}
           style={{
-            borderColor: "var(--dash-border)",
-            background: isDark ? "rgba(255,255,255,0.04)" : "white",
+            ...(chrome?.style ?? {}),
+            borderColor,
+            background,
           }}
         >
           {/* Keep BlockNote itself on light theme for CSS stability */}

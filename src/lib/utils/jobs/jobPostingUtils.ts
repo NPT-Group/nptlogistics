@@ -11,6 +11,9 @@ import {
 import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { JobPostingModel } from "@/mongoose/models/JobPosting";
 
+// ✅ add these imports
+import { IMAGE_MIME_TYPES, VIDEO_MIME_TYPES, EFileMimeType } from "@/types/shared.types";
+
 /** Ensure unique slug for JobPosting collection. */
 export async function ensureUniqueJobSlug(requested: string): Promise<string> {
   const base = slugify(trim(requested) || "job");
@@ -36,6 +39,20 @@ function isLikelyFileAsset(v: any): v is IFileAsset {
   );
 }
 
+// ✅ helper: decide folder by mimeType
+function folderForJobMediaAsset(asset: IFileAsset): ES3Folder {
+  const mt = String(asset.mimeType || "").toLowerCase() as EFileMimeType;
+
+  // Prefer explicit video match first
+  if (mt.startsWith("video/") || VIDEO_MIME_TYPES.includes(mt)) return ES3Folder.MEDIA_VIDEOS;
+
+  // Then images
+  if (mt.startsWith("image/") || IMAGE_MIME_TYPES.includes(mt)) return ES3Folder.MEDIA_IMAGES;
+
+  // If something odd slips through, keep it in images (or throw if you prefer strictness)
+  return ES3Folder.MEDIA_IMAGES;
+}
+
 /**
  * Finalize temp assets found inside an arbitrary JSON doc (BlockNote doc).
  * - Walks the object graph
@@ -57,12 +74,12 @@ export async function finalizeJobDocAssetsAllOrNothing({
 }> {
   const cache = new Map<string, IFileAsset>();
   const movedFinalKeys: string[] = [];
-
   const onMoved = (finalKey: string) => movedFinalKeys.push(finalKey);
 
-  const finalMediaFolder = makeEntityFinalPrefix(ES3Namespace.JOBS, jobId, ES3Folder.MEDIA_IMAGES);
+  // ✅ build both final destinations once
+  const finalImagesFolder = makeEntityFinalPrefix(ES3Namespace.JOBS, jobId, ES3Folder.MEDIA_IMAGES);
+  const finalVideosFolder = makeEntityFinalPrefix(ES3Namespace.JOBS, jobId, ES3Folder.MEDIA_VIDEOS);
 
-  // Deep walk + replace
   const seen = new Set<object>();
 
   async function walk(v: any): Promise<any> {
@@ -77,9 +94,11 @@ export async function finalizeJobDocAssetsAllOrNothing({
       return out;
     }
 
-    // If it looks like a file asset, finalize it
     if (isLikelyFileAsset(v)) {
-      const finalized = await finalizeAssetWithCache(v, finalMediaFolder, cache, onMoved);
+      const folder = folderForJobMediaAsset(v);
+      const dest = folder === ES3Folder.MEDIA_VIDEOS ? finalVideosFolder : finalImagesFolder;
+
+      const finalized = await finalizeAssetWithCache(v, dest, cache, onMoved);
       return finalized ?? v;
     }
 
@@ -87,16 +106,27 @@ export async function finalizeJobDocAssetsAllOrNothing({
     for (const k of Object.keys(out)) {
       out[k] = await walk(out[k]);
     }
+
+    // ✅ IMPORTANT: BlockNote blocks store the render URL separately from the asset object.
+    // If an object has both { url, asset }, ensure url tracks asset.url (finalized).
+    if (
+      typeof out.url === "string" &&
+      isLikelyFileAsset(out.asset) &&
+      typeof out.asset.url === "string" &&
+      out.asset.url
+    ) {
+      out.url = out.asset.url;
+    }
+
     return out;
   }
 
   const nextDescription = (await walk(description)) as BlockNoteDocJSON;
 
-  // cover image: finalize to images folder as well
-  const nextCover = await finalizeAssetWithCache(coverImage, finalMediaFolder, cache, onMoved);
+  // cover image: always images
+  const nextCover = await finalizeAssetWithCache(coverImage, finalImagesFolder, cache, onMoved);
 
   async function rollback() {
-    // best-effort rollback of moved objects (delete finals). (Only keys we moved.)
     if (!movedFinalKeys.length) return;
     try {
       await deleteS3Objects(movedFinalKeys);

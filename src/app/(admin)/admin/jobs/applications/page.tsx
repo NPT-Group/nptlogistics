@@ -1,15 +1,15 @@
-// src/app/(admin)/admin/jobs/page.tsx
+// src/app/(admin)/admin/jobs/applications/page.tsx
 import { nptMetadata } from "@/lib/utils/blog/metadata";
 import { ssrApiFetch } from "@/lib/utils/ssrFetch";
-import AdminJobsListClient from "./AdminJobsListClient";
+import AdminJobApplicationsClient from "./AdminJobApplicationsClient";
 
 export const metadata = nptMetadata({
-  title: "Admin - Jobs",
-  description: "Manage job postings.",
+  title: "Admin - Job applications",
+  description: "Review job applications.",
   noIndex: true,
 });
 
-export default async function AdminJobsPage({
+export default async function AdminJobApplicationsPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -24,8 +24,8 @@ export default async function AdminJobsPage({
   }
 
   const data = await ssrApiFetch<{ data: { items: any[]; meta: any } }>(
-    `/api/v1/admin/jobs?${qs.toString()}`,
+    `/api/v1/admin/job-applications?${qs.toString()}`,
   );
 
-  return <AdminJobsListClient initialItems={data.data.items} initialMeta={data.data.meta} />;
+  return <AdminJobApplicationsClient initialItems={data.data.items} initialMeta={data.data.meta} />;
 }
