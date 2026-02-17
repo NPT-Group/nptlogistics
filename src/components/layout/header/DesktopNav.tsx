@@ -52,6 +52,23 @@ export function DesktopNav() {
     router.push("/#solutions");
   }, [closeMenu, pathname, router]);
 
+  const navigateToIndustries = React.useCallback(() => {
+    closeMenu();
+
+    if (pathname === "/") {
+      const section = document.getElementById("industries");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (window.location.hash !== "#industries") {
+          window.history.replaceState(null, "", "#industries");
+        }
+        return;
+      }
+    }
+
+    router.push("/#industries");
+  }, [closeMenu, pathname, router]);
+
   React.useEffect(() => {
     return () => {
       if (closeTimer.current) window.clearTimeout(closeTimer.current);
@@ -92,6 +109,7 @@ export function DesktopNav() {
             scheduleClose={scheduleClose}
             cancelClose={cancelClose}
             closeMenu={closeMenu}
+            onPrimaryAction={navigateToIndustries}
           />
 
           <DesktopRichDropdown

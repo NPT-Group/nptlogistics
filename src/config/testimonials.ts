@@ -40,14 +40,14 @@ export const TRUST_PROOF_ITEMS: TestimonialItem[] = [
     title: "Watch NPT in Action",
     description: "A quick look at how our team executes with speed, control, and consistency.",
     youtubeUrl: "https://www.youtube.com/watch?v=mQv-1GA-HYo",
-    channelUrl: "https://www.youtube.com/@nptlogistics", // change if needed
+    channelUrl: "https://www.youtube.com/@SSPGroupofCompanies", 
   },
   {
     type: "testimonial",
     id: "ben-horther",
     rating: 5,
     quote:
-      "Our partnership with SSP has been excellent. They are consistently on time, provide clear updates, and step up quickly on special projects. They are one of our most reliable carrier partners in Canada.",
+      "Our partnership with NPT has been excellent. They are consistently on time, provide clear updates, and step up quickly on special projects. They are one of our most reliable carrier partners in Canada.",
     name: "Ben Horther",
   },
   {
@@ -87,13 +87,13 @@ export const TRUST_PROOF_ITEMS: TestimonialItem[] = [
 ];
 
 export const TRUST_PARTNER_LOGOS: PartnerLogo[] = [
-  { src: "/partners/CTPAT-icon.png", alt: "CTPAT certified" },
+  { src: "/partners/CTPAT-icon.png", alt: "CTPAT" },
   { src: "/partners/smartWay-icon.png", alt: "SmartWay" },
   { src: "/partners/ACI-icon.png", alt: "ACI" },
   { src: "/partners/CSA-icon.png", alt: "CSA" },
   { src: "/partners/pip-icon.png", alt: "PIP" },
   { src: "/partners/Haccp-icon.png", alt: "HACCP" },
   { src: "/partners/ccc-icon.png", alt: "CCC" },
-  { src: "/partners/Fast-free-secure-icon.png", alt: "FAST / Free and Secure" },
+  { src: "/partners/Fast-free-secure-icon.png", alt: "FAST" },
   { src: "/partners/Ace-icon.png", alt: "ACE" },
 ];

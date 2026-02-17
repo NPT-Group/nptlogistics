@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 
 const WhyNPTOrbit = dynamic(
-  () => import("./WhyNptOrbit").then((module) => module.WhyNPTOrbit),
+  () => import("./WhyNptOrbitVisualization").then((module) => module.WhyNPTOrbitVisualization),
   { ssr: false },
 );
 

@@ -5,13 +5,14 @@ import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/components/layout/Container";
 import { cn } from "@/lib/cn";
+import { trackCtaClick } from "@/lib/analytics/cta";
 
 const VIDEO_DESKTOP = "/hero/hero-desktop.mp4";
 const VIDEO_MOBILE = "/hero/hero-mobile.mp4";
 const POSTER = "/hero/hero-poster.png";
 
 const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-black/40";
+  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
 
 export function Hero() {
   const reduceMotion = useReducedMotion();
@@ -61,7 +62,7 @@ export function Hero() {
     : { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
 
   return (
-    <section className="relative overflow-hidden">
+    <section id="top" className="relative overflow-hidden">
       {/* Background media */}
       <div className="absolute inset-0">
         {desktopVideoState === "failed" ? (
@@ -92,6 +93,7 @@ export function Hero() {
           onCanPlay={markDesktopReady}
           onError={markDesktopFailed}
           src={VIDEO_DESKTOP}
+          aria-hidden="true"
         />
 
         <video
@@ -107,6 +109,7 @@ export function Hero() {
           onCanPlay={markMobileReady}
           onError={markMobileFailed}
           src={VIDEO_MOBILE}
+          aria-hidden="true"
         />
 
         {/* Overlays */}
@@ -177,8 +180,8 @@ export function Hero() {
                   "leading-relaxed tracking-wide",
                 )}
               >
-                Truckload, LTL, intermodal, and cross border shipping with proactive updates,
-                compliance first execution, and clear handoffs from pickup to delivery.
+                Truckload, LTL, intermodal, and cross-border shipping with proactive updates,
+                compliance-first execution, and clear handoffs from pickup to delivery.
               </p>
             </motion.div>
 
@@ -189,7 +192,15 @@ export function Hero() {
               className="mt-8 flex flex-wrap items-center gap-3"
             >
               <Link
-                href="/contact"
+                href="/quote"
+                onClick={() =>
+                  trackCtaClick({
+                    ctaId: "hero_primary_quote",
+                    location: "hero",
+                    destination: "/quote",
+                    label: "Request a Quote",
+                  })
+                }
                 className={cn(
                   "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold",
                   "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",
@@ -197,11 +208,19 @@ export function Hero() {
                   focusRing,
                 )}
               >
-                Contact Us
+                Request a Quote
               </Link>
 
               <Link
                 href="/#solutions"
+                onClick={() =>
+                  trackCtaClick({
+                    ctaId: "hero_secondary_explore_services",
+                    location: "hero",
+                    destination: "/#solutions",
+                    label: "Explore Services",
+                  })
+                }
                 className={cn(
                   "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold",
                   "border border-white/22 bg-white/10 text-white hover:bg-white/15",
@@ -209,7 +228,7 @@ export function Hero() {
                   focusRing,
                 )}
               >
-                Our Services
+                Explore Services
               </Link>
             </motion.div>
 
@@ -222,7 +241,7 @@ export function Hero() {
             >
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-white/55" />
-                Canada USA Mexico coverage
+                Canada • USA • Mexico coverage
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-white/55" />
@@ -230,7 +249,7 @@ export function Hero() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-white/55" />
-                Real time shipment visibility
+                Real-time shipment visibility
               </div>
             </motion.div>
           </motion.div>

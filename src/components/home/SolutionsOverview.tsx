@@ -7,6 +7,7 @@ import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/layout/Container";
 import { cn } from "@/lib/cn";
+import { trackCtaClick } from "@/lib/analytics/cta";
 import {
   SOLUTIONS_CATEGORIES,
   SOLUTIONS_DATA,
@@ -65,7 +66,7 @@ const SOLUTIONS_OVERVIEW_TOKENS = {
   },
 } as const;
 
-// Deterministic gradients (keeps your look, removes label parsing).
+// Deterministic gradients.
 const CARD_GRADIENTS: Record<CardTheme | "fallback", string> = {
   navy: "linear-gradient(-16deg, rgba(7,10,18,0.98), rgba(11,16,32,0.92))",
   red: "linear-gradient(-14deg, rgba(8,14,28,0.98), rgba(153,27,27,0.86))",
@@ -97,12 +98,13 @@ function resolveCategoryPresentation(
   category: keyof typeof SOLUTIONS_DATA,
   data: SolutionsCategory,
 ) {
-  // Prefer config if present, otherwise fall back to your current behavior based on category name.
+  // Prefer config if present, otherwise fall back to prior behavior.
   const theme =
     data.theme ??
     (category === "Specialized & Time-Sensitive" || category === "Logistics & Value-Added"
       ? "dark"
       : "default");
+
   const layout =
     data.layout ??
     (category === "Specialized & Time-Sensitive" ||
@@ -119,18 +121,20 @@ function resolveCategoryPresentation(
 
 function ServiceCard({
   card,
+  categoryKey,
   categoryImage,
   isFourGridCategory,
   isSpecializedThemeCategory,
   cardIndex,
 }: {
   card: SolutionServiceCard;
+  categoryKey: keyof typeof SOLUTIONS_DATA;
   categoryImage?: string;
   isFourGridCategory: boolean;
   isSpecializedThemeCategory: boolean;
   cardIndex: number;
 }) {
-  // Preserve your old “category-driven” variety if cardTheme isn’t specified.
+  // Preserve prior variety if cardTheme isn’t specified.
   const specializedGradients = [
     "linear-gradient(-16deg, rgba(8,14,28,0.98), rgba(30,41,59,0.9))",
     "linear-gradient(-14deg, rgba(38,8,12,0.98), rgba(153,27,27,0.86))",
@@ -153,9 +157,25 @@ function ServiceCard({
         ? coreThemeGradients[cardIndex % coreThemeGradients.length]
         : CARD_GRADIENTS.fallback;
 
+  const analyticsId =
+    card.analyticsId ??
+    card.label
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+
   return (
     <Link
       href={card.href}
+      onClick={() =>
+        trackCtaClick({
+          ctaId: `solutions_card_${analyticsId}`,
+          location: `solutions_overview:${String(categoryKey)}`,
+          destination: card.href,
+          label: card.label,
+        })
+      }
       className={cn(
         "group relative inline-block h-[360px] w-full max-w-[400px] overflow-hidden rounded-[24px] transition-all duration-500 min-[680px]:h-[372px] sm:h-[390px] sm:rounded-[30px] md:h-[372px] lg:h-[400px]",
         isFourGridCategory && "lg:h-[350px] lg:max-w-none",
@@ -390,6 +410,7 @@ function CategorySection({
               <ServiceCard
                 key={card.href}
                 card={card}
+                categoryKey={category}
                 cardIndex={cardIndex}
                 categoryImage={data.image}
                 isFourGridCategory={isFourGridCategory}
@@ -423,7 +444,6 @@ export function SolutionsOverview() {
 
     syncViewport();
 
-    // Safari compatibility (older)
     if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener("change", syncViewport);
       return () => mediaQuery.removeEventListener("change", syncViewport);
@@ -587,7 +607,11 @@ export function SolutionsOverview() {
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(500px_130px_at_50%_-20%,rgba(220,38,38,0.24),transparent_65%)]"
               aria-hidden="true"
             />
-            <div className="relative grid gap-2 sm:grid-cols-2 lg:grid-cols-4" role="tablist">
+            <div
+              className="relative grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
+              role="tablist"
+              aria-label="Shipping solution categories"
+            >
               {SOLUTIONS_CATEGORIES.map((category, index) => {
                 const isActive = activeCategory === category;
 
@@ -601,12 +625,18 @@ export function SolutionsOverview() {
                     role="tab"
                     type="button"
                     aria-selected={isActive}
-                    aria-controls={`solutions-panel-${index}`}
+                    aria-controls="solutions-panel"
                     tabIndex={isActive ? 0 : -1}
                     onKeyDown={(event) => handleTabKeyDown(event, index)}
                     onClick={() => {
                       setActiveCategory(category);
                       pauseAutoRotation();
+                      trackCtaClick({
+                        ctaId: `solutions_tab_${index + 1}`,
+                        location: "solutions_overview_tabs",
+                        destination: `category:${String(category)}`,
+                        label: String(category),
+                      });
                     }}
                     className={cn(
                       SOLUTIONS_OVERVIEW_TOKENS.classes.tabButton,
@@ -657,7 +687,7 @@ export function SolutionsOverview() {
       <AnimatePresence mode="wait">
         <motion.div
           key={activeCategory}
-          id={`solutions-panel-${activeIndex}`}
+          id="solutions-panel"
           role="tabpanel"
           aria-labelledby={`solutions-tab-${activeIndex}`}
           onMouseEnter={pauseAutoRotation}
@@ -678,7 +708,7 @@ export function SolutionsOverview() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Guidance Strip (unchanged) */}
+      {/* Guidance Strip */}
       <div className="relative border-t border-[color:var(--color-border-light)] bg-[color:var(--color-surface-0-light)] py-10 sm:py-12">
         <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
           <div className="relative overflow-hidden rounded-2xl border border-white/65 bg-white/82 px-5 py-6 shadow-[0_14px_38px_rgba(2,6,23,0.08),inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl sm:px-7 sm:py-7">
@@ -719,6 +749,14 @@ export function SolutionsOverview() {
               <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
                 <Link
                   href="/quote"
+                  onClick={() =>
+                    trackCtaClick({
+                      ctaId: "solutions_guidance_primary_request_quote",
+                      location: "solutions_guidance_strip",
+                      destination: "/quote",
+                      label: "Request a Quote",
+                    })
+                  }
                   className={cn(
                     "inline-flex h-11 w-full items-center justify-center rounded-md px-5 text-sm font-semibold sm:w-auto",
                     "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",
@@ -726,10 +764,18 @@ export function SolutionsOverview() {
                     "focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:outline-none",
                   )}
                 >
-                  Get a Quote
+                  Request a Quote
                 </Link>
                 <Link
                   href="/contact"
+                  onClick={() =>
+                    trackCtaClick({
+                      ctaId: "solutions_guidance_secondary_contact_operations",
+                      location: "solutions_guidance_strip",
+                      destination: "/contact",
+                      label: "Contact Operations",
+                    })
+                  }
                   className={cn(
                     "inline-flex h-11 w-full items-center justify-center rounded-md px-5 text-sm font-semibold sm:w-auto",
                     "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)]",
@@ -737,7 +783,7 @@ export function SolutionsOverview() {
                     "focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:outline-none",
                   )}
                 >
-                  Talk to a Logistics Expert
+                  Contact Operations
                 </Link>
               </div>
             </div>

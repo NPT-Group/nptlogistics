@@ -7,6 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/layout/Container";
 import { cn } from "@/lib/cn";
 import { INDUSTRIES_SECTION, INDUSTRY_SLIDES, type IndustrySlide } from "@/config/industries";
+import { trackCtaClick } from "@/lib/analytics/cta";
 
 const focusRing =
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
@@ -157,19 +158,22 @@ function DesktopStage({
           className="absolute inset-0"
           id={`${shellId}-panel`}
           role="tabpanel"
-          aria-labelledby={`industry-tab-${active.key}`}
+          aria-labelledby={`${shellId}-panel-heading-${active.key}`}
           initial={reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 1.01 }}
           animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
           exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.99 }}
           transition={{ duration: reduceMotion ? 0 : 0.35, ease: "easeOut" }}
         >
+          <h3 id={`${shellId}-panel-heading-${active.key}`} className="sr-only">
+            {active.label}
+          </h3>
           <Image
             src={active.image}
             alt=""
             fill
             priority={index === 0}
             className="object-cover"
-            sizes="1440px"
+            sizes="(min-width: 1440px) 1440px, 100vw"
           />
         </motion.div>
       </AnimatePresence>
@@ -198,7 +202,18 @@ function DesktopStage({
               <h3 className={TOKENS.desktopTitle}>{active.title}</h3>
               <p className={TOKENS.desktopSubtitle}>{active.subtitle}</p>
               <div className={TOKENS.ctaRow}>
-                <Link href={active.href} className={cn(TOKENS.ctaPrimary, focusRing)}>
+                <Link
+                  href={active.href}
+                  onClick={() =>
+                    trackCtaClick({
+                      ctaId: `industries_explore_${active.key}`,
+                      location: "industries_carousel_desktop",
+                      destination: active.href,
+                      label: `Explore ${active.label}`,
+                    })
+                  }
+                  className={cn(TOKENS.ctaPrimary, focusRing)}
+                >
                   Explore {active.label}
                 </Link>
               </div>
@@ -245,12 +260,15 @@ function MobileStage({
             className="absolute inset-0"
             id={`${shellId}-panel-mobile`}
             role="tabpanel"
-            aria-labelledby={`industry-tab-${active.key}`}
+            aria-labelledby={`${shellId}-panel-heading-${active.key}`}
             initial={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0 }}
             transition={{ duration: reduceMotion ? 0 : 0.3, ease: "easeOut" }}
           >
+            <h3 id={`${shellId}-panel-heading-${active.key}`} className="sr-only">
+              {active.label}
+            </h3>
             <Image
               src={active.image}
               alt=""
@@ -282,7 +300,18 @@ function MobileStage({
               {active.mobileSubtitle ?? active.subtitle}
             </p>
             <div className={TOKENS.ctaRow}>
-              <Link href={active.href} className={cn(TOKENS.ctaPrimary, focusRing)}>
+              <Link
+                href={active.href}
+                onClick={() =>
+                  trackCtaClick({
+                    ctaId: `industries_explore_${active.key}`,
+                    location: "industries_carousel_mobile",
+                    destination: active.href,
+                    label: `Explore ${active.label}`,
+                  })
+                }
+                className={cn(TOKENS.ctaPrimary, focusRing)}
+              >
                 Explore {active.label}
               </Link>
             </div>
@@ -320,6 +349,7 @@ export function IndustriesCarouselSection() {
 
   const onKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
+      if (e.currentTarget !== e.target) return;
       if (e.key === "ArrowLeft") {
         e.preventDefault();
         goPrev();
@@ -382,7 +412,7 @@ export function IndustriesCarouselSection() {
   );
 
   return (
-    <section id={INDUSTRIES_SECTION.id} className={TOKENS.section}>
+    <section id={INDUSTRIES_SECTION.id} className={cn(TOKENS.section, "scroll-mt-16")}>
       <div className="absolute inset-0" aria-hidden="true">
         <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#f7f1e8] to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(880px_460px_at_14%_12%,rgba(220,38,38,0.12),transparent_62%)]" />

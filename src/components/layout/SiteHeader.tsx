@@ -22,6 +22,18 @@ export function SiteHeader() {
         "shadow-[0_1px_0_rgba(255,255,255,0.04)]",
       )}
     >
+      <Link
+        href="#main-content"
+        className={cn(
+          "sr-only focus:not-sr-only",
+          "fixed top-4 left-4 z-[60]",
+          "rounded-md bg-white px-4 py-2 text-sm font-semibold text-black",
+          focusRing,
+        )}
+      >
+        Skip to content
+      </Link>
+
       <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo (NO hover background) */}

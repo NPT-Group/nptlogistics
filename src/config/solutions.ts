@@ -27,6 +27,9 @@ export type SolutionsTheme = "default" | "dark";
 export type SolutionsLayout = "auto" | "three" | "four";
 
 export type ServiceCard = {
+  /** Stable identifier for analytics and reporting (never change once live). */
+  analyticsId?: string;
+
   label: string;
   href: string;
   description: string;
@@ -58,6 +61,7 @@ export const SOLUTIONS_DATA = {
     theme: "default",
     cards: [
       {
+        analyticsId: "truckload_tl",
         label: "Truckload (TL)",
         href: "/services/truckload",
         description: "Dedicated capacity for your entire shipment with faster transit times.",
@@ -67,6 +71,7 @@ export const SOLUTIONS_DATA = {
         cardTheme: "red",
       },
       {
+        analyticsId: "ltl",
         label: "Less-Than-Truckload (LTL)",
         href: "/services/ltl",
         description: "Cost-efficient shipping by consolidating smaller shipments.",
@@ -76,6 +81,7 @@ export const SOLUTIONS_DATA = {
         cardTheme: "ltl",
       },
       {
+        analyticsId: "intermodal",
         label: "Intermodal",
         href: "/services/intermodal",
         description: "Rail efficiency for long distances with truck flexibility for delivery.",
@@ -93,6 +99,7 @@ export const SOLUTIONS_DATA = {
     theme: "dark",
     cards: [
       {
+        analyticsId: "expedited",
         label: "Expedited Shipping",
         href: "/services/specialized#expedited",
         description: "Fast-track delivery for urgent shipments.",
@@ -101,6 +108,7 @@ export const SOLUTIONS_DATA = {
         image: "/solutions/card-expedited.jpg",
       },
       {
+        analyticsId: "specialized_vehicle_transport",
         label: "Specialized Vehicle Transport",
         href: "/services/specialized#vehicle-transport",
         description: "Expert handling for specialized vehicles and equipment.",
@@ -109,6 +117,7 @@ export const SOLUTIONS_DATA = {
         image: "/solutions/card-specialized-vehicle.jpg",
       },
       {
+        analyticsId: "hazmat",
         label: "Hazardous Materials (HAZMAT)",
         href: "/services/hazmat",
         description: "Compliant hazmat movement and documentation.",
@@ -117,6 +126,7 @@ export const SOLUTIONS_DATA = {
         image: "/solutions/card-hazmat.jpg",
       },
       {
+        analyticsId: "temperature_controlled",
         label: "Refrigerated / Temperature-Controlled",
         href: "/services/temperature-controlled",
         description: "Refrigerated and controlled-temperature freight.",
@@ -133,6 +143,7 @@ export const SOLUTIONS_DATA = {
     theme: "default",
     cards: [
       {
+        analyticsId: "cross_border_canada_us",
         label: "Canada ↔ USA Cross-Border",
         href: "/services/cross-border#canada-us",
         description: "Seamless cross-border shipping between Canada and USA.",
@@ -141,6 +152,7 @@ export const SOLUTIONS_DATA = {
         image: "/solutions/card-cross-border-canada-us.jpg",
       },
       {
+        analyticsId: "cross_border_mexico",
         label: "Mexico Cross-Border",
         href: "/services/cross-border#mexico",
         description: "Reliable Mexico cross-border logistics.",
@@ -149,6 +161,7 @@ export const SOLUTIONS_DATA = {
         image: "/solutions/card-cross-border-mexico.jpg",
       },
       {
+        analyticsId: "ocean_freight",
         label: "Ocean Freight",
         href: "/services/cross-border#ocean",
         description: "International ocean shipping solutions.",
@@ -157,6 +170,7 @@ export const SOLUTIONS_DATA = {
         image: "/solutions/card-ocean-freight.jpg",
       },
       {
+        analyticsId: "air_freight",
         label: "Air Freight",
         href: "/services/cross-border#air",
         description: "Fast international air cargo services.",
@@ -173,6 +187,7 @@ export const SOLUTIONS_DATA = {
     theme: "dark",
     cards: [
       {
+        analyticsId: "warehousing_distribution",
         label: "Warehousing & Distribution",
         href: "/services/value-added#warehousing",
         description: "Strategic warehousing and distribution networks.",
@@ -181,6 +196,7 @@ export const SOLUTIONS_DATA = {
         image: "/solutions/card-warehousing-distribution.jpg",
       },
       {
+        analyticsId: "managed_capacity",
         label: "Managed Capacity",
         href: "/services/value-added#managed-capacity",
         description: "Dedicated capacity solutions for consistent volume.",
@@ -189,6 +205,7 @@ export const SOLUTIONS_DATA = {
         image: "/solutions/card-managed-capacity.jpg",
       },
       {
+        analyticsId: "dedicated_contract_logistics",
         label: "Dedicated / Contract Logistics",
         href: "/services/value-added#dedicated",
         description: "Custom logistics programs tailored to your needs.",
@@ -197,6 +214,7 @@ export const SOLUTIONS_DATA = {
         image: "/solutions/card-dedicated-contract.jpg",
       },
       {
+        analyticsId: "project_oversize_programs",
         label: "Project-Specific / Oversize Programs",
         href: "/services/value-added#project-oversize",
         description: "Specialized handling for large-scale and oversize projects.",

@@ -6,22 +6,12 @@ const HOME_PATH = "/";
 const HOME_TOP_HASH = "#top";
 const HASH_TARGETS = {
   "#solutions": "solutions",
+  "#industries": "industries",
 } as const;
 
 function normalizePath(path: string) {
   if (!path) return "/";
   return path.endsWith("/") && path !== "/" ? path.slice(0, -1) : path;
-}
-
-function scrollToElementById(id: string, behavior: ScrollBehavior) {
-  const target = document.getElementById(id);
-  if (!target) return false;
-  target.scrollIntoView({ behavior, block: "start", inline: "nearest" });
-  return true;
-}
-
-function scrollToHomeTop(behavior: ScrollBehavior) {
-  window.scrollTo({ top: 0, left: 0, behavior });
 }
 
 function normalizeHash(hash: string) {
@@ -36,7 +26,32 @@ function getHashTargetId(hash: string) {
 function isHomeTopLink(pathname: string, hash: string) {
   const normalizedPath = normalizePath(pathname);
   const normalizedHash = normalizeHash(hash);
-  return normalizedPath === HOME_PATH && (normalizedHash === "" || normalizedHash === HOME_TOP_HASH);
+  return (
+    normalizedPath === HOME_PATH && (normalizedHash === "" || normalizedHash === HOME_TOP_HASH)
+  );
+}
+
+function prefersReducedMotion(): boolean {
+  // Guard for older browsers + SSR safety (though this is client-only)
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function resolveScrollBehavior(preferred: ScrollBehavior): ScrollBehavior {
+  // If user prefers reduced motion, never animate scroll.
+  if (preferred === "smooth" && prefersReducedMotion()) return "auto";
+  return preferred;
+}
+
+function scrollToElementById(id: string, behavior: ScrollBehavior) {
+  const target = document.getElementById(id);
+  if (!target) return false;
+  target.scrollIntoView({ behavior, block: "start", inline: "nearest" });
+  return true;
+}
+
+function scrollToHomeTop(behavior: ScrollBehavior) {
+  window.scrollTo({ top: 0, left: 0, behavior });
 }
 
 export function SolutionsHashScroll() {
@@ -45,10 +60,12 @@ export function SolutionsHashScroll() {
       const targetId = getHashTargetId(window.location.hash);
       if (!targetId) return;
 
+      const resolved = resolveScrollBehavior(behavior);
+
       // Double RAF ensures layout is stable before scrolling.
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          scrollToElementById(targetId, behavior);
+          scrollToElementById(targetId, resolved);
         });
       });
     };
@@ -77,21 +94,23 @@ export function SolutionsHashScroll() {
       if (hashTargetId) {
         // Same-page hash click should always scroll, even repeatedly.
         event.preventDefault();
-        scrollToElementById(hashTargetId, "smooth");
+        scrollToElementById(hashTargetId, resolveScrollBehavior("smooth"));
         return;
       }
 
       if (isHomeTopLink(url.pathname, url.hash)) {
         // Clicking the logo/home on the homepage should always return to hero top.
         event.preventDefault();
-        scrollToHomeTop("smooth");
+        scrollToHomeTop(resolveScrollBehavior("smooth"));
         if (window.location.hash) {
           window.history.replaceState(null, "", window.location.pathname + window.location.search);
         }
       }
     };
 
+    // Initial route: don't animate to avoid jank on load.
     handleHashRoute("auto");
+
     window.addEventListener("hashchange", onHashChange);
     document.addEventListener("click", onClick, true);
 
@@ -103,4 +122,3 @@ export function SolutionsHashScroll() {
 
   return null;
 }
-

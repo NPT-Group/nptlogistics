@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useInView } from "framer-motion";
 import { Container } from "@/components/layout/Container";
 import { cn } from "@/lib/cn";
+import { trackCtaClick } from "@/lib/analytics/cta";
 
 const glassCard = cn(
   "relative overflow-hidden rounded-2xl",
@@ -81,13 +82,37 @@ function AnimatedStat({
   );
 }
 
+const AUDIENCE_CARDS = [
+  {
+    id: "shipper",
+    title: "I'm Shipping Freight",
+    description:
+      "Find the right service for your lane, timeline, and requirements with a fast response.",
+    href: "/#solutions",
+    label: "Explore Solutions",
+  },
+  {
+    id: "tracking",
+    title: "I Need Tracking or Status",
+    description:
+      "Get shipment status and updates with a clear path to the right team when you need help.",
+    href: "/tracking",
+    label: "Track Shipment",
+  },
+  {
+    id: "careers",
+    title: "I Want to Work at NPT",
+    description:
+      "View open roles and join a team built on safety, discipline, and operational excellence.",
+    href: "/careers/jobs",
+    label: "View Jobs",
+  },
+] as const;
+
 export function AudienceSection() {
   return (
     <section
-      className={cn(
-        "relative overflow-hidden bg-[color:var(--audience-bg)]",
-        "py-12 sm:py-16",
-      )}
+      className={cn("relative overflow-hidden bg-[color:var(--audience-bg)]", "py-12 sm:py-16")}
     >
       {/* Very subtle warmth — soft red tint from top, barely there */}
       <div
@@ -113,7 +138,7 @@ export function AudienceSection() {
           {/* Proof line: > reads as "more than" — minimal and confident */}
           <p className="mt-4 flex flex-wrap items-center justify-center gap-x-1 gap-y-1 text-sm text-[color:var(--audience-muted)] sm:text-base">
             <span className="font-medium text-[color:var(--audience-text)]">
-              <span className="font-semibold tabular-nums text-[color:var(--color-brand-600)]">
+              <span className="font-semibold text-[color:var(--color-brand-600)] tabular-nums">
                 &gt;
                 <AnimatedStat target={250} suffix="k" />
               </span>{" "}
@@ -123,7 +148,7 @@ export function AudienceSection() {
               ·
             </span>
             <span className="font-medium text-[color:var(--audience-text)]">
-              <span className="font-semibold tabular-nums text-[color:var(--color-brand-600)]">
+              <span className="font-semibold text-[color:var(--color-brand-600)] tabular-nums">
                 <AnimatedStat target={98} suffix="%" />
               </span>{" "}
               on time
@@ -132,7 +157,7 @@ export function AudienceSection() {
               ·
             </span>
             <span className="font-medium text-[color:var(--audience-text)]">
-              <span className="font-semibold tabular-nums text-[color:var(--color-brand-600)]">
+              <span className="font-semibold text-[color:var(--color-brand-600)] tabular-nums">
                 &gt;
                 <AnimatedStat target={25} suffix="k" />
               </span>{" "}
@@ -142,33 +167,11 @@ export function AudienceSection() {
         </div>
 
         <div className="relative mt-8 grid gap-4 min-[680px]:grid-cols-2 lg:grid-cols-3">
-          {[
-            {
-              title: "I'm Shipping Freight",
-              description:
-                "Find the right service for your lane, timeline, and requirements with a fast response.",
-              href: "/#solutions",
-              label: "Explore Solutions",
-            },
-            {
-              title: "I Need Tracking or Status",
-              description:
-                "Get shipment status and updates with a clear path to the right team when you need help.",
-              href: "/tracking",
-              label: "Track Shipment",
-            },
-            {
-              title: "I Want to Work at NPT",
-              description:
-                "View open roles and join a team built on safety, discipline, and operational excellence.",
-              href: "/careers/jobs",
-              label: "View Jobs",
-            },
-          ].map((card) => (
-            <div key={card.href} className={glassCard}>
+          {AUDIENCE_CARDS.map((card) => (
+            <div key={card.id} className={glassCard}>
               {/* Subtle red tint bottom-right for elegant glass */}
               <div
-                className="absolute inset-0 rounded-2xl bg-gradient-to-br from-transparent via-transparent to-[color:var(--color-brand-500)]/10 pointer-events-none"
+                className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-transparent via-transparent to-[color:var(--color-brand-500)]/10"
                 aria-hidden
               />
               <div className="relative z-10 p-6">
@@ -178,7 +181,18 @@ export function AudienceSection() {
                 <p className="mt-2 text-sm leading-relaxed text-[color:var(--audience-muted)]">
                   {card.description}
                 </p>
-                <Link href={card.href} className={cardLink}>
+                <Link
+                  href={card.href}
+                  onClick={() =>
+                    trackCtaClick({
+                      ctaId: `audience_${card.id}`,
+                      location: "audience_section",
+                      destination: card.href,
+                      label: card.label,
+                    })
+                  }
+                  className={cardLink}
+                >
                   {card.label}
                   <span aria-hidden className="arrow">
                     →

@@ -1,10 +1,12 @@
 "use client";
 
+import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/layout/Container";
 import { cn } from "@/lib/cn";
+import { trackCtaClick } from "@/lib/analytics/cta";
 
 const TRACKING_VISIBILITY_TOKENS = {
   focusRing:
@@ -27,8 +29,6 @@ const TRACKING_VISIBILITY_TOKENS = {
   gridClass: "grid items-center gap-10 lg:grid-cols-12 lg:gap-12",
   mapMotionClass: "relative order-2 lg:order-2 lg:col-span-7",
   mapWrapperClass: "relative aspect-[16/10] w-full overflow-hidden",
-  mapBrandAnchorClass:
-    "pointer-events-none absolute inset-0 bg-[radial-gradient(600px_320px_at_60%_50%,rgba(220,38,38,0.08),transparent_60%)]",
   mapImageClass:
     "-translate-y-[2%] scale-[1.26] object-contain object-center brightness-[1.02] contrast-[1.02] saturate-[0.9]",
   mapSignalLayerClass: "pointer-events-none absolute inset-0",
@@ -97,6 +97,8 @@ const BULLETS: Bullet[] = [
 
 export function TrackingVisibilitySection() {
   const reduceMotion = useReducedMotion();
+  const mapRef = React.useRef<HTMLDivElement | null>(null);
+  const mapInView = useInView(mapRef, { amount: 0.25 });
 
   return (
     <section id="tracking" className={TRACKING_VISIBILITY_TOKENS.sectionClass}>
@@ -118,17 +120,16 @@ export function TrackingVisibilitySection() {
             transition={{ duration: 0.45, ease: "easeOut" }}
           >
             {/* The map image */}
-            <div className={TRACKING_VISIBILITY_TOKENS.mapWrapperClass}>
-              <div className={TRACKING_VISIBILITY_TOKENS.mapBrandAnchorClass} aria-hidden="true" />
+            <div ref={mapRef} className={TRACKING_VISIBILITY_TOKENS.mapWrapperClass}>
               <Image
                 src="/tracking/Tracking-map2.png"
-                alt="Global shipment tracking network map"
+                alt="North America shipment tracking coverage map"
                 fill
                 className={TRACKING_VISIBILITY_TOKENS.mapImageClass}
-                priority={false}
+                loading="lazy"
                 sizes="(max-width: 1024px) 100vw, 60vw"
               />
-              {!reduceMotion ? (
+              {!reduceMotion && mapInView ? (
                 <div className={TRACKING_VISIBILITY_TOKENS.mapSignalLayerClass} aria-hidden="true">
                   {TRACKING_SIGNAL_NODES.map((node) => (
                     <motion.span
@@ -210,6 +211,14 @@ export function TrackingVisibilitySection() {
             <div className={TRACKING_VISIBILITY_TOKENS.ctaRowClass}>
               <Link
                 href="/tracking"
+                onClick={() =>
+                  trackCtaClick({
+                    ctaId: "tracking_primary_track_shipment",
+                    location: "tracking_visibility",
+                    destination: "/tracking",
+                    label: "Track Shipment",
+                  })
+                }
                 className={cn(
                   TRACKING_VISIBILITY_TOKENS.ctaButtonClass,
                   TRACKING_VISIBILITY_TOKENS.focusRing,

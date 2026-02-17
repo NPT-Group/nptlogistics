@@ -1,15 +1,18 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SolutionsHashScroll } from "@/components/layout/SolutionsHashScroll";
+import { AnalyticsClient } from "@/components/analytics/AnalyticsClient";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nptlogistics.com"), // change later if needed
+  metadataBase: new URL("https://nptlogistics.com"),
   title: {
-    default: "NPT Logistics|Flatbed, Dry Van, RGN & Shipmemt Trucking Solutions",
+    default: "NPT Logistics | Reliable Freight Solutions Across North America",
     template: "%s | NPT Logistics",
   },
+
   description:
     "NPT Logistics provides reliable freight transportation across North America, specializing in truckload, LTL, intermodal, and cross-border shipping.",
   applicationName: "NPT Logistics",
@@ -52,16 +55,24 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#070a12",
+  colorScheme: "dark",
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className="min-h-dvh bg-[color:var(--color-surface-0)] text-[color:var(--color-text)]">
         <SolutionsHashScroll />
+        <Suspense fallback={null}>
+          <AnalyticsClient />
+        </Suspense>
         <SiteHeader />
-        <div className="overflow-x-clip">
+        <main id="main-content" className="overflow-x-clip">
           {children}
-          <SiteFooter />
-        </div>
+        </main>
+        <SiteFooter />
       </body>
     </html>
   );

@@ -83,9 +83,11 @@ function TestimonialCard({ item }: { item: Extract<TestimonialItem, { type: "tes
 function VideoCard({
   item,
   isActive,
+  reduceMotion,
 }: {
   item: Extract<TestimonialItem, { type: "video" }>;
   isActive: boolean;
+  reduceMotion: boolean;
 }) {
   const ytId = React.useMemo(() => getYouTubeId(item.youtubeUrl), [item.youtubeUrl]);
   const channelHref = item.channelUrl ?? item.youtubeUrl;
@@ -93,10 +95,12 @@ function VideoCard({
   // Autoplay requires mute. Loop requires playlist=ID.
   const embedSrc = React.useMemo(() => {
     if (!ytId || !isActive) return "";
+    const autoplay = reduceMotion ? "0" : "1";
+    const loop = reduceMotion ? "0" : "1";
     const params = new URLSearchParams({
-      autoplay: "1",
+      autoplay,
       mute: "1",
-      loop: "1",
+      loop,
       playlist: ytId,
       controls: "0",
       modestbranding: "1",
@@ -104,7 +108,7 @@ function VideoCard({
       playsinline: "1",
     });
     return `https://www.youtube.com/embed/${ytId}?${params.toString()}`;
-  }, [isActive, ytId]);
+  }, [isActive, ytId, reduceMotion]);
   const thumbnailSrc = ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : "";
 
   const [hovered, setHovered] = React.useState(false);
@@ -112,6 +116,7 @@ function VideoCard({
   const copyResetTimeoutRef = React.useRef<number | null>(null);
 
   const openYoutube = React.useCallback(() => {
+    if (typeof window === "undefined") return;
     window.open(item.youtubeUrl, "_blank", "noopener,noreferrer");
   }, [item.youtubeUrl]);
 
@@ -199,6 +204,7 @@ function VideoCard({
           className={cn(
             "absolute inset-x-0 top-0 flex items-center justify-between bg-black/78 px-4 py-2.5 text-white transition-opacity duration-200",
             hovered ? "opacity-100" : "opacity-0",
+            "group-focus-within:opacity-100",
           )}
         >
           <a
@@ -285,6 +291,16 @@ export function TrustProofSection() {
   const leftIndex = React.useMemo(() => getLoopedIndex(index - 1), [getLoopedIndex, index]);
   const rightIndex = React.useMemo(() => getLoopedIndex(index + 1), [getLoopedIndex, index]);
   const activeItem = orderedItems[index];
+  const shellId = `${TRUST_PROOF_SECTION.id}-carousel`;
+  const activeAnnouncement = React.useMemo(() => {
+    const label =
+      activeItem?.type === "video"
+        ? "Featured video"
+        : activeItem
+          ? `Testimonial from ${activeItem.name ?? "customer"}`
+          : "Slide";
+    return `${label}, slide ${index + 1} of ${total}`;
+  }, [activeItem, index, total]);
   const onPointerDown = React.useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (!hasMultiple) return;
@@ -321,6 +337,34 @@ export function TrustProofSection() {
   const onPointerCancel = React.useCallback(() => {
     pointerStartRef.current = null;
   }, []);
+  const onKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (!hasMultiple) return;
+      if (e.currentTarget !== e.target) return;
+
+      switch (e.key) {
+        case "ArrowLeft":
+          e.preventDefault();
+          goPrev();
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          goNext();
+          break;
+        case "Home":
+          e.preventDefault();
+          setDirectIndex(0);
+          break;
+        case "End":
+          e.preventDefault();
+          setDirectIndex(total - 1);
+          break;
+        default:
+          break;
+      }
+    },
+    [goNext, goPrev, hasMultiple, setDirectIndex, total],
+  );
 
   return (
     <section id={TRUST_PROOF_SECTION.id} className="relative overflow-hidden bg-white">
@@ -361,16 +405,31 @@ export function TrustProofSection() {
         {/* Carousel */}
         <motion.div
           className="mt-10 select-none"
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerCancel}
-          onDragStart={(e) => e.preventDefault()}
           initial={reduceMotion ? false : { opacity: 0, y: 14 }}
           whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
         >
-          <div className="mx-auto flex max-w-[1120px] items-center justify-between gap-4">
+          <p className="sr-only" aria-live="polite" aria-atomic="true">
+            {activeAnnouncement}
+          </p>
+          <div
+            className={cn("outline-none", focusRing)}
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="Trust and proof carousel"
+            aria-describedby={`${shellId}-status`}
+            tabIndex={0}
+            onKeyDown={onKeyDown}
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerCancel}
+            onDragStart={(e) => e.preventDefault()}
+          >
+            <p id={`${shellId}-status`} className="sr-only">
+              {activeAnnouncement}
+            </p>
+            <div className="mx-auto flex max-w-[1120px] items-center justify-between gap-4">
             <div className="text-sm text-[color:var(--color-muted-light)]">
               {index + 1} / {orderedItems.length}
             </div>
@@ -407,9 +466,9 @@ export function TrustProofSection() {
                 →
               </button>
             </div>
-          </div>
+            </div>
 
-          <div className="mx-auto mt-5 max-w-[1120px]">
+            <div className="mx-auto mt-5 max-w-[1120px]">
             <div className="hidden items-center justify-center gap-5 md:flex">
               {orderedItems[leftIndex] ? (
                 <AnimatePresence mode="wait" initial={false}>
@@ -424,7 +483,11 @@ export function TrustProofSection() {
                     transition={{ duration: 0.28, ease: "easeOut" }}
                   >
                     {orderedItems[leftIndex].type === "video" ? (
-                      <VideoCard item={orderedItems[leftIndex]} isActive={false} />
+                      <VideoCard
+                        item={orderedItems[leftIndex]}
+                        isActive={false}
+                        reduceMotion={!!reduceMotion}
+                      />
                     ) : (
                       <TestimonialCard item={orderedItems[leftIndex]} />
                     )}
@@ -442,7 +505,7 @@ export function TrustProofSection() {
                   transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
                 >
                   {activeItem?.type === "video" ? (
-                    <VideoCard item={activeItem} isActive={true} />
+                    <VideoCard item={activeItem} isActive={true} reduceMotion={!!reduceMotion} />
                   ) : activeItem ? (
                     <TestimonialCard item={activeItem} />
                   ) : null}
@@ -461,7 +524,11 @@ export function TrustProofSection() {
                     transition={{ duration: 0.28, ease: "easeOut" }}
                   >
                     {orderedItems[rightIndex].type === "video" ? (
-                      <VideoCard item={orderedItems[rightIndex]} isActive={false} />
+                      <VideoCard
+                        item={orderedItems[rightIndex]}
+                        isActive={false}
+                        reduceMotion={!!reduceMotion}
+                      />
                     ) : (
                       <TestimonialCard item={orderedItems[rightIndex]} />
                     )}
@@ -481,34 +548,35 @@ export function TrustProofSection() {
                   transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                 >
                   {activeItem?.type === "video" ? (
-                    <VideoCard item={activeItem} isActive={true} />
+                    <VideoCard item={activeItem} isActive={true} reduceMotion={!!reduceMotion} />
                   ) : activeItem ? (
                     <TestimonialCard item={activeItem} />
                   ) : null}
                 </motion.div>
               </AnimatePresence>
             </div>
-          </div>
+            </div>
 
-          {/* Small dots */}
-          <div className="mt-4 flex items-center justify-center gap-2">
-            {orderedItems.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setDirectIndex(i)}
-                disabled={!hasMultiple}
-                className={cn(
-                  focusRing,
-                  "h-2.5 rounded-full transition-all duration-200",
-                  i === index
-                    ? "w-6 bg-[color:var(--color-brand-500)]"
-                    : "w-2.5 bg-[color:var(--color-border-light)] hover:bg-[color:var(--color-muted-light)]/45",
-                  "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-[color:var(--color-border-light)]",
-                )}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
+            {/* Small dots */}
+            <div className="mt-4 flex items-center justify-center gap-2">
+              {orderedItems.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setDirectIndex(i)}
+                  disabled={!hasMultiple}
+                  className={cn(
+                    focusRing,
+                    "h-2.5 rounded-full transition-all duration-200",
+                    i === index
+                      ? "w-6 bg-[color:var(--color-brand-500)]"
+                      : "w-2.5 bg-[color:var(--color-border-light)] hover:bg-[color:var(--color-muted-light)]/45",
+                    "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-[color:var(--color-border-light)]",
+                  )}
+                  aria-label={`Go to slide ${i + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </motion.div>
 

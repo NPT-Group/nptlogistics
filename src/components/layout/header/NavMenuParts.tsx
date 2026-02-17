@@ -340,6 +340,7 @@ export function DesktopRichDropdown({
   scheduleClose,
   cancelClose,
   closeMenu,
+  onPrimaryAction,
 }: {
   valueKey: string;
   section: typeof NAV.industries | typeof NAV.company | typeof NAV.careers;
@@ -348,6 +349,7 @@ export function DesktopRichDropdown({
   scheduleClose: () => void;
   cancelClose: () => void;
   closeMenu: () => void;
+  onPrimaryAction?: () => void;
 }) {
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const [triggerRect, setTriggerRect] = React.useState<TriggerRect>(null);
@@ -383,7 +385,15 @@ export function DesktopRichDropdown({
         label={section.label}
         onMouseEnter={() => openMenu(valueKey)}
         onFocus={() => openMenu(valueKey)}
-        onClick={() => openMenu(valueKey)}
+        onClick={(event) => {
+          if (onPrimaryAction) {
+            event.preventDefault();
+            event.stopPropagation();
+            onPrimaryAction();
+            return;
+          }
+          openMenu(valueKey);
+        }}
       />
 
       <NavigationMenu.Content
