@@ -18,7 +18,7 @@ export default function AdminLoginClient({
 
   React.useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/admin");
+      router.replace("/admin/blog");
     }
   }, [status, router]);
 

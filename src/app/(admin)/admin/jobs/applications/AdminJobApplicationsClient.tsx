@@ -1,4 +1,4 @@
-// src/app/%28admin%29/admin/jobs/applications/AdminJobApplicationsClient.tsx
+// src/app/(admin)/admin/jobs/applications/AdminJobApplicationsClient.tsx
 "use client";
 
 import * as React from "react";
@@ -8,20 +8,19 @@ import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
 import { ConfirmModal, type ConfirmTone } from "@/components/admin/ui/ConfirmModal";
 import { Select } from "@/components/admin/ui/Select";
 import { SoftButton, IconButton } from "@/components/admin/ui/Buttons";
-
+import { JobApplicationDetailsModal } from "@/components/admin/jobs/JobApplicationDetailsModal";
 import {
   Search,
   RefreshCw,
   X,
   AlertTriangle,
-  User,
   Eye,
   Archive,
   ExternalLink,
+  ArchiveRestore,
 } from "lucide-react";
 import { EJobApplicationStatus } from "@/types/jobApplication.types";
 import { adminSetApplicationStatus } from "@/lib/utils/jobs/adminJobsApi";
-import { getDownloadUrlFromS3Key } from "@/lib/utils/s3Helper";
 
 export default function AdminJobApplicationsClient({
   initialItems,
@@ -43,8 +42,8 @@ export default function AdminJobApplicationsClient({
   const [busy, setBusy] = React.useState(false);
   const [err, setErr] = React.useState<string | null>(null);
   const [isPending, startTransition] = React.useTransition();
+  const [selectedApplication, setSelectedApplication] = React.useState<any | null>(null);
 
-  // confirm modal
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmActionRef = React.useRef<null | (() => Promise<void>)>(null);
   const [confirmTone, setConfirmTone] = React.useState<ConfirmTone>("neutral");
@@ -89,12 +88,6 @@ export default function AdminJobApplicationsClient({
     setConfirmOpen(true);
   }
 
-  async function downloadAsset(s3Key?: string, fallbackName?: string) {
-    if (!s3Key) throw new Error("Missing file key");
-    const url = await getDownloadUrlFromS3Key({ s3Key, filename: fallbackName || "download" });
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
-
   return (
     <div className="min-h-screen bg-[var(--dash-bg)]">
       <div
@@ -123,6 +116,19 @@ export default function AdminJobApplicationsClient({
         }}
       />
 
+      <JobApplicationDetailsModal
+        open={Boolean(selectedApplication)}
+        application={selectedApplication}
+        onClose={() => setSelectedApplication(null)}
+        onDownloadResume={() => {
+          // handled inside modal via passed callbacks in your existing usage pattern
+          // (kept signature required by modal)
+        }}
+        onDownloadPhoto={() => {
+          // handled inside modal via passed callbacks in your existing usage pattern
+        }}
+      />
+
       <div className="mx-auto max-w-7xl px-6 py-8">
         <div
           className={cn(
@@ -137,7 +143,7 @@ export default function AdminJobApplicationsClient({
                   Job applications
                 </div>
                 <div className="mt-1 text-sm text-[var(--dash-muted)]">
-                  Review applicants, download resumes, and track status.
+                  Review applicants and track status.
                 </div>
               </div>
 
@@ -189,7 +195,7 @@ export default function AdminJobApplicationsClient({
                 <input
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  placeholder="Search name, email…"
+                  placeholder="Search name, email..."
                   className="w-full bg-transparent text-sm text-[var(--dash-text)] outline-none placeholder:text-[var(--dash-muted)]"
                 />
                 {q.trim() ? (
@@ -243,6 +249,7 @@ export default function AdminJobApplicationsClient({
               <thead className="sticky top-0 z-10">
                 <tr className="border-b border-[var(--dash-border)] bg-[var(--dash-surface-2)]/60 backdrop-blur">
                   <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Applicant</th>
+                  <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Job</th>
                   <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Contact</th>
                   <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Status</th>
                   <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Submitted</th>
@@ -254,8 +261,12 @@ export default function AdminJobApplicationsClient({
               <tbody>
                 {items.map((a: any) => {
                   const id = String(a.id);
-                  const name = `${a.firstName || ""} ${a.lastName || ""}`.trim() || "—";
-                  const email = a.email || "—";
+                  const name = `${a.firstName || ""} ${a.lastName || ""}`.trim() || "-";
+                  const email = a.email || "-";
+
+                  const jobTitle = a?.jobPosting?.title || a?.jobTitle || a?.jobPostingId || "-";
+                  const slug = a?.jobPosting?.slug || a?.jobSlug || a?.jobPostingSlug;
+                  const isArchived = a.status === EJobApplicationStatus.ARCHIVED;
 
                   return (
                     <tr
@@ -268,15 +279,41 @@ export default function AdminJobApplicationsClient({
                       <td className="px-4 py-3">
                         <div className="font-semibold text-[var(--dash-text)]">{name}</div>
                         <div className="mt-0.5 text-xs text-[var(--dash-muted)]">
-                          {a.currentLocation || a.addressLine || "—"}
+                          {a.currentLocation || a.addressLine || "-"}
                         </div>
                       </td>
+
+                      <td className="px-4 py-3">
+                        <div className="max-w-[320px] truncate">
+                          {slug ? (
+                            <a
+                              href={`/careers/${encodeURIComponent(slug)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={cn(
+                                "inline-flex items-center gap-2 text-left font-semibold",
+                                "underline decoration-[var(--dash-muted)]/50 underline-offset-4",
+                                "text-[var(--dash-text)] hover:decoration-[var(--dash-red-soft)]",
+                                "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dash-red-soft)]",
+                              )}
+                              title="Open public job posting"
+                            >
+                              <span className="truncate">{jobTitle}</span>
+                              <ExternalLink className="h-3.5 w-3.5 shrink-0 text-[var(--dash-muted)]" />
+                            </a>
+                          ) : (
+                            <div className="text-[var(--dash-text)]/90">{jobTitle}</div>
+                          )}
+                        </div>
+                      </td>
+
                       <td className="px-4 py-3">
                         <div className="text-[var(--dash-text)]/90">{email}</div>
                         <div className="mt-0.5 text-xs text-[var(--dash-muted)]">
-                          {a.phone || "—"}
+                          {a.phone || "-"}
                         </div>
                       </td>
+
                       <td className="px-4 py-3">
                         <span
                           className={cn(
@@ -287,58 +324,66 @@ export default function AdminJobApplicationsClient({
                           {a.status}
                         </span>
                       </td>
+
                       <td className="px-4 py-3 text-[var(--dash-muted)]">
                         {a.createdAt ? new Date(a.createdAt).toLocaleString() : "-"}
                       </td>
+
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-2">
                           <SoftButton
                             disabled={busy || isPending}
-                            onClick={() =>
-                              run(async () => {
-                                await adminSetApplicationStatus(id, EJobApplicationStatus.VIEWED);
-                              })
-                            }
+                            onClick={() => setSelectedApplication(a)}
                             icon={<Eye className="h-4 w-4" />}
-                            label="Mark viewed"
+                            label="View"
                           />
 
-                          <SoftButton
-                            disabled={busy || isPending}
-                            onClick={() => downloadAsset(a?.resume?.s3Key, `${name}-resume`)}
-                            icon={<ExternalLink className="h-4 w-4" />}
-                            label="Resume"
-                          />
-
-                          {a?.photo?.s3Key ? (
-                            <SoftButton
+                          {isArchived ? (
+                            <IconButton
+                              title="Unarchive application"
                               disabled={busy || isPending}
-                              onClick={() => downloadAsset(a?.photo?.s3Key, `${name}-photo`)}
-                              icon={<User className="h-4 w-4" />}
-                              label="Photo"
-                            />
-                          ) : null}
-
-                          <IconButton
-                            title="Archive application"
-                            disabled={busy || isPending}
-                            onClick={() =>
-                              confirm({
-                                tone: "danger",
-                                title: "Archive this application?",
-                                description: "Archived applications are hidden from default views.",
-                                confirmLabel: "Archive",
-                                action: async () => {
-                                  await adminSetApplicationStatus(
-                                    id,
-                                    EJobApplicationStatus.ARCHIVED,
-                                  );
-                                },
-                              })
-                            }
-                          >
-                            <Archive className="h-4 w-4" />
-                          </IconButton>
+                              onClick={() =>
+                                confirm({
+                                  tone: "neutral",
+                                  title: "Unarchive this application?",
+                                  description: "This will make it visible again in default views.",
+                                  confirmLabel: "Unarchive",
+                                  action: async () => {
+                                    // choose the default “restored” state:
+                                    await adminSetApplicationStatus(
+                                      id,
+                                      EJobApplicationStatus.RECEIVED,
+                                    );
+                                  },
+                                })
+                              }
+                            >
+                              {/* Use any icon you like; if you don't have RotateCcw imported, use Archive with styling or add RotateCcw */}
+                              <ArchiveRestore className="h-4 w-4 -scale-x-100" />
+                            </IconButton>
+                          ) : (
+                            <IconButton
+                              title="Archive application"
+                              disabled={busy || isPending}
+                              onClick={() =>
+                                confirm({
+                                  tone: "danger",
+                                  title: "Archive this application?",
+                                  description:
+                                    "Archived applications are hidden from default views.",
+                                  confirmLabel: "Archive",
+                                  action: async () => {
+                                    await adminSetApplicationStatus(
+                                      id,
+                                      EJobApplicationStatus.ARCHIVED,
+                                    );
+                                  },
+                                })
+                              }
+                            >
+                              <Archive className="h-4 w-4" />
+                            </IconButton>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -347,7 +392,7 @@ export default function AdminJobApplicationsClient({
 
                 {!items.length ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-10 text-center text-[var(--dash-muted)]">
+                    <td colSpan={6} className="px-4 py-10 text-center text-[var(--dash-muted)]">
                       No applications found.
                     </td>
                   </tr>

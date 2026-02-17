@@ -119,6 +119,11 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
   const [resumeAsset, setResumeAsset] = React.useState<IFileAsset | null>(null);
   const [photoAsset, setPhotoAsset] = React.useState<IFileAsset | null>(null);
 
+  // light screening (generic)
+  const [commuteMode, setCommuteMode] = React.useState("");
+  const [canWorkOnsite, setCanWorkOnsite] = React.useState(false);
+  const [hasReferences, setHasReferences] = React.useState(false);
+
   // Refs: reset file inputs + scroll to messages
   const resumeInputRef = React.useRef<HTMLInputElement | null>(null);
   const photoInputRef = React.useRef<HTMLInputElement | null>(null);
@@ -128,7 +133,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
     requestAnimationFrame(() => {
       if (!noticeRef.current) return;
 
-      const NAVBAR_OFFSET = 80;
+      const NAVBAR_OFFSET = 170;
       // adjust if needed (e.g. 80, 100, etc.)
       // should match your sticky navbar height
 
@@ -201,6 +206,10 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
 
     setLinkedInUrl("");
     setPortfolioUrl("");
+
+    setCommuteMode("");
+    setCanWorkOnsite(false);
+    setHasReferences(false);
 
     setResumeFile(null);
     setPhotoFile(null);
@@ -291,6 +300,10 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
 
           resume,
           photo: photo ?? undefined,
+
+          commuteMode: commuteMode.trim() || undefined,
+          canWorkOnsite,
+          hasReferences,
 
           coverLetter: coverLetter.trim() || undefined,
           linkedInUrl: linkedInUrl.trim() || undefined,
@@ -569,6 +582,57 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                     className={[fieldBase, focusRing].join(" ")}
                     disabled={busy}
                   />
+                </div>
+
+                {/* Light screening */}
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="text-sm font-semibold text-slate-900">A few quick questions</div>
+                  <div className="mt-3 grid gap-3">
+                    <div>
+                      <div className="text-xs font-semibold text-slate-700">
+                        Commute mode (optional)
+                      </div>
+                      <input
+                        value={commuteMode}
+                        onChange={(e) => setCommuteMode(e.target.value)}
+                        placeholder="e.g. Car, Transit, Bike"
+                        className={[fieldBase, focusRing].join(" ")}
+                        disabled={busy}
+                      />
+                    </div>
+
+                    <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                      <input
+                        type="checkbox"
+                        checked={canWorkOnsite}
+                        onChange={(e) => setCanWorkOnsite(e.target.checked)}
+                        disabled={busy}
+                        className="mt-1 h-4 w-4 rounded border-slate-300"
+                      />
+                      <span>
+                        I can work onsite if required.
+                        <div className="mt-1 text-xs text-slate-500">
+                          Some roles may require onsite work depending on location and schedule.
+                        </div>
+                      </span>
+                    </label>
+
+                    <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                      <input
+                        type="checkbox"
+                        checked={hasReferences}
+                        onChange={(e) => setHasReferences(e.target.checked)}
+                        disabled={busy}
+                        className="mt-1 h-4 w-4 rounded border-slate-300"
+                      />
+                      <span>
+                        I can provide references upon request.
+                        <div className="mt-1 text-xs text-slate-500">
+                          You won’t be asked to share references here—just confirming availability.
+                        </div>
+                      </span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">

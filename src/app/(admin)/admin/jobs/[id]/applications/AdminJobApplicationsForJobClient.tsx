@@ -1,13 +1,26 @@
-// src/app/(admin)/admin/jobs/applications/AdminJobApplicationsClient.tsx
+// src/app/(admin)/admin/jobs/applications/AdminJobApplicationsForJobClient.tsx
 "use client";
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
 import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
+import { ConfirmModal, type ConfirmTone } from "@/components/admin/ui/ConfirmModal";
 import { Select } from "@/components/admin/ui/Select";
-import { SoftButton } from "@/components/admin/ui/Buttons";
-import { Search, RefreshCw, X, Users } from "lucide-react";
+import { SoftButton, IconButton } from "@/components/admin/ui/Buttons";
+import { JobApplicationDetailsModal } from "@/components/admin/jobs/JobApplicationDetailsModal";
+import {
+  Search,
+  RefreshCw,
+  X,
+  Users,
+  Eye,
+  Archive,
+  AlertTriangle,
+  ArchiveRestore,
+} from "lucide-react";
+import { EJobApplicationStatus } from "@/types/jobApplication.types";
+import { adminSetApplicationStatus } from "@/lib/utils/jobs/adminJobsApi";
 
 export default function AdminJobApplicationsForJobClient({
   jobId,
@@ -30,7 +43,17 @@ export default function AdminJobApplicationsForJobClient({
 
   const [q, setQ] = React.useState(sp.get("q") ?? "");
   const [status, setStatus] = React.useState(sp.get("status") ?? "");
+  const [busy, setBusy] = React.useState(false);
+  const [err, setErr] = React.useState<string | null>(null);
   const [isPending, startTransition] = React.useTransition();
+  const [selectedApplication, setSelectedApplication] = React.useState<any | null>(null);
+
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const confirmActionRef = React.useRef<null | (() => Promise<void>)>(null);
+  const [confirmTone, setConfirmTone] = React.useState<ConfirmTone>("neutral");
+  const [confirmTitle, setConfirmTitle] = React.useState("");
+  const [confirmDesc, setConfirmDesc] = React.useState<React.ReactNode>(null);
+  const [confirmLabel, setConfirmLabel] = React.useState("Confirm");
 
   function pushQuery(next: Record<string, string | null | undefined>) {
     const qs = new URLSearchParams(sp.toString());
@@ -43,6 +66,34 @@ export default function AdminJobApplicationsForJobClient({
     );
   }
 
+  async function run(fn: () => Promise<void>) {
+    setErr(null);
+    setBusy(true);
+    try {
+      await fn();
+      startTransition(() => router.refresh());
+    } catch (e: any) {
+      setErr(e?.message || "Action failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function confirm(opts: {
+    tone?: ConfirmTone;
+    title: string;
+    description?: React.ReactNode;
+    confirmLabel?: string;
+    action: () => Promise<void>;
+  }) {
+    confirmActionRef.current = opts.action;
+    setConfirmTone(opts.tone ?? "neutral");
+    setConfirmTitle(opts.title);
+    setConfirmDesc(opts.description ?? null);
+    setConfirmLabel(opts.confirmLabel ?? "Confirm");
+    setConfirmOpen(true);
+  }
+
   return (
     <div className="min-h-screen bg-[var(--dash-bg)]">
       <div
@@ -53,6 +104,34 @@ export default function AdminJobApplicationsForJobClient({
             ? "bg-[radial-gradient(1200px_600px_at_10%_0%,rgba(220,38,38,0.14),transparent_55%),radial-gradient(900px_500px_at_90%_10%,rgba(255,255,255,0.06),transparent_55%)]"
             : "bg-[radial-gradient(1100px_520px_at_10%_0%,rgba(220,38,38,0.08),transparent_55%),radial-gradient(900px_480px_at_90%_10%,rgba(15,23,42,0.06),transparent_55%)]",
         )}
+      />
+
+      <ConfirmModal
+        open={confirmOpen}
+        tone={confirmTone}
+        title={confirmTitle}
+        description={confirmDesc}
+        confirmLabel={confirmLabel}
+        busy={busy}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          const act = confirmActionRef.current;
+          setConfirmOpen(false);
+          if (!act) return;
+          run(act);
+        }}
+      />
+
+      <JobApplicationDetailsModal
+        open={Boolean(selectedApplication)}
+        application={selectedApplication ? { ...selectedApplication, jobTitle } : null}
+        onClose={() => setSelectedApplication(null)}
+        onDownloadResume={() => {
+          // modal handles download via passed callbacks in your existing pattern
+        }}
+        onDownloadPhoto={() => {
+          // modal handles download via passed callbacks in your existing pattern
+        }}
       />
 
       <div className="mx-auto max-w-7xl px-6 py-8">
@@ -86,12 +165,40 @@ export default function AdminJobApplicationsForJobClient({
               </div>
 
               <SoftButton
-                disabled={isPending}
+                disabled={busy || isPending}
                 onClick={() => startTransition(() => router.refresh())}
-                icon={<RefreshCw className={cn("h-4 w-4", isPending && "animate-spin")} />}
+                icon={
+                  <RefreshCw className={cn("h-4 w-4", (busy || isPending) && "animate-spin")} />
+                }
                 label="Refresh"
               />
             </div>
+
+            {err ? (
+              <div
+                className={cn(
+                  "mt-4 flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm",
+                  isDark
+                    ? "border-red-500/25 bg-red-600/15 text-red-50"
+                    : "border-red-200 bg-red-50 text-red-900",
+                )}
+              >
+                <AlertTriangle className="mt-0.5 h-4 w-4" />
+                <div className="flex-1">{err}</div>
+                <button
+                  type="button"
+                  onClick={() => setErr(null)}
+                  className={cn(
+                    "rounded-2xl p-1.5 transition",
+                    "text-inherit hover:bg-black/5",
+                    isDark && "hover:bg-white/5",
+                  )}
+                  aria-label="Dismiss error"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : null}
 
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_220px_160px]">
               <div
@@ -105,7 +212,7 @@ export default function AdminJobApplicationsForJobClient({
                 <input
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  placeholder="Search name, email…"
+                  placeholder="Search name, email..."
                   className="w-full bg-transparent text-sm text-[var(--dash-text)] outline-none placeholder:text-[var(--dash-muted)]"
                 />
                 {q.trim() ? (
@@ -127,17 +234,17 @@ export default function AdminJobApplicationsForJobClient({
                 value={status}
                 onChange={setStatus}
                 placeholder="All statuses"
-                disabled={isPending}
+                disabled={busy || isPending}
                 options={[
-                  { value: "RECEIVED", label: "Received" },
-                  { value: "VIEWED", label: "Viewed" },
-                  { value: "ARCHIVED", label: "Archived" },
+                  { value: EJobApplicationStatus.RECEIVED, label: "Received" },
+                  { value: EJobApplicationStatus.VIEWED, label: "Viewed" },
+                  { value: EJobApplicationStatus.ARCHIVED, label: "Archived" },
                 ]}
                 className="z-[80]"
               />
 
               <SoftButton
-                disabled={isPending}
+                disabled={busy || isPending}
                 onClick={() =>
                   pushQuery({ q: q.trim() || null, status: status || null, page: "1" })
                 }
@@ -148,8 +255,6 @@ export default function AdminJobApplicationsForJobClient({
           </div>
         </div>
 
-        {/* Reuse the global table by just linking back to global page if you want deeper controls.
-            For now we keep it simple here: show data + pagination. */}
         <div
           className={cn(
             "overflow-hidden rounded-3xl border bg-[var(--dash-surface)] shadow-[var(--dash-shadow)]",
@@ -161,17 +266,24 @@ export default function AdminJobApplicationsForJobClient({
               <thead className="sticky top-0 z-10">
                 <tr className="border-b border-[var(--dash-border)] bg-[var(--dash-surface-2)]/60 backdrop-blur">
                   <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Applicant</th>
-                  <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Email</th>
+                  <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Contact</th>
                   <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Status</th>
                   <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Submitted</th>
+                  <th className="px-4 py-3 text-right font-semibold text-[var(--dash-muted)]">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((a: any) => {
-                  const name = `${a.firstName || ""} ${a.lastName || ""}`.trim() || "—";
+                  const id = String(a.id);
+                  const name = `${a.firstName || ""} ${a.lastName || ""}`.trim() || "-";
+                  const email = a.email || "-";
+                  const isArchived = a.status === EJobApplicationStatus.ARCHIVED;
+
                   return (
                     <tr
-                      key={String(a.id)}
+                      key={id}
                       className={cn(
                         "border-b border-[var(--dash-border)]/70 last:border-b-0",
                         "transition hover:bg-[var(--dash-surface-2)]/45",
@@ -180,10 +292,17 @@ export default function AdminJobApplicationsForJobClient({
                       <td className="px-4 py-3">
                         <div className="font-semibold text-[var(--dash-text)]">{name}</div>
                         <div className="mt-0.5 text-xs text-[var(--dash-muted)]">
-                          {a.phone || "—"}
+                          {a.currentLocation || a.addressLine || "-"}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-[var(--dash-text)]/90">{a.email || "—"}</td>
+
+                      <td className="px-4 py-3">
+                        <div className="text-[var(--dash-text)]/90">{email}</div>
+                        <div className="mt-0.5 text-xs text-[var(--dash-muted)]">
+                          {a.phone || "-"}
+                        </div>
+                      </td>
+
                       <td className="px-4 py-3">
                         <span
                           className={cn(
@@ -194,8 +313,65 @@ export default function AdminJobApplicationsForJobClient({
                           {a.status}
                         </span>
                       </td>
+
                       <td className="px-4 py-3 text-[var(--dash-muted)]">
                         {a.createdAt ? new Date(a.createdAt).toLocaleString() : "-"}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-2">
+                          <SoftButton
+                            disabled={busy || isPending}
+                            onClick={() => setSelectedApplication(a)}
+                            icon={<Eye className="h-4 w-4" />}
+                            label="View"
+                          />
+
+                          {isArchived ? (
+                            <IconButton
+                              title="Unarchive application"
+                              disabled={busy || isPending}
+                              onClick={() =>
+                                confirm({
+                                  tone: "neutral",
+                                  title: "Unarchive this application?",
+                                  description: "This will make it visible again in default views.",
+                                  confirmLabel: "Unarchive",
+                                  action: async () => {
+                                    await adminSetApplicationStatus(
+                                      id,
+                                      EJobApplicationStatus.RECEIVED,
+                                    );
+                                  },
+                                })
+                              }
+                            >
+                              <ArchiveRestore className="h-4 w-4 -scale-x-100" />
+                            </IconButton>
+                          ) : (
+                            <IconButton
+                              title="Archive application"
+                              disabled={busy || isPending}
+                              onClick={() =>
+                                confirm({
+                                  tone: "danger",
+                                  title: "Archive this application?",
+                                  description:
+                                    "Archived applications are hidden from default views.",
+                                  confirmLabel: "Archive",
+                                  action: async () => {
+                                    await adminSetApplicationStatus(
+                                      id,
+                                      EJobApplicationStatus.ARCHIVED,
+                                    );
+                                  },
+                                })
+                              }
+                            >
+                              <Archive className="h-4 w-4" />
+                            </IconButton>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -203,7 +379,7 @@ export default function AdminJobApplicationsForJobClient({
 
                 {!items.length ? (
                   <tr>
-                    <td colSpan={4} className="px-4 py-10 text-center text-[var(--dash-muted)]">
+                    <td colSpan={5} className="px-4 py-10 text-center text-[var(--dash-muted)]">
                       No applications found.
                     </td>
                   </tr>
@@ -221,7 +397,7 @@ export default function AdminJobApplicationsForJobClient({
 
             <div className="flex gap-2">
               <button
-                disabled={!meta?.hasPrev || isPending}
+                disabled={!meta?.hasPrev || busy || isPending}
                 onClick={() => pushQuery({ page: String(Math.max(1, (meta.page ?? 1) - 1)) })}
                 className={cn(
                   "rounded-2xl border px-3 py-2 text-sm font-semibold transition",
@@ -234,7 +410,7 @@ export default function AdminJobApplicationsForJobClient({
                 Prev
               </button>
               <button
-                disabled={!meta?.hasNext || isPending}
+                disabled={!meta?.hasNext || busy || isPending}
                 onClick={() => pushQuery({ page: String((meta.page ?? 1) + 1) })}
                 className={cn(
                   "rounded-2xl border px-3 py-2 text-sm font-semibold transition",
@@ -247,18 +423,6 @@ export default function AdminJobApplicationsForJobClient({
                 Next
               </button>
             </div>
-          </div>
-
-          <div className="border-t border-[var(--dash-border)] bg-[var(--dash-surface)] px-4 py-3 text-[12px] text-[var(--dash-muted)]">
-            Need resume downloads + status controls? Use the global{" "}
-            <button
-              type="button"
-              className="font-semibold text-[var(--dash-text)] underline underline-offset-4"
-              onClick={() => router.push("/admin/jobs/applications")}
-            >
-              Applications
-            </button>{" "}
-            page.
           </div>
         </div>
       </div>

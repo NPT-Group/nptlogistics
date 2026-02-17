@@ -13,7 +13,6 @@ import {
   ChevronRight,
   FileText,
   FolderTree,
-  Home,
   MessageSquareText,
   PlusCircle,
   Settings,
@@ -59,7 +58,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     {
       label: "NAVIGATION",
       items: [
-        { href: "/admin", label: "Home", Icon: Home },
         {
           href: "/admin/blog",
           label: "Blog",

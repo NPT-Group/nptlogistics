@@ -49,7 +49,7 @@ async function resolveAdmin(
 /* ───────────────────────── proxy ───────────────────────── */
 
 export async function proxy(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  const { pathname, search } = req.nextUrl;
 
   // Only enforce on /admin routes
   if (!pathname.startsWith("/admin")) {
@@ -61,13 +61,33 @@ export async function proxy(req: NextRequest) {
     const { isAdmin, hasInvalidAuthCookie } = await resolveAdmin(req);
 
     if (isAdmin) {
-      return NextResponse.redirect(new URL("/admin", req.url));
+      // Authenticated admins land on /admin/blog
+      const res = NextResponse.redirect(new URL("/admin/blog", req.url));
+      if (hasInvalidAuthCookie) res.cookies.delete(AUTH_COOKIE_NAME);
+      return res;
     }
 
     const res = NextResponse.next();
     if (hasInvalidAuthCookie) {
       res.cookies.delete(AUTH_COOKIE_NAME);
     }
+    return res;
+  }
+
+  // If an authenticated admin manually visits /admin, redirect to /admin/blog
+  if (pathname === "/admin") {
+    const { isAdmin, hasInvalidAuthCookie } = await resolveAdmin(req);
+
+    if (!isAdmin) {
+      const callbackUrl = encodeURIComponent(pathname + search);
+      const url = new URL(`/login?callbackUrl=${callbackUrl}`, req.url);
+      const res = NextResponse.redirect(url);
+      if (hasInvalidAuthCookie) res.cookies.delete(AUTH_COOKIE_NAME);
+      return res;
+    }
+
+    const res = NextResponse.redirect(new URL("/admin/blog", req.url));
+    if (hasInvalidAuthCookie) res.cookies.delete(AUTH_COOKIE_NAME);
     return res;
   }
 

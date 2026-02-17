@@ -4,10 +4,18 @@ import { NextRequest } from "next/server";
 import connectDB from "@/lib/utils/connectDB";
 import { guard } from "@/lib/utils/auth/authUtils";
 import { successResponse, errorResponse } from "@/lib/utils/apiResponse";
-import { parsePagination, parseSort, buildMeta } from "@/lib/utils/queryUtils";
+import {
+  parseEnumParam,
+  parsePagination,
+  parseSort,
+  buildMeta,
+  rx,
+} from "@/lib/utils/queryUtils";
+import { trim } from "@/lib/utils/stringUtils";
 
 import { JobPostingModel } from "@/mongoose/models/JobPosting";
 import { JobApplicationModel } from "@/mongoose/models/JobApplication";
+import { EJobApplicationStatus } from "@/types/jobApplication.types";
 
 export const GET = async (req: NextRequest, ctx: { params: Promise<{ id: string }> }) => {
   try {
@@ -21,6 +29,12 @@ export const GET = async (req: NextRequest, ctx: { params: Promise<{ id: string 
 
     const url = new URL(req.url);
     const sp = url.searchParams;
+    const q = trim(sp.get("q"));
+    const status = parseEnumParam(
+      sp.get("status"),
+      Object.values(EJobApplicationStatus) as readonly EJobApplicationStatus[],
+      "status",
+    );
 
     const { page, limit, skip } = parsePagination(sp.get("page"), sp.get("pageSize"), 200);
     const allowedSortKeys = ["createdAt", "updatedAt", "status"] as const;
@@ -32,6 +46,19 @@ export const GET = async (req: NextRequest, ctx: { params: Promise<{ id: string 
     );
 
     const filter: any = { jobPostingId: id };
+    if (status) filter.status = status;
+
+    if (q) {
+      const tokens = q.split(/\s+/).filter(Boolean);
+      filter.$and = tokens.map((t) => ({
+        $or: [
+          { firstName: rx(t) },
+          { lastName: rx(t) },
+          { email: rx(t) },
+          { currentLocation: rx(t) },
+        ],
+      }));
+    }
 
     const total = await JobApplicationModel.countDocuments(filter);
 
@@ -49,7 +76,7 @@ export const GET = async (req: NextRequest, ctx: { params: Promise<{ id: string 
       total,
       sortBy,
       sortDir,
-      filters: { jobPostingId: id },
+      filters: { jobPostingId: id, q: q ?? null, status: status ?? null },
     });
 
     return successResponse(200, "Job applications", { items, meta });

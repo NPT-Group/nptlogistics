@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Calendar, Clock, Search, ArrowRight, Tag } from "lucide-react";
 import Image from "next/image";
 
+import { NAV_OFFSET } from "@/constants/ui";
+
 type CategoryItem = {
   id: string;
   name: string;
@@ -72,11 +74,17 @@ export default function BlogIndexClient({
   const router = useRouter();
   const sp = useSearchParams();
 
-  const [q, setQ] = React.useState(sp.get("q") ?? "");
+  const appliedQ = sp.get("q") ?? "";
   const activeCategoryId = sp.get("categoryId") ?? "";
+  const pageNum = Number(sp.get("page") ?? "1");
 
-  const featured = initialItems?.[0] ?? null;
-  const rest = initialItems?.slice?.(1) ?? [];
+  const [q, setQ] = React.useState(appliedQ);
+
+  const hasFilters = Boolean(appliedQ.trim() || activeCategoryId);
+  const showFeatured = !hasFilters && pageNum === 1;
+
+  const featured = showFeatured ? (initialItems?.[0] ?? null) : null;
+  const items = showFeatured ? (initialItems?.slice?.(1) ?? []) : (initialItems ?? []);
 
   function pushWith(params: Record<string, string | null | undefined>) {
     const qs = new URLSearchParams(sp.toString());
@@ -94,6 +102,15 @@ export default function BlogIndexClient({
 
   function selectCategory(categoryId?: string | null) {
     pushWith({ categoryId: categoryId && categoryId !== "all" ? categoryId : null });
+  }
+
+  function clearFilters() {
+    const qs = new URLSearchParams(sp.toString());
+    qs.delete("q");
+    qs.delete("categoryId");
+    qs.set("page", "1");
+    router.push(`/blog?${qs.toString()}`);
+    setQ(""); // reset input UI too
   }
 
   const featuredBannerUrl = featured
@@ -118,7 +135,6 @@ export default function BlogIndexClient({
               className="object-cover"
             />
           </div>
-
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/55 to-slate-950/15" />
         </div>
 
@@ -138,7 +154,7 @@ export default function BlogIndexClient({
               and logistics innovation across the United States, Mexico, and Canada.
             </p>
 
-            {/* search */}
+            {/* search (single source of truth; sidebar search removed) */}
             <div className="mt-6 flex max-w-xl items-center gap-2">
               <div className="relative w-full">
                 <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/65" />
@@ -159,7 +175,7 @@ export default function BlogIndexClient({
             </div>
           </div>
 
-          {/* FEATURED */}
+          {/* FEATURED (only when no filters + page 1) */}
           {featured ? (
             <div className="mt-10 grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
               <Link
@@ -210,8 +226,8 @@ export default function BlogIndexClient({
                 </div>
               </Link>
 
-              {/* mini panel */}
-              <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 text-white/90 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.6)] backdrop-blur">
+              {/* mini panel (mobile only; desktop uses sidebar categories) */}
+              <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 text-white/90 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.6)] backdrop-blur lg:hidden">
                 <div className="text-sm font-semibold">Explore topics</div>
                 <div className="mt-3 grid gap-2">
                   {(initialCategories ?? []).slice(0, 6).map((c) => {
@@ -258,19 +274,28 @@ export default function BlogIndexClient({
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
                 <div className="text-xl font-semibold tracking-tight text-slate-900">
-                  Latest Articles
+                  {hasFilters ? "Results" : "Latest Articles"}
                 </div>
                 <div className="mt-1 text-sm text-slate-500">
-                  {activeCategoryId
-                    ? "Filtered by category"
+                  {hasFilters
+                    ? "Showing posts matching your filters."
                     : "Fresh thinking from our logistics team."}
                 </div>
               </div>
+
+              {hasFilters ? (
+                <button
+                  onClick={clearFilters}
+                  className="rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                >
+                  Clear filters
+                </button>
+              ) : null}
             </div>
 
             {/* Cards grid */}
             <div className="grid gap-5 sm:grid-cols-2">
-              {rest.map((p) => {
+              {items.map((p) => {
                 const bannerUrl =
                   typeof p.bannerImage === "string" ? p.bannerImage : (p.bannerImage?.url ?? null);
 
@@ -364,42 +389,21 @@ export default function BlogIndexClient({
 
           {/* RIGHT (sticky) */}
           <aside className="hidden lg:block">
-            <div className="sticky top-6 space-y-5">
-              {/* Search */}
-              <div className="rounded-[28px] border border-slate-200/70 bg-white p-5 shadow-sm">
-                <div className="text-sm font-semibold text-slate-900">Search</div>
-                <div className="mt-3 flex gap-2">
-                  <div className="relative w-full">
-                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <input
-                      value={q}
-                      onChange={(e) => setQ(e.target.value)}
-                      onKeyDown={(e) => (e.key === "Enter" ? applySearch() : null)}
-                      placeholder="Search articles…"
-                      className="w-full rounded-2xl border border-slate-200 bg-white py-2 pr-3 pl-9 text-sm outline-none focus:ring-4 focus:ring-slate-900/5"
-                    />
-                  </div>
-                  <button
-                    onClick={applySearch}
-                    className="rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
-                  >
-                    Go
-                  </button>
-                </div>
-              </div>
-
-              {/* Categories */}
+            <div className="space-y-5" style={{ position: "sticky", top: NAV_OFFSET + 16 }}>
+              {/* Categories (desktop only; no duplication with mobile mini panel) */}
               <div className="rounded-[28px] border border-slate-200/70 bg-white p-5 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-semibold text-slate-900">Categories</div>
                   <button
-                    onClick={() => selectCategory(null)}
+                    onClick={() => (hasFilters ? clearFilters() : selectCategory(null))}
                     className={cx(
                       "text-xs font-semibold",
-                      !activeCategoryId ? "text-slate-900" : "text-slate-500 hover:text-slate-900",
+                      hasFilters || !activeCategoryId
+                        ? "text-slate-900"
+                        : "text-slate-500 hover:text-slate-900",
                     )}
                   >
-                    All
+                    {hasFilters ? "Clear filters" : "All"}
                   </button>
                 </div>
 

@@ -1,3 +1,4 @@
+// src/lib/utils/jobs/publicJobsApi.ts
 import type { IJobPosting, EEmploymentType, EWorkplaceType } from "@/types/jobPosting.types";
 
 function pickMessage(json: any, fallback: string) {

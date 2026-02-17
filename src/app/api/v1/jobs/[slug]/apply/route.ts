@@ -17,6 +17,9 @@ import type { IFileAsset } from "@/types/shared.types";
 
 import { verifyTurnstileToken, getRequestIp } from "@/lib/utils/turnstile";
 
+import { sendJobApplicantConfirmationEmail } from "@/lib/mail/jobApplications/sendJobApplicantConfirmationEmail";
+import { sendJobApplicantHrNotificationEmail } from "@/lib/mail/jobApplications/sendJobApplicantHrNotificationEmail";
+
 type ApplyBody = {
   // Turnstile
   turnstileToken: string;
@@ -42,6 +45,32 @@ type ApplyBody = {
   hasReferences?: boolean;
 };
 
+/**
+ * Derive the public-facing site origin from the incoming request.
+ * Works for localhost, http/https, and reverse-proxy deployments.
+ */
+function getSiteUrlFromRequest(req: NextRequest): string {
+  // 1) Prefer req.nextUrl.origin (Next.js usually sets this well)
+  const origin = req.nextUrl?.origin;
+  if (origin && origin !== "null") return origin;
+
+  // 2) Fall back to proxy headers
+  const h = req.headers;
+  const proto = (h.get("x-forwarded-proto") || "").split(",")[0].trim();
+  const forwardedHost = (h.get("x-forwarded-host") || "").split(",")[0].trim();
+  if (proto && forwardedHost) return `${proto}://${forwardedHost}`;
+
+  // 3) Fall back to host header; assume https unless clearly localhost
+  const host = (h.get("host") || "").trim();
+  if (host) {
+    const scheme = host.includes("localhost") || host.startsWith("127.0.0.1") ? "http" : "https";
+    return `${scheme}://${host}`;
+  }
+
+  // 4) Last resort
+  return "http://localhost:3000";
+}
+
 export const POST = async (req: NextRequest, ctx: { params: Promise<{ slug: string }> }) => {
   try {
     await connectDB();
@@ -65,15 +94,11 @@ export const POST = async (req: NextRequest, ctx: { params: Promise<{ slug: stri
     const turnstile = await verifyTurnstileToken({
       token: body?.turnstileToken,
       ip,
-      // If your frontend sets an action, set expectedAction here to enforce it.
       // expectedAction: "job_apply",
     });
 
     if (!turnstile.ok) {
-      // Use 400 so bots don’t learn too much; keep message simple
       return errorResponse(400, "Turnstile validation failed");
-      // If you want debugging in dev, you can log:
-      // console.warn("Turnstile failed:", turnstile);
     }
     // --- end Turnstile ---
 
@@ -83,6 +108,18 @@ export const POST = async (req: NextRequest, ctx: { params: Promise<{ slug: stri
 
     if (!firstName || !lastName || !email)
       return errorResponse(400, "firstName, lastName, email are required");
+
+    const emailLower = String(email).toLowerCase();
+
+    // Prevent duplicate applications for the same job + email
+    const alreadyApplied = await JobApplicationModel.exists({
+      jobPostingId: (job as any)._id,
+      email: emailLower,
+    });
+
+    if (alreadyApplied) {
+      return errorResponse(409, "You have already applied for this job with this email");
+    }
 
     if (!body?.resume?.s3Key || !body?.resume?.url || !body?.resume?.mimeType) {
       return errorResponse(400, "resume is required and must be a valid file asset");
@@ -94,7 +131,7 @@ export const POST = async (req: NextRequest, ctx: { params: Promise<{ slug: stri
 
       firstName,
       lastName,
-      email: String(email).toLowerCase(),
+      email: emailLower,
       phone: trim(body?.phone),
 
       currentLocation: trim(body?.currentLocation),
@@ -134,6 +171,57 @@ export const POST = async (req: NextRequest, ctx: { params: Promise<{ slug: stri
 
     await app.validate();
     await app.save();
+
+    const jobId = String((job as any)._id);
+    const jobTitle = (job as any)?.title || (job as any)?.name || undefined;
+    const siteUrl = getSiteUrlFromRequest(req);
+
+    // ───────────────────────── Applicant confirmation (non-blocking) ─────────────────────────
+    try {
+      await sendJobApplicantConfirmationEmail({
+        to: emailLower,
+        firstName,
+        lastName,
+        jobTitle,
+        applicationId: appId,
+      });
+    } catch (mailErr) {
+      console.warn("Failed to send applicant confirmation email:", mailErr);
+    }
+    // ────────────────────────────────────────────────────────────────────────────────────────
+
+    // ───────────────────────── HR notification (non-blocking) ─────────────────────────
+    try {
+      await sendJobApplicantHrNotificationEmail({
+        siteUrl,
+        applicationId: appId,
+        job: {
+          id: jobId,
+          title: jobTitle,
+          slug: (job as any)?.slug || s,
+        },
+        applicant: {
+          firstName,
+          lastName,
+          email: emailLower,
+          phone: trim(body?.phone),
+          currentLocation: trim(body?.currentLocation),
+          addressLine: trim(body?.addressLine),
+          linkedInUrl: trim(body?.linkedInUrl),
+          portfolioUrl: trim(body?.portfolioUrl),
+          commuteMode: trim(body?.commuteMode),
+          canWorkOnsite: body?.canWorkOnsite,
+          hasReferences: body?.hasReferences,
+          coverLetter: trim(body?.coverLetter),
+        },
+        // attach finalized files (self-sustaining email)
+        resume: app.resume as any,
+        photo: app.photo as any,
+      });
+    } catch (mailErr) {
+      console.warn("Failed to send HR notification email:", mailErr);
+    }
+    // ─────────────────────────────────────────────────────────────────────────────────
 
     const obj = app.toObject({ virtuals: true, getters: true });
 

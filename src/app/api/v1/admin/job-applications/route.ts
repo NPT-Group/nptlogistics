@@ -60,12 +60,31 @@ export const GET = async (req: NextRequest) => {
     const total = await JobApplicationModel.countDocuments(filter);
 
     const docs = await JobApplicationModel.find(filter)
+      .populate({ path: "jobPostingId", select: "title slug" })
       .sort({ [sortBy]: sortDir })
       .skip(skip)
       .limit(limit)
       .lean();
 
-    const items = docs.map((d: any) => ({ ...d, id: d?._id?.toString?.() ?? d?.id ?? "" }));
+    const items = docs.map((d: any) => {
+      const populated =
+        d?.jobPostingId && typeof d.jobPostingId === "object" ? d.jobPostingId : null;
+
+      return {
+        ...d,
+        id: d?._id?.toString?.() ?? d?.id ?? "",
+        // keep jobPostingId as a string for convenience/consistency
+        jobPostingId: populated?._id?.toString?.() ?? d?.jobPostingId?.toString?.() ?? "",
+        // add a stable "jobPosting" object for the client
+        jobPosting: populated
+          ? {
+              id: populated?._id?.toString?.() ?? "",
+              title: populated?.title ?? "",
+              slug: populated?.slug ?? "",
+            }
+          : null,
+      };
+    });
 
     const meta = buildMeta({
       page,

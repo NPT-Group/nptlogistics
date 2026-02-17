@@ -1,3 +1,4 @@
+// src/lib/utils/jobs/ssrJobsFetchers.ts
 import type { IJobPosting, EEmploymentType, EWorkplaceType } from "@/types/jobPosting.types";
 import { ssrApiFetch } from "@/lib/utils/ssrFetch";
 
@@ -30,9 +31,15 @@ export async function getPublicJobsListSSR(opts?: {
   return res?.data ?? { items: [], meta: {} };
 }
 
-export async function getPublicJobBySlugSSR(slug: string) {
-  const res = await ssrApiFetch<{ data: { jobPosting: IJobPosting } }>(
-    `/api/v1/jobs/${encodeURIComponent(slug)}`,
-  );
-  return res?.data?.jobPosting;
+export async function getPublicJobBySlugSSR(slug: string): Promise<IJobPosting | null> {
+  try {
+    const res = await ssrApiFetch<{ data: { jobPosting: IJobPosting } }>(
+      `/api/v1/jobs/${encodeURIComponent(slug)}`,
+    );
+    return res?.data?.jobPosting ?? null;
+  } catch (e: any) {
+    // ssrApiFetch sets err.status = res.status
+    if (e?.status === 404) return null;
+    throw e;
+  }
 }
