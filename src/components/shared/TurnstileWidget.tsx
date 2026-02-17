@@ -10,7 +10,6 @@ declare global {
       reset: (widgetId?: string) => void;
       remove: (widgetId?: string) => void;
     };
-    __turnstileScriptLoading?: boolean;
     __turnstileScriptLoaded?: boolean;
     __turnstileScriptLoadPromise?: Promise<void>;
   }
@@ -36,7 +35,6 @@ function loadTurnstileScript(): Promise<void> {
   if (window.__turnstileScriptLoadPromise) return window.__turnstileScriptLoadPromise;
 
   window.__turnstileScriptLoadPromise = new Promise<void>((resolve, reject) => {
-    // If script tag already exists, hook into load/error
     const existing = document.querySelector<HTMLScriptElement>('script[data-turnstile="true"]');
     if (existing) {
       existing.addEventListener("load", () => {
@@ -46,7 +44,6 @@ function loadTurnstileScript(): Promise<void> {
       existing.addEventListener("error", () =>
         reject(new Error("Failed to load Turnstile script")),
       );
-      // If it already loaded but flags not set:
       if ((window as any).turnstile) {
         window.__turnstileScriptLoaded = true;
         resolve();
@@ -76,6 +73,18 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const widgetIdRef = React.useRef<string | null>(null);
 
+  // Keep latest callbacks in refs so parent re-renders don't re-init widget
+  const onTokenRef = React.useRef(onToken);
+  const onErrorRef = React.useRef(onError);
+
+  React.useEffect(() => {
+    onTokenRef.current = onToken;
+  }, [onToken]);
+
+  React.useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+
   const [status, setStatus] = React.useState<"idle" | "loading" | "ready" | "verified" | "error">(
     "idle",
   );
@@ -86,9 +95,9 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
     if (!siteKey) {
       setStatus("error");
       setMsg("Turnstile is not configured (missing NEXT_PUBLIC_TURNSTILE_SITE_KEY).");
-      onError?.("Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY");
+      onErrorRef.current?.("Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY");
     }
-  }, [siteKey, onError]);
+  }, [siteKey]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -107,7 +116,7 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
         if (!window.turnstile) {
           setStatus("error");
           setMsg("Turnstile failed to initialize (script loaded but API missing).");
-          onError?.("Turnstile API missing after script load");
+          onErrorRef.current?.("Turnstile API missing after script load");
           return;
         }
 
@@ -128,12 +137,12 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
           sitekey: siteKey,
           action: action || undefined,
 
-          // IMPORTANT: callback is where we receive the token
+          // Receive the token
           callback: (token: string) => {
             if (cancelled) return;
             setStatus("verified");
             setMsg("");
-            onToken(token);
+            onTokenRef.current(token);
           },
 
           // If token expires, reset and clear token upstream
@@ -141,7 +150,7 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
             if (cancelled) return;
             setStatus("ready");
             setMsg("Verification expired. Please try again.");
-            onToken(""); // clear token
+            onTokenRef.current(""); // clear token
             try {
               window.turnstile?.reset(widgetIdRef.current || undefined);
             } catch {
@@ -156,8 +165,8 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
             setMsg(
               "Verification failed to load. If you’re on localhost, ensure the site key allows this domain.",
             );
-            onToken(""); // clear token
-            onError?.("Turnstile error-callback fired");
+            onTokenRef.current(""); // clear token
+            onErrorRef.current?.("Turnstile error-callback fired");
           },
 
           // Optional: visuals
@@ -171,7 +180,7 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
         if (cancelled) return;
         setStatus("error");
         setMsg(e?.message || "Failed to load verification.");
-        onError?.(e?.message || "Turnstile load failed");
+        onErrorRef.current?.(e?.message || "Turnstile load failed");
       }
     }
 
@@ -188,7 +197,7 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
         widgetIdRef.current = null;
       }
     };
-  }, [siteKey, action, onToken, onError]);
+  }, [siteKey, action]); // ✅ NOTE: callbacks intentionally excluded
 
   return (
     <div className={className}>

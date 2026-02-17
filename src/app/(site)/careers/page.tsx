@@ -1,13 +1,13 @@
 import { nptMetadata } from "@/lib/utils/blog/metadata";
 import { getPublicJobsListSSR } from "@/lib/utils/jobs/ssrJobsFetchers";
-import JobsIndexClient from "./JobsIndexClient";
+import JobsIndexClient from "./CareersClient";
 
 export const metadata = nptMetadata({
-  title: "Jobs",
+  title: "Careers",
   description: "Explore open roles at NPT Logistics and apply online.",
 });
 
-export default async function JobsIndexPage({
+export default async function CareersPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

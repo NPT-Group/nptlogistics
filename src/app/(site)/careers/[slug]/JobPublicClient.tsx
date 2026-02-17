@@ -1,4 +1,4 @@
-// src/app/(site)/jobs/[slug]/JobPublicClient.tsx
+// src/app/(site)/careers/[slug]/JobPublicClient.tsx
 "use client";
 
 import * as React from "react";
@@ -28,6 +28,7 @@ import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 
 import TurnstileWidget from "@/components/shared/TurnstileWidget";
 import { uploadToS3PresignedPublic } from "@/lib/utils/s3ClientUpload";
+import { NEXT_PUBLIC_NPT_HR_EMAIL } from "@/config/env";
 
 const BlockNote = dynamic(() => import("@/components/BlockNote"), { ssr: false });
 
@@ -82,9 +83,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
 
   const loc = Array.isArray(job.locations) ? job.locations : [];
   const locLabel = loc[0]?.label || loc[0]?.city || loc[0]?.region || loc[0]?.country || "—";
-
   const typeLabel = [job.workplaceType, job.employmentType].filter(Boolean).join(" • ") || "—";
-
   const compLabel = fmtComp(job.compensation);
 
   const coverUrl = getAssetUrl(job.coverImage);
@@ -99,6 +98,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
   const [ok, setOk] = React.useState(false);
 
   const [turnstileToken, setTurnstileToken] = React.useState("");
+  const [turnstileInstanceKey, setTurnstileInstanceKey] = React.useState(0); // NEW: force remount to reset widget UI
 
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
@@ -118,6 +118,39 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
   const [resumeAsset, setResumeAsset] = React.useState<IFileAsset | null>(null);
   const [photoAsset, setPhotoAsset] = React.useState<IFileAsset | null>(null);
 
+  // Refs: reset file inputs + scroll to messages
+  const resumeInputRef = React.useRef<HTMLInputElement | null>(null);
+  const photoInputRef = React.useRef<HTMLInputElement | null>(null);
+  const noticeRef = React.useRef<HTMLDivElement | null>(null);
+
+  const scrollToNotice = React.useCallback(() => {
+    requestAnimationFrame(() => {
+      if (!noticeRef.current) return;
+
+      const NAVBAR_OFFSET = 80;
+      // adjust if needed (e.g. 80, 100, etc.)
+      // should match your sticky navbar height
+
+      const rect = noticeRef.current.getBoundingClientRect();
+      const absoluteTop = rect.top + window.scrollY;
+
+      window.scrollTo({
+        top: absoluteTop - NAVBAR_OFFSET,
+        behavior: "smooth",
+      });
+    });
+  }, []);
+
+  // Keep this too (helps in cases where error/success set outside submit)
+  React.useEffect(() => {
+    if (!err && !ok) return;
+    scrollToNotice();
+  }, [err, ok, scrollToNotice]);
+
+  const handleTurnstileToken = React.useCallback((t: string) => {
+    setTurnstileToken(t);
+  }, []);
+
   const focusRing =
     "focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-ring)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
@@ -130,6 +163,35 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
     "mt-1 block w-full rounded-xl border border-slate-200/70 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm " +
     "file:mr-3 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white " +
     "hover:file:bg-slate-800";
+
+  function resetFormAfterSuccess() {
+    // keep ok=true so success message stays visible
+    setErr(null);
+
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setPhone("");
+
+    setCurrentLocation("");
+    setAddressLine("");
+    setCoverLetter("");
+
+    setLinkedInUrl("");
+    setPortfolioUrl("");
+
+    setResumeFile(null);
+    setPhotoFile(null);
+    setResumeAsset(null);
+    setPhotoAsset(null);
+
+    if (resumeInputRef.current) resumeInputRef.current.value = "";
+    if (photoInputRef.current) photoInputRef.current.value = "";
+
+    // Clear token + remount Turnstile so UI un-checks
+    setTurnstileToken("");
+    setTurnstileInstanceKey((k) => k + 1);
+  }
 
   async function uploadResumeIfNeeded() {
     if (!resumeFile) throw new Error("Please attach your resume.");
@@ -164,20 +226,25 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
   }
 
   async function submit() {
+    // Clear previous messages so repeated same error still triggers a "fresh" scroll path
     setErr(null);
+    setOk(false);
 
     if (!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
       setErr("Turnstile is not configured (missing NEXT_PUBLIC_TURNSTILE_SITE_KEY).");
+      scrollToNotice();
       return;
     }
 
     if (!turnstileToken) {
       setErr("Please complete the verification.");
+      scrollToNotice();
       return;
     }
 
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
       setErr("First name, last name, and email are required.");
+      scrollToNotice();
       return;
     }
 
@@ -213,9 +280,11 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
       if (!res.ok) throw new Error(json?.message || "Failed to submit application");
 
       setOk(true);
-      setTurnstileToken("");
+      scrollToNotice();
+      resetFormAfterSuccess();
     } catch (e: any) {
       setErr(e?.message || "Failed to submit application");
+      scrollToNotice();
     } finally {
       setBusy(false);
     }
@@ -226,7 +295,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
       <div className="mx-auto max-w-6xl px-6 py-8">
         <button
           type="button"
-          onClick={() => router.push("/jobs")}
+          onClick={() => router.push("/careers#jobs")}
           className={[
             "inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50",
             focusRing,
@@ -381,6 +450,9 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                 Submit your details and upload your resume. We’ll review and follow up.
               </div>
 
+              {/* Anchor for scroll */}
+              <div ref={noticeRef} />
+
               {err ? (
                 <div className="mt-4 flex items-start gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
                   <AlertTriangle className="mt-0.5 h-4 w-4" />
@@ -489,6 +561,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                         Resume (PDF/DOC/DOCX) *
                       </div>
                       <input
+                        ref={resumeInputRef}
                         type="file"
                         accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                         onChange={(e) => {
@@ -507,6 +580,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                     <div>
                       <div className="text-xs font-semibold text-slate-700">Photo (optional)</div>
                       <input
+                        ref={photoInputRef}
                         type="file"
                         accept="image/*"
                         onChange={(e) => {
@@ -527,8 +601,9 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                 <div className="rounded-2xl border border-slate-200 bg-white p-4">
                   <div className="text-xs font-semibold text-slate-700">Verification</div>
                   <TurnstileWidget
+                    key={turnstileInstanceKey} // NEW: remount resets checked UI
                     action="job_apply"
-                    onToken={(t) => setTurnstileToken(t)}
+                    onToken={handleTurnstileToken}
                     className="mt-2"
                   />
                   <div className="mt-2 text-[11px] text-slate-500">
@@ -561,7 +636,18 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                 <Mail className="h-4 w-4" />
                 Questions?
               </div>
-              <div className="mt-2">If you need help applying, contact HR.</div>
+              <div className="mt-2">
+                If you need help applying, contact{" "}
+                <a
+                  href={`mailto:${NEXT_PUBLIC_NPT_HR_EMAIL}?subject=${encodeURIComponent(
+                    `Question about ${job.title}`,
+                  )}`}
+                  className="font-medium text-[color:var(--color-brand-600)] hover:underline"
+                >
+                  {NEXT_PUBLIC_NPT_HR_EMAIL}
+                </a>
+                .
+              </div>
               <div className="mt-3 flex items-center gap-2 text-xs text-slate-600">
                 <Phone className="h-3.5 w-3.5" />
                 Include the job title in your message.

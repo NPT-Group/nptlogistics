@@ -39,3 +39,7 @@ export const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY!;
 // Application Environment
 export const isProd = process.env.NODE_ENV === "production";
 export const PORT = process.env.PORT! ?? 3000;
+
+// Public HR email
+export const NEXT_PUBLIC_NPT_HR_EMAIL =
+  process.env.NEXT_PUBLIC_NPT_HR_EMAIL! || "hr@nptlogistics.com";
