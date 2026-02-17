@@ -207,7 +207,7 @@ function VideoCard({
             rel="noopener noreferrer"
             className={cn(
               "pointer-events-auto inline-flex items-center gap-2 truncate text-sm font-semibold",
-              "hover:text-white/90 cursor-pointer",
+              "cursor-pointer hover:text-white/90",
               focusRing,
             )}
           >
@@ -225,7 +225,7 @@ function VideoCard({
               type="button"
               onClick={copyLink}
               className={cn(
-                "inline-flex h-8 items-center justify-center rounded-lg border border-white/22 px-2.5 text-xs font-semibold hover:bg-white/12 cursor-pointer",
+                "inline-flex h-8 cursor-pointer items-center justify-center rounded-lg border border-white/22 px-2.5 text-xs font-semibold hover:bg-white/12",
                 focusRing,
               )}
             >
@@ -260,22 +260,16 @@ export function TrustProofSection() {
     },
     [total],
   );
-  const goPrev = React.useCallback(
-    () => {
-      if (total <= 1) return;
-      setDirection(-1);
-      setIndex((prev) => getLoopedIndex(prev - 1));
-    },
-    [getLoopedIndex, total],
-  );
-  const goNext = React.useCallback(
-    () => {
-      if (total <= 1) return;
-      setDirection(1);
-      setIndex((prev) => getLoopedIndex(prev + 1));
-    },
-    [getLoopedIndex, total],
-  );
+  const goPrev = React.useCallback(() => {
+    if (total <= 1) return;
+    setDirection(-1);
+    setIndex((prev) => getLoopedIndex(prev - 1));
+  }, [getLoopedIndex, total]);
+  const goNext = React.useCallback(() => {
+    if (total <= 1) return;
+    setDirection(1);
+    setIndex((prev) => getLoopedIndex(prev + 1));
+  }, [getLoopedIndex, total]);
   const setDirectIndex = React.useCallback(
     (next: number) => {
       if (total <= 1) return;
@@ -356,7 +350,7 @@ export function TrustProofSection() {
           <div className="text-xs font-semibold tracking-wide text-[color:var(--color-muted-light)]">
             {TRUST_PROOF_SECTION.kicker}
           </div>
-          <h2 className="mt-2 text-[30px] font-semibold text-[color:var(--color-text-light)] sm:text-[38px] lg:whitespace-nowrap lg:text-[2.6rem]">
+          <h2 className="mt-2 text-[30px] font-semibold text-[color:var(--color-text-light)] sm:text-[38px] lg:text-[2.6rem] lg:whitespace-nowrap">
             {TRUST_PROOF_SECTION.title}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-[color:var(--color-muted-light)] sm:text-base">
@@ -423,7 +417,9 @@ export function TrustProofSection() {
                     key={`left-${orderedItems[leftIndex].id}`}
                     className="w-[250px] shrink-0"
                     initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -16, scale: 0.9 }}
-                    animate={reduceMotion ? { opacity: 0.68 } : { opacity: 0.68, x: 0, scale: 0.92 }}
+                    animate={
+                      reduceMotion ? { opacity: 0.68 } : { opacity: 0.68, x: 0, scale: 0.92 }
+                    }
                     exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 16, scale: 0.9 }}
                     transition={{ duration: 0.28, ease: "easeOut" }}
                   >
@@ -440,13 +436,9 @@ export function TrustProofSection() {
                   key={activeItem?.id ?? "active-empty"}
                   custom={direction}
                   className="w-[460px] shrink-0 md:-mx-2"
-                  initial={
-                    reduceMotion ? { x: 0 } : { x: direction > 0 ? 22 : -22 }
-                  }
+                  initial={reduceMotion ? { x: 0 } : { x: direction > 0 ? 22 : -22 }}
                   animate={{ x: 0 }}
-                  exit={
-                    reduceMotion ? { x: 0 } : { x: direction > 0 ? -22 : 22 }
-                  }
+                  exit={reduceMotion ? { x: 0 } : { x: direction > 0 ? -22 : 22 }}
                   transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
                 >
                   {activeItem?.type === "video" ? (
@@ -462,7 +454,9 @@ export function TrustProofSection() {
                     key={`right-${orderedItems[rightIndex].id}`}
                     className="w-[250px] shrink-0"
                     initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 16, scale: 0.9 }}
-                    animate={reduceMotion ? { opacity: 0.68 } : { opacity: 0.68, x: 0, scale: 0.92 }}
+                    animate={
+                      reduceMotion ? { opacity: 0.68 } : { opacity: 0.68, x: 0, scale: 0.92 }
+                    }
                     exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -16, scale: 0.9 }}
                     transition={{ duration: 0.28, ease: "easeOut" }}
                   >
@@ -481,13 +475,9 @@ export function TrustProofSection() {
                 <motion.div
                   key={`mobile-${activeItem?.id ?? "active-empty"}`}
                   custom={direction}
-                  initial={
-                    reduceMotion ? { x: 0 } : { x: direction > 0 ? 18 : -18 }
-                  }
+                  initial={reduceMotion ? { x: 0 } : { x: direction > 0 ? 18 : -18 }}
                   animate={{ x: 0 }}
-                  exit={
-                    reduceMotion ? { x: 0 } : { x: direction > 0 ? -18 : 18 }
-                  }
+                  exit={reduceMotion ? { x: 0 } : { x: direction > 0 ? -18 : 18 }}
                   transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                 >
                   {activeItem?.type === "video" ? (
