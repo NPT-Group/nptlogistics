@@ -1,4 +1,4 @@
-import { Container } from "@/components/layout/Container";
+import { Container } from "@/app/(site)/components/layout/Container";
 import Link from "next/link";
 
 const LAST_UPDATED = "February 17, 2026";
@@ -11,7 +11,9 @@ export default function AccessibilityPage() {
           <h1 className="text-3xl font-semibold text-[color:var(--color-text-light)]">
             Accessibility Statement
           </h1>
-          <p className="mt-2 text-xs text-[color:var(--color-muted-light)]">Last updated: {LAST_UPDATED}</p>
+          <p className="mt-2 text-xs text-[color:var(--color-muted-light)]">
+            Last updated: {LAST_UPDATED}
+          </p>
 
           <p className="mt-4 text-sm leading-relaxed text-[color:var(--color-muted-light)] sm:text-base">
             NPT Logistics is committed to making our digital experiences accessible to all users,
@@ -33,9 +35,9 @@ export default function AccessibilityPage() {
             Feedback and support
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-[color:var(--color-muted-light)] sm:text-base">
-            If you experience accessibility barriers or need support accessing content, please contact
-            us and include the page URL and a short description of the issue so we can address it
-            promptly.
+            If you experience accessibility barriers or need support accessing content, please
+            contact us and include the page URL and a short description of the issue so we can
+            address it promptly.
           </p>
           <p className="mt-4 text-sm leading-relaxed text-[color:var(--color-muted-light)] sm:text-base">
             Contact us via the{" "}

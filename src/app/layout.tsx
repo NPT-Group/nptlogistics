@@ -1,10 +1,6 @@
+// src/app/layout.tsx
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import { Suspense } from "react";
-import { SiteHeader } from "@/components/layout/SiteHeader";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { SolutionsHashScroll } from "@/components/layout/SolutionsHashScroll";
-import { AnalyticsClient } from "@/components/analytics/AnalyticsClient";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nptlogistics.com"),
@@ -12,7 +8,6 @@ export const metadata: Metadata = {
     default: "NPT Logistics | Reliable Freight Solutions Across North America",
     template: "%s | NPT Logistics",
   },
-
   description:
     "NPT Logistics provides reliable freight transportation across North America, specializing in truckload, LTL, intermodal, and cross-border shipping.",
   applicationName: "NPT Logistics",
@@ -28,7 +23,6 @@ export const metadata: Metadata = {
   authors: [{ name: "NPT Logistics" }],
   creator: "NPT Logistics",
   publisher: "NPT Logistics",
-
   openGraph: {
     type: "website",
     siteName: "NPT Logistics",
@@ -36,16 +30,8 @@ export const metadata: Metadata = {
     description:
       "Reliable freight solutions across North America. Truckload, LTL, intermodal, and cross-border shipping built on compliance and execution.",
     url: "https://nptlogistics.com",
-    images: [
-      {
-        url: "/og-image.png", // placeholder for now
-        width: 1200,
-        height: 630,
-        alt: "NPT Logistics",
-      },
-    ],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "NPT Logistics" }],
   },
-
   twitter: {
     card: "summary_large_image",
     title: "NPT Logistics",
@@ -64,15 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-dvh bg-[color:var(--color-surface-0)] text-[color:var(--color-text)]">
-        <SolutionsHashScroll />
-        <Suspense fallback={null}>
-          <AnalyticsClient />
-        </Suspense>
-        <SiteHeader />
-        <main id="main-content" className="overflow-x-clip">
-          {children}
-        </main>
-        <SiteFooter />
+        {children}
       </body>
     </html>
   );

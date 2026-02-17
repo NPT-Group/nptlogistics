@@ -4,7 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Container } from "@/components/layout/Container";
+import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
 import { INDUSTRIES_SECTION, INDUSTRY_SLIDES, type IndustrySlide } from "@/config/industries";
 import { trackCtaClick } from "@/lib/analytics/cta";
@@ -146,11 +146,7 @@ function DesktopStage({
   onTouchEnd: (e: React.TouchEvent<HTMLDivElement>) => void;
 }) {
   return (
-    <div
-      className={TOKENS.desktopStage}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-    >
+    <div className={TOKENS.desktopStage} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       {/* Background image */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -247,11 +243,7 @@ function MobileStage({
   onTouchEnd: (e: React.TouchEvent<HTMLDivElement>) => void;
 }) {
   return (
-    <div
-      className={TOKENS.mobileStage}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-    >
+    <div className={TOKENS.mobileStage} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       {/* Image area */}
       <div className={TOKENS.mobileImageWrap}>
         <AnimatePresence mode="wait">
@@ -293,12 +285,8 @@ function MobileStage({
             transition={{ duration: reduceMotion ? 0 : 0.22, ease: "easeOut" }}
           >
             <IndustryBadge label={active.label} />
-            <h3 className={TOKENS.mobileTitle}>
-              {active.mobileTitle ?? active.title}
-            </h3>
-            <p className={TOKENS.mobileSubtitle}>
-              {active.mobileSubtitle ?? active.subtitle}
-            </p>
+            <h3 className={TOKENS.mobileTitle}>{active.mobileTitle ?? active.title}</h3>
+            <p className={TOKENS.mobileSubtitle}>{active.mobileSubtitle ?? active.subtitle}</p>
             <div className={TOKENS.ctaRow}>
               <Link
                 href={active.href}

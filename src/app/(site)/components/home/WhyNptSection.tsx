@@ -1,4 +1,4 @@
-import { Container } from "@/components/layout/Container";
+import { Container } from "@/app/(site)/components/layout/Container";
 import { WHY_NPT_SECTION, WHY_NPT_TOKENS } from "@/config/whyNpt";
 import { cn } from "@/lib/cn";
 import { WhyNPTOrbitClient } from "./WhyNptOrbitClient";
@@ -6,7 +6,10 @@ import { WhyNptMobileStack } from "./WhyNptMobileStack";
 
 export function WhyNptSection() {
   return (
-    <section id={WHY_NPT_SECTION.id} className={cn("relative overflow-hidden", "bg-[color:var(--color-surface-0)]")}>
+    <section
+      id={WHY_NPT_SECTION.id}
+      className={cn("relative overflow-hidden", "bg-[color:var(--color-surface-0)]")}
+    >
       <div className="absolute inset-0" aria-hidden="true">
         <div
           className="absolute inset-0"
@@ -28,7 +31,9 @@ export function WhyNptSection() {
       <Container className={WHY_NPT_TOKENS.section.containerClass}>
         <div className="mx-auto max-w-3xl text-center">
           <div className="mx-auto mb-3 h-[2px] w-14 bg-[color:var(--color-brand-500)]" />
-          <div className="text-xs font-semibold tracking-wide text-white/60">{WHY_NPT_SECTION.kicker}</div>
+          <div className="text-xs font-semibold tracking-wide text-white/60">
+            {WHY_NPT_SECTION.kicker}
+          </div>
           <h2 className={WHY_NPT_TOKENS.section.headingClass}>{WHY_NPT_SECTION.title}</h2>
           <p className={WHY_NPT_TOKENS.section.descriptionClass}>{WHY_NPT_SECTION.description}</p>
         </div>

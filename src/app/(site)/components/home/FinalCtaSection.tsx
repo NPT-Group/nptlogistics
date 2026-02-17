@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { Container } from "@/components/layout/Container";
+import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 
@@ -87,7 +87,7 @@ export function FinalCtaSection() {
                 className={cn(
                   "rounded-2xl border border-[color:var(--color-border-light)]/85",
                   "bg-[linear-gradient(155deg,rgba(255,255,255,0.95),rgba(255,255,255,0.84))]",
-                  "p-4 sm:p-5 shadow-[0_14px_34px_rgba(2,6,23,0.08)]",
+                  "p-4 shadow-[0_14px_34px_rgba(2,6,23,0.08)] sm:p-5",
                 )}
               >
                 <div className="grid grid-cols-3 gap-2.5">
@@ -148,8 +148,8 @@ export function FinalCtaSection() {
                 </div>
 
                 <div className="mt-3 text-center text-[11px] text-[color:var(--color-muted-light)]">
-                  Prefer a quick call? We&apos;ll align on lanes, service levels, and launch timing in
-                  minutes.
+                  Prefer a quick call? We&apos;ll align on lanes, service levels, and launch timing
+                  in minutes.
                 </div>
               </div>
             </div>

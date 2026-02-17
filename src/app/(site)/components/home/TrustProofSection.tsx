@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Container } from "@/components/layout/Container";
+import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
 import {
   TRUST_PROOF_ITEMS,
@@ -430,131 +430,131 @@ export function TrustProofSection() {
               {activeAnnouncement}
             </p>
             <div className="mx-auto flex max-w-[1120px] items-center justify-between gap-4">
-            <div className="text-sm text-[color:var(--color-muted-light)]">
-              {index + 1} / {orderedItems.length}
-            </div>
+              <div className="text-sm text-[color:var(--color-muted-light)]">
+                {index + 1} / {orderedItems.length}
+              </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={goPrev}
-                disabled={!hasMultiple}
-                className={cn(
-                  "inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-sm font-semibold",
-                  "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
-                  "transition-all duration-200 hover:-translate-y-0.5 hover:border-[color:var(--color-brand-500)]/45 hover:text-[color:var(--color-brand-600)] hover:shadow-[0_12px_24px_rgba(2,6,23,0.12)]",
-                  "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:border-[color:var(--color-border-light)] disabled:hover:text-[color:var(--color-text-light)] disabled:hover:shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
-                  focusRing,
-                )}
-                aria-label="Previous slide"
-              >
-                ←
-              </button>
-              <button
-                type="button"
-                onClick={goNext}
-                disabled={!hasMultiple}
-                className={cn(
-                  "inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-sm font-semibold",
-                  "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
-                  "transition-all duration-200 hover:-translate-y-0.5 hover:border-[color:var(--color-brand-500)]/45 hover:text-[color:var(--color-brand-600)] hover:shadow-[0_12px_24px_rgba(2,6,23,0.12)]",
-                  "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:border-[color:var(--color-border-light)] disabled:hover:text-[color:var(--color-text-light)] disabled:hover:shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
-                  focusRing,
-                )}
-                aria-label="Next slide"
-              >
-                →
-              </button>
-            </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  disabled={!hasMultiple}
+                  className={cn(
+                    "inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-sm font-semibold",
+                    "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
+                    "transition-all duration-200 hover:-translate-y-0.5 hover:border-[color:var(--color-brand-500)]/45 hover:text-[color:var(--color-brand-600)] hover:shadow-[0_12px_24px_rgba(2,6,23,0.12)]",
+                    "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:border-[color:var(--color-border-light)] disabled:hover:text-[color:var(--color-text-light)] disabled:hover:shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
+                    focusRing,
+                  )}
+                  aria-label="Previous slide"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={goNext}
+                  disabled={!hasMultiple}
+                  className={cn(
+                    "inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-sm font-semibold",
+                    "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
+                    "transition-all duration-200 hover:-translate-y-0.5 hover:border-[color:var(--color-brand-500)]/45 hover:text-[color:var(--color-brand-600)] hover:shadow-[0_12px_24px_rgba(2,6,23,0.12)]",
+                    "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:border-[color:var(--color-border-light)] disabled:hover:text-[color:var(--color-text-light)] disabled:hover:shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
+                    focusRing,
+                  )}
+                  aria-label="Next slide"
+                >
+                  →
+                </button>
+              </div>
             </div>
 
             <div className="mx-auto mt-5 max-w-[1120px]">
-            <div className="hidden items-center justify-center gap-5 md:flex">
-              {orderedItems[leftIndex] ? (
-                <AnimatePresence mode="wait" initial={false}>
+              <div className="hidden items-center justify-center gap-5 md:flex">
+                {orderedItems[leftIndex] ? (
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                      key={`left-${orderedItems[leftIndex].id}`}
+                      className="w-[250px] shrink-0"
+                      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -16, scale: 0.9 }}
+                      animate={
+                        reduceMotion ? { opacity: 0.68 } : { opacity: 0.68, x: 0, scale: 0.92 }
+                      }
+                      exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 16, scale: 0.9 }}
+                      transition={{ duration: 0.28, ease: "easeOut" }}
+                    >
+                      {orderedItems[leftIndex].type === "video" ? (
+                        <VideoCard
+                          item={orderedItems[leftIndex]}
+                          isActive={false}
+                          reduceMotion={!!reduceMotion}
+                        />
+                      ) : (
+                        <TestimonialCard item={orderedItems[leftIndex]} />
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+                ) : null}
+                <AnimatePresence mode="wait" initial={false} custom={direction}>
                   <motion.div
-                    key={`left-${orderedItems[leftIndex].id}`}
-                    className="w-[250px] shrink-0"
-                    initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -16, scale: 0.9 }}
-                    animate={
-                      reduceMotion ? { opacity: 0.68 } : { opacity: 0.68, x: 0, scale: 0.92 }
-                    }
-                    exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 16, scale: 0.9 }}
-                    transition={{ duration: 0.28, ease: "easeOut" }}
+                    key={activeItem?.id ?? "active-empty"}
+                    custom={direction}
+                    className="w-[460px] shrink-0 md:-mx-2"
+                    initial={reduceMotion ? { x: 0 } : { x: direction > 0 ? 22 : -22 }}
+                    animate={{ x: 0 }}
+                    exit={reduceMotion ? { x: 0 } : { x: direction > 0 ? -22 : 22 }}
+                    transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    {orderedItems[leftIndex].type === "video" ? (
-                      <VideoCard
-                        item={orderedItems[leftIndex]}
-                        isActive={false}
-                        reduceMotion={!!reduceMotion}
-                      />
-                    ) : (
-                      <TestimonialCard item={orderedItems[leftIndex]} />
-                    )}
+                    {activeItem?.type === "video" ? (
+                      <VideoCard item={activeItem} isActive={true} reduceMotion={!!reduceMotion} />
+                    ) : activeItem ? (
+                      <TestimonialCard item={activeItem} />
+                    ) : null}
                   </motion.div>
                 </AnimatePresence>
-              ) : null}
-              <AnimatePresence mode="wait" initial={false} custom={direction}>
-                <motion.div
-                  key={activeItem?.id ?? "active-empty"}
-                  custom={direction}
-                  className="w-[460px] shrink-0 md:-mx-2"
-                  initial={reduceMotion ? { x: 0 } : { x: direction > 0 ? 22 : -22 }}
-                  animate={{ x: 0 }}
-                  exit={reduceMotion ? { x: 0 } : { x: direction > 0 ? -22 : 22 }}
-                  transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  {activeItem?.type === "video" ? (
-                    <VideoCard item={activeItem} isActive={true} reduceMotion={!!reduceMotion} />
-                  ) : activeItem ? (
-                    <TestimonialCard item={activeItem} />
-                  ) : null}
-                </motion.div>
-              </AnimatePresence>
-              {orderedItems[rightIndex] ? (
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
-                    key={`right-${orderedItems[rightIndex].id}`}
-                    className="w-[250px] shrink-0"
-                    initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 16, scale: 0.9 }}
-                    animate={
-                      reduceMotion ? { opacity: 0.68 } : { opacity: 0.68, x: 0, scale: 0.92 }
-                    }
-                    exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -16, scale: 0.9 }}
-                    transition={{ duration: 0.28, ease: "easeOut" }}
-                  >
-                    {orderedItems[rightIndex].type === "video" ? (
-                      <VideoCard
-                        item={orderedItems[rightIndex]}
-                        isActive={false}
-                        reduceMotion={!!reduceMotion}
-                      />
-                    ) : (
-                      <TestimonialCard item={orderedItems[rightIndex]} />
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-              ) : null}
-            </div>
+                {orderedItems[rightIndex] ? (
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                      key={`right-${orderedItems[rightIndex].id}`}
+                      className="w-[250px] shrink-0"
+                      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 16, scale: 0.9 }}
+                      animate={
+                        reduceMotion ? { opacity: 0.68 } : { opacity: 0.68, x: 0, scale: 0.92 }
+                      }
+                      exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -16, scale: 0.9 }}
+                      transition={{ duration: 0.28, ease: "easeOut" }}
+                    >
+                      {orderedItems[rightIndex].type === "video" ? (
+                        <VideoCard
+                          item={orderedItems[rightIndex]}
+                          isActive={false}
+                          reduceMotion={!!reduceMotion}
+                        />
+                      ) : (
+                        <TestimonialCard item={orderedItems[rightIndex]} />
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+                ) : null}
+              </div>
 
-            <div className="mx-auto w-full max-w-[420px] md:hidden">
-              <AnimatePresence mode="wait" initial={false} custom={direction}>
-                <motion.div
-                  key={`mobile-${activeItem?.id ?? "active-empty"}`}
-                  custom={direction}
-                  initial={reduceMotion ? { x: 0 } : { x: direction > 0 ? 18 : -18 }}
-                  animate={{ x: 0 }}
-                  exit={reduceMotion ? { x: 0 } : { x: direction > 0 ? -18 : 18 }}
-                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  {activeItem?.type === "video" ? (
-                    <VideoCard item={activeItem} isActive={true} reduceMotion={!!reduceMotion} />
-                  ) : activeItem ? (
-                    <TestimonialCard item={activeItem} />
-                  ) : null}
-                </motion.div>
-              </AnimatePresence>
-            </div>
+              <div className="mx-auto w-full max-w-[420px] md:hidden">
+                <AnimatePresence mode="wait" initial={false} custom={direction}>
+                  <motion.div
+                    key={`mobile-${activeItem?.id ?? "active-empty"}`}
+                    custom={direction}
+                    initial={reduceMotion ? { x: 0 } : { x: direction > 0 ? 18 : -18 }}
+                    animate={{ x: 0 }}
+                    exit={reduceMotion ? { x: 0 } : { x: direction > 0 ? -18 : 18 }}
+                    transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    {activeItem?.type === "video" ? (
+                      <VideoCard item={activeItem} isActive={true} reduceMotion={!!reduceMotion} />
+                    ) : activeItem ? (
+                      <TestimonialCard item={activeItem} />
+                    ) : null}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </div>
 
             {/* Small dots */}

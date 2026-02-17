@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useInView } from "framer-motion";
-import { Container } from "@/components/layout/Container";
+import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 

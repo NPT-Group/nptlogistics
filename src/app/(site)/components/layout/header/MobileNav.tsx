@@ -9,11 +9,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { NAV, type NavLink } from "@/config/navigation";
-import {
-  focusRingNav,
-  focusRingMenu,
-  NAV_DESKTOP_MEDIA_QUERY,
-} from "@/components/layout/header/constants";
+import { focusRingNav, focusRingMenu, NAV_DESKTOP_MEDIA_QUERY } from "./constants";
 import {
   X,
   Menu,

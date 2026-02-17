@@ -4,7 +4,7 @@ import React from "react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { usePathname, useRouter } from "next/navigation";
 import { NAV } from "@/config/navigation";
-import { DesktopRichDropdown, SolutionsMegaMenu } from "@/components/layout/header/NavMenuParts";
+import { DesktopRichDropdown, SolutionsMegaMenu } from "./NavMenuParts";
 
 export function DesktopNav() {
   const [value, setValue] = React.useState<string>("");

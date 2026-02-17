@@ -27,7 +27,7 @@ import {
   HEADER_HEIGHT_PX,
   GAP_BELOW_TRIGGER,
   VIEWPORT_PADDING,
-} from "@/components/layout/header/constants";
+} from "./constants";
 
 const ICONS = {
   truck: Truck,
@@ -103,7 +103,7 @@ function MenuLink({
               </div>
 
               {description ? (
-                <div className="mt-1 text-xs leading-[1.45] text-[color:var(--color-menu-muted)] whitespace-normal">
+                <div className="mt-1 text-xs leading-[1.45] whitespace-normal text-[color:var(--color-menu-muted)]">
                   {description}
                 </div>
               ) : null}
@@ -283,7 +283,7 @@ export function SolutionsMegaMenu({
       >
         <AnimatePresence mode="wait">
           <AnimatedPanel>
-            <div className="grid grid-cols-12 max-w-[calc(100vw-2rem)]">
+            <div className="grid max-w-[calc(100vw-2rem)] grid-cols-12">
               <div className="col-span-3 flex flex-col bg-[color:var(--color-menu-panel)] p-6">
                 <div className="text-[15px] font-semibold text-[color:var(--color-menu-title)]">
                   {NAV.solutions.intro.title}
@@ -429,13 +429,10 @@ export function DesktopRichDropdown({
                 </div>
               </div>
 
-              <div className="col-span-8 p-6 min-w-0">
+              <div className="col-span-8 min-w-0 p-6">
                 <div className="grid grid-cols-2 gap-x-6 gap-y-3">
                   {section.links.map((l, i) => (
-                    <div
-                      key={l.href}
-                      className={cn(isCareers && i === 2 && "col-span-2")}
-                    >
+                    <div key={l.href} className={cn(isCareers && i === 2 && "col-span-2")}>
                       <MenuLink {...l} onNavigate={closeMenu} />
                     </div>
                   ))}

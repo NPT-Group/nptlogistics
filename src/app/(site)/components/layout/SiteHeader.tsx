@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Container } from "@/components/layout/Container";
+import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
-import { DesktopNav } from "@/components/layout/header/DesktopNav";
-import { MobileNav } from "@/components/layout/header/MobileNav";
+import { DesktopNav } from "./header/DesktopNav";
+import { MobileNav } from "./header/MobileNav";
 
 const focusRing =
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-nav-ring)] focus-visible:ring-offset-0";

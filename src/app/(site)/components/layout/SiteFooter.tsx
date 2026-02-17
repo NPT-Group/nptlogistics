@@ -1,7 +1,7 @@
 // src/components/layout/SiteFooter.tsx
 
 import Link from "next/link";
-import { Container } from "@/components/layout/Container";
+import { Container } from "@/app/(site)/components/layout/Container";
 import { NAV } from "@/config/navigation";
 import { cn } from "@/lib/cn";
 import { CookiePreferencesButton } from "./footer/CookiePreferencesButton";

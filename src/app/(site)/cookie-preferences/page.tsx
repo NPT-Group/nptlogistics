@@ -1,6 +1,6 @@
 "use client";
 
-import { Container } from "@/components/layout/Container";
+import { Container } from "@/app/(site)/components/layout/Container";
 
 export default function CookiePreferencesPage() {
   const openCookiePreferences = () => {

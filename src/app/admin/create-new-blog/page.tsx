@@ -5,7 +5,7 @@ import * as React from "react";
 import dynamic from "next/dynamic";
 import type { PartialBlock } from "@blocknote/core";
 
-const BlockNote = dynamic(() => import("@/components/BlockNote"), {
+const BlockNote = dynamic(() => import("@/app/(site)/components/BlockNote"), {
   ssr: false,
   loading: () => <div className="rounded-xl border p-4 text-sm text-gray-500">Loading editor…</div>,
 });
@@ -26,7 +26,12 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-3xl p-6">
-      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Post title" className="mb-4 w-full rounded-xl border px-4 py-3 text-2xl outline-none" />
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Post title"
+        className="mb-4 w-full rounded-xl border px-4 py-3 text-2xl outline-none"
+      />
 
       <BlockNote onChange={setDoc} />
 
