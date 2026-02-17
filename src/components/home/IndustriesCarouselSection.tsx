@@ -45,11 +45,6 @@ const TOKENS = {
     "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",
     "shadow-sm shadow-black/18",
   ),
-  ctaSecondary: cn(
-    "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold",
-    "border border-white/18 bg-white/6 text-white hover:bg-white/10",
-    "backdrop-blur",
-  ),
   navBar: cn(
     "relative z-20 border-t border-white/12 bg-[linear-gradient(180deg,rgba(7,12,22,0.62),rgba(23,32,45,0.52))]",
     "backdrop-blur-sm",
@@ -93,6 +88,79 @@ function bottomIndustryTint(key: IndustrySlide["key"]) {
     default:
       return "linear-gradient(180deg, transparent 0%, rgba(30,41,59,0.3) 50%, rgba(13,28,49,0.9) 100%)";
   }
+}
+
+function MobileIndustryOverlay({ active, reduceMotion }: { active: IndustrySlide; reduceMotion: boolean }) {
+  return (
+    <div className="w-full px-5 pb-6 sm:hidden">
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={`mobile-copy-${active.key}`}
+          initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
+          animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+          transition={{ duration: reduceMotion ? 0 : 0.24, ease: "easeOut" }}
+          className="max-h-[calc(100%-1.5rem)] max-w-[19.5rem] overflow-hidden rounded-2xl border border-white/14 bg-black/32 p-3 shadow-[0_10px_28px_rgba(2,6,23,0.34)] backdrop-blur-[1.5px]"
+        >
+          <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-[10px] font-semibold text-white/80">
+            <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-500)]" />
+            <span className="truncate">{active.label}</span>
+          </div>
+          <h3 className="mt-2 text-[18px] leading-[1.12] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] [display:-webkit-box] [overflow:hidden] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+            {active.mobileTitle ?? active.title}
+          </h3>
+          <p className="mt-1 text-[12px] leading-[1.42] text-white/88 drop-shadow-[0_2px_8px_rgba(0,0,0,0.42)] [display:-webkit-box] [overflow:hidden] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+            {active.mobileSubtitle ?? active.subtitle}
+          </p>
+          <div className="mt-2.5 flex flex-wrap items-center gap-2.5">
+            <Link
+              href={active.href}
+              className={cn(
+                "inline-flex h-9 items-center justify-center rounded-md px-4 text-[15px] font-semibold",
+                "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",
+                "shadow-sm shadow-black/18",
+                focusRing,
+              )}
+            >
+              Explore {active.label}
+            </Link>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function DesktopIndustryOverlay({ active, reduceMotion }: { active: IndustrySlide; reduceMotion: boolean }) {
+  return (
+    <div className="hidden w-full sm:block">
+      <div className={TOKENS.left}>
+        <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur">
+          <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-500)]" />
+          <span className="truncate">{active.label}</span>
+        </div>
+
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={`desktop-copy-${active.key}`}
+            initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
+            transition={{ duration: reduceMotion ? 0 : 0.28, ease: "easeOut" }}
+          >
+            <h3 className={TOKENS.title}>{active.title}</h3>
+            <p className={TOKENS.subtitle}>{active.subtitle}</p>
+
+            <div className={TOKENS.ctaRow}>
+              <Link href={active.href} className={cn(TOKENS.ctaPrimary, focusRing)}>
+                Explore {active.label}
+              </Link>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
 }
 
 export function IndustriesCarouselSection() {
@@ -254,55 +322,8 @@ export function IndustriesCarouselSection() {
 
             {/* content */}
             <div className={TOKENS.content}>
-              {/* Dedicated mobile composition to avoid real-device text metric drift */}
-              <div className="w-full px-5 pb-6 sm:hidden">
-                <div className="max-w-[20rem] rounded-2xl border border-white/14 bg-black/32 p-3.5 shadow-[0_10px_28px_rgba(2,6,23,0.34)] backdrop-blur-[1.5px]">
-                  <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-[11px] font-semibold text-white/80">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-500)]" />
-                    <span className="truncate">{active.label}</span>
-                  </div>
-                  <h3 className="mt-2 text-[19px] leading-[1.1] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]">
-                    {active.mobileTitle ?? active.title}
-                  </h3>
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-white/88 drop-shadow-[0_2px_8px_rgba(0,0,0,0.42)]">
-                    {active.mobileSubtitle ?? active.subtitle}
-                  </p>
-                  <div className="mt-3 flex flex-wrap items-center gap-3">
-                    <Link href={active.href} className={cn(TOKENS.ctaPrimary, focusRing)}>
-                      Explore {active.label}
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              {/* Desktop/tablet composition */}
-              <div className="hidden w-full sm:block">
-                <div className={TOKENS.left}>
-                  <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-500)]" />
-                    <span className="truncate">{active.label}</span>
-                  </div>
-
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={`${active.key}-copy`}
-                      initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
-                      animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-                      exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
-                      transition={{ duration: reduceMotion ? 0 : 0.28, ease: "easeOut" }}
-                    >
-                      <h3 className={TOKENS.title}>{active.title}</h3>
-                      <p className={TOKENS.subtitle}>{active.subtitle}</p>
-
-                      <div className={TOKENS.ctaRow}>
-                        <Link href={active.href} className={cn(TOKENS.ctaPrimary, focusRing)}>
-                          Explore {active.label}
-                        </Link>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              </div>
+              <MobileIndustryOverlay active={active} reduceMotion={!!reduceMotion} />
+              <DesktopIndustryOverlay active={active} reduceMotion={!!reduceMotion} />
             </div>
           </div>
 
