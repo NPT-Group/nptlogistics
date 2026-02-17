@@ -28,7 +28,7 @@ const TOKENS = {
     "shadow-[0_22px_56px_rgba(2,6,23,0.38),inset_0_1px_0_rgba(255,255,255,0.16)]",
   ),
   stage:
-    "relative aspect-[16/9] w-full min-h-[300px] sm:aspect-[16/6.8] sm:min-h-[300px] lg:aspect-[16/6.2] lg:min-h-[320px]",
+    "relative aspect-[16/9] w-full min-h-[330px] sm:aspect-[16/6.8] sm:min-h-[300px] lg:aspect-[16/6.2] lg:min-h-[320px]",
   overlay:
     "absolute inset-0 bg-[linear-gradient(90deg,rgba(7,15,29,0.86)_0%,rgba(7,15,29,0.68)_48%,rgba(7,15,29,0.28)_100%)] sm:bg-[linear-gradient(90deg,rgba(7,15,29,0.72)_0%,rgba(7,15,29,0.5)_42%,rgba(7,15,29,0.2)_100%)]",
   bottomFadeToLight:
@@ -36,9 +36,9 @@ const TOKENS = {
   content: "relative z-10 flex h-full items-end",
   left: "w-full max-w-2xl px-5 pb-6 sm:px-8 sm:pb-6 lg:px-9 lg:pb-7",
   title:
-    "text-[22px] leading-[1.08] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] sm:text-[30px] lg:text-[34px]",
+    "text-[20px] leading-[1.12] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] [display:-webkit-box] [overflow:hidden] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] sm:text-[30px] sm:[-webkit-line-clamp:unset] lg:text-[34px]",
   subtitle:
-    "mt-1.5 max-w-xl text-[13px] leading-relaxed text-white/88 drop-shadow-[0_2px_8px_rgba(0,0,0,0.42)] sm:text-[14px]",
+    "mt-1.5 max-w-xl text-[13px] leading-relaxed text-white/88 drop-shadow-[0_2px_8px_rgba(0,0,0,0.42)] [display:-webkit-box] [overflow:hidden] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] sm:text-[14px] sm:[-webkit-line-clamp:unset]",
   ctaRow: "mt-3 flex flex-wrap items-center gap-3",
   ctaPrimary: cn(
     "inline-flex h-10 items-center justify-center rounded-md px-5 text-sm font-semibold",
@@ -255,9 +255,9 @@ export function IndustriesCarouselSection() {
             {/* content */}
             <div className={TOKENS.content}>
               <div className={TOKENS.left}>
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur">
+                <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-[11px] font-semibold text-white/80 backdrop-blur sm:text-xs">
                   <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-500)]" />
-                  {active.label}
+                  <span className="truncate">{active.label}</span>
                 </div>
 
                 <AnimatePresence mode="wait">

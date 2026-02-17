@@ -25,7 +25,7 @@ const TRACKING_VISIBILITY_TOKENS = {
     "absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.2),rgba(255,255,255,0.42))]",
   containerClass: "relative max-w-[1440px] px-4 py-12 sm:px-6 sm:py-14 lg:px-6 lg:py-16",
   gridClass: "grid items-center gap-10 lg:grid-cols-12 lg:gap-12",
-  mapMotionClass: "relative lg:order-2 lg:col-span-7",
+  mapMotionClass: "relative order-2 lg:order-2 lg:col-span-7",
   mapWrapperClass: "relative aspect-[16/10] w-full overflow-hidden",
   mapBrandAnchorClass:
     "pointer-events-none absolute inset-0 bg-[radial-gradient(600px_320px_at_60%_50%,rgba(220,38,38,0.08),transparent_60%)]",
@@ -38,7 +38,7 @@ const TRACKING_VISIBILITY_TOKENS = {
     "absolute h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color:var(--color-brand-500)]/80",
   mapSignalGlowClass:
     "absolute h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color:var(--color-brand-500)]/20 blur-[1px]",
-  copyMotionClass: "lg:order-1 lg:col-span-5",
+  copyMotionClass: "order-1 lg:order-1 lg:col-span-5",
   eyebrowLineClass: "mb-3 h-[2px] w-14 bg-[color:var(--color-brand-500)]",
   kickerClass: "text-xs font-semibold tracking-wide text-[color:var(--color-muted-light)]",
   headingClass:
