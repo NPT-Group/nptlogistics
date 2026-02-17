@@ -11,6 +11,10 @@ import { INDUSTRIES_SECTION, INDUSTRY_SLIDES, type IndustrySlide } from "@/confi
 const focusRing =
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
 
+/* ------------------------------------------------------------------ */
+/*  Design tokens                                                      */
+/* ------------------------------------------------------------------ */
+
 const TOKENS = {
   section: cn(
     "relative overflow-hidden",
@@ -27,18 +31,33 @@ const TOKENS = {
     "border border-white/12 bg-[linear-gradient(145deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))]",
     "shadow-[0_22px_56px_rgba(2,6,23,0.38),inset_0_1px_0_rgba(255,255,255,0.16)]",
   ),
-  stage:
-    "relative aspect-[16/9] w-full min-h-[330px] sm:aspect-[16/6.8] sm:min-h-[300px] lg:aspect-[16/6.2] lg:min-h-[320px]",
-  overlay:
-    "absolute inset-0 bg-[linear-gradient(90deg,rgba(7,15,29,0.86)_0%,rgba(7,15,29,0.68)_48%,rgba(7,15,29,0.28)_100%)] sm:bg-[linear-gradient(90deg,rgba(7,15,29,0.72)_0%,rgba(7,15,29,0.5)_42%,rgba(7,15,29,0.2)_100%)]",
-  bottomFadeToLight:
-    "pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-b from-transparent to-[#f2e9df] sm:h-14",
-  content: "relative z-10 flex h-full items-end",
-  left: "w-full max-w-2xl px-5 pb-6 sm:px-8 sm:pb-6 lg:px-9 lg:pb-7",
-  title:
-    "text-[20px] leading-[1.1] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] sm:text-[30px] lg:text-[34px]",
-  subtitle:
-    "mt-1.5 max-w-xl text-[13px] leading-relaxed text-white/88 drop-shadow-[0_2px_8px_rgba(0,0,0,0.42)] sm:text-[14px]",
+
+  /* Desktop / tablet stage — fixed aspect, absolute overlay */
+  desktopStage:
+    "relative hidden sm:block sm:aspect-[16/6.8] sm:min-h-[300px] lg:aspect-[16/6.2] lg:min-h-[320px]",
+  desktopOverlay:
+    "absolute inset-0 bg-[linear-gradient(90deg,rgba(7,15,29,0.72)_0%,rgba(7,15,29,0.5)_42%,rgba(7,15,29,0.2)_100%)]",
+  desktopContent: "relative z-10 flex h-full items-end",
+  desktopLeft: "w-full max-w-2xl px-8 pb-6 lg:px-9 lg:pb-7",
+  desktopTitle:
+    "text-[30px] leading-[1.1] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] lg:text-[34px]",
+  desktopSubtitle:
+    "mt-1.5 max-w-xl text-[14px] leading-relaxed text-white/88 drop-shadow-[0_2px_8px_rgba(0,0,0,0.42)]",
+  desktopBottomFade:
+    "pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-b from-transparent to-[#f2e9df]",
+
+  /* Mobile stage — stacked layout, content flows naturally */
+  mobileStage: "relative sm:hidden",
+  mobileImageWrap: "relative aspect-[16/9] w-full",
+  mobileOverlay:
+    "absolute inset-0 bg-[linear-gradient(180deg,rgba(7,15,29,0.18)_0%,rgba(7,15,29,0.72)_100%)]",
+  mobileContent:
+    "relative z-10 bg-[linear-gradient(180deg,rgba(7,15,29,0.88)_0%,rgba(7,15,29,0.96)_100%)] px-5 py-4",
+  mobileTitle:
+    "text-[20px] leading-[1.12] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]",
+  mobileSubtitle:
+    "mt-1.5 text-[13px] leading-relaxed text-white/85 drop-shadow-[0_2px_8px_rgba(0,0,0,0.42)]",
+
   ctaRow: "mt-3 flex flex-wrap items-center gap-3",
   ctaPrimary: cn(
     "inline-flex h-10 items-center justify-center rounded-md px-5 text-sm font-semibold",
@@ -62,6 +81,10 @@ const TOKENS = {
   ),
 } as const;
 
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
 function accentGlow(accent: IndustrySlide["accent"]) {
   if (accent === "blue")
     return "radial-gradient(900px 520px at 22% 30%, rgba(37,99,235,0.18), transparent 55%)";
@@ -71,7 +94,6 @@ function accentGlow(accent: IndustrySlide["accent"]) {
 }
 
 function bottomIndustryTint(key: IndustrySlide["key"]) {
-  // Keep tones muted and low-opacity to feel premium, not playful.
   switch (key) {
     case "automotive":
       return "linear-gradient(180deg, transparent 0%, rgba(127,29,29,0.34) 50%, rgba(13,28,49,0.9) 100%)";
@@ -90,67 +112,175 @@ function bottomIndustryTint(key: IndustrySlide["key"]) {
   }
 }
 
-function MobileIndustryOverlay({ active, reduceMotion }: { active: IndustrySlide; reduceMotion: boolean }) {
+/* ------------------------------------------------------------------ */
+/*  Badge                                                              */
+/* ------------------------------------------------------------------ */
+
+function IndustryBadge({ label }: { label: string }) {
   return (
-    <div className="w-full px-5 pb-6 sm:hidden">
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={`mobile-copy-${active.key}`}
-          initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
-          animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
-          transition={{ duration: reduceMotion ? 0 : 0.24, ease: "easeOut" }}
-          className="max-h-[calc(100%-1.5rem)] max-w-[19.5rem] overflow-hidden rounded-2xl border border-white/14 bg-black/32 p-3 shadow-[0_10px_28px_rgba(2,6,23,0.34)] backdrop-blur-[1.5px]"
-        >
-          <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-[10px] font-semibold text-white/80">
-            <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-500)]" />
-            <span className="truncate">{active.label}</span>
-          </div>
-          <h3 className="mt-2 text-[18px] leading-[1.12] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] [display:-webkit-box] [overflow:hidden] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
-            {active.mobileTitle ?? active.title}
-          </h3>
-          <p className="mt-1 text-[12px] leading-[1.42] text-white/88 drop-shadow-[0_2px_8px_rgba(0,0,0,0.42)] [display:-webkit-box] [overflow:hidden] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
-            {active.mobileSubtitle ?? active.subtitle}
-          </p>
-          <div className="mt-2.5 flex flex-wrap items-center gap-2.5">
-            <Link
-              href={active.href}
-              className={cn(
-                "inline-flex h-9 items-center justify-center rounded-md px-4 text-[15px] font-semibold",
-                "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",
-                "shadow-sm shadow-black/18",
-                focusRing,
-              )}
-            >
-              Explore {active.label}
-            </Link>
-          </div>
-        </motion.div>
-      </AnimatePresence>
+    <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-[11px] font-semibold text-white/80 backdrop-blur sm:text-xs">
+      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--color-brand-500)]" />
+      <span className="truncate">{label}</span>
     </div>
   );
 }
 
-function DesktopIndustryOverlay({ active, reduceMotion }: { active: IndustrySlide; reduceMotion: boolean }) {
-  return (
-    <div className="hidden w-full sm:block">
-      <div className={TOKENS.left}>
-        <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur">
-          <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-500)]" />
-          <span className="truncate">{active.label}</span>
-        </div>
+/* ------------------------------------------------------------------ */
+/*  Desktop stage — absolute overlay on fixed-aspect image             */
+/* ------------------------------------------------------------------ */
 
+function DesktopStage({
+  active,
+  index,
+  reduceMotion,
+  shellId,
+  onTouchStart,
+  onTouchEnd,
+}: {
+  active: IndustrySlide;
+  index: number;
+  reduceMotion: boolean;
+  shellId: string;
+  onTouchStart: (e: React.TouchEvent<HTMLDivElement>) => void;
+  onTouchEnd: (e: React.TouchEvent<HTMLDivElement>) => void;
+}) {
+  return (
+    <div
+      className={TOKENS.desktopStage}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* Background image */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={active.key}
+          className="absolute inset-0"
+          id={`${shellId}-panel`}
+          role="tabpanel"
+          aria-labelledby={`industry-tab-${active.key}`}
+          initial={reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 1.01 }}
+          animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.99 }}
+          transition={{ duration: reduceMotion ? 0 : 0.35, ease: "easeOut" }}
+        >
+          <Image
+            src={active.image}
+            alt=""
+            fill
+            priority={index === 0}
+            className="object-cover"
+            sizes="1440px"
+          />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Overlays */}
+      <div className={TOKENS.desktopOverlay} aria-hidden="true" />
+      <div
+        className="absolute inset-0"
+        style={{ background: accentGlow(active.accent) }}
+        aria-hidden="true"
+      />
+      <div className={TOKENS.desktopBottomFade} aria-hidden="true" />
+
+      {/* Content — bottom-left anchored */}
+      <div className={TOKENS.desktopContent}>
+        <div className={TOKENS.desktopLeft}>
+          <IndustryBadge label={active.label} />
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={`desktop-copy-${active.key}`}
+              initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+              animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
+              transition={{ duration: reduceMotion ? 0 : 0.28, ease: "easeOut" }}
+            >
+              <h3 className={TOKENS.desktopTitle}>{active.title}</h3>
+              <p className={TOKENS.desktopSubtitle}>{active.subtitle}</p>
+              <div className={TOKENS.ctaRow}>
+                <Link href={active.href} className={cn(TOKENS.ctaPrimary, focusRing)}>
+                  Explore {active.label}
+                </Link>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Mobile stage — stacked: image on top, content below (flow-based)   */
+/*  Content can NEVER spill upward because it's in normal document     */
+/*  flow, not absolutely positioned over the image.                    */
+/* ------------------------------------------------------------------ */
+
+function MobileStage({
+  active,
+  index,
+  reduceMotion,
+  shellId,
+  onTouchStart,
+  onTouchEnd,
+}: {
+  active: IndustrySlide;
+  index: number;
+  reduceMotion: boolean;
+  shellId: string;
+  onTouchStart: (e: React.TouchEvent<HTMLDivElement>) => void;
+  onTouchEnd: (e: React.TouchEvent<HTMLDivElement>) => void;
+}) {
+  return (
+    <div
+      className={TOKENS.mobileStage}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* Image area */}
+      <div className={TOKENS.mobileImageWrap}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={active.key}
+            className="absolute inset-0"
+            id={`${shellId}-panel-mobile`}
+            role="tabpanel"
+            aria-labelledby={`industry-tab-${active.key}`}
+            initial={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0 : 0.3, ease: "easeOut" }}
+          >
+            <Image
+              src={active.image}
+              alt=""
+              fill
+              priority={index === 0}
+              className="object-cover"
+              sizes="100vw"
+            />
+          </motion.div>
+        </AnimatePresence>
+        <div className={TOKENS.mobileOverlay} aria-hidden="true" />
+      </div>
+
+      {/* Content area — normal flow, cannot spill */}
+      <div className={TOKENS.mobileContent}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
-            key={`desktop-copy-${active.key}`}
-            initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+            key={`mobile-copy-${active.key}`}
+            initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
             animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
-            transition={{ duration: reduceMotion ? 0 : 0.28, ease: "easeOut" }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
+            transition={{ duration: reduceMotion ? 0 : 0.22, ease: "easeOut" }}
           >
-            <h3 className={TOKENS.title}>{active.title}</h3>
-            <p className={TOKENS.subtitle}>{active.subtitle}</p>
-
+            <IndustryBadge label={active.label} />
+            <h3 className={TOKENS.mobileTitle}>
+              {active.mobileTitle ?? active.title}
+            </h3>
+            <p className={TOKENS.mobileSubtitle}>
+              {active.mobileSubtitle ?? active.subtitle}
+            </p>
             <div className={TOKENS.ctaRow}>
               <Link href={active.href} className={cn(TOKENS.ctaPrimary, focusRing)}>
                 Explore {active.label}
@@ -162,6 +292,10 @@ function DesktopIndustryOverlay({ active, reduceMotion }: { active: IndustrySlid
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/*  Main section                                                       */
+/* ------------------------------------------------------------------ */
 
 export function IndustriesCarouselSection() {
   const reduceMotion = useReducedMotion();
@@ -184,7 +318,6 @@ export function IndustriesCarouselSection() {
   const activeSlideAnnouncement = `${active.label}, slide ${index + 1} of ${total}`;
   const shellId = `${INDUSTRIES_SECTION.id}-carousel`;
 
-  // keyboard: left/right
   const onKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "ArrowLeft") {
@@ -198,6 +331,7 @@ export function IndustriesCarouselSection() {
     },
     [goNext, goPrev],
   );
+
   const onTabKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLButtonElement>) => {
       if (e.key === "ArrowLeft") {
@@ -220,11 +354,13 @@ export function IndustriesCarouselSection() {
     },
     [goNext, goPrev, total],
   );
+
   const onTouchStart = React.useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     const t = e.changedTouches[0];
     if (!t) return;
     touchStartRef.current = { x: t.clientX, y: t.clientY };
   }, []);
+
   const onTouchEnd = React.useCallback(
     (e: React.TouchEvent<HTMLDivElement>) => {
       if (!hasMultiple) return;
@@ -237,7 +373,6 @@ export function IndustriesCarouselSection() {
       const dy = t.clientY - start.y;
       const minSwipe = 44;
 
-      // Only trigger on intentional horizontal swipes.
       if (Math.abs(dx) < minSwipe || Math.abs(dx) <= Math.abs(dy)) return;
 
       if (dx > 0) goPrev();
@@ -249,12 +384,10 @@ export function IndustriesCarouselSection() {
   return (
     <section id={INDUSTRIES_SECTION.id} className={TOKENS.section}>
       <div className="absolute inset-0" aria-hidden="true">
-        {/* Soft light entry at top, then deepen toward bottom */}
         <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#f7f1e8] to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(880px_460px_at_14%_12%,rgba(220,38,38,0.12),transparent_62%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(980px_520px_at_86%_112%,rgba(37,99,235,0.1),transparent_64%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.2),rgba(7,12,22,0.24))]" />
-        {/* Dynamic bottom tint by industry for subtle premium color matching */}
         <div
           className="absolute inset-x-0 bottom-0 h-[44%]"
           style={{ background: bottomIndustryTint(active.key) }}
@@ -265,6 +398,7 @@ export function IndustriesCarouselSection() {
         <p className="sr-only" aria-live="polite" aria-atomic="true">
           {activeSlideAnnouncement}
         </p>
+
         {/* Header */}
         <div className={TOKENS.headerWrap}>
           <div className="mx-auto mb-3 h-[2px] w-14 bg-[color:var(--color-brand-500)]" />
@@ -273,7 +407,7 @@ export function IndustriesCarouselSection() {
           <p className={TOKENS.desc}>{INDUSTRIES_SECTION.description}</p>
         </div>
 
-        {/* Carousel */}
+        {/* Carousel shell */}
         <div
           className={cn(TOKENS.shell, focusRing)}
           role="region"
@@ -286,48 +420,28 @@ export function IndustriesCarouselSection() {
           <p id={`${shellId}-status`} className="sr-only">
             {activeSlideAnnouncement}
           </p>
-          <div className={TOKENS.stage} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active.key}
-                className="absolute inset-0"
-                id={`${shellId}-panel`}
-                role="tabpanel"
-                aria-labelledby={`industry-tab-${active.key}`}
-                initial={reduceMotion ? { opacity: 1 } : { opacity: 0.0, scale: 1.01 }}
-                animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.99 }}
-                transition={{ duration: reduceMotion ? 0 : 0.35, ease: "easeOut" }}
-              >
-                <Image
-                  src={active.image}
-                  // Decorative: the visible heading/subtitle already conveys meaning.
-                  alt=""
-                  fill
-                  priority={index === 0}
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 1440px"
-                />
-              </motion.div>
-            </AnimatePresence>
 
-            {/* overlays */}
-            <div className={TOKENS.overlay} aria-hidden="true" />
-            <div
-              className="absolute inset-0"
-              style={{ background: accentGlow(active.accent) }}
-              aria-hidden="true"
-            />
-            <div className={TOKENS.bottomFadeToLight} aria-hidden="true" />
+          {/* Mobile: stacked layout (image + content in flow) */}
+          <MobileStage
+            active={active}
+            index={index}
+            reduceMotion={!!reduceMotion}
+            shellId={shellId}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+          />
 
-            {/* content */}
-            <div className={TOKENS.content}>
-              <MobileIndustryOverlay active={active} reduceMotion={!!reduceMotion} />
-              <DesktopIndustryOverlay active={active} reduceMotion={!!reduceMotion} />
-            </div>
-          </div>
+          {/* Desktop / tablet: absolute overlay on fixed-aspect image */}
+          <DesktopStage
+            active={active}
+            index={index}
+            reduceMotion={!!reduceMotion}
+            shellId={shellId}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+          />
 
-          {/* nav */}
+          {/* Navigation bar */}
           <div className={TOKENS.navBar}>
             <div className={TOKENS.navInner}>
               <div className={TOKENS.pills} role="tablist" aria-label="Select an industry">
