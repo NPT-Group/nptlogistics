@@ -76,15 +76,10 @@ export default function BlogIndexClient({
 
   const appliedQ = sp.get("q") ?? "";
   const activeCategoryId = sp.get("categoryId") ?? "";
-  const pageNum = Number(sp.get("page") ?? "1");
 
   const [q, setQ] = React.useState(appliedQ);
 
   const hasFilters = Boolean(appliedQ.trim() || activeCategoryId);
-  const showFeatured = !hasFilters && pageNum === 1;
-
-  const featured = showFeatured ? (initialItems?.[0] ?? null) : null;
-  const items = showFeatured ? (initialItems?.slice?.(1) ?? []) : (initialItems ?? []);
 
   function pushWith(params: Record<string, string | null | undefined>) {
     const qs = new URLSearchParams(sp.toString());
@@ -113,11 +108,7 @@ export default function BlogIndexClient({
     setQ(""); // reset input UI too
   }
 
-  const featuredBannerUrl = featured
-    ? typeof featured.bannerImage === "string"
-      ? featured.bannerImage
-      : (featured.bannerImage?.url ?? null)
-    : null;
+  const items = initialItems ?? [];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-white">
@@ -154,7 +145,7 @@ export default function BlogIndexClient({
               and logistics innovation across the United States, Mexico, and Canada.
             </p>
 
-            {/* search (single source of truth; sidebar search removed) */}
+            {/* search */}
             <div className="mt-6 flex max-w-xl items-center gap-2">
               <div className="relative w-full">
                 <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/65" />
@@ -175,94 +166,41 @@ export default function BlogIndexClient({
             </div>
           </div>
 
-          {/* FEATURED (only when no filters + page 1) */}
-          {featured ? (
-            <div className="mt-10 grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
-              <Link
-                href={`/blog/${encodeURIComponent(featured.slug)}`}
-                className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/5 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.6)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/10"
-              >
-                <div className="relative h-56 sm:h-64">
-                  <BannerImg
-                    url={featuredBannerUrl}
-                    alt={featured.title ?? "Featured post"}
-                    className="h-full w-full"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent" />
-                  <div className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
-                    Latest
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <div className="text-xl font-semibold tracking-tight text-white group-hover:underline">
-                    {featured.title}
-                  </div>
-                  {featured.excerpt ? (
-                    <div className="mt-2 line-clamp-2 text-sm text-white/80">
-                      {featured.excerpt}
-                    </div>
-                  ) : null}
-
-                  <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-white/75">
-                    {featured.publishedAt ? (
-                      <span className="inline-flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5" />
-                        {fmtDate(featured.publishedAt)}
-                      </span>
-                    ) : null}
-                    {featured.readingTimeMinutes ? (
-                      <span className="inline-flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5" />
-                        {featured.readingTimeMinutes} min read
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-
-                <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
-                  <div className="absolute inset-0 ring-2 ring-white/15" />
-                </div>
-              </Link>
-
-              {/* mini panel (mobile only; desktop uses sidebar categories) */}
-              <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 text-white/90 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.6)] backdrop-blur lg:hidden">
-                <div className="text-sm font-semibold">Explore topics</div>
-                <div className="mt-3 grid gap-2">
-                  {(initialCategories ?? []).slice(0, 6).map((c) => {
-                    const active = activeCategoryId && c.id === activeCategoryId;
-                    return (
-                      <button
-                        key={c.id}
-                        onClick={() => selectCategory(c.id)}
-                        className={cx(
-                          "flex items-center justify-between rounded-2xl border px-3 py-2 text-left text-sm transition",
-                          active
-                            ? "border-white/25 bg-white/10"
-                            : "border-white/10 bg-white/5 hover:bg-white/10",
-                        )}
-                      >
-                        <span className="inline-flex items-center gap-2">
-                          <Tag className="h-4 w-4 text-white/70" />
-                          <span className="truncate">{c.name}</span>
-                        </span>
-                        <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/80">
-                          {c.postCount ?? 0}
-                        </span>
-                      </button>
-                    );
-                  })}
+          {/* Topics panel (mobile only) */}
+          <div className="mt-10 rounded-[28px] border border-white/10 bg-white/5 p-5 text-white/90 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.6)] backdrop-blur lg:hidden">
+            <div className="text-sm font-semibold">Explore topics</div>
+            <div className="mt-3 grid gap-2">
+              {(initialCategories ?? []).slice(0, 6).map((c) => {
+                const active = activeCategoryId && c.id === activeCategoryId;
+                return (
                   <button
-                    onClick={() => selectCategory(null)}
-                    className="mt-1 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/90 transition hover:bg-white/10"
+                    key={c.id}
+                    onClick={() => selectCategory(c.id)}
+                    className={cx(
+                      "flex items-center justify-between rounded-2xl border px-3 py-2 text-left text-sm transition",
+                      active
+                        ? "border-white/25 bg-white/10"
+                        : "border-white/10 bg-white/5 hover:bg-white/10",
+                    )}
                   >
-                    All categories
+                    <span className="inline-flex items-center gap-2">
+                      <Tag className="h-4 w-4 text-white/70" />
+                      <span className="truncate">{c.name}</span>
+                    </span>
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/80">
+                      {c.postCount ?? 0}
+                    </span>
                   </button>
-                </div>
-              </div>
+                );
+              })}
+              <button
+                onClick={() => selectCategory(null)}
+                className="mt-1 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/90 transition hover:bg-white/10"
+              >
+                All categories
+              </button>
             </div>
-          ) : null}
+          </div>
         </div>
       </div>
 
@@ -345,7 +283,7 @@ export default function BlogIndexClient({
               })}
             </div>
 
-            {!initialItems.length ? (
+            {!items.length ? (
               <div className="rounded-[28px] border border-slate-200 bg-white p-10 text-center text-sm text-slate-500 shadow-sm">
                 No posts found.
               </div>
@@ -390,7 +328,7 @@ export default function BlogIndexClient({
           {/* RIGHT (sticky) */}
           <aside className="hidden lg:block">
             <div className="space-y-5" style={{ position: "sticky", top: NAV_OFFSET + 16 }}>
-              {/* Categories (desktop only; no duplication with mobile mini panel) */}
+              {/* Categories (desktop only) */}
               <div className="rounded-[28px] border border-slate-200/70 bg-white p-5 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-semibold text-slate-900">Categories</div>

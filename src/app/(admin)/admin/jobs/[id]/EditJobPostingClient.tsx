@@ -1,3 +1,4 @@
+// src/app/(admin)/admin/jobs/[id]/EditJobPostingClient.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -25,7 +26,7 @@ export default function EditJobPostingClient({ id, initialJob }: { id: string; i
       backHref="/admin/jobs"
       onBack={() => router.push("/admin/jobs")}
       initial={initialJob}
-      previewUrl={isPublished ? `/jobs/${encodeURIComponent(initialJob?.slug ?? "")}` : null}
+      previewUrl={isPublished ? `/careers/${encodeURIComponent(initialJob?.slug ?? "")}` : null}
       primaryLabel="Save"
       secondaryLabel={isPublished ? "Close" : "Publish"}
       secondaryActionKind={isPublished ? "CLOSE" : "PUBLISH"}

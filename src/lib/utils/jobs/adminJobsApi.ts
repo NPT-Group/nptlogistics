@@ -103,6 +103,15 @@ export async function adminArchiveJob(id: string): Promise<IJobPosting> {
   return (json?.data?.jobPosting ?? json?.data?.job ?? json?.data) as IJobPosting;
 }
 
+export async function adminUnarchiveJob(id: string): Promise<IJobPosting> {
+  const res = await fetch(`/api/v1/admin/jobs/${encodeURIComponent(id)}/unarchive`, {
+    method: "POST",
+  });
+  const json = await readJsonSafe(res);
+  if (!res.ok) throw new Error(pickMessage(json, "Failed to unarchive job"));
+  return (json?.data?.jobPosting ?? json?.data?.job ?? json?.data) as IJobPosting;
+}
+
 /* ───────────────────────── Applications ───────────────────────── */
 
 export async function adminFetchJobApplications(opts?: {

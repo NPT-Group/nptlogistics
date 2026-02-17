@@ -1,3 +1,4 @@
+// src/app/(admin)/admin/jobs/new/NewJobPostingClient.tsx
 "use client";
 
 import { useRouter } from "next/navigation";

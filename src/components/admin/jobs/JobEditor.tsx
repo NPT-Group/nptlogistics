@@ -19,7 +19,7 @@ import { IMAGE_MIME_TYPES, VIDEO_MIME_TYPES } from "@/types/shared.types";
 import { uploadToS3Presigned, type UploadResult } from "@/lib/utils/s3Helper";
 
 import JobPostingSidebar from "./JobPostingSidebar";
-import { AlertTriangle, Briefcase, ExternalLink } from "lucide-react";
+import { AlertTriangle, Briefcase, CheckCircle2, ExternalLink } from "lucide-react";
 import { getAllowedJobActions } from "@/lib/utils/jobs/jobStatusTransitions";
 
 const BlockNote = dynamic(() => import("@/components/BlockNote"), {
@@ -175,13 +175,12 @@ export default function JobEditor(props: Props) {
   const currentStatus = (props.initial?.status as EJobPostingStatus | undefined) ?? undefined;
   const { canPublish, canClose, canArchive } = getAllowedJobActions(currentStatus);
 
-  const isRepublish =
-    currentStatus === EJobPostingStatus.ARCHIVED || currentStatus === EJobPostingStatus.CLOSED;
+  const isArchived = currentStatus === EJobPostingStatus.ARCHIVED;
+  const isRepublish = currentStatus === EJobPostingStatus.CLOSED; // archived uses "Unarchive" now
 
-  // Determine if the secondary action is allowed based on its kind:
   const secondaryAllowed =
     props.secondaryActionKind === "PUBLISH"
-      ? !!canPublish
+      ? !!canPublish || isArchived // allow unarchive even if publish rules differ upstream
       : props.secondaryActionKind === "CLOSE"
         ? !!canClose
         : true;
@@ -190,12 +189,13 @@ export default function JobEditor(props: Props) {
 
   const effectiveSecondaryLabel =
     props.secondaryActionKind === "PUBLISH"
-      ? isRepublish
-        ? "Republish"
-        : props.secondaryLabel
+      ? isArchived
+        ? "Unarchive"
+        : isRepublish
+          ? "Republish"
+          : props.secondaryLabel
       : props.secondaryLabel;
 
-  // Danger (archive) only when allowed
   const showArchiveDanger = !!props.onDanger && !!props.dangerLabel && !!canArchive;
   const effectiveDangerDisabled = !!props.dangerDisabled || !canArchive;
 
@@ -254,10 +254,15 @@ export default function JobEditor(props: Props) {
   );
 
   const [saving, setSaving] = React.useState(false);
-  const [error, setError] = React.useState<{ message: string; nonce: number } | null>(null);
-  const errorRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Danger confirm
+  const [error, setError] = React.useState<{ message: string; nonce: number } | null>(null);
+  const [success, setSuccess] = React.useState<{ message: string; nonce: number } | null>(null);
+
+  const headerRef = React.useRef<HTMLDivElement | null>(null);
+  const errorRef = React.useRef<HTMLDivElement | null>(null);
+  const successRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Confirm modal state
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmActionRef = React.useRef<null | (() => Promise<void>)>(null);
   const [confirmTone, setConfirmTone] = React.useState<ConfirmTone>("danger");
@@ -322,6 +327,13 @@ export default function JobEditor(props: Props) {
     setIsDirty(false);
   }
 
+  function scrollToHeader() {
+    requestAnimationFrame(() => {
+      headerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      (headerRef.current as any)?.focus?.();
+    });
+  }
+
   React.useEffect(() => {
     if (!error) return;
     requestAnimationFrame(() => {
@@ -330,13 +342,31 @@ export default function JobEditor(props: Props) {
     });
   }, [error?.nonce]);
 
+  React.useEffect(() => {
+    if (!success) return;
+    requestAnimationFrame(() => {
+      // scroll the header so the “success + all changes saved” is visible
+      headerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      successRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }, [success?.nonce]);
+
+  // Clear success on edits / new saves
+  React.useEffect(() => {
+    if (!success) return;
+    // if the user edits anything after a success, drop the banner
+    if (isDirty) setSuccess(null);
+  }, [isDirty]);
+
   async function onPickCover(file: File) {
     setError(null);
+    setSuccess(null);
     const asset = await uploadCoverToTemp(file);
     setCoverImage(asset);
   }
 
   function onRemoveCover() {
+    setSuccess(null);
     setCoverImage(undefined);
   }
 
@@ -412,18 +442,65 @@ export default function JobEditor(props: Props) {
     };
   }
 
-  async function runAction(fn: (p: SubmitPayload) => Promise<void>) {
+  async function runAction(fn: (p: SubmitPayload) => Promise<void>, successMessage: string) {
     setError(null);
+    setSuccess(null);
     setSaving(true);
     try {
       const payload = buildPayload();
       await fn(payload);
       markSavedNow();
+      setSuccess({ message: successMessage, nonce: Date.now() });
+      scrollToHeader();
     } catch (e: any) {
       setError({ message: e?.message || "Failed to save.", nonce: Date.now() });
     } finally {
       setSaving(false);
     }
+  }
+
+  async function confirmSecondary(): Promise<void> {
+    if (effectiveSecondaryDisabled) return;
+
+    const kind = props.secondaryActionKind;
+
+    const isClose = kind === "CLOSE";
+    const isPublishLike = kind === "PUBLISH";
+
+    const tone: ConfirmTone = isClose ? "danger" : "neutral";
+
+    let title = "Confirm action";
+    let body: React.ReactNode = "Are you sure you want to continue?";
+    const label = effectiveSecondaryLabel;
+    let successMsg = "Action completed.";
+
+    if (isPublishLike) {
+      if (isArchived) {
+        title = "Unarchive this job?";
+        body = "This will restore the posting and make it live again.";
+        successMsg = "Job unarchived.";
+      } else if (isRepublish) {
+        title = "Republish this job?";
+        body = "This will publish the posting again and make it visible publicly.";
+        successMsg = "Job republished.";
+      } else {
+        title = "Publish this job?";
+        body = "This will publish the posting and make it visible publicly.";
+        successMsg = "Job published.";
+      }
+    } else if (isClose) {
+      title = "Close this job?";
+      body = "This will close the posting and remove it from public listings.";
+      successMsg = "Job closed.";
+    }
+
+    confirmActionRef.current = async () => runAction(props.onSaveSecondary, successMsg);
+
+    setConfirmTone(tone);
+    setConfirmTitle(title);
+    setConfirmDesc(body);
+    setConfirmLabel(label);
+    setConfirmOpen(true);
   }
 
   function confirmDanger() {
@@ -435,7 +512,7 @@ export default function JobEditor(props: Props) {
       props.dangerConfirmBody ??
       "This will archive the posting and remove it from public listings.";
 
-    confirmActionRef.current = async () => runAction(props.onDanger!);
+    confirmActionRef.current = async () => runAction(props.onDanger!, "Job archived.");
 
     setConfirmTone("danger");
     setConfirmTitle(title);
@@ -477,6 +554,8 @@ export default function JobEditor(props: Props) {
       <div className="mx-auto max-w-7xl px-6 py-6">
         {/* Header */}
         <div
+          ref={headerRef}
+          tabIndex={-1}
           className={cn(
             "mb-6 rounded-3xl border shadow-[var(--dash-shadow)]",
             "border-[var(--dash-border)] bg-[var(--dash-surface)]",
@@ -524,6 +603,21 @@ export default function JobEditor(props: Props) {
             <div className="mt-4 lg:hidden">
               <ChangePill saving={saving} isDirty={isDirty} />
             </div>
+
+            {success ? (
+              <div
+                ref={successRef}
+                className={cn(
+                  "mt-4 flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm",
+                  isDark
+                    ? "border-emerald-400/25 bg-emerald-500/15 text-emerald-50"
+                    : "border-emerald-200 bg-emerald-50 text-emerald-900",
+                )}
+              >
+                <CheckCircle2 className="mt-0.5 h-4 w-4" />
+                <div className="flex-1">{success.message}</div>
+              </div>
+            ) : null}
 
             {error ? (
               <div
@@ -575,7 +669,11 @@ export default function JobEditor(props: Props) {
               >
                 <div className="p-4">
                   <BlockNote
-                    onChange={setDoc}
+                    onChange={(v: any) => {
+                      setSuccess(null);
+                      setError(null);
+                      setDoc(v);
+                    }}
                     uploadFile={uploadJobsMediaToTemp}
                     initialContent={doc ?? undefined}
                   />
@@ -587,48 +685,116 @@ export default function JobEditor(props: Props) {
           {/* Sidebar */}
           <JobPostingSidebar
             title={title}
-            setTitle={setTitle}
+            setTitle={(v) => {
+              setSuccess(null);
+              setError(null);
+              setTitle(v);
+            }}
             slug={slug}
-            setSlug={setSlug}
+            setSlug={(v) => {
+              setSuccess(null);
+              setError(null);
+              setSlug(v);
+            }}
             department={department}
-            setDepartment={setDepartment}
+            setDepartment={(v) => {
+              setSuccess(null);
+              setError(null);
+              setDepartment(v);
+            }}
             workplaceType={workplaceType}
-            setWorkplaceType={setWorkplaceType}
+            setWorkplaceType={(v) => {
+              setSuccess(null);
+              setError(null);
+              setWorkplaceType(v);
+            }}
             employmentType={employmentType}
-            setEmploymentType={setEmploymentType}
+            setEmploymentType={(v) => {
+              setSuccess(null);
+              setError(null);
+              setEmploymentType(v);
+            }}
             numberOfOpenings={numberOfOpenings}
-            setNumberOfOpenings={setNumberOfOpenings}
+            setNumberOfOpenings={(n) => {
+              setSuccess(null);
+              setError(null);
+              setNumberOfOpenings(n);
+            }}
             locationsText={locationsText}
-            setLocationsText={setLocationsText}
+            setLocationsText={(v) => {
+              setSuccess(null);
+              setError(null);
+              setLocationsText(v);
+            }}
             summary={summary}
-            setSummary={setSummary}
+            setSummary={(v) => {
+              setSuccess(null);
+              setError(null);
+              setSummary(v);
+            }}
             tags={tags}
-            setTags={setTags}
+            setTags={(v) => {
+              setSuccess(null);
+              setError(null);
+              setTags(v);
+            }}
             allowApplications={allowApplications}
-            setAllowApplications={setAllowApplications}
+            setAllowApplications={(v) => {
+              setSuccess(null);
+              setError(null);
+              setAllowApplications(v);
+            }}
             coverImage={coverImage}
             onPickCover={onPickCover}
             onRemoveCover={onRemoveCover}
             compCurrency={compCurrency}
-            setCompCurrency={setCompCurrency}
+            setCompCurrency={(v) => {
+              setSuccess(null);
+              setError(null);
+              setCompCurrency(v);
+            }}
             compMin={compMin}
-            setCompMin={setCompMin}
+            setCompMin={(v) => {
+              setSuccess(null);
+              setError(null);
+              setCompMin(v);
+            }}
             compMax={compMax}
-            setCompMax={setCompMax}
+            setCompMax={(v) => {
+              setSuccess(null);
+              setError(null);
+              setCompMax(v);
+            }}
             compInterval={compInterval}
-            setCompInterval={setCompInterval}
+            setCompInterval={(v) => {
+              setSuccess(null);
+              setError(null);
+              setCompInterval(v);
+            }}
             compNote={compNote}
-            setCompNote={setCompNote}
+            setCompNote={(v) => {
+              setSuccess(null);
+              setError(null);
+              setCompNote(v);
+            }}
             compPublic={compPublic}
-            setCompPublic={setCompPublic}
+            setCompPublic={(v) => {
+              setSuccess(null);
+              setError(null);
+              setCompPublic(v);
+            }}
             benefitsText={benefitsText}
-            setBenefitsText={setBenefitsText}
+            setBenefitsText={(v) => {
+              setSuccess(null);
+              setError(null);
+              setBenefitsText(v);
+            }}
             saving={saving}
             primaryLabel={props.primaryLabel}
             secondaryLabel={effectiveSecondaryLabel}
             secondaryDisabled={effectiveSecondaryDisabled}
-            onPrimary={() => runAction(props.onSavePrimary)}
-            onSecondary={() => runAction(props.onSaveSecondary)}
+            onPrimary={() => runAction(props.onSavePrimary, "Changes saved.")}
+            onSecondary={confirmSecondary}
             dangerLabel={showArchiveDanger ? props.dangerLabel : undefined}
             dangerDisabled={effectiveDangerDisabled}
             onDanger={showArchiveDanger ? confirmDanger : undefined}

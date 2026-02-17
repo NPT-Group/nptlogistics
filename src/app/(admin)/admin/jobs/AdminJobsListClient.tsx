@@ -70,6 +70,14 @@ function statusPill(status: string, isDark: boolean) {
   );
 }
 
+function formatEnumLabel(v?: string) {
+  if (!v) return "";
+  return v
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
 function RowMenu({
   busy,
   canArchive,
@@ -511,7 +519,9 @@ export default function AdminJobsListClient({
                   const { canPublish, canClose, canArchive } = getAllowedJobActions(j.status);
 
                   const typeLabel =
-                    [j.workplaceType, j.employmentType].filter(Boolean).join(" • ") || "—";
+                    [formatEnumLabel(j.workplaceType), formatEnumLabel(j.employmentType)]
+                      .filter(Boolean)
+                      .join(" • ") || "—";
 
                   const viewCount = Number.isFinite(Number(j?.viewCount)) ? Number(j.viewCount) : 0;
                   const applicationsCount = Number.isFinite(Number(j?.applicationsCount))

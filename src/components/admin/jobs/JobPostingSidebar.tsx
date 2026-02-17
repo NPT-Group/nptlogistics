@@ -170,7 +170,9 @@ export default function JobPostingSidebar(props: Props) {
   // Helpful little hint (optional)
   const secondaryUnavailableText =
     props.secondaryActionKind === "PUBLISH"
-      ? "This posting can’t be published from its current state."
+      ? props.status === EJobPostingStatus.ARCHIVED
+        ? "This posting can’t be unarchived from its current state."
+        : "This posting can’t be published from its current state."
       : "This posting can’t be closed from its current state.";
 
   return (
