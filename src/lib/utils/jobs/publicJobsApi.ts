@@ -55,3 +55,24 @@ export async function publicFetchJobBySlug(slug: string): Promise<IJobPosting> {
   if (!res.ok) throw new Error(pickMessage(json, "Failed to fetch job"));
   return (json?.data?.jobPosting ?? json?.data?.job ?? json?.data) as IJobPosting;
 }
+
+/**
+ * Increment viewCount for a published job.
+ * Dedupe should be handled by the caller (session/local storage).
+ */
+export async function publicCountJobView(
+  slug: string,
+): Promise<{ slug: string; viewCount: number } | null> {
+  const res = await fetch(`/api/v1/jobs/${encodeURIComponent(slug)}/view`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    // Helps when user navigates away quickly
+    keepalive: true as any,
+  });
+
+  // Avoid throwing here - view count is non-critical
+  const json = await readJsonSafe(res);
+  if (!res.ok) return null;
+
+  return json?.data ?? null;
+}

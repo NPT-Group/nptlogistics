@@ -112,6 +112,7 @@ export const GET = async (req: NextRequest) => {
       benefitsPreview: 1,
       status: 1,
       allowApplications: 1,
+      viewCount: 1,
       publishedAt: 1,
       closedAt: 1,
       createdBy: 1,
@@ -145,6 +146,7 @@ export const GET = async (req: NextRequest) => {
     const items = docs.map((d: any) => ({
       ...d,
       id: d?._id?.toString?.() ?? d?.id ?? "",
+      viewCount: Number.isFinite(Number(d?.viewCount)) ? Number(d.viewCount) : 0,
       ...(includeAppsCount ? { applicationsCount: appsCountByJob[String(d._id)] ?? 0 } : {}),
     }));
 

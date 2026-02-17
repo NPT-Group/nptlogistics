@@ -29,6 +29,7 @@ import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import TurnstileWidget from "@/components/shared/TurnstileWidget";
 import { uploadToS3PresignedPublic } from "@/lib/utils/s3ClientUpload";
 import { NEXT_PUBLIC_NPT_HR_EMAIL } from "@/config/env";
+import { publicCountJobView } from "@/lib/utils/jobs/publicJobsApi";
 
 const BlockNote = dynamic(() => import("@/components/BlockNote"), { ssr: false });
 
@@ -146,6 +147,27 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
     if (!err && !ok) return;
     scrollToNotice();
   }, [err, ok, scrollToNotice]);
+
+  // Count views once per tab session
+  React.useEffect(() => {
+    if (!job?.slug) return;
+    if (job?.status && String(job.status) !== "PUBLISHED") return;
+
+    const key = `npt_job_viewed:${job.slug}`;
+    try {
+      if (typeof window === "undefined") return;
+
+      // sessionStorage = once per tab session (avoid inflated counts on back/forward)
+      const already = window.sessionStorage.getItem(key);
+      if (already) return;
+
+      window.sessionStorage.setItem(key, "1");
+      publicCountJobView(job.slug);
+    } catch {
+      // if storage is blocked, still count view
+      publicCountJobView(job.slug);
+    }
+  }, [job?.slug, job?.status]);
 
   const handleTurnstileToken = React.useCallback((t: string) => {
     setTurnstileToken(t);

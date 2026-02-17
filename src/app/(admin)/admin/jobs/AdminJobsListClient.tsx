@@ -487,6 +487,12 @@ export default function AdminJobsListClient({
                   <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Department</th>
                   <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Type</th>
                   <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Status</th>
+                  <th className="px-4 py-3 text-right font-semibold text-[var(--dash-muted)]">
+                    Views
+                  </th>
+                  <th className="px-4 py-3 text-right font-semibold text-[var(--dash-muted)]">
+                    Applications
+                  </th>
                   <th className="px-4 py-3 font-semibold text-[var(--dash-muted)]">Updated</th>
                   <th className="px-4 py-3 text-right font-semibold text-[var(--dash-muted)]">
                     Actions
@@ -506,6 +512,11 @@ export default function AdminJobsListClient({
 
                   const typeLabel =
                     [j.workplaceType, j.employmentType].filter(Boolean).join(" • ") || "—";
+
+                  const viewCount = Number.isFinite(Number(j?.viewCount)) ? Number(j.viewCount) : 0;
+                  const applicationsCount = Number.isFinite(Number(j?.applicationsCount))
+                    ? Number(j.applicationsCount)
+                    : 0;
 
                   const showPublish = canPublish;
                   const showClose = canClose;
@@ -539,6 +550,14 @@ export default function AdminJobsListClient({
 
                       <td className="px-4 py-3">
                         <span className={statusPill(j.status, isDark)}>{j.status}</span>
+                      </td>
+
+                      <td className="px-4 py-3 text-right font-medium text-[var(--dash-text)]/85">
+                        {viewCount}
+                      </td>
+
+                      <td className="px-4 py-3 text-right font-medium text-[var(--dash-text)]/85">
+                        {applicationsCount}
                       </td>
 
                       <td className="px-4 py-3 text-[var(--dash-muted)]">
@@ -645,7 +664,7 @@ export default function AdminJobsListClient({
 
                 {!items.length ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-10 text-center text-[var(--dash-muted)]">
+                    <td colSpan={9} className="px-4 py-10 text-center text-[var(--dash-muted)]">
                       No job postings found.
                     </td>
                   </tr>

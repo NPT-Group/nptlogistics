@@ -444,6 +444,7 @@ export default function CareersClient({
                   <Link
                     key={String(j.id ?? j.slug)}
                     href={`/careers/${encodeURIComponent(String(j.slug))}`}
+                    target="_blank"
                     className={[
                       "group block px-5 py-4 transition",
                       "hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-ring)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white",

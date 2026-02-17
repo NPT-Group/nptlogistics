@@ -81,6 +81,7 @@ export const jobPostingSchema = new Schema<IJobPosting>(
       index: true,
     },
     allowApplications: { type: Boolean, default: true, index: true },
+    viewCount: { type: Number, default: 0, min: 0 },
 
     publishedAt: { type: Date, index: true },
     closedAt: { type: Date },

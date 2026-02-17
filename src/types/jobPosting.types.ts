@@ -72,6 +72,8 @@ export interface IJobPosting {
   // controls
   status: EJobPostingStatus;
   allowApplications: boolean;
+  viewCount?: number;
+  applicationsCount?: number;
 
   publishedAt?: Date | string;
   closedAt?: Date | string;
