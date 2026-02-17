@@ -94,6 +94,6 @@ export const TRUST_PARTNER_LOGOS: PartnerLogo[] = [
   { src: "/partners/pip-icon.png", alt: "PIP" },
   { src: "/partners/Haccp-icon.png", alt: "HACCP" },
   { src: "/partners/ccc-icon.png", alt: "CCC" },
-  { src: "/partners/fast-free-secure-icon.png", alt: "FAST / Free and Secure" },
+  { src: "/partners/Fast-free-secure-icon.png", alt: "FAST / Free and Secure" },
   { src: "/partners/Ace-icon.png", alt: "ACE" },
 ];

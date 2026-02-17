@@ -27,13 +27,14 @@ const TOKENS = {
     "border border-white/12 bg-[linear-gradient(145deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))]",
     "shadow-[0_22px_56px_rgba(2,6,23,0.38),inset_0_1px_0_rgba(255,255,255,0.16)]",
   ),
-  stage: "relative aspect-[16/6.2] w-full min-h-[240px] sm:min-h-[285px] lg:min-h-[320px]",
+  stage:
+    "relative aspect-[16/9] w-full min-h-[300px] sm:aspect-[16/6.8] sm:min-h-[300px] lg:aspect-[16/6.2] lg:min-h-[320px]",
   overlay:
     "absolute inset-0 bg-[linear-gradient(90deg,rgba(7,15,29,0.86)_0%,rgba(7,15,29,0.68)_48%,rgba(7,15,29,0.28)_100%)] sm:bg-[linear-gradient(90deg,rgba(7,15,29,0.72)_0%,rgba(7,15,29,0.5)_42%,rgba(7,15,29,0.2)_100%)]",
   bottomFadeToLight:
     "pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-b from-transparent to-[#f2e9df] sm:h-14",
   content: "relative z-10 flex h-full items-end",
-  left: "w-full max-w-2xl px-5 pb-5 sm:px-8 sm:pb-6 lg:px-9 lg:pb-7",
+  left: "w-full max-w-2xl px-5 pb-6 sm:px-8 sm:pb-6 lg:px-9 lg:pb-7",
   title:
     "text-[22px] leading-[1.08] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] sm:text-[30px] lg:text-[34px]",
   subtitle:
