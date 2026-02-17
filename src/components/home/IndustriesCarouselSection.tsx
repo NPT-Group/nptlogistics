@@ -36,9 +36,9 @@ const TOKENS = {
   content: "relative z-10 flex h-full items-end",
   left: "w-full max-w-2xl px-5 pb-6 sm:px-8 sm:pb-6 lg:px-9 lg:pb-7",
   title:
-    "text-[20px] leading-[1.12] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] [display:-webkit-box] [overflow:hidden] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] sm:text-[30px] sm:[-webkit-line-clamp:unset] lg:text-[34px]",
+    "text-[20px] leading-[1.1] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] sm:text-[30px] lg:text-[34px]",
   subtitle:
-    "mt-1.5 max-w-xl text-[13px] leading-relaxed text-white/88 drop-shadow-[0_2px_8px_rgba(0,0,0,0.42)] [display:-webkit-box] [overflow:hidden] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] sm:text-[14px] sm:[-webkit-line-clamp:unset]",
+    "mt-1.5 max-w-xl text-[13px] leading-relaxed text-white/88 drop-shadow-[0_2px_8px_rgba(0,0,0,0.42)] sm:text-[14px]",
   ctaRow: "mt-3 flex flex-wrap items-center gap-3",
   ctaPrimary: cn(
     "inline-flex h-10 items-center justify-center rounded-md px-5 text-sm font-semibold",
@@ -254,30 +254,54 @@ export function IndustriesCarouselSection() {
 
             {/* content */}
             <div className={TOKENS.content}>
-              <div className={TOKENS.left}>
-                <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-[11px] font-semibold text-white/80 backdrop-blur sm:text-xs">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-500)]" />
-                  <span className="truncate">{active.label}</span>
+              {/* Dedicated mobile composition to avoid real-device text metric drift */}
+              <div className="w-full px-5 pb-6 sm:hidden">
+                <div className="max-w-[20rem] rounded-2xl border border-white/14 bg-black/32 p-3.5 shadow-[0_10px_28px_rgba(2,6,23,0.34)] backdrop-blur-[1.5px]">
+                  <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-[11px] font-semibold text-white/80">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-500)]" />
+                    <span className="truncate">{active.label}</span>
+                  </div>
+                  <h3 className="mt-2 text-[19px] leading-[1.1] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]">
+                    {active.mobileTitle ?? active.title}
+                  </h3>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-white/88 drop-shadow-[0_2px_8px_rgba(0,0,0,0.42)]">
+                    {active.mobileSubtitle ?? active.subtitle}
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-3">
+                    <Link href={active.href} className={cn(TOKENS.ctaPrimary, focusRing)}>
+                      Explore {active.label}
+                    </Link>
+                  </div>
                 </div>
+              </div>
 
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={`${active.key}-copy`}
-                    initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
-                    animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-                    exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
-                    transition={{ duration: reduceMotion ? 0 : 0.28, ease: "easeOut" }}
-                  >
-                    <h3 className={TOKENS.title}>{active.title}</h3>
-                    <p className={TOKENS.subtitle}>{active.subtitle}</p>
+              {/* Desktop/tablet composition */}
+              <div className="hidden w-full sm:block">
+                <div className={TOKENS.left}>
+                  <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/14 bg-white/6 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-500)]" />
+                    <span className="truncate">{active.label}</span>
+                  </div>
 
-                    <div className={TOKENS.ctaRow}>
-                      <Link href={active.href} className={cn(TOKENS.ctaPrimary, focusRing)}>
-                        Explore {active.label}
-                      </Link>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`${active.key}-copy`}
+                      initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+                      animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                      exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
+                      transition={{ duration: reduceMotion ? 0 : 0.28, ease: "easeOut" }}
+                    >
+                      <h3 className={TOKENS.title}>{active.title}</h3>
+                      <p className={TOKENS.subtitle}>{active.subtitle}</p>
+
+                      <div className={TOKENS.ctaRow}>
+                        <Link href={active.href} className={cn(TOKENS.ctaPrimary, focusRing)}>
+                          Explore {active.label}
+                        </Link>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </div>
