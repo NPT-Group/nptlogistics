@@ -49,10 +49,10 @@ export const NAV = {
             description: "Full truckload shipping for time-critical freight.",
             icon: "truck",
             children: [
-              { label: "Dry Van", href: "/services/truckload#dry-van" },
-              { label: "Flatbed", href: "/services/truckload#flatbed" },
-              { label: "RGN / Oversize", href: "/services/truckload#rgn-oversize" },
-              { label: "Roll-Tite / Conestoga", href: "/services/truckload#conestoga" },
+              { label: "Dry Van", href: "/services/truckload#section-dry-van" },
+              { label: "Flatbed", href: "/services/truckload#section-flatbed" },
+              { label: "RGN / Oversize", href: "/services/truckload#section-rgn-oversize" },
+              { label: "Roll-Tite / Conestoga", href: "/services/truckload#section-roll-tite-conestoga" },
             ],
           },
           {

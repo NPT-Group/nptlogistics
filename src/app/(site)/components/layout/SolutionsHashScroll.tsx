@@ -18,9 +18,32 @@ function normalizeHash(hash: string) {
   return hash.toLowerCase();
 }
 
-function getHashTargetId(hash: string) {
+function getMappedHashTargetId(hash: string) {
   const normalizedHash = normalizeHash(hash) as keyof typeof HASH_TARGETS;
   return HASH_TARGETS[normalizedHash];
+}
+
+function getRawHashId(hash: string) {
+  if (!hash || hash === "#") return null;
+  const raw = hash.startsWith("#") ? hash.slice(1) : hash;
+  if (!raw) return null;
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
+function getHashTargetId(hash: string) {
+  // First honor explicit mapped anchors (homepage sections).
+  const mapped = getMappedHashTargetId(hash);
+  if (mapped) return mapped;
+
+  // Fallback: if hash points to an existing id (service pages), use it.
+  const rawId = getRawHashId(hash);
+  if (!rawId) return null;
+  const target = document.getElementById(rawId);
+  return target ? rawId : null;
 }
 
 function isHomeTopLink(pathname: string, hash: string) {
@@ -46,6 +69,16 @@ function resolveScrollBehavior(preferred: ScrollBehavior): ScrollBehavior {
 function scrollToElementById(id: string, behavior: ScrollBehavior) {
   const target = document.getElementById(id);
   if (!target) return false;
+  const serviceShell = target.closest?.("[data-service-shell]") as HTMLElement | null;
+  if (serviceShell) {
+    const style = getComputedStyle(serviceShell);
+    const headerH = parseFloat(style.getPropertyValue("--service-header-h")) || 0;
+    const subnavH = parseFloat(style.getPropertyValue("--service-subnav-h")) || 0;
+    const top = window.scrollY + target.getBoundingClientRect().top - (headerH + subnavH);
+    window.scrollTo({ top: Math.max(0, top), left: 0, behavior });
+    return true;
+  }
+
   target.scrollIntoView({ behavior, block: "start", inline: "nearest" });
   return true;
 }
@@ -93,6 +126,7 @@ export function SolutionsHashScroll() {
       const hashTargetId = getHashTargetId(url.hash);
       if (hashTargetId) {
         // Same-page hash click should always scroll, even repeatedly.
+        // Works for both mapped home anchors and generic id hashes.
         event.preventDefault();
         scrollToElementById(hashTargetId, resolveScrollBehavior("smooth"));
         return;
