@@ -1,3 +1,4 @@
+// src/lib/chatbot/widgets/ContactWidget.tsx
 "use client";
 
 import { CONTACT_INFO } from "../knowledgeBase";

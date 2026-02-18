@@ -1,3 +1,4 @@
+// src/lib/chatbot/MessageParser.ts
 export default class MessageParser {
   actionProvider: any;
 
@@ -6,17 +7,37 @@ export default class MessageParser {
   }
 
   parse(message: string) {
-    const text = (message || "").trim().toLowerCase();
+    const text = message.toLowerCase();
 
-    // Minimal starter logic:
-    if (!text) return;
+    if (text.includes("quote") || text.includes("price") || text.includes("rate")) {
+      return this.actionProvider.startQuote();
+    }
 
-    // Simple intent keywords (customize later)
-    if (text.includes("quote")) return this.actionProvider.startQuote();
-    if (text.includes("service")) return this.actionProvider.startServicesHelp();
-    if (text.includes("contact") || text.includes("agent") || text.includes("human")) return this.actionProvider.showContact();
+    if (text.includes("track") || text.includes("tracking") || text.includes("status")) {
+      return this.actionProvider.startTracking();
+    }
 
-    // Fallback: treat as FAQ search (placeholder)
+    if (text.includes("career") || text.includes("job") || text.includes("hiring")) {
+      return this.actionProvider.showCareers();
+    }
+
+    if (text.includes("driver")) {
+      // direct, predictable navigation
+      return this.actionProvider.goTo("/careers#drive");
+    }
+
+    if (text.includes("industry") || text.includes("industries")) {
+      return this.actionProvider.showIndustries();
+    }
+
+    if (text.includes("why") || text.includes("reliable") || text.includes("on-time")) {
+      return this.actionProvider.showWhyNpt();
+    }
+
+    if (text.includes("contact") || text.includes("email") || text.includes("phone")) {
+      return this.actionProvider.showContact();
+    }
+
     return this.actionProvider.searchFaq(message);
   }
 }

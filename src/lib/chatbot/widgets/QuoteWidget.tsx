@@ -1,3 +1,4 @@
+// src/lib/chatbot/widgets/QuoteWidget.tsx
 "use client";
 
 const SERVICES = [
@@ -26,7 +27,11 @@ export default function QuoteWidget(props: any) {
         </button>
       ))}
 
-      <button onClick={() => actionProvider.showContact()} className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50" type="button">
+      <button
+        onClick={() => actionProvider.showContact()}
+        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
+        type="button"
+      >
         Contact an agent
       </button>
     </div>

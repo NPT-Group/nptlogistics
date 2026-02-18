@@ -1,25 +1,17 @@
-// src/lib/chatbot/widgets/ServicesWidget.tsx
+// src/lib/chatbot/widgets/TrackingWidget.tsx
 "use client";
 
-export default function ServicesWidget(props: any) {
+export default function TrackingWidget(props: any) {
   const { actionProvider } = props;
 
   return (
     <div className="flex flex-wrap gap-2">
       <button
-        onClick={() => actionProvider.scrollToSection("solutions")}
+        onClick={() => actionProvider.goTo("/tracking")}
         className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
         type="button"
       >
-        View solutions
-      </button>
-
-      <button
-        onClick={() => actionProvider.startQuote()}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
-      >
-        Start a quote
+        Open tracking
       </button>
 
       <button
@@ -27,7 +19,7 @@ export default function ServicesWidget(props: any) {
         className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
         type="button"
       >
-        Contact an agent
+        Contact support
       </button>
     </div>
   );
