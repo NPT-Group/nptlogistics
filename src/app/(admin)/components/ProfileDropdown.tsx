@@ -1,4 +1,4 @@
-// src/components/shared/ProfileDropdown.tsx
+// src/app/(admin)/components/shared/ProfileDropdown.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";

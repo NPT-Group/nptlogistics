@@ -1,4 +1,4 @@
-// src/components/admin/ui/Select.tsx
+// src/app/(admin)/components/ui/Select.tsx
 "use client";
 
 import * as React from "react";

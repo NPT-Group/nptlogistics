@@ -1,4 +1,4 @@
-// src/components/admin/jobs/JobEditor.tsx
+// src/app/(admin)/components/jobs/JobEditor.tsx
 "use client";
 
 import * as React from "react";
@@ -677,6 +677,11 @@ export default function JobEditor(props: Props) {
                     }}
                     uploadFile={uploadJobsMediaToTemp}
                     initialContent={doc ?? undefined}
+                    chrome={{
+                      borderColor: "var(--dash-border)",
+                      background: isDark ? "rgba(255,255,255,0.04)" : "white",
+                      className: "rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12",
+                    }}
                   />
                 </div>
               </div>

@@ -1,5 +1,7 @@
-@import "./(site)/styles/theme.css";
+/* src/app/globals.css */
 @import "./(admin)/styles/theme.css";
+@import "./(site)/styles/theme.css";
+@import "../lib/chatbot/styles/chatbot.css";
 @import "tailwindcss";
 
 html {

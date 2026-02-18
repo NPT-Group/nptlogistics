@@ -1,11 +1,11 @@
 // src/app/(site)/layout.tsx
 import type { ReactNode } from "react";
 import { Suspense } from "react";
-
 import { SiteHeader } from "./components/layout/SiteHeader";
 import { SiteFooter } from "./components/layout/SiteFooter";
 import { SolutionsHashScroll } from "./components/layout/SolutionsHashScroll";
 import { AnalyticsClient } from "./components/analytics/AnalyticsClient";
+import GuidedChatbot from "@/lib/chatbot/GuidedChatbot";
 
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
@@ -21,6 +21,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       <main id="main-content" className="overflow-x-clip">
         {children}
       </main>
+      <GuidedChatbot />
       <SiteFooter />
     </>
   );

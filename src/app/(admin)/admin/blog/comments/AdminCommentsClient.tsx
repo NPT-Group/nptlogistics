@@ -1,3 +1,4 @@
+// src/app/(admin)/admin/blog/comments/AdminCommentsClient.tsx
 "use client";
 
 import * as React from "react";

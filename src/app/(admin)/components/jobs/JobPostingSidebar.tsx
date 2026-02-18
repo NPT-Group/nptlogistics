@@ -1,4 +1,4 @@
-// src/components/admin/jobs/JobPostingSidebar.tsx
+// src/app/(admin)/components/jobs/JobPostingSidebar.tsx
 "use client";
 
 import * as React from "react";

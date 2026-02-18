@@ -1,4 +1,4 @@
-// src/components/admin/ui/ConfirmModal.tsx
+// src/app/(admin)/components/ui/ConfirmModal.tsx
 "use client";
 
 import * as React from "react";

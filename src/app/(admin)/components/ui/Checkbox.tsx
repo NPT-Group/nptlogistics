@@ -1,4 +1,4 @@
-// src/components/admin/ui/Checkbox.tsx
+// src/app/(admin)/components/ui/Checkbox.tsx
 "use client";
 
 import { cn } from "@/lib/utils/cn";

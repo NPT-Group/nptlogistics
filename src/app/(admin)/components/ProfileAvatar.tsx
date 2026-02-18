@@ -1,4 +1,4 @@
-// src/components/shared/ProfileAvatar.tsx
+// src/app/(admin)/components/shared/ProfileAvatar.tsx
 "use client";
 
 import Image from "next/image";

@@ -1,4 +1,4 @@
-// src/components/admin/ui/Buttons.tsx
+// src/app/(admin)/components/ui/Buttons.tsx
 "use client";
 
 import * as React from "react";

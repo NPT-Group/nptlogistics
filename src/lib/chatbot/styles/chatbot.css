@@ -1,0 +1,99 @@
+/* src/lib/chatbot/styles/chatbot.css */ /* --- react-chatbot-kit sizing fixes --- */
+.react-chatbot-kit-chat-container {
+  width: 100% !important;
+}
+.react-chatbot-kit-chat-inner-container {
+  width: 100% !important;
+} /* Hide react-chatbot-kit built-in header (we render our own) */
+.react-chatbot-kit-chat-header {
+  display: none !important;
+} /* Tighter message container padding */
+.react-chatbot-kit-chat-message-container {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+.react-chatbot-kit-chat-input {
+  border-bottom-left-radius: 15px !important;
+} /* --- NPT chatbot: force readable colors (prevents inheriting white text) --- */
+.npt-chatbot,
+.npt-chatbot * {
+  color: #111827; /* gray-900 */
+} /* main areas */
+.npt-chatbot .react-chatbot-kit-chat-message-container {
+  background: #ffffff !important;
+} /* bot bubble (keep dark bubble + white text) */
+.npt-chatbot .react-chatbot-kit-chat-bot-message {
+  background: #111827 !important;
+  color: #ffffff !important;
+}
+.npt-chatbot .react-chatbot-kit-chat-bot-message * {
+  color: #ffffff !important;
+} /* user bubble */
+.npt-chatbot .react-chatbot-kit-user-chat-message {
+  background: #f3f4f6 !important; /* gray-100 */
+  color: #111827 !important;
+} /* option / widget buttons (this is usually where text disappears) */
+.npt-chatbot .react-chatbot-kit-chat-btn {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important; /* gray-200 */
+  color: #111827 !important;
+}
+.npt-chatbot .react-chatbot-kit-chat-btn:hover {
+  background: #f9fafb !important; /* gray-50 */
+} /* input */
+.npt-chatbot .react-chatbot-kit-chat-input-form {
+  background: #ffffff !important;
+}
+.npt-chatbot .react-chatbot-kit-chat-input {
+  background: #ffffff !important;
+  color: #111827 !important;
+}
+.npt-chatbot .react-chatbot-kit-chat-input::placeholder {
+  color: #6b7280 !important; /* gray-500 */
+  opacity: 1;
+} /* send button icon */
+.npt-chatbot .react-chatbot-kit-chat-btn-send-icon {
+  fill: #ffffff !important;
+}
+
+/* --- react-chatbot-kit sizing + remove internal borders/edges --- */
+.npt-chatbot .react-chatbot-kit-chat-container,
+.npt-chatbot .react-chatbot-kit-chat-inner-container {
+  width: 100% !important;
+  background: #ffffff !important;
+  border: 0 !important; /* kills the dark border */
+  outline: 0 !important;
+  box-shadow: none !important; /* kills any inner shadow edge */
+}
+
+/* Sometimes the "edge" is coming from the message container */
+.npt-chatbot .react-chatbot-kit-chat-message-container {
+  background: #ffffff !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* If the input area is drawing a dark edge */
+.npt-chatbot .react-chatbot-kit-chat-input-form {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: #ffffff !important;
+}
+
+/* Optional: make the scrollbars look native/clean (prevents “dark gutter” feel) */
+.npt-chatbot .react-chatbot-kit-chat-message-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15, 23, 42, 0.25) transparent;
+}
+.npt-chatbot .react-chatbot-kit-chat-message-container::-webkit-scrollbar {
+  width: 10px;
+}
+.npt-chatbot .react-chatbot-kit-chat-message-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.npt-chatbot .react-chatbot-kit-chat-message-container::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.18);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}

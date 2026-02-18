@@ -1,11 +1,15 @@
-// src/app/admin/blog/[id]/page.tsx
+// src/app/(admin)/admin/blog/[id]/page.tsx
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { nptMetadata } from "@/lib/utils/blog/metadata";
 import { getAdminBlogPostById } from "@/lib/utils/blog/ssrBlogFetchers";
 import EditBlogPostClient from "./EditBlogPostClient";
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
   const { id } = await params;
 
   try {
@@ -21,7 +25,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 }
 
-export default async function AdminEditBlogPostPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function AdminEditBlogPostPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
 
   try {

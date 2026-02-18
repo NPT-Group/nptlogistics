@@ -1,4 +1,4 @@
-// src/app/admin/blog/page.tsx
+// src/app/(admin)/admin/blog/page.tsx
 import { nptMetadata } from "@/lib/utils/blog/metadata";
 import { ssrApiFetch } from "@/lib/utils/ssrFetch";
 import AdminBlogListClient from "./AdminBlogListClient";
@@ -9,7 +9,11 @@ export const metadata = nptMetadata({
   noIndex: true,
 });
 
-export default async function AdminBlogPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function AdminBlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const sp = await searchParams;
 
   const qs = new URLSearchParams();
@@ -19,6 +23,8 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Pr
     else qs.set(k, v);
   }
 
-  const data = await ssrApiFetch<{ data: { items: any[]; meta: any } }>(`/api/v1/admin/blog?${qs.toString()}`);
+  const data = await ssrApiFetch<{ data: { items: any[]; meta: any } }>(
+    `/api/v1/admin/blog?${qs.toString()}`,
+  );
   return <AdminBlogListClient initialItems={data.data.items} initialMeta={data.data.meta} />;
 }

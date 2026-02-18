@@ -4,7 +4,7 @@
 import React from "react";
 import Chatbot from "react-chatbot-kit";
 import "react-chatbot-kit/build/main.css";
-import { MessageCircle, X, Sparkles } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 
 import botConfig from "@/lib/chatbot/botConfig";
 import MessageParser from "@/lib/chatbot/MessageParser";
@@ -96,7 +96,7 @@ export default function GuidedChatbot() {
         <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
           <div className="flex items-center gap-2">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-white">
-              <MessageCircle size={16} />
+              <Sparkles size={16} />
             </span>
             <div className="text-sm font-semibold text-gray-900">NPT Assistant</div>
           </div>
@@ -174,34 +174,67 @@ export default function GuidedChatbot() {
             </div>
           )}
 
-          {/* Circular launcher */}
+          {/* Circular launcher (polished to match site theme) */}
           <button
             type="button"
             onClick={openChat}
             aria-label="Open chat"
-            className="group relative inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-gray-900 to-gray-700 text-white shadow-lg ring-1 ring-white/10 transition hover:-translate-y-0.5 hover:shadow-xl focus:outline-none active:translate-y-0"
+            className={[
+              "group relative inline-flex h-14 w-14 items-center justify-center rounded-full",
+              "shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+            ].join(" ")}
+            style={{
+              background: "linear-gradient(145deg, var(--color-surface-1), var(--color-surface-2))",
+              border: "1px solid var(--color-border)",
+              boxShadow: "0 14px 30px rgba(0,0,0,0.28), 0 1px 0 rgba(255,255,255,0.06) inset",
+            }}
           >
-            {/* animated sheen */}
+            {/* Brand accent ring */}
             <span
-              className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition duration-300 group-hover:opacity-100"
+              className="pointer-events-none absolute -inset-[2px] rounded-full opacity-70 transition group-hover:opacity-100"
               style={{
                 background:
-                  "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18), transparent 55%)",
+                  "conic-gradient(from 220deg, rgba(185,28,28,0.85), rgba(220,38,38,0.25), rgba(255,255,255,0.08), rgba(185,28,28,0.85))",
+                filter: "blur(0.2px)",
+              }}
+            />
+            <span
+              className="pointer-events-none absolute inset-0 rounded-full"
+              style={{
+                background:
+                  "radial-gradient(circle at 30% 25%, rgba(255,255,255,0.10), transparent 55%)",
               }}
             />
 
-            {/* subtle border glow */}
-            <span className="pointer-events-none absolute -inset-[1px] rounded-full bg-gradient-to-br from-white/20 to-transparent opacity-40" />
-
-            {/* Ping dot (cleaner) */}
+            {/* Ping dot (subtle + cleaner) */}
             <span className="absolute -top-0.5 -right-0.5 inline-flex h-3.5 w-3.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
-              <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-emerald-500 ring-2 ring-white" />
+              <span
+                className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-40"
+                style={{ background: "rgba(220,38,38,0.9)" }}
+              />
+              <span
+                className="relative inline-flex h-3.5 w-3.5 rounded-full ring-2"
+                style={{
+                  background: "rgb(220,38,38)", // brand-600
+                }}
+              />
             </span>
 
-            {/* icon badge */}
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 backdrop-blur">
-              <MessageCircle size={20} className="transition group-hover:scale-105" />
+            {/* Icon badge */}
+            <span
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full transition group-hover:scale-[1.02]"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.10)",
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              <Sparkles
+                size={20}
+                style={{ color: "rgba(255,255,255,0.92)" }}
+                className="transition group-hover:scale-105"
+              />
             </span>
           </button>
         </div>

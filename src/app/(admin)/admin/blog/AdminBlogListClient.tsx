@@ -1,3 +1,4 @@
+// src/app/(admin)/admin/blog/AdminBlogListClient.tsx
 "use client";
 
 import * as React from "react";

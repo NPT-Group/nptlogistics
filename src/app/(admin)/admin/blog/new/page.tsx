@@ -1,4 +1,4 @@
-// src/app/admin/blog/new/page.tsx
+// src/app/(admin)/admin/blog/new/page.tsx
 import { nptMetadata } from "@/lib/utils/blog/metadata";
 import NewBlogPostClient from "./NewBlogPostClient";
 

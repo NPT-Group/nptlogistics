@@ -111,7 +111,7 @@ export default function BlockNote({
     <MantineProvider defaultColorScheme="light">
       <div className="bn-scope">
         <div
-          className={chrome?.className ?? "rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12"}
+          className={chrome?.className}
           style={{
             ...(chrome?.style ?? {}),
             borderColor,

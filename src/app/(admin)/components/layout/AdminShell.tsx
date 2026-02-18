@@ -1,4 +1,4 @@
-// src/components/admin/layout/AdminShell.tsx
+// src/app/(admin)/components/layout/AdminShell.tsx
 "use client";
 
 import * as React from "react";

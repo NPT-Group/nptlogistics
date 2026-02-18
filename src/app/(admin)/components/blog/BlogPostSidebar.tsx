@@ -1,3 +1,4 @@
+// src/app/(admin)/components/blog/BlogPostSidebar.tsx
 "use client";
 
 import * as React from "react";

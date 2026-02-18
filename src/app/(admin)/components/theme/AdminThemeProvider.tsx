@@ -1,4 +1,4 @@
-// src/components/admin/theme/AdminThemeProvider.tsx
+// src/app/(admin)/components/theme/AdminThemeProvider.tsx
 "use client";
 
 import React, { createContext, useEffect, useMemo, useRef, useState } from "react";

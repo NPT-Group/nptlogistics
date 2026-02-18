@@ -1,4 +1,4 @@
-// src/components/admin/jobs/JobApplicationDetailsModal.tsx
+// src/app/(admin)/components/jobs/JobApplicationDetailsModal.tsx
 "use client";
 
 import * as React from "react";

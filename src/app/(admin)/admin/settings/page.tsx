@@ -1,3 +1,4 @@
+// src/app/(admin)/admin/settings/page.tsx
 "use client";
 
 import { Laptop, Moon, Sun, Settings as SettingsIcon } from "lucide-react";

@@ -1,4 +1,4 @@
-// src/components/admin/theme/ThemeModeSwitcher.tsx
+// src/app/(admin)/components/theme/ThemeModeSwitcher.tsx
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
