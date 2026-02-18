@@ -136,7 +136,7 @@ export default function CareersClient({
         {/* background banner */}
         <div className="absolute inset-0">
           <Image
-            src="/images/jobs-banner.jpg"
+            src="/careers/careers-banner.jpg"
             alt="Careers banner"
             fill
             priority

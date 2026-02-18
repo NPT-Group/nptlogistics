@@ -3,8 +3,8 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils/cn";
-import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
-import { Checkbox } from "@/components/admin/ui/Checkbox";
+import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider";
+import { Checkbox } from "@/app/(admin)/components/ui/Checkbox";
 import {
   AlignLeft,
   Archive,

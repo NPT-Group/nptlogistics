@@ -4,11 +4,11 @@
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
-import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
-import { ConfirmModal, type ConfirmTone } from "@/components/admin/ui/ConfirmModal";
-import { Select } from "@/components/admin/ui/Select";
-import { SoftButton, IconButton } from "@/components/admin/ui/Buttons";
-import { JobApplicationDetailsModal } from "@/components/admin/jobs/JobApplicationDetailsModal";
+import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider";
+import { ConfirmModal, type ConfirmTone } from "@/app/(admin)/components/ui/ConfirmModal";
+import { Select } from "@/app/(admin)/components/ui/Select";
+import { SoftButton, IconButton } from "@/app/(admin)/components/ui/Buttons";
+import { JobApplicationDetailsModal } from "@/app/(admin)/components/jobs/JobApplicationDetailsModal";
 import {
   Search,
   RefreshCw,

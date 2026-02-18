@@ -2,8 +2,13 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import BlogEditor from "@/components/admin/blog/BlogEditor";
-import { adminUpdatePost, adminPublishPost, adminUnpublishPost, adminArchivePost } from "@/lib/utils/blog/adminBlogApi";
+import BlogEditor from "@/app/(admin)/components/blog/BlogEditor";
+import {
+  adminUpdatePost,
+  adminPublishPost,
+  adminUnpublishPost,
+  adminArchivePost,
+} from "@/lib/utils/blog/adminBlogApi";
 import { EBlogStatus } from "@/types/blogPost.types";
 
 export default function EditBlogPostClient({ id, initialPost }: { id: string; initialPost: any }) {
@@ -61,7 +66,9 @@ export default function EditBlogPostClient({ id, initialPost }: { id: string; in
         setStatus(updated.status);
         router.refresh();
       }}
-      previewUrl={status === EBlogStatus.PUBLISHED ? `/blog/${encodeURIComponent(initialPost.slug)}` : null}
+      previewUrl={
+        status === EBlogStatus.PUBLISHED ? `/blog/${encodeURIComponent(initialPost.slug)}` : null
+      }
     />
   );
 }

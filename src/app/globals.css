@@ -1,89 +1,15 @@
-/* src/app/globals.css */
-@import "./styles/theme.css";
+@import "./(site)/styles/theme.css";
+@import "./(admin)/styles/theme.css";
 @import "tailwindcss";
 
-/* Prevent horizontal overflow and scrollbar; clip is stricter than hidden (no scroll container). */
 html {
   overflow-x: clip;
-  scroll-behavior: smooth;
-}
-body {
-  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-/* --- react-chatbot-kit sizing fixes --- */
-.react-chatbot-kit-chat-container {
-  width: 100% !important;
-}
-.react-chatbot-kit-chat-inner-container {
-  width: 100% !important;
-}
-
-/* Hide react-chatbot-kit built-in header (we render our own) */
-.react-chatbot-kit-chat-header {
-  display: none !important;
-}
-
-/* Tighter message container padding */
-.react-chatbot-kit-chat-message-container {
-  padding-left: 12px !important;
-  padding-right: 12px !important;
-}
-
-.react-chatbot-kit-chat-input {
-  border-bottom-left-radius: 15px !important;
-}
-
-/* --- NPT chatbot: force readable colors (prevents inheriting white text) --- */
-.npt-chatbot,
-.npt-chatbot * {
-  color: #111827; /* gray-900 */
-}
-
-/* main areas */
-.npt-chatbot .react-chatbot-kit-chat-message-container {
-  background: #ffffff !important;
-}
-
-/* bot bubble (keep dark bubble + white text) */
-.npt-chatbot .react-chatbot-kit-chat-bot-message {
-  background: #111827 !important;
-  color: #ffffff !important;
-}
-.npt-chatbot .react-chatbot-kit-chat-bot-message * {
-  color: #ffffff !important;
-}
-
-/* user bubble */
-.npt-chatbot .react-chatbot-kit-user-chat-message {
-  background: #f3f4f6 !important; /* gray-100 */
-  color: #111827 !important;
-}
-
-/* option / widget buttons (this is usually where text disappears) */
-.npt-chatbot .react-chatbot-kit-chat-btn {
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb !important; /* gray-200 */
-  color: #111827 !important;
-}
-.npt-chatbot .react-chatbot-kit-chat-btn:hover {
-  background: #f9fafb !important; /* gray-50 */
-}
-
-/* input */
-.npt-chatbot .react-chatbot-kit-chat-input-form {
-  background: #ffffff !important;
-}
-.npt-chatbot .react-chatbot-kit-chat-input {
-  background: #ffffff !important;
-  color: #111827 !important;
-}
-.npt-chatbot .react-chatbot-kit-chat-input::placeholder {
-  color: #6b7280 !important; /* gray-500 */
-  opacity: 1;
-}
-
-/* send button icon */
-.npt-chatbot .react-chatbot-kit-chat-btn-send-icon {
-  fill: #ffffff !important;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

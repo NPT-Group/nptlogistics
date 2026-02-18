@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import JobEditor from "@/components/admin/jobs/JobEditor";
+import JobEditor from "@/app/(admin)/components/jobs/JobEditor";
 import { adminCreateJob, adminPublishJob } from "@/lib/utils/jobs/adminJobsApi";
 
 export default function NewJobPostingClient() {

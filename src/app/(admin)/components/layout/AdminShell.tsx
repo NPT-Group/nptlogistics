@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils/cn";
-import ProfileDropdown from "@/components/shared/ProfileDropdown";
+import ProfileDropdown from "@/app/(admin)/components/ProfileDropdown";
 import { ThemeModeSwitcher } from "../theme/ThemeModeSwitcher";
 
 type IconType = React.ComponentType<{ className?: string }>;

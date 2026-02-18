@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { adminDeleteComment } from "@/lib/utils/blog/adminBlogApi";
 import { cn } from "@/lib/utils/cn";
-import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
-import { ConfirmModal, type ConfirmTone } from "@/components/admin/ui/ConfirmModal";
+import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider";
+import { ConfirmModal, type ConfirmTone } from "@/app/(admin)/components/ui/ConfirmModal";
 import { CalendarClock, ExternalLink, MessageSquareText, Trash2 } from "lucide-react";
 
 export default function AdminCommentsClient({

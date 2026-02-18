@@ -2,7 +2,10 @@
 
 import { Laptop, Moon, Sun, Settings as SettingsIcon } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import { useAdminTheme, type AdminThemeMode } from "@/components/admin/theme/AdminThemeProvider";
+import {
+  useAdminTheme,
+  type AdminThemeMode,
+} from "@/app/(admin)/components/theme/AdminThemeProvider";
 
 export default function AdminSettingsPage() {
   const { mode, setMode } = useAdminTheme();

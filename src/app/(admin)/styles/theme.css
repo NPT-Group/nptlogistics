@@ -1,0 +1,89 @@
+/* =========================
+   ADMIN Dashboard tokens (extracted)
+   ========================= */
+
+/* Base admin token palette */
+:root {
+  --adm-bg: #0b1020; /* page */
+  --adm-surface: #0f172a; /* cards / sidebar */
+  --adm-surface-2: #111c36; /* hover surfaces */
+  --adm-border: rgba(255, 255, 255, 0.12);
+
+  --adm-text: rgba(255, 255, 255, 0.92);
+  --adm-muted: rgba(255, 255, 255, 0.68);
+
+  --adm-red: #dc2626;
+  --adm-red-soft: rgba(220, 38, 38, 0.16);
+
+  --adm-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+  /* Light mode tokens */
+  --adm-bg-light: #f6f8fc;
+  --adm-surface-light: #ffffff;
+  --adm-surface-2-light: #eef3fb;
+  --adm-border-light: rgba(15, 23, 42, 0.1);
+
+  --adm-text-light: rgba(15, 23, 42, 0.95);
+  --adm-muted-light: rgba(15, 23, 42, 0.65);
+
+  --adm-shadow-light: 0 10px 25px rgba(15, 23, 42, 0.08);
+
+  /* Brand red used in light admin theme binding */
+  --color-brand-600: #dc2626;
+}
+
+/* Admin theme binding (html[data-admin-theme]) */
+html[data-admin-theme="dark"] {
+  --dash-bg: var(--adm-bg);
+  --dash-surface: var(--adm-surface);
+  --dash-surface-2: var(--adm-surface-2);
+  --dash-border: var(--adm-border);
+  --dash-text: var(--adm-text);
+  --dash-muted: var(--adm-muted);
+  --dash-red: var(--adm-red);
+  --dash-red-soft: var(--adm-red-soft);
+  --dash-shadow: var(--adm-shadow);
+}
+
+html[data-admin-theme="light"] {
+  --dash-bg: var(--adm-bg-light);
+  --dash-surface: var(--adm-surface-light);
+  --dash-surface-2: var(--adm-surface-2-light);
+  --dash-border: var(--adm-border-light);
+  --dash-text: var(--adm-text-light);
+  --dash-muted: var(--adm-muted-light);
+  --dash-red: var(--color-brand-600);
+  --dash-red-soft: rgba(220, 38, 38, 0.12);
+  --dash-shadow: var(--adm-shadow-light);
+}
+
+/* -----------------------------------------
+   ADMIN defaults (prevents "no theme" FOUC)
+   These are used BEFORE data-admin-theme is set.
+------------------------------------------ */
+:root {
+  --dash-bg: var(--adm-bg-light);
+  --dash-surface: var(--adm-surface-light);
+  --dash-surface-2: var(--adm-surface-2-light);
+  --dash-border: var(--adm-border-light);
+  --dash-text: var(--adm-text-light);
+  --dash-muted: var(--adm-muted-light);
+  --dash-red: var(--color-brand-600);
+  --dash-red-soft: rgba(220, 38, 38, 0.12);
+  --dash-shadow: var(--adm-shadow-light);
+}
+
+/* Optional: if OS prefers dark, default to dark before JS runs */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --dash-bg: var(--adm-bg);
+    --dash-surface: var(--adm-surface);
+    --dash-surface-2: var(--adm-surface-2);
+    --dash-border: var(--adm-border);
+    --dash-text: var(--adm-text);
+    --dash-muted: var(--adm-muted);
+    --dash-red: var(--adm-red);
+    --dash-red-soft: var(--adm-red-soft);
+    --dash-shadow: var(--adm-shadow);
+  }
+}

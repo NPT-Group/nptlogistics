@@ -2,11 +2,11 @@
 import { cookies } from "next/headers";
 import Script from "next/script";
 
-import { AdminShell } from "@/components/admin/layout/AdminShell";
+import { AdminShell } from "@/app/(admin)/components/layout/AdminShell";
 import {
   AdminThemeProvider,
   type AdminThemeMode,
-} from "@/components/admin/theme/AdminThemeProvider";
+} from "@/app/(admin)/components/theme/AdminThemeProvider";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();

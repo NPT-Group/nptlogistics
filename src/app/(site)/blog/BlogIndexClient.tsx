@@ -119,7 +119,7 @@ export default function BlogIndexClient({
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800" />
           <div className="absolute inset-0 opacity-30">
             <Image
-              src="/images/blog-banner.jpg"
+              src="/blog/blog-banner.jpg"
               alt="Blog banner"
               fill
               priority

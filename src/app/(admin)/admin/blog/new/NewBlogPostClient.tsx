@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import BlogEditor from "@/components/admin/blog/BlogEditor";
+import BlogEditor from "@/app/(admin)/components/blog/BlogEditor";
 import { adminCreatePost, adminPublishPost } from "@/lib/utils/blog/adminBlogApi";
 import { EBlogStatus } from "@/types/blogPost.types";
 
@@ -20,12 +20,20 @@ export default function NewBlogPostClient() {
       secondaryLabel="Publish"
       secondaryActionKind="PUBLISH"
       onSavePrimary={async (payload) => {
-        const created = await adminCreatePost({ ...payload, status: EBlogStatus.DRAFT, publishedAt: null });
+        const created = await adminCreatePost({
+          ...payload,
+          status: EBlogStatus.DRAFT,
+          publishedAt: null,
+        });
         const id = (created as any)?.id || (created as any)?._id;
         if (id) router.push(`/admin/blog/${id}`);
       }}
       onSaveSecondary={async (payload) => {
-        const created = await adminCreatePost({ ...payload, status: EBlogStatus.DRAFT, publishedAt: null });
+        const created = await adminCreatePost({
+          ...payload,
+          status: EBlogStatus.DRAFT,
+          publishedAt: null,
+        });
         const id = (created as any)?.id || (created as any)?._id;
         if (!id) throw new Error("Failed to create post");
         await adminPublishPost(id, payload.publishedAt ?? null);

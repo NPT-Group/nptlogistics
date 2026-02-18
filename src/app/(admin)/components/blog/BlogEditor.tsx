@@ -11,13 +11,13 @@ import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { IMAGE_MIME_TYPES, VIDEO_MIME_TYPES } from "@/types/shared.types";
 import { uploadToS3Presigned, type UploadResult } from "@/lib/utils/s3Helper";
 
-import BlogPostSidebar from "@/components/admin/blog/BlogPostSidebar";
+import BlogPostSidebar from "@/app/(admin)/components/blog/BlogPostSidebar";
 import { adminCreateCategory, adminFetchCategories } from "@/lib/utils/blog/adminBlogApi";
 import { cn } from "@/lib/utils/cn";
-import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
+import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider";
 
-import { ConfirmModal, type ConfirmTone } from "@/components/admin/ui/ConfirmModal";
-import { SoftButton } from "@/components/admin/ui/Buttons";
+import { ConfirmModal, type ConfirmTone } from "@/app/(admin)/components/ui/ConfirmModal";
+import { SoftButton } from "@/app/(admin)/components/ui/Buttons";
 import { ExternalLink, FileText, AlertTriangle } from "lucide-react";
 
 const BlockNote = dynamic(() => import("@/components/BlockNote"), {

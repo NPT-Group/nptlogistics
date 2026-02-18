@@ -2,12 +2,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import JobEditor from "@/components/admin/jobs/JobEditor";
+import JobEditor from "@/app/(admin)/components/jobs/JobEditor";
 import { EJobPostingStatus } from "@/types/jobPosting.types";
 import {
   adminArchiveJob,
   adminCloseJob,
   adminPublishJob,
+  adminUnarchiveJob,
   adminUpdateJob,
 } from "@/lib/utils/jobs/adminJobsApi";
 
@@ -17,6 +18,10 @@ export default function EditJobPostingClient({ id, initialJob }: { id: string; i
 
   const isPublished = status === EJobPostingStatus.PUBLISHED;
   const isArchived = status === EJobPostingStatus.ARCHIVED;
+
+  // When archived, we want the "secondary" button to unarchive (JobEditor maps ARCHIVED + PUBLISH => Unarchive label)
+  const secondaryActionKind = isPublished ? "CLOSE" : "PUBLISH";
+  const secondaryLabel = isPublished ? "Close" : "Publish";
 
   return (
     <JobEditor
@@ -28,10 +33,12 @@ export default function EditJobPostingClient({ id, initialJob }: { id: string; i
       initial={initialJob}
       previewUrl={isPublished ? `/careers/${encodeURIComponent(initialJob?.slug ?? "")}` : null}
       primaryLabel="Save"
-      secondaryLabel={isPublished ? "Close" : "Publish"}
-      secondaryActionKind={isPublished ? "CLOSE" : "PUBLISH"}
-      secondaryDisabled={isArchived}
-      dangerLabel="Archive"
+      secondaryLabel={secondaryLabel}
+      secondaryActionKind={secondaryActionKind}
+      // IMPORTANT: do NOT disable secondary when archived; we need it for Unarchive
+      secondaryDisabled={false}
+      // Only show Archive when NOT archived
+      dangerLabel={!isArchived ? "Archive" : undefined}
       dangerDisabled={isArchived}
       dangerConfirmTitle="Archive this job?"
       dangerConfirmBody="Archived postings are removed from public listings and kept for records."
@@ -40,16 +47,27 @@ export default function EditJobPostingClient({ id, initialJob }: { id: string; i
         router.refresh();
       }}
       onSaveSecondary={async (payload) => {
-        // always save first to avoid closing/publishing stale data
+        // always save first to avoid closing/publishing/unarchiving stale data
         await adminUpdateJob(id, payload);
-        if (isPublished) await adminCloseJob(id);
-        else await adminPublishJob(id, null);
+
+        if (isArchived) {
+          await adminUnarchiveJob(id);
+        } else if (isPublished) {
+          await adminCloseJob(id);
+        } else {
+          await adminPublishJob(id, null);
+        }
+
         router.refresh();
       }}
-      onDanger={async () => {
-        await adminArchiveJob(id);
-        router.refresh();
-      }}
+      onDanger={
+        !isArchived
+          ? async () => {
+              await adminArchiveJob(id);
+              router.refresh();
+            }
+          : undefined
+      }
     />
   );
 }

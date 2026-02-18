@@ -1,13 +1,13 @@
 // src/app/layout.tsx
-import SessionWrapper from "@/components/ui/SessionWrapper";
 import "./globals.css";
-import type { Metadata } from "next";
+import SessionWrapper from "@/components/SessionWrapper";
+import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nptlogistics.com"),
   title: {
-    default: "NPT Logistics|Flatbed, Dry Van, RGN & Shipmemt Trucking Solutions",
+    default: "NPT Logistics | Reliable Freight Solutions Across North America",
     template: "%s | NPT Logistics",
   },
   description:
@@ -19,8 +19,13 @@ export const metadata: Metadata = {
     "Freight transportation",
     "Truckload shipping",
     "LTL freight",
+    "Intermodal freight",
     "Cross-border logistics",
     "North America freight",
+    "Flatbed trucking",
+    "Dry van trucking",
+    "RGN trucking",
+    "Freight shipping solutions",
   ],
   authors: [{ name: "NPT Logistics" }],
   creator: "NPT Logistics",
@@ -43,6 +48,11 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#070a12",
+  colorScheme: "dark",
+};
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const mode = cookieStore.get("npt.admin.theme.mode")?.value; // light | dark | system
@@ -56,7 +66,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
       {...(adminTheme ? { "data-admin-theme": adminTheme } : {})}
     >
-      <body className="min-h-dvh">
+      <body className="min-h-dvh bg-[color:var(--color-surface-0)] text-[color:var(--color-text)]">
         <SessionWrapper>{children}</SessionWrapper>
       </body>
     </html>

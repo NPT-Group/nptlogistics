@@ -6,9 +6,9 @@ import dynamic from "next/dynamic";
 import type { PartialBlock } from "@blocknote/core";
 
 import { cn } from "@/lib/utils/cn";
-import { useAdminTheme } from "@/components/admin/theme/AdminThemeProvider";
-import { ConfirmModal, type ConfirmTone } from "@/components/admin/ui/ConfirmModal";
-import { SoftButton } from "@/components/admin/ui/Buttons";
+import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider";
+import { ConfirmModal, type ConfirmTone } from "@/app/(admin)/components/ui/ConfirmModal";
+import { SoftButton } from "@/app/(admin)/components/ui/Buttons";
 
 import type { BlockNoteDocJSON, IFileAsset } from "@/types/shared.types";
 import type { IJobPosting, JobLocation, JobCompensation } from "@/types/jobPosting.types";
@@ -176,11 +176,12 @@ export default function JobEditor(props: Props) {
   const { canPublish, canClose, canArchive } = getAllowedJobActions(currentStatus);
 
   const isArchived = currentStatus === EJobPostingStatus.ARCHIVED;
-  const isRepublish = currentStatus === EJobPostingStatus.CLOSED; // archived uses "Unarchive" now
+  const isRepublish = currentStatus === EJobPostingStatus.CLOSED;
 
+  // Allow secondary when archived (we map it to "Unarchive" UX-wise)
   const secondaryAllowed =
     props.secondaryActionKind === "PUBLISH"
-      ? !!canPublish || isArchived // allow unarchive even if publish rules differ upstream
+      ? !!canPublish || isArchived
       : props.secondaryActionKind === "CLOSE"
         ? !!canClose
         : true;
@@ -196,6 +197,7 @@ export default function JobEditor(props: Props) {
           : props.secondaryLabel
       : props.secondaryLabel;
 
+  // Danger (archive) only when allowed
   const showArchiveDanger = !!props.onDanger && !!props.dangerLabel && !!canArchive;
   const effectiveDangerDisabled = !!props.dangerDisabled || !canArchive;
 
@@ -262,7 +264,7 @@ export default function JobEditor(props: Props) {
   const errorRef = React.useRef<HTMLDivElement | null>(null);
   const successRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Confirm modal state
+  // Confirm modal
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmActionRef = React.useRef<null | (() => Promise<void>)>(null);
   const [confirmTone, setConfirmTone] = React.useState<ConfirmTone>("danger");
@@ -327,10 +329,11 @@ export default function JobEditor(props: Props) {
     setIsDirty(false);
   }
 
-  function scrollToHeader() {
+  function scrollToTop() {
+    // This is the key: always go to the very top, not "nearest header"
+    window.scrollTo({ top: 0, behavior: "smooth" });
     requestAnimationFrame(() => {
-      headerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      (headerRef.current as any)?.focus?.();
+      headerRef.current?.focus?.();
     });
   }
 
@@ -344,17 +347,11 @@ export default function JobEditor(props: Props) {
 
   React.useEffect(() => {
     if (!success) return;
-    requestAnimationFrame(() => {
-      // scroll the header so the “success + all changes saved” is visible
-      headerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      successRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    });
+    scrollToTop();
   }, [success?.nonce]);
 
-  // Clear success on edits / new saves
   React.useEffect(() => {
     if (!success) return;
-    // if the user edits anything after a success, drop the banner
     if (isDirty) setSuccess(null);
   }, [isDirty]);
 
@@ -450,8 +447,13 @@ export default function JobEditor(props: Props) {
       const payload = buildPayload();
       await fn(payload);
       markSavedNow();
+
+      // success signal + jump to top so user sees it
       setSuccess({ message: successMessage, nonce: Date.now() });
-      scrollToHeader();
+      requestAnimationFrame(() => {
+        // ensure banner exists in DOM before focusing
+        successRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
     } catch (e: any) {
       setError({ message: e?.message || "Failed to save.", nonce: Date.now() });
     } finally {
@@ -463,7 +465,6 @@ export default function JobEditor(props: Props) {
     if (effectiveSecondaryDisabled) return;
 
     const kind = props.secondaryActionKind;
-
     const isClose = kind === "CLOSE";
     const isPublishLike = kind === "PUBLISH";
 
