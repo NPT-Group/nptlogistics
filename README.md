@@ -1,24 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+NPT Logistics marketing website built with Next.js.
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies and run the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production Build Check
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run build
+```
+
+## Analytics + Cookie Consent (GA4)
+
+This project includes consent-aware GA4 tracking:
+
+- Cookie banner with:
+  - Accept all
+  - Reject non-essential
+  - Manage preferences
+- Footer links:
+  - Cookie Policy
+  - Cookie Preferences (re-open settings)
+- CTA click tracking and page view tracking only when analytics consent is granted.
+
+### Required environment variable
+
+Set this in your deployment environment (Vercel project settings):
+
+```bash
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+If this variable is missing, analytics scripts and cookie banner are not rendered.
+
+### Events tracked
+
+- `cta_click`
+  - Includes: `ctaId`, `location`, `destination`, `label`, `ts`
+- `page_view`
+  - Fired on route changes after consent
+
+You can consume events in:
+
+- Google Analytics (`gtag`)
+- Google Tag Manager (`dataLayer`)
+
+## Legal Pages
+
+The following routes are available and linked in footer:
+
+- `/privacy`
+- `/terms`
+- `/cookies`
+- `/accessibility`
 
 ## Learn More
 
@@ -31,6 +73,4 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deploy with Vercel and ensure `NEXT_PUBLIC_GA_MEASUREMENT_ID` is configured for production analytics.

@@ -101,7 +101,7 @@ export const NAV = {
             description: "Cross-border execution + global modes as needed.",
             icon: "globe",
             children: [
-              { label: "Canada ↔ USA", href: "/services/cross-border#canada-usa" },
+              { label: "Canada ↔ USA", href: "/services/cross-border#canada-us" },
               { label: "Mexico Cross-Border", href: "/services/cross-border#mexico" },
               { label: "Ocean Freight", href: "/services/cross-border#ocean" },
               { label: "Air Freight", href: "/services/cross-border#air" },
@@ -136,7 +136,7 @@ export const NAV = {
       description:
         "Specialized logistics support for industries with unique requirements and compliance needs.",
       ctaLabel: "View all industries",
-      ctaHref: "/industries",
+      ctaHref: "/#industries",
     },
     links: [
       {
@@ -147,13 +147,13 @@ export const NAV = {
       },
       {
         label: "Manufacturing & Materials",
-        href: "/industries/manufacturing",
+        href: "/industries/manufacturing-materials",
         description: "Reliable movement for industrial supply chains.",
         icon: "package",
       },
       {
         label: "Retail & Consumer Goods",
-        href: "/industries/retail",
+        href: "/industries/retail-consumer-goods",
         description: "Store replenishment and distribution support.",
         icon: "warehouse",
       },

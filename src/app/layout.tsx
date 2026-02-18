@@ -1,4 +1,5 @@
 // src/app/layout.tsx
+// src/app/layout.tsx
 import "./globals.css";
 import SessionWrapper from "@/components/SessionWrapper";
 import type { Metadata, Viewport } from "next";
@@ -6,7 +7,9 @@ import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nptlogistics.com"),
+  metadataBase: new URL("https://nptlogistics.com"),
   title: {
+    default: "NPT Logistics | Reliable Freight Solutions Across North America",
     default: "NPT Logistics | Reliable Freight Solutions Across North America",
     template: "%s | NPT Logistics",
   },
@@ -38,6 +41,7 @@ export const metadata: Metadata = {
       "Reliable freight solutions across North America. Truckload, LTL, intermodal, and cross-border shipping built on compliance and execution.",
     url: "https://nptlogistics.com",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "NPT Logistics" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "NPT Logistics" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -46,6 +50,11 @@ export const metadata: Metadata = {
       "Reliable freight solutions across North America. Built on compliance, visibility, and execution.",
     images: ["/og-image.png"],
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#070a12",
+  colorScheme: "dark",
 };
 
 export const viewport: Viewport = {
