@@ -30,6 +30,7 @@ import TurnstileWidget from "@/components/TurnstileWidget";
 import { uploadToS3PresignedPublic } from "@/lib/utils/s3ClientUpload";
 import { NEXT_PUBLIC_NPT_HR_EMAIL } from "@/config/env";
 import { publicCountJobView } from "@/lib/utils/jobs/publicJobsApi";
+import { trackCtaClick } from "@/lib/analytics/cta";
 
 const BlockNote = dynamic(() => import("@/components/BlockNote"), { ssr: false });
 
@@ -82,6 +83,8 @@ function fmtComp(comp: any) {
 export default function JobPublicClient({ job }: { job: IJobPosting }) {
   const router = useRouter();
 
+  const slug = String(job?.slug || "unknown");
+
   const loc = Array.isArray(job.locations) ? job.locations : [];
   const locLabel = loc[0]?.label || loc[0]?.city || loc[0]?.region || loc[0]?.country || "—";
   const typeLabel = [job.workplaceType, job.employmentType].filter(Boolean).join(" • ") || "—";
@@ -99,7 +102,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
   const [ok, setOk] = React.useState(false);
 
   const [turnstileToken, setTurnstileToken] = React.useState("");
-  const [turnstileInstanceKey, setTurnstileInstanceKey] = React.useState(0); // NEW: force remount to reset widget UI
+  const [turnstileInstanceKey, setTurnstileInstanceKey] = React.useState(0);
 
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
@@ -134,9 +137,6 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
       if (!noticeRef.current) return;
 
       const NAVBAR_OFFSET = 170;
-      // adjust if needed (e.g. 80, 100, etc.)
-      // should match your sticky navbar height
-
       const rect = noticeRef.current.getBoundingClientRect();
       const absoluteTop = rect.top + window.scrollY;
 
@@ -147,7 +147,6 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
     });
   }, []);
 
-  // Keep this too (helps in cases where error/success set outside submit)
   React.useEffect(() => {
     if (!err && !ok) return;
     scrollToNotice();
@@ -162,21 +161,30 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
     try {
       if (typeof window === "undefined") return;
 
-      // sessionStorage = once per tab session (avoid inflated counts on back/forward)
       const already = window.sessionStorage.getItem(key);
       if (already) return;
 
       window.sessionStorage.setItem(key, "1");
       publicCountJobView(job.slug);
     } catch {
-      // if storage is blocked, still count view
       publicCountJobView(job.slug);
     }
   }, [job?.slug, job?.status]);
 
-  const handleTurnstileToken = React.useCallback((t: string) => {
-    setTurnstileToken(t);
-  }, []);
+  const handleTurnstileToken = React.useCallback(
+    (t: string) => {
+      setTurnstileToken(t);
+
+      // Optional: confirm verification completions rate
+      trackCtaClick({
+        ctaId: `job_apply_turnstile_verified_${slug}`,
+        location: "job_apply_form",
+        destination: `/careers/${encodeURIComponent(slug)}`,
+        label: "Turnstile verified",
+      });
+    },
+    [slug],
+  );
 
   const focusRing =
     "focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-ring)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
@@ -192,7 +200,6 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
     "hover:file:bg-slate-800";
 
   function resetFormAfterSuccess() {
-    // keep ok=true so success message stays visible
     setErr(null);
 
     setFirstName("");
@@ -219,7 +226,6 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
     if (resumeInputRef.current) resumeInputRef.current.value = "";
     if (photoInputRef.current) photoInputRef.current.value = "";
 
-    // Clear token + remount Turnstile so UI un-checks
     setTurnstileToken("");
     setTurnstileInstanceKey((k) => k + 1);
   }
@@ -257,25 +263,56 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
   }
 
   async function submit() {
-    // Clear previous messages so repeated same error still triggers a "fresh" scroll path
+    // Track the attempt up-front (even if validation fails)
+    trackCtaClick({
+      ctaId: `job_apply_submit_attempt_${slug}`,
+      location: "job_apply_form",
+      destination: `/careers/${encodeURIComponent(slug)}`,
+      label: "Submit application (attempt)",
+    });
+
     setErr(null);
     setOk(false);
 
     if (!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
       setErr("Turnstile is not configured (missing NEXT_PUBLIC_TURNSTILE_SITE_KEY).");
       scrollToNotice();
+
+      trackCtaClick({
+        ctaId: `job_apply_submit_failed_turnstile_not_configured_${slug}`,
+        location: "job_apply_form",
+        destination: `/careers/${encodeURIComponent(slug)}`,
+        label: "Submit failed: turnstile not configured",
+      });
+
       return;
     }
 
     if (!turnstileToken) {
       setErr("Please complete the verification.");
       scrollToNotice();
+
+      trackCtaClick({
+        ctaId: `job_apply_submit_failed_missing_turnstile_${slug}`,
+        location: "job_apply_form",
+        destination: `/careers/${encodeURIComponent(slug)}`,
+        label: "Submit failed: missing turnstile",
+      });
+
       return;
     }
 
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
       setErr("First name, last name, and email are required.");
       scrollToNotice();
+
+      trackCtaClick({
+        ctaId: `job_apply_submit_failed_missing_required_${slug}`,
+        location: "job_apply_form",
+        destination: `/careers/${encodeURIComponent(slug)}`,
+        label: "Submit failed: missing required fields",
+      });
+
       return;
     }
 
@@ -317,9 +354,24 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
       setOk(true);
       scrollToNotice();
       resetFormAfterSuccess();
+
+      trackCtaClick({
+        ctaId: `job_apply_submit_success_${slug}`,
+        location: "job_apply_form",
+        destination: `/careers/${encodeURIComponent(slug)}`,
+        label: "Submit application (success)",
+      });
     } catch (e: any) {
-      setErr(e?.message || "Failed to submit application");
+      const msg = e?.message || "Failed to submit application";
+      setErr(msg);
       scrollToNotice();
+
+      trackCtaClick({
+        ctaId: `job_apply_submit_failed_${slug}`,
+        location: "job_apply_form",
+        destination: `/careers/${encodeURIComponent(slug)}`,
+        label: `Submit application (failed): ${msg}`,
+      });
     } finally {
       setBusy(false);
     }
@@ -330,7 +382,15 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
       <div className="mx-auto max-w-6xl px-6 py-8">
         <button
           type="button"
-          onClick={() => router.push("/careers#jobs")}
+          onClick={() => {
+            trackCtaClick({
+              ctaId: `job_back_to_jobs_${slug}`,
+              location: "job_header",
+              destination: "/careers#jobs",
+              label: "Back to jobs",
+            });
+            router.push("/careers#jobs");
+          }}
           className={[
             "inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50",
             focusRing,
@@ -654,6 +714,15 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                           const f = e.target.files?.[0] ?? null;
                           setResumeFile(f);
                           setResumeAsset(null);
+
+                          if (f) {
+                            trackCtaClick({
+                              ctaId: `job_apply_resume_selected_${slug}`,
+                              location: "job_apply_form",
+                              destination: `/careers/${encodeURIComponent(slug)}`,
+                              label: "Resume selected",
+                            });
+                          }
                         }}
                         disabled={busy}
                         className={[fileBase, focusRing].join(" ")}
@@ -673,6 +742,15 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                           const f = e.target.files?.[0] ?? null;
                           setPhotoFile(f);
                           setPhotoAsset(null);
+
+                          if (f) {
+                            trackCtaClick({
+                              ctaId: `job_apply_photo_selected_${slug}`,
+                              location: "job_apply_form",
+                              destination: `/careers/${encodeURIComponent(slug)}`,
+                              label: "Photo selected",
+                            });
+                          }
                         }}
                         disabled={busy}
                         className={[fileBase, focusRing].join(" ")}
@@ -687,7 +765,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                 <div className="rounded-2xl border border-slate-200 bg-white p-4">
                   <div className="text-xs font-semibold text-slate-700">Verification</div>
                   <TurnstileWidget
-                    key={turnstileInstanceKey} // NEW: remount resets checked UI
+                    key={turnstileInstanceKey}
                     action="job_apply"
                     onToken={handleTurnstileToken}
                     className="mt-2"
@@ -728,6 +806,14 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                   href={`mailto:${NEXT_PUBLIC_NPT_HR_EMAIL}?subject=${encodeURIComponent(
                     `Question about ${job.title}`,
                   )}`}
+                  onClick={() =>
+                    trackCtaClick({
+                      ctaId: `job_contact_hr_email_${slug}`,
+                      location: "job_contact_card",
+                      destination: `mailto:${NEXT_PUBLIC_NPT_HR_EMAIL}`,
+                      label: "Email HR (mailto)",
+                    })
+                  }
                   className="font-medium text-[color:var(--color-brand-600)] hover:underline"
                 >
                   {NEXT_PUBLIC_NPT_HR_EMAIL}

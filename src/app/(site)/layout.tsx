@@ -5,7 +5,7 @@ import { SiteHeader } from "./components/layout/SiteHeader";
 import { SiteFooter } from "./components/layout/SiteFooter";
 import { SolutionsHashScroll } from "./components/layout/SolutionsHashScroll";
 import { AnalyticsClient } from "./components/analytics/AnalyticsClient";
-import GuidedChatbot from "@/lib/chatbot/GuidedChatbot";
+import ClientChatbot from "./components/ClientChatbot";
 
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
@@ -21,7 +21,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       <main id="main-content" className="overflow-x-clip">
         {children}
       </main>
-      <GuidedChatbot />
+
+      {/* Lazy-loaded client-only widget */}
+      <ClientChatbot />
+
       <SiteFooter />
     </>
   );

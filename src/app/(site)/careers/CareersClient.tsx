@@ -1,4 +1,3 @@
-// src/app/(site)/careers/CareersClient.tsx
 "use client";
 
 import * as React from "react";
@@ -19,6 +18,7 @@ import {
 
 import { NAV_OFFSET } from "@/constants/ui";
 import { EEmploymentType } from "@/types/jobPosting.types";
+import { trackCtaClick } from "@/lib/analytics/cta";
 
 function pillLabel(v?: string) {
   return (v || "")
@@ -106,6 +106,14 @@ export default function CareersClient({
   }
 
   function apply() {
+    // Track filter application (useful to know if people are using search/filtering)
+    trackCtaClick({
+      ctaId: "careers_apply_filters",
+      location: "careers_jobs_filters",
+      destination: "/careers#jobs",
+      label: "Apply filters",
+    });
+
     push({
       q: q.trim() ? q.trim() : null,
       department: department.trim() ? department.trim() : null,
@@ -115,6 +123,13 @@ export default function CareersClient({
   }
 
   function clearAll() {
+    trackCtaClick({
+      ctaId: "careers_clear_filters",
+      location: "careers_jobs_filters",
+      destination: "/careers#jobs",
+      label: "Clear filters",
+    });
+
     setQ("");
     setDepartment("");
     setLocation("");
@@ -194,7 +209,15 @@ export default function CareersClient({
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => scrollToId("jobs")}
+                  onClick={() => {
+                    trackCtaClick({
+                      ctaId: "careers_view_job_listings",
+                      location: "careers_hero",
+                      destination: "/careers#jobs",
+                      label: "View Job Listings",
+                    });
+                    scrollToId("jobs");
+                  }}
                   className={[
                     "inline-flex h-10 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold",
                     "bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
@@ -206,7 +229,15 @@ export default function CareersClient({
 
                 <button
                   type="button"
-                  onClick={() => scrollToId("drive")}
+                  onClick={() => {
+                    trackCtaClick({
+                      ctaId: "careers_driver_opportunities",
+                      location: "careers_hero",
+                      destination: "/careers#drive",
+                      label: "Driver Opportunities",
+                    });
+                    scrollToId("drive");
+                  }}
                   className={[
                     "inline-flex h-10 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold",
                     "border border-white/22 bg-white/10 text-white shadow-sm transition hover:bg-white/15",
@@ -281,6 +312,14 @@ export default function CareersClient({
               href="https://drivedock.ssp4you.com"
               target="_blank"
               rel="noreferrer"
+              onClick={() =>
+                trackCtaClick({
+                  ctaId: "careers_apply_drivedock",
+                  location: "careers_drive_card",
+                  destination: "https://drivedock.ssp4you.com",
+                  label: "Apply via Drivedock",
+                })
+              }
               className={[
                 "mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-semibold",
                 "bg-slate-900 text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
@@ -440,11 +479,22 @@ export default function CareersClient({
                 const deptLabel = j.department || j.departmentName || "—";
                 const publishedLabel = fmtDate(j.publishedAt || j.createdAt);
 
+                const slug = String(j.slug || "");
+                const jobHref = `/careers/${encodeURIComponent(slug)}`;
+
                 return (
                   <Link
                     key={String(j.id ?? j.slug)}
-                    href={`/careers/${encodeURIComponent(String(j.slug))}`}
+                    href={jobHref}
                     target="_blank"
+                    onClick={() =>
+                      trackCtaClick({
+                        ctaId: `careers_open_job_${slug || "unknown"}`,
+                        location: "careers_jobs_list",
+                        destination: jobHref,
+                        label: j.title ? `Open job: ${j.title}` : "Open job",
+                      })
+                    }
                     className={[
                       "group block px-5 py-4 transition",
                       "hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-ring)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
@@ -506,6 +556,13 @@ export default function CareersClient({
             <button
               disabled={!meta?.hasPrev || isPending}
               onClick={() => {
+                trackCtaClick({
+                  ctaId: "careers_pagination_prev",
+                  location: "careers_jobs_pagination",
+                  destination: "/careers#jobs",
+                  label: "Prev page",
+                });
+
                 const qs = new URLSearchParams(sp.toString());
                 qs.set("page", String(Math.max(1, (meta.page ?? 1) - 1)));
                 startTransition(() => router.push(`/careers?${qs.toString()}#jobs`));
@@ -523,6 +580,13 @@ export default function CareersClient({
             <button
               disabled={!meta?.hasNext || isPending}
               onClick={() => {
+                trackCtaClick({
+                  ctaId: "careers_pagination_next",
+                  location: "careers_jobs_pagination",
+                  destination: "/careers#jobs",
+                  label: "Next page",
+                });
+
                 const qs = new URLSearchParams(sp.toString());
                 qs.set("page", String((meta.page ?? 1) + 1));
                 startTransition(() => router.push(`/careers?${qs.toString()}#jobs`));
@@ -540,7 +604,15 @@ export default function CareersClient({
             Driver role? Use{" "}
             <button
               type="button"
-              onClick={() => scrollToId("drive")}
+              onClick={() => {
+                trackCtaClick({
+                  ctaId: "careers_driver_opportunities_footer",
+                  location: "careers_jobs_footer",
+                  destination: "/careers#drive",
+                  label: "Driver Opportunities",
+                });
+                scrollToId("drive");
+              }}
               className={[
                 "font-semibold text-slate-900 underline underline-offset-2",
                 focusRing,

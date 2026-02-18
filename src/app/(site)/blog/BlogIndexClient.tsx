@@ -1,4 +1,4 @@
-// src/app/blog/BlogIndexClient.tsx
+// src/app/(site)/blog/BlogIndexClient.tsx
 "use client";
 
 import * as React from "react";
@@ -8,6 +8,7 @@ import { Calendar, Clock, Search, ArrowRight, Tag } from "lucide-react";
 import Image from "next/image";
 
 import { NAV_OFFSET } from "@/constants/ui";
+import { trackCtaClick } from "@/lib/analytics/cta";
 
 type CategoryItem = {
   id: string;
@@ -92,14 +93,37 @@ export default function BlogIndexClient({
   }
 
   function applySearch() {
+    trackCtaClick({
+      ctaId: "blog_search_apply",
+      location: "blog_hero_search",
+      destination: "/blog",
+      label: "Search",
+    });
+
     pushWith({ q: q.trim() ? q.trim() : null });
   }
 
   function selectCategory(categoryId?: string | null) {
-    pushWith({ categoryId: categoryId && categoryId !== "all" ? categoryId : null });
+    const nextId = categoryId && categoryId !== "all" ? categoryId : null;
+
+    trackCtaClick({
+      ctaId: nextId ? `blog_category_select_${nextId}` : "blog_category_select_all",
+      location: "blog_categories",
+      destination: "/blog",
+      label: nextId ? "Select category" : "All categories",
+    });
+
+    pushWith({ categoryId: nextId });
   }
 
   function clearFilters() {
+    trackCtaClick({
+      ctaId: "blog_clear_filters",
+      location: "blog_filters",
+      destination: "/blog",
+      label: "Clear filters",
+    });
+
     const qs = new URLSearchParams(sp.toString());
     qs.delete("q");
     qs.delete("categoryId");
@@ -237,10 +261,21 @@ export default function BlogIndexClient({
                 const bannerUrl =
                   typeof p.bannerImage === "string" ? p.bannerImage : (p.bannerImage?.url ?? null);
 
+                const slug = String(p.slug || "");
+                const href = `/blog/${encodeURIComponent(slug)}`;
+
                 return (
                   <Link
                     key={String(p.id)}
-                    href={`/blog/${encodeURIComponent(p.slug)}`}
+                    href={href}
+                    onClick={() =>
+                      trackCtaClick({
+                        ctaId: `blog_open_post_${slug || "unknown"}`,
+                        location: "blog_posts_grid",
+                        destination: href,
+                        label: p.title ? `Open post: ${p.title}` : "Open post",
+                      })
+                    }
                     className="group overflow-hidden rounded-[28px] border border-slate-200/70 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
                   >
                     <div className="relative h-44 overflow-hidden bg-slate-100">
@@ -301,6 +336,13 @@ export default function BlogIndexClient({
                 <button
                   disabled={!initialMeta?.hasPrev}
                   onClick={() => {
+                    trackCtaClick({
+                      ctaId: "blog_pagination_prev",
+                      location: "blog_pagination",
+                      destination: "/blog",
+                      label: "Prev page",
+                    });
+
                     const qs = new URLSearchParams(sp.toString());
                     qs.set("page", String(Math.max(1, (initialMeta.page ?? 1) - 1)));
                     router.push(`/blog?${qs.toString()}`);
@@ -313,6 +355,13 @@ export default function BlogIndexClient({
                 <button
                   disabled={!initialMeta?.hasNext}
                   onClick={() => {
+                    trackCtaClick({
+                      ctaId: "blog_pagination_next",
+                      location: "blog_pagination",
+                      destination: "/blog",
+                      label: "Next page",
+                    });
+
                     const qs = new URLSearchParams(sp.toString());
                     qs.set("page", String((initialMeta.page ?? 1) + 1));
                     router.push(`/blog?${qs.toString()}`);
@@ -333,7 +382,19 @@ export default function BlogIndexClient({
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-semibold text-slate-900">Categories</div>
                   <button
-                    onClick={() => (hasFilters ? clearFilters() : selectCategory(null))}
+                    onClick={() => {
+                      trackCtaClick({
+                        ctaId: hasFilters
+                          ? "blog_clear_filters_sidebar"
+                          : "blog_category_select_all",
+                        location: "blog_categories_sidebar",
+                        destination: "/blog",
+                        label: hasFilters ? "Clear filters (sidebar)" : "All (sidebar)",
+                      });
+
+                      if (hasFilters) clearFilters();
+                      else selectCategory(null);
+                    }}
                     className={cx(
                       "text-xs font-semibold",
                       hasFilters || !activeCategoryId
@@ -375,18 +436,30 @@ export default function BlogIndexClient({
               <div className="rounded-[28px] border border-slate-200/70 bg-white p-5 shadow-sm">
                 <div className="text-sm font-semibold text-slate-900">Recent Posts</div>
                 <div className="mt-3 divide-y divide-slate-200">
-                  {(initialRecentPosts ?? []).slice(0, 6).map((p: any) => (
-                    <Link
-                      key={String(p.id)}
-                      href={`/blog/${encodeURIComponent(p.slug)}`}
-                      className="block py-3 transition hover:opacity-80"
-                    >
-                      <div className="line-clamp-2 text-sm font-semibold text-slate-900">
-                        {p.title}
-                      </div>
-                      <div className="mt-1 text-xs text-slate-500">{fmtDate(p.publishedAt)}</div>
-                    </Link>
-                  ))}
+                  {(initialRecentPosts ?? []).slice(0, 6).map((p: any) => {
+                    const slug = String(p.slug || "");
+                    const href = `/blog/${encodeURIComponent(slug)}`;
+                    return (
+                      <Link
+                        key={String(p.id)}
+                        href={href}
+                        onClick={() =>
+                          trackCtaClick({
+                            ctaId: `blog_open_recent_${slug || "unknown"}`,
+                            location: "blog_recent_posts",
+                            destination: href,
+                            label: p.title ? `Open recent post: ${p.title}` : "Open recent post",
+                          })
+                        }
+                        className="block py-3 transition hover:opacity-80"
+                      >
+                        <div className="line-clamp-2 text-sm font-semibold text-slate-900">
+                          {p.title}
+                        </div>
+                        <div className="mt-1 text-xs text-slate-500">{fmtDate(p.publishedAt)}</div>
+                      </Link>
+                    );
+                  })}
                   {!initialRecentPosts?.length ? (
                     <div className="py-3 text-sm text-slate-500">No recent posts.</div>
                   ) : null}
