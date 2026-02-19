@@ -6,28 +6,43 @@ import { usePathname, useRouter } from "next/navigation";
 import { NAV } from "@/config/navigation";
 import { DesktopRichDropdown, SolutionsMegaMenu } from "./NavMenuParts";
 
+const NAV_OPEN_DELAY_MS = 360;
+const NAV_CLOSE_DELAY_MS = 560;
+
 export function DesktopNav() {
   const [value, setValue] = React.useState<string>("");
   const closeTimer = React.useRef<number | null>(null);
+  const openTimer = React.useRef<number | null>(null);
   const pathname = usePathname();
   const router = useRouter();
-
   const openMenu = React.useCallback((v: string) => {
+    if (openTimer.current) window.clearTimeout(openTimer.current);
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    setValue(v);
+    openTimer.current = window.setTimeout(() => {
+      setValue(v);
+      openTimer.current = null;
+    }, NAV_OPEN_DELAY_MS);
   }, []);
 
   const scheduleClose = React.useCallback(() => {
+    if (openTimer.current) window.clearTimeout(openTimer.current);
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setValue(""), 150);
+    closeTimer.current = window.setTimeout(() => {
+      setValue("");
+      closeTimer.current = null;
+    }, NAV_CLOSE_DELAY_MS);
   }, []);
 
   const cancelClose = React.useCallback(() => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    closeTimer.current = null;
   }, []);
 
   const closeMenu = React.useCallback(() => {
+    if (openTimer.current) window.clearTimeout(openTimer.current);
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    openTimer.current = null;
+    closeTimer.current = null;
     setValue("");
   }, []);
 
@@ -71,6 +86,7 @@ export function DesktopNav() {
 
   React.useEffect(() => {
     return () => {
+      if (openTimer.current) window.clearTimeout(openTimer.current);
       if (closeTimer.current) window.clearTimeout(closeTimer.current);
     };
   }, []);
@@ -84,11 +100,14 @@ export function DesktopNav() {
       <NavigationMenu.Root
         value={value}
         onValueChange={(nextValue) => {
-          if (closeTimer.current) window.clearTimeout(closeTimer.current);
-          setValue(nextValue);
+          if (!nextValue) {
+            scheduleClose();
+            return;
+          }
+          openMenu(nextValue);
         }}
-        delayDuration={0}
-        skipDelayDuration={0}
+        delayDuration={NAV_OPEN_DELAY_MS}
+        skipDelayDuration={NAV_CLOSE_DELAY_MS}
       >
         <NavigationMenu.List className="flex items-center gap-3">
           <SolutionsMegaMenu
