@@ -127,8 +127,8 @@ function MenuLink({
                   focusRingMenu,
                 )}
               >
-                <span className="inline-flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-menu-accent)] opacity-40 group-hover:opacity-80" />
+                <span className="inline-flex items-start gap-2">
+                  <span className="mt-[0.38rem] h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--color-menu-accent)] opacity-40 group-hover:opacity-80" />
                   {child.label}
                 </span>
               </Link>

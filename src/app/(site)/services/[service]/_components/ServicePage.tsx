@@ -6,17 +6,22 @@ import { ServiceSection } from "./ServiceSection";
 import { ServiceFinalCta } from "./ServiceFinalCta";
 import { ServiceJsonLd } from "./ServiceJsonLd";
 import { ServicePageShell } from "./ServicePageShell";
+import { ServiceSingleLayout } from "./ServiceSingleLayout";
 
 export function ServicePage({ model }: { model: ServicePageModel }) {
+  const hasSections = Boolean(model.sections && model.sections.length > 0);
+
   return (
     <ServicePageShell>
       <ServiceJsonLd model={model} />
       <ServiceHero model={model} />
-      <ServiceSubnav model={model} />
+      {hasSections ? <ServiceSubnav model={model} /> : null}
 
-      {model.sections.map((section, index) => (
-        <ServiceSection key={section.key} section={section} serviceKey={model.key} index={index} />
-      ))}
+      {hasSections
+        ? model.sections!.map((section, index) => (
+            <ServiceSection key={section.key} section={section} serviceKey={model.key} index={index} />
+          ))
+        : <ServiceSingleLayout model={model} />}
 
       <ServiceFinalCta model={model} />
     </ServicePageShell>

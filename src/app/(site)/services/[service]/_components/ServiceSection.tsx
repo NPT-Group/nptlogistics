@@ -101,6 +101,176 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
       reason: "For split shipments, multi-stop deliveries, and smaller payloads.",
     },
   ],
+  expedited: [
+    {
+      label: "Air Freight",
+      href: "/services/cross-border#section-air-freight",
+      reason: "For cross-region urgent moves when timeline compression outweighs landed-cost priority.",
+    },
+    {
+      label: "Truckload (TL)",
+      href: "/services/truckload",
+      reason: "For full-load continuity once recovery demand transitions into steady lane flow.",
+    },
+    {
+      label: "Managed Capacity",
+      href: "/services/value-added#section-managed-capacity",
+      reason: "To convert recurring urgent lanes into governed, KPI-managed execution.",
+    },
+  ],
+  "specialized-vehicle-programs": [
+    {
+      label: "RGN / Oversize",
+      href: "/services/truckload#section-rgn-oversize",
+      reason: "For heavy-haul and permit-sensitive loads requiring specialized deck configuration.",
+    },
+    {
+      label: "Project-Specific / Oversize",
+      href: "/services/value-added#section-project-oversize-programs",
+      reason: "For multi-shipment complex programs requiring centralized project governance.",
+    },
+    {
+      label: "Cross-Border & Global",
+      href: "/services/cross-border",
+      reason: "For specialized freight programs involving customs and international handoff complexity.",
+    },
+  ],
+  "canada-us": [
+    {
+      label: "Mexico Cross-Border",
+      href: "/services/cross-border#section-mexico-cross-border",
+      reason: "For southbound and northbound lanes requiring multi-party border handoffs.",
+    },
+    {
+      label: "Truckload (TL)",
+      href: "/services/truckload",
+      reason: "For domestic inland execution after border clearance.",
+    },
+    {
+      label: "Intermodal",
+      href: "/services/intermodal",
+      reason: "For steady lanes where cost stability can outperform full truckload.",
+    },
+  ],
+  "mexico-cross-border": [
+    {
+      label: "Canada ↔ USA",
+      href: "/services/cross-border#section-canada-us",
+      reason: "For northern cross-border lanes with different customs process profiles.",
+    },
+    {
+      label: "Ocean Freight",
+      href: "/services/cross-border#section-ocean-freight",
+      reason: "For global inbound programs feeding Mexico or U.S. border distribution.",
+    },
+    {
+      label: "Truckload (TL)",
+      href: "/services/truckload",
+      reason: "For inland plant, warehouse, and distribution handoff execution.",
+    },
+  ],
+  "ocean-freight": [
+    {
+      label: "Air Freight",
+      href: "/services/cross-border#section-air-freight",
+      reason: "For urgent SKUs that need speed while ocean carries base volume.",
+    },
+    {
+      label: "Canada ↔ USA",
+      href: "/services/cross-border#section-canada-us",
+      reason: "For post-arrival cross-border distribution between CA and US facilities.",
+    },
+    {
+      label: "Truckload (TL)",
+      href: "/services/truckload",
+      reason: "For inland drayage and final over-the-road delivery after port handling.",
+    },
+  ],
+  "air-freight": [
+    {
+      label: "Ocean Freight",
+      href: "/services/cross-border#section-ocean-freight",
+      reason: "For base-load cost optimization while reserving air for urgent demand.",
+    },
+    {
+      label: "Canada ↔ USA",
+      href: "/services/cross-border#section-canada-us",
+      reason: "For cross-border final-mile execution after air arrival and customs release.",
+    },
+    {
+      label: "Mexico Cross-Border",
+      href: "/services/cross-border#section-mexico-cross-border",
+      reason: "For fast replenishment into Mexico-related supply chain flows.",
+    },
+  ],
+  "warehousing-distribution": [
+    {
+      label: "Managed Capacity",
+      href: "/services/value-added#section-managed-capacity",
+      reason: "For transportation governance tied directly to warehouse outbound execution.",
+    },
+    {
+      label: "Dedicated / Contract",
+      href: "/services/value-added#section-dedicated-contract",
+      reason: "When recurring flows need committed capacity and service-level accountability.",
+    },
+    {
+      label: "Truckload (TL)",
+      href: "/services/truckload",
+      reason: "For scalable linehaul from distribution nodes into major lane networks.",
+    },
+  ],
+  "managed-capacity": [
+    {
+      label: "Warehousing & Distribution",
+      href: "/services/value-added#section-warehousing-distribution",
+      reason: "To align transportation planning with inventory and fulfillment operations.",
+    },
+    {
+      label: "Dedicated / Contract",
+      href: "/services/value-added#section-dedicated-contract",
+      reason: "For lanes where committed resources improve service continuity.",
+    },
+    {
+      label: "Intermodal",
+      href: "/services/intermodal",
+      reason: "For predictable corridors where mode optimization can improve cost stability.",
+    },
+  ],
+  "dedicated-contract": [
+    {
+      label: "Managed Capacity",
+      href: "/services/value-added#section-managed-capacity",
+      reason: "To add strategic network optimization on top of committed execution resources.",
+    },
+    {
+      label: "Warehousing & Distribution",
+      href: "/services/value-added#section-warehousing-distribution",
+      reason: "For integrated storage-to-delivery programs under one operating cadence.",
+    },
+    {
+      label: "Truckload (TL)",
+      href: "/services/truckload",
+      reason: "For recurring lanes requiring disciplined over-the-road execution.",
+    },
+  ],
+  "project-oversize-programs": [
+    {
+      label: "RGN / Oversize",
+      href: "/services/truckload#section-rgn-oversize",
+      reason: "For heavy-haul execution when project loads exceed standard legal thresholds.",
+    },
+    {
+      label: "Managed Capacity",
+      href: "/services/value-added#section-managed-capacity",
+      reason: "To coordinate multi-lane project flows with KPI-led transport governance.",
+    },
+    {
+      label: "Cross-Border & Global",
+      href: "/services/cross-border",
+      reason: "When project cargo spans customs boundaries and global transport handoffs.",
+    },
+  ],
 };
 
 const CONVERSION_SIGNALS_BY_TYPE: Record<SubServiceSection["key"], string[]> = {
@@ -124,6 +294,98 @@ const CONVERSION_SIGNALS_BY_TYPE: Record<SubServiceSection["key"], string[]> = {
     "Load access flexibility with operational control",
     "Status cadence tailored to shipper requirements",
   ],
+  expedited: [
+    "Priority dispatch aligned to hard delivery windows",
+    "Direct-route planning to reduce timeline variance",
+    "Escalation path defined before release",
+  ],
+  "specialized-vehicle-programs": [
+    "Equipment-fit and handling profile validation",
+    "Route and access feasibility planning",
+    "Permit-aware timeline governance",
+  ],
+  "canada-us": [
+    "Broker and documentation handoff alignment",
+    "Border milestone updates tied to decision points",
+    "Exception response for holds and inspection events",
+  ],
+  "mexico-cross-border": [
+    "Crossing-point and transfer workflow coordination",
+    "Bilingual communication support across handoffs",
+    "Escalation process for border release disruptions",
+  ],
+  "ocean-freight": [
+    "FCL/LCL planning aligned to service objectives",
+    "Booking-to-delivery milestone governance",
+    "Exception workflow for rollover and schedule shifts",
+  ],
+  "air-freight": [
+    "Priority booking guidance for urgent demand",
+    "Fast status cadence across critical milestones",
+    "Recovery planning for time-sensitive disruptions",
+  ],
+  "warehousing-distribution": [
+    "Inventory and order workflow governance",
+    "Outbound SLA monitoring and exception control",
+    "Scalable throughput planning for variable demand",
+  ],
+  "managed-capacity": [
+    "Carrier and lane strategy aligned to KPIs",
+    "Cost and service optimization cadence",
+    "Structured escalation for network exceptions",
+  ],
+  "dedicated-contract": [
+    "Committed resource model with SLA accountability",
+    "Recurring lane governance and performance reviews",
+    "Reduced volatility through embedded execution",
+  ],
+  "project-oversize-programs": [
+    "Engineering-grade route and permit planning",
+    "Multi-stakeholder milestone control",
+    "Contingency design for schedule-risk events",
+  ],
+};
+
+const BORDER_PRIORITIES_BY_TYPE: Partial<Record<SubServiceSection["key"], string[]>> = {
+  "canada-us": [
+    "Customs and broker touchpoints confirmed pre-pickup",
+    "Border milestone ownership defined across teams",
+    "Delivery commitments aligned to release-risk scenarios",
+  ],
+  "mexico-cross-border": [
+    "Crossing-point strategy matched to service requirements",
+    "Transfer and yard handoffs mapped before dispatch",
+    "Exception paths pre-aligned for release and inspection delays",
+  ],
+  "ocean-freight": [
+    "FCL vs LCL decision tied to service and cost goals",
+    "Port-to-door timeline aligned to inventory exposure",
+    "Fallback pathways prepared for rollover and congestion",
+  ],
+  "air-freight": [
+    "Urgency validated against landed-cost impact",
+    "Critical milestones tied to downstream operations",
+    "Recovery mode defined before first exception event",
+  ],
+};
+
+const CROSS_BORDER_FLOW_STEPS: Partial<Record<SubServiceSection["key"], string[]>> = {
+  "canada-us": ["Docs", "Clearance", "Delivery"],
+  "mexico-cross-border": ["Handoff", "Release", "Final-mile"],
+  "ocean-freight": ["Booking", "Sailing", "Arrival"],
+  "air-freight": ["Book", "Uplift", "Release"],
+};
+
+const VALUE_ADDED_OUTCOMES: Partial<Record<SubServiceSection["key"], string[]>> = {
+  "warehousing-distribution": ["Order accuracy", "Cycle-time discipline", "Inventory integrity"],
+  "managed-capacity": ["Cost governance", "KPI visibility", "Lane optimization"],
+  "dedicated-contract": ["Service continuity", "SLA accountability", "Capacity stability"],
+  "project-oversize-programs": ["Route certainty", "Permit control", "Risk-managed execution"],
+};
+
+const ES_PRIORITY_TAGS: Partial<Record<SubServiceSection["key"], string[]>> = {
+  expedited: ["Deadline-first", "Rapid handoff", "Escalation ready"],
+  "specialized-vehicle-programs": ["Equipment-fit", "Route-feasible", "Constraint-controlled"],
 };
 
 const SHIPPER_FAQS_BY_TYPE: Record<
@@ -201,6 +463,72 @@ const SHIPPER_FAQS_BY_TYPE: Record<
       },
     ],
   },
+  expedited: {
+    title: "Expedited shipper FAQs",
+    items: [
+      {
+        q: "What details speed up expedited quoting?",
+        a: "Provide ready time, latest acceptable delivery time, dimensions/weight, and pickup-delivery constraints with escalation contacts.",
+      },
+      {
+        q: "When is expedited the right mode?",
+        a: "Use it when delay risk impacts production, customer recovery, or contractual service commitments.",
+      },
+      {
+        q: "How is timeline risk managed during transit?",
+        a: "Execution uses milestone-based updates with proactive escalation so teams can make decisions before a missed commitment occurs.",
+      },
+    ],
+  },
+  "specialized-vehicle-programs": {
+    title: "Specialized program FAQs",
+    items: [
+      {
+        q: "What information is required before planning starts?",
+        a: "Verified dimensions, weight profile, handling method, site access constraints, and required timeline windows.",
+      },
+      {
+        q: "Why are route and access checks important?",
+        a: "They reduce avoidable delays by validating clearance, turning constraints, and loading conditions before dispatch.",
+      },
+      {
+        q: "How do you reduce risk on specialized moves?",
+        a: "By aligning equipment fit, route feasibility, permit constraints, and milestone ownership in one execution plan.",
+      },
+    ],
+  },
+  "canada-us": {
+    title: "Cross-border guidance",
+    items: [],
+  },
+  "mexico-cross-border": {
+    title: "Cross-border guidance",
+    items: [],
+  },
+  "ocean-freight": {
+    title: "Cross-border guidance",
+    items: [],
+  },
+  "air-freight": {
+    title: "Cross-border guidance",
+    items: [],
+  },
+  "warehousing-distribution": {
+    title: "Value-added guidance",
+    items: [],
+  },
+  "managed-capacity": {
+    title: "Value-added guidance",
+    items: [],
+  },
+  "dedicated-contract": {
+    title: "Value-added guidance",
+    items: [],
+  },
+  "project-oversize-programs": {
+    title: "Value-added guidance",
+    items: [],
+  },
 };
 
 const PILL_ACCENTS_BY_TYPE: Record<SubServiceSection["key"], string[]> = {
@@ -230,6 +558,58 @@ const PILL_ACCENTS_BY_TYPE: Record<SubServiceSection["key"], string[]> = {
     "right-[10%] top-[20%] h-8 w-35 border border-transparent bg-[rgba(37,99,235,0.10)]",
    "left-[18%] top-[23.5%]  h-8 w-30 border border-transparent bg-[rgba(15,23,42,0.05)]",
     "right-[11%] bottom-[2.5%] h-9 w-40 border border-slate-300/42 bg-transparent",
+  ],
+  expedited: [
+    "left-[9%] top-[2.5%] h-9 w-36 border border-slate-300/50 bg-transparent",
+    "right-[10%] top-[20%] h-8 w-34 border border-transparent bg-[rgba(244,63,94,0.11)]",
+    "left-[17%] top-[24%] h-8 w-30 border border-transparent bg-[rgba(15,23,42,0.06)]",
+    "right-[11%] bottom-[2.5%] h-8 w-34 border border-slate-300/42 bg-transparent",
+  ],
+  "specialized-vehicle-programs": [
+    "left-[9%] top-[2.5%] h-9 w-40 border border-slate-300/50 bg-transparent",
+    "right-[10%] top-[20%] h-8 w-38 border border-transparent bg-[rgba(124,58,237,0.11)]",
+    "left-[16%] top-[24%] h-8 w-31 border border-transparent bg-[rgba(15,23,42,0.06)]",
+    "right-[10.5%] bottom-[2.5%] h-8 w-36 border border-slate-300/42 bg-transparent",
+  ],
+  "canada-us": [
+    "left-[10%] top-[2.4%] h-9 w-40 border border-slate-300/56 bg-transparent",
+    "left-[16%] top-[24.5%] h-7 w-28 border border-transparent bg-[rgba(2,6,23,0.06)]",
+    "right-[11%] bottom-[2.5%] h-8 w-32 border border-slate-300/44 bg-transparent",
+  ],
+  "mexico-cross-border": [
+    "left-[9%] top-[2.5%] h-9 w-36 border border-slate-300/52 bg-transparent",
+    "left-[17%] top-[24%] h-8 w-30 border border-transparent bg-[rgba(2,6,23,0.05)]",
+    "right-[10.5%] bottom-[2.5%] h-8 w-34 border border-slate-300/42 bg-transparent",
+  ],
+  "ocean-freight": [
+    "left-[9%] top-[2.5%] h-9 w-35 border border-slate-300/52 bg-transparent",
+    "left-[16%] top-[24%] h-8 w-30 border border-transparent bg-[rgba(15,23,42,0.05)]",
+    "right-[11%] bottom-[2.5%] h-8 w-33 border border-slate-300/42 bg-transparent",
+  ],
+  "air-freight": [
+    "left-[9.5%] top-[2.5%] h-9 w-34 border border-slate-300/50 bg-transparent",
+    "left-[17%] top-[24%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.05)]",
+    "right-[10.5%] bottom-[2.5%] h-8 w-30 border border-slate-300/42 bg-transparent",
+  ],
+  "warehousing-distribution": [
+    "left-[9%] top-[2.5%] h-9 w-38 border border-slate-300/52 bg-transparent",
+    "left-[16%] top-[24%] h-8 w-30 border border-transparent bg-[rgba(16,185,129,0.09)]",
+    "right-[11%] bottom-[2.5%] h-8 w-34 border border-slate-300/42 bg-transparent",
+  ],
+  "managed-capacity": [
+    "left-[9%] top-[2.5%] h-9 w-36 border border-slate-300/52 bg-transparent",
+    "left-[17%] top-[24%] h-8 w-30 border border-transparent bg-[rgba(59,130,246,0.09)]",
+    "right-[11%] bottom-[2.5%] h-8 w-32 border border-slate-300/42 bg-transparent",
+  ],
+  "dedicated-contract": [
+    "left-[9%] top-[2.5%] h-9 w-35 border border-slate-300/52 bg-transparent",
+    "left-[17%] top-[24%] h-8 w-30 border border-transparent bg-[rgba(99,102,241,0.09)]",
+    "right-[11%] bottom-[2.5%] h-8 w-34 border border-slate-300/42 bg-transparent",
+  ],
+  "project-oversize-programs": [
+    "left-[9%] top-[2.5%] h-9 w-40 border border-slate-300/52 bg-transparent",
+    "left-[16%] top-[24%] h-8 w-30 border border-transparent bg-[rgba(245,158,11,0.1)]",
+    "right-[10.5%] bottom-[2.5%] h-8 w-36 border border-slate-300/42 bg-transparent",
   ],
 };
 
@@ -300,6 +680,136 @@ const SECTION_THEME: Record<
     panelBg: "bg-[rgba(255,255,255,0.8)]",
     imageWash: "bg-[linear-gradient(120deg,rgba(37,99,235,0.16),rgba(2,6,23,0.12))]",
   },
+  expedited: {
+    accent: "#e11d48",
+    glow: "rgba(225,29,72,0.1)",
+    sectionBase:
+      "bg-[linear-gradient(180deg,rgba(252,248,251,0.99),rgba(250,244,248,0.97))]",
+    sectionVeil: "bg-[radial-gradient(980px_500px_at_48%_-11%,rgba(225,29,72,0.047),transparent_67%)]",
+    auraA: "bg-[radial-gradient(920px_520px_at_15%_10%,rgba(225,29,72,0.082),transparent_62%)]",
+    auraB: "bg-[radial-gradient(860px_560px_at_89%_86%,rgba(99,102,241,0.036),transparent_68%)]",
+    gridStroke: "rgba(159,18,57,0.02)",
+    gridOpacity: 0.39,
+    panelBg: "bg-[rgba(255,255,255,0.82)]",
+    imageWash: "bg-[linear-gradient(120deg,rgba(225,29,72,0.16),rgba(15,23,42,0.1))]",
+  },
+  "specialized-vehicle-programs": {
+    accent: "#7c3aed",
+    glow: "rgba(124,58,237,0.1)",
+    sectionBase:
+      "bg-[linear-gradient(180deg,rgba(249,248,255,0.99),rgba(245,244,252,0.97))]",
+    sectionVeil: "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(124,58,237,0.046),transparent_67%)]",
+    auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(124,58,237,0.08),transparent_62%)]",
+    auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(2,132,199,0.033),transparent_68%)]",
+    gridStroke: "rgba(91,33,182,0.02)",
+    gridOpacity: 0.39,
+    panelBg: "bg-[rgba(255,255,255,0.82)]",
+    imageWash: "bg-[linear-gradient(120deg,rgba(124,58,237,0.16),rgba(15,23,42,0.11))]",
+  },
+  "canada-us": {
+    accent: "#2563eb",
+    glow: "rgba(37,99,235,0.1)",
+    sectionBase:
+      "bg-[linear-gradient(180deg,rgba(248,251,255,0.99),rgba(243,248,255,0.97))]",
+    sectionVeil: "bg-[radial-gradient(980px_500px_at_48%_-12%,rgba(37,99,235,0.048),transparent_67%)]",
+    auraA: "bg-[radial-gradient(920px_520px_at_14%_9%,rgba(37,99,235,0.082),transparent_62%)]",
+    auraB: "bg-[radial-gradient(900px_560px_at_89%_86%,rgba(14,116,144,0.04),transparent_68%)]",
+    gridStroke: "rgba(30,64,175,0.019)",
+    gridOpacity: 0.39,
+    panelBg: "bg-[rgba(255,255,255,0.82)]",
+    imageWash: "bg-[linear-gradient(120deg,rgba(37,99,235,0.16),rgba(15,23,42,0.1))]",
+  },
+  "mexico-cross-border": {
+    accent: "#dc2626",
+    glow: "rgba(220,38,38,0.1)",
+    sectionBase:
+      "bg-[linear-gradient(180deg,rgba(255,250,250,0.99),rgba(252,246,246,0.97))]",
+    sectionVeil: "bg-[radial-gradient(980px_500px_at_50%_-12%,rgba(220,38,38,0.045),transparent_67%)]",
+    auraA: "bg-[radial-gradient(940px_520px_at_18%_10%,rgba(220,38,38,0.08),transparent_62%)]",
+    auraB: "bg-[radial-gradient(860px_560px_at_88%_86%,rgba(30,64,175,0.038),transparent_68%)]",
+    gridStroke: "rgba(127,29,29,0.02)",
+    gridOpacity: 0.39,
+    panelBg: "bg-[rgba(255,255,255,0.82)]",
+    imageWash: "bg-[linear-gradient(120deg,rgba(220,38,38,0.15),rgba(15,23,42,0.11))]",
+  },
+  "ocean-freight": {
+    accent: "#0e7490",
+    glow: "rgba(14,116,144,0.11)",
+    sectionBase:
+      "bg-[linear-gradient(180deg,rgba(248,251,252,0.99),rgba(242,248,250,0.97))]",
+    sectionVeil: "bg-[radial-gradient(980px_500px_at_48%_-12%,rgba(14,116,144,0.048),transparent_67%)]",
+    auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(14,116,144,0.082),transparent_62%)]",
+    auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(37,99,235,0.038),transparent_68%)]",
+    gridStroke: "rgba(15,118,110,0.02)",
+    gridOpacity: 0.39,
+    panelBg: "bg-[rgba(255,255,255,0.82)]",
+    imageWash: "bg-[linear-gradient(120deg,rgba(14,116,144,0.17),rgba(2,6,23,0.12))]",
+  },
+  "air-freight": {
+    accent: "#0284c7",
+    glow: "rgba(2,132,199,0.11)",
+    sectionBase:
+      "bg-[linear-gradient(180deg,rgba(248,252,255,0.99),rgba(244,249,253,0.97))]",
+    sectionVeil: "bg-[radial-gradient(980px_500px_at_48%_-10%,rgba(2,132,199,0.045),transparent_67%)]",
+    auraA: "bg-[radial-gradient(920px_520px_at_14%_9%,rgba(2,132,199,0.08),transparent_62%)]",
+    auraB: "bg-[radial-gradient(860px_560px_at_89%_86%,rgba(220,38,38,0.035),transparent_68%)]",
+    gridStroke: "rgba(3,105,161,0.019)",
+    gridOpacity: 0.39,
+    panelBg: "bg-[rgba(255,255,255,0.82)]",
+    imageWash: "bg-[linear-gradient(120deg,rgba(2,132,199,0.16),rgba(15,23,42,0.11))]",
+  },
+  "warehousing-distribution": {
+    accent: "#059669",
+    glow: "rgba(5,150,105,0.1)",
+    sectionBase:
+      "bg-[linear-gradient(180deg,rgba(248,252,250,0.99),rgba(242,250,247,0.97))]",
+    sectionVeil: "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(5,150,105,0.045),transparent_67%)]",
+    auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(16,185,129,0.08),transparent_62%)]",
+    auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(2,132,199,0.035),transparent_68%)]",
+    gridStroke: "rgba(5,150,105,0.02)",
+    gridOpacity: 0.39,
+    panelBg: "bg-[rgba(255,255,255,0.82)]",
+    imageWash: "bg-[linear-gradient(120deg,rgba(5,150,105,0.16),rgba(15,23,42,0.11))]",
+  },
+  "managed-capacity": {
+    accent: "#2563eb",
+    glow: "rgba(37,99,235,0.1)",
+    sectionBase:
+      "bg-[linear-gradient(180deg,rgba(248,251,255,0.99),rgba(242,248,255,0.97))]",
+    sectionVeil: "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(37,99,235,0.045),transparent_67%)]",
+    auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(59,130,246,0.08),transparent_62%)]",
+    auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(16,185,129,0.033),transparent_68%)]",
+    gridStroke: "rgba(30,64,175,0.019)",
+    gridOpacity: 0.39,
+    panelBg: "bg-[rgba(255,255,255,0.82)]",
+    imageWash: "bg-[linear-gradient(120deg,rgba(37,99,235,0.16),rgba(15,23,42,0.11))]",
+  },
+  "dedicated-contract": {
+    accent: "#4f46e5",
+    glow: "rgba(79,70,229,0.1)",
+    sectionBase:
+      "bg-[linear-gradient(180deg,rgba(249,250,255,0.99),rgba(244,246,255,0.97))]",
+    sectionVeil: "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(79,70,229,0.045),transparent_67%)]",
+    auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(99,102,241,0.08),transparent_62%)]",
+    auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(30,64,175,0.033),transparent_68%)]",
+    gridStroke: "rgba(79,70,229,0.02)",
+    gridOpacity: 0.39,
+    panelBg: "bg-[rgba(255,255,255,0.82)]",
+    imageWash: "bg-[linear-gradient(120deg,rgba(79,70,229,0.16),rgba(15,23,42,0.11))]",
+  },
+  "project-oversize-programs": {
+    accent: "#d97706",
+    glow: "rgba(217,119,6,0.1)",
+    sectionBase:
+      "bg-[linear-gradient(180deg,rgba(253,251,247,0.99),rgba(250,246,239,0.97))]",
+    sectionVeil: "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(217,119,6,0.045),transparent_67%)]",
+    auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(245,158,11,0.08),transparent_62%)]",
+    auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(185,28,28,0.03),transparent_68%)]",
+    gridStroke: "rgba(180,83,9,0.02)",
+    gridOpacity: 0.39,
+    panelBg: "bg-[rgba(255,255,255,0.82)]",
+    imageWash: "bg-[linear-gradient(120deg,rgba(217,119,6,0.16),rgba(15,23,42,0.11))]",
+  },
 };
 
 function ContentSection({
@@ -354,6 +864,23 @@ export function ServiceSection({
   const conversionSignals = CONVERSION_SIGNALS_BY_TYPE[section.key];
   const shipperFaqs = SHIPPER_FAQS_BY_TYPE[section.key];
   const pillAccents = PILL_ACCENTS_BY_TYPE[section.key];
+  const borderPriorities = BORDER_PRIORITIES_BY_TYPE[section.key] ?? [];
+  const isCrossBorderService = serviceKey === "cross-border";
+  const isCrossBorderMode =
+    section.key === "canada-us" ||
+    section.key === "mexico-cross-border" ||
+    section.key === "ocean-freight" ||
+    section.key === "air-freight";
+  const isValueAddedMode =
+    section.key === "warehousing-distribution" ||
+    section.key === "managed-capacity" ||
+    section.key === "dedicated-contract" ||
+    section.key === "project-oversize-programs";
+  const isSpecializedMode =
+    section.key === "expedited" || section.key === "specialized-vehicle-programs";
+  const flowSteps = CROSS_BORDER_FLOW_STEPS[section.key] ?? [];
+  const valueAddedOutcomes = VALUE_ADDED_OUTCOMES[section.key] ?? [];
+  const esPriorityTags = ES_PRIORITY_TAGS[section.key] ?? [];
 
   return (
     <section
@@ -408,8 +935,24 @@ export function ServiceSection({
       <Container className="relative z-10 max-w-[1440px] px-4 py-12 sm:px-6 sm:py-14 lg:px-6 lg:py-16">
         <div className="relative">
           {/* Intro row */}
-          <div className="grid gap-0 border-y border-[color:var(--color-border-light)]/70 lg:grid-cols-12 lg:items-stretch">
-            <div className={cn(theme.panelBg, "px-6 py-7 sm:px-8 sm:py-8 lg:col-span-6 lg:px-9 lg:py-10")}>
+          <div
+            className={cn(
+              "grid gap-0 border-y border-[color:var(--color-border-light)]/70 lg:grid-cols-12 lg:items-stretch",
+              isCrossBorderMode &&
+                "bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(59,130,246,0.01))] shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]",
+              isValueAddedMode &&
+                "bg-[linear-gradient(180deg,rgba(248,250,252,0.72),rgba(255,255,255,0.45))] backdrop-blur-[1px]",
+              isSpecializedMode &&
+                "bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(124,58,237,0.02))] shadow-[inset_0_1px_0_rgba(255,255,255,0.34)]",
+            )}
+          >
+            <div
+              className={cn(
+                theme.panelBg,
+                "px-6 py-7 sm:px-8 sm:py-8 lg:px-9 lg:py-10",
+                isCrossBorderMode ? "lg:order-1 lg:col-span-6" : "lg:col-span-6",
+              )}
+            >
               <div className="mb-3 h-[2px] w-14" style={{ backgroundColor: theme.accent }} />
               <div className="text-xs font-semibold tracking-wide text-[color:var(--color-muted-light)]">
                 {section.label}
@@ -420,10 +963,64 @@ export function ServiceSection({
               <p className="mt-4 text-[15px] leading-[1.72] text-[color:var(--color-muted-light)] sm:text-[15.5px]">
                 {section.description}
               </p>
+
+              {isCrossBorderMode ? (
+                <div className="mt-4 flex items-center gap-2.5">
+                  {flowSteps.map((step, idx) => (
+                    <div key={step} className="flex items-center gap-2.5">
+                      <span
+                        className="inline-flex h-5 min-w-6 items-center justify-center rounded-md px-1.5 text-[10px] font-semibold text-white"
+                        style={{ backgroundColor: theme.accent }}
+                      >
+                        {step}
+                      </span>
+                      {idx < flowSteps.length - 1 ? (
+                        <span className="h-px w-5 bg-[color:var(--color-border-light)]" aria-hidden="true" />
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              {isValueAddedMode ? (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {valueAddedOutcomes.map((outcome) => (
+                    <span
+                      key={outcome}
+                      className="inline-flex items-center rounded-md border border-[color:var(--color-border-light)]/80 bg-white/88 px-2.5 py-1 text-[11px] font-medium text-[color:var(--color-muted-light)]"
+                    >
+                      {outcome}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+
+              {isSpecializedMode ? (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {esPriorityTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center rounded-full border border-[color:var(--color-border-light)] bg-white/90 px-2.5 py-1 text-[11px] font-medium text-[color:var(--color-muted-light)]"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
-            <div className="relative border-t border-[color:var(--color-border-light)]/65 bg-white/60 lg:col-span-6 lg:border-t-0 lg:border-l">
-              <div className="relative h-[260px] w-full sm:h-[300px] lg:h-full">
+            <div
+              className={cn(
+                "relative border-t border-[color:var(--color-border-light)]/65 bg-white/60 lg:border-t-0",
+                isCrossBorderMode ? "lg:order-2 lg:col-span-6 lg:border-l" : "lg:col-span-6 lg:border-l",
+              )}
+            >
+              <div
+                className={cn(
+                  "relative h-[260px] w-full sm:h-[300px]",
+                  isCrossBorderMode ? "lg:h-[380px]" : "lg:h-full",
+                )}
+              >
                 <Image
                   src={section.image}
                   alt={section.imageAlt}
@@ -442,7 +1039,15 @@ export function ServiceSection({
           </div>
 
           {/* Content + conversion row */}
-          <div className="grid gap-0 border-b border-[color:var(--color-border-light)]/70 lg:grid-cols-12 lg:items-start">
+          <div
+            className={cn(
+              "grid gap-0 border-b border-[color:var(--color-border-light)]/70 lg:grid-cols-12 lg:items-stretch",
+              isValueAddedMode &&
+                "bg-[linear-gradient(90deg,rgba(15,23,42,0.02),rgba(255,255,255,0.0)_35%,rgba(15,23,42,0.02))]",
+              isSpecializedMode &&
+                "bg-[linear-gradient(90deg,rgba(244,114,182,0.03),rgba(255,255,255,0.0)_35%,rgba(99,102,241,0.03))]",
+            )}
+          >
             <div className="bg-white/64 px-6 py-7 sm:px-8 sm:py-8 lg:col-span-7 lg:px-9 lg:py-10">
               {section.whenToUse && (
                 <ContentSection
@@ -472,14 +1077,31 @@ export function ServiceSection({
               )}
             </div>
 
-            <div className="border-t border-[color:var(--color-border-light)]/65 bg-white/60 px-6 py-7 sm:px-8 sm:py-8 lg:col-span-5 lg:border-t-0 lg:border-l lg:px-9 lg:py-10">
-              <div className="space-y-4">
+            <div
+              className={cn(
+                "border-t border-[color:var(--color-border-light)]/65 px-6 py-7 sm:px-8 sm:py-8 lg:col-span-5 lg:border-t-0 lg:border-l lg:px-9 lg:py-10",
+                isCrossBorderMode
+                  ? "bg-[linear-gradient(180deg,rgba(248,252,255,0.78),rgba(240,249,255,0.62))]"
+                  : isValueAddedMode
+                    ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,250,252,0.72))]"
+                    : isSpecializedMode
+                      ? "bg-[linear-gradient(180deg,rgba(252,248,251,0.8),rgba(247,243,255,0.68))]"
+                    : "bg-white/60",
+              )}
+            >
+              <div className="flex h-full flex-col gap-4">
                 {/* CTA */}
                 <div
                   className={cn(
                     "relative overflow-hidden rounded-lg",
                     "border border-[color:var(--color-border-light)]",
-                    "bg-white/82",
+                    isCrossBorderMode
+                      ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.93),rgba(239,246,255,0.74))]"
+                      : isValueAddedMode
+                        ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,250,252,0.74))]"
+                      : isSpecializedMode
+                        ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.93),rgba(250,245,255,0.74))]"
+                        : "bg-white/82",
                     "p-5 sm:p-6",
                   )}
                 >
@@ -551,7 +1173,13 @@ export function ServiceSection({
                   className={cn(
                     "relative overflow-hidden rounded-lg",
                     "border border-[color:var(--color-border-light)]",
-                    "bg-white/78",
+                    isCrossBorderMode
+                      ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(241,245,249,0.72))]"
+                      : isValueAddedMode
+                        ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(243,244,246,0.72))]"
+                      : isSpecializedMode
+                        ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(248,244,255,0.72))]"
+                        : "bg-white/78",
                     "p-5 sm:p-6",
                   )}
                 >
@@ -566,33 +1194,73 @@ export function ServiceSection({
                 </div>
 
                 {/* Practical Q&A card (non-redundant decision support) */}
-                <div
-                  className={cn(
-                    "relative overflow-hidden rounded-lg",
-                    "border border-[color:var(--color-border-light)]",
-                    "bg-white/78",
-                    "p-5 sm:p-6",
-                  )}
-                >
-                  <h3 className="text-[1.14rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
-                    {shipperFaqs.title}
-                  </h3>
-                  <div className="mt-4 space-y-3">
-                    {shipperFaqs.items.map((item) => (
-                      <div
-                        key={item.q}
-                        className="rounded-xl border border-[color:var(--color-border-light)] bg-[color:var(--color-surface-0-light)] px-4 py-3"
-                      >
-                        <div className="text-[13px] font-semibold text-[color:var(--color-text-light)]">
-                          {item.q}
+                {shipperFaqs.items.length > 0 ? (
+                  <div
+                    className={cn(
+                      "relative overflow-hidden rounded-lg flex-1",
+                      "border border-[color:var(--color-border-light)]",
+                      isCrossBorderMode
+                        ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(239,246,255,0.72))]"
+                        : isValueAddedMode
+                          ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(243,244,246,0.72))]"
+                        : isSpecializedMode
+                          ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(248,244,255,0.72))]"
+                          : "bg-white/78",
+                      "p-5 sm:p-6",
+                    )}
+                  >
+                    <h3 className="text-[1.14rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
+                      {shipperFaqs.title}
+                    </h3>
+                    <div className="mt-4 space-y-3">
+                      {shipperFaqs.items.map((item) => (
+                        <div
+                          key={item.q}
+                          className="rounded-xl border border-[color:var(--color-border-light)] bg-[color:var(--color-surface-0-light)] px-4 py-3"
+                        >
+                          <div className="text-[13px] font-semibold text-[color:var(--color-text-light)]">
+                            {item.q}
+                          </div>
+                          <div className="mt-1 text-[12px] leading-[1.58] text-[color:var(--color-muted-light)]">
+                            {item.a}
+                          </div>
                         </div>
-                        <div className="mt-1 text-[12px] leading-[1.58] text-[color:var(--color-muted-light)]">
-                          {item.a}
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ) : null}
+
+                {isCrossBorderService && shipperFaqs.items.length === 0 && borderPriorities.length > 0 ? (
+                  <div
+                    className={cn(
+                      "relative overflow-hidden rounded-lg flex-1",
+                      "border border-[color:var(--color-border-light)]",
+                      "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(239,246,255,0.72))]",
+                      "p-5 sm:p-6",
+                    )}
+                  >
+                    <h3 className="text-[1.14rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
+                      Program design priorities
+                    </h3>
+                    <p className="mt-2 text-[13px] leading-[1.62] text-[color:var(--color-muted-light)]">
+                      Core decisions we align before launch to reduce border and handoff variance.
+                    </p>
+                    <ul className="mt-4 space-y-2.5">
+                      {borderPriorities.map((item) => (
+                        <li key={item} className="flex items-start gap-2.5">
+                          <span
+                            className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
+                            style={{ backgroundColor: theme.accent }}
+                            aria-hidden="true"
+                          />
+                          <span className="text-[12.5px] leading-[1.62] text-[color:var(--color-muted-light)]">
+                            {item}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
@@ -606,7 +1274,13 @@ export function ServiceSection({
                 )}
               >
                 <div className="text-xs font-semibold tracking-wide text-[color:var(--color-muted-light)]">
-                  Execution standards included
+                  {isCrossBorderMode
+                    ? "Cross-border execution standards"
+                    : isValueAddedMode
+                      ? "Program standards included"
+                      : isSpecializedMode
+                        ? "Priority and control standards"
+                      : "Execution standards included"}
                 </div>
                 <ul className="mt-4 space-y-3">
                   {section.highlights.map((h) => (
@@ -633,19 +1307,52 @@ export function ServiceSection({
                 )}
               >
                 <h3 className="text-[1.14rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
-                  Related for {section.label}
+                  {isCrossBorderMode
+                    ? `Connected mode pairings for ${section.label}`
+                    : isValueAddedMode
+                      ? `Program adjacencies for ${section.label}`
+                      : isSpecializedMode
+                        ? `Critical-support services for ${section.label}`
+                      : `Related for ${section.label}`}
                 </h3>
                 <p className="mt-1 text-xs text-[color:var(--color-muted-light)]">
-                  Suggestions based on equipment fit, risk profile, and shipment constraints.
+                  {isCrossBorderMode
+                    ? "Mode combinations frequently used to balance urgency, landed cost, and border reliability."
+                    : isValueAddedMode
+                      ? "Adjacent services that improve end-to-end program performance and governance."
+                    : isSpecializedMode
+                      ? "Service pairings commonly used to protect urgent timelines and high-constraint shipments."
+                    : "Suggestions based on equipment fit, risk profile, and shipment constraints."}
                 </p>
                 <div className="mt-4 grid gap-2.5">
                   {contextualRelated.map((service, idx) => {
-                    const colors = [
-                      "bg-pink-500/10 text-pink-600",
-                      "bg-red-500/10 text-red-600",
-                      "bg-blue-500/10 text-blue-600",
-                      "bg-green-500/10 text-green-600",
-                    ];
+                    const colors = isCrossBorderMode
+                      ? [
+                          "bg-blue-500/10 text-blue-700",
+                          "bg-cyan-500/10 text-cyan-700",
+                          "bg-slate-500/12 text-slate-700",
+                          "bg-indigo-500/10 text-indigo-700",
+                        ]
+                      : isValueAddedMode
+                        ? [
+                            "bg-emerald-500/10 text-emerald-700",
+                            "bg-indigo-500/10 text-indigo-700",
+                            "bg-amber-500/10 text-amber-700",
+                            "bg-slate-500/12 text-slate-700",
+                          ]
+                        : isSpecializedMode
+                          ? [
+                              "bg-rose-500/10 text-rose-700",
+                              "bg-violet-500/10 text-violet-700",
+                              "bg-fuchsia-500/10 text-fuchsia-700",
+                              "bg-slate-500/12 text-slate-700",
+                            ]
+                        : [
+                          "bg-pink-500/10 text-pink-600",
+                          "bg-red-500/10 text-red-600",
+                          "bg-blue-500/10 text-blue-600",
+                          "bg-green-500/10 text-green-600",
+                        ];
                     const colorClass = colors[idx % colors.length];
 
                     return (

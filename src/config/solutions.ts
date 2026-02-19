@@ -101,7 +101,7 @@ export const SOLUTIONS_DATA = {
       {
         analyticsId: "expedited",
         label: "Expedited Shipping",
-        href: "/services/specialized#expedited",
+        href: "/services/expedited-specialized#section-expedited",
         description: "Fast-track delivery for urgent shipments.",
         icon: "zap",
         bestFor: "Time-sensitive freight",
@@ -109,8 +109,8 @@ export const SOLUTIONS_DATA = {
       },
       {
         analyticsId: "specialized_vehicle_transport",
-        label: "Specialized Vehicle Transport",
-        href: "/services/specialized#vehicle-transport",
+        label: "Specialized Vehicle Programs",
+        href: "/services/expedited-specialized#section-specialized-vehicle-programs",
         description: "Expert handling for specialized vehicles and equipment.",
         icon: "truck",
         bestFor: "Oversized, delicate cargo",
@@ -145,7 +145,7 @@ export const SOLUTIONS_DATA = {
       {
         analyticsId: "cross_border_canada_us",
         label: "Canada ↔ USA Cross-Border",
-        href: "/services/cross-border#canada-us",
+        href: "/services/cross-border#section-canada-us",
         description: "Seamless cross-border shipping between Canada and USA.",
         icon: "globe",
         bestFor: "North American trade",
@@ -154,7 +154,7 @@ export const SOLUTIONS_DATA = {
       {
         analyticsId: "cross_border_mexico",
         label: "Mexico Cross-Border",
-        href: "/services/cross-border#mexico",
+        href: "/services/cross-border#section-mexico-cross-border",
         description: "Reliable Mexico cross-border logistics.",
         icon: "globe",
         bestFor: "Mexico trade lanes",
@@ -163,7 +163,7 @@ export const SOLUTIONS_DATA = {
       {
         analyticsId: "ocean_freight",
         label: "Ocean Freight",
-        href: "/services/cross-border#ocean",
+        href: "/services/cross-border#section-ocean-freight",
         description: "International ocean shipping solutions.",
         icon: "ship",
         bestFor: "International bulk shipping",
@@ -172,7 +172,7 @@ export const SOLUTIONS_DATA = {
       {
         analyticsId: "air_freight",
         label: "Air Freight",
-        href: "/services/cross-border#air",
+        href: "/services/cross-border#section-air-freight",
         description: "Fast international air cargo services.",
         icon: "plane",
         bestFor: "Urgent international delivery",
@@ -189,7 +189,7 @@ export const SOLUTIONS_DATA = {
       {
         analyticsId: "warehousing_distribution",
         label: "Warehousing & Distribution",
-        href: "/services/value-added#warehousing",
+        href: "/services/value-added#section-warehousing-distribution",
         description: "Strategic warehousing and distribution networks.",
         icon: "warehouse",
         bestFor: "Inventory management",
@@ -198,7 +198,7 @@ export const SOLUTIONS_DATA = {
       {
         analyticsId: "managed_capacity",
         label: "Managed Capacity",
-        href: "/services/value-added#managed-capacity",
+        href: "/services/value-added#section-managed-capacity",
         description: "Dedicated capacity solutions for consistent volume.",
         icon: "briefcase",
         bestFor: "High-volume shippers",
@@ -207,7 +207,7 @@ export const SOLUTIONS_DATA = {
       {
         analyticsId: "dedicated_contract_logistics",
         label: "Dedicated / Contract Logistics",
-        href: "/services/value-added#dedicated",
+        href: "/services/value-added#section-dedicated-contract",
         description: "Custom logistics programs tailored to your needs.",
         icon: "briefcase",
         bestFor: "Long-term partnerships",
@@ -216,7 +216,7 @@ export const SOLUTIONS_DATA = {
       {
         analyticsId: "project_oversize_programs",
         label: "Project-Specific / Oversize Programs",
-        href: "/services/value-added#project-oversize",
+        href: "/services/value-added#section-project-oversize-programs",
         description: "Specialized handling for large-scale and oversize projects.",
         icon: "truck",
         bestFor: "Complex, oversized cargo",

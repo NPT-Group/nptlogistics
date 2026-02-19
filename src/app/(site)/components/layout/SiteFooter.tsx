@@ -37,7 +37,7 @@ function getSolutionsFooterLinks(): FooterLink[] {
     { label: "Truckload (TL)", href: "/services/truckload" },
     { label: "Less-Than-Truckload (LTL)", href: "/services/ltl" },
     { label: "Intermodal", href: "/services/intermodal" },
-    { label: "Specialized & Time-Sensitive", href: "/services/specialized" },
+    { label: "Expedited & Specialized (ES)", href: "/services/expedited-specialized" },
     { label: "Hazardous Materials (HAZMAT)", href: "/services/hazmat" },
     { label: "Temperature-Controlled", href: "/services/temperature-controlled" },
     { label: "Cross-Border & Global", href: "/services/cross-border" },

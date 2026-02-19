@@ -73,10 +73,17 @@ export const NAV = {
         title: "Specialized & Time-Sensitive",
         links: [
           {
-            label: "Specialized & Time-Sensitive",
-            href: "/services/specialized",
-            description: "Expedited and specialized vehicle programs.",
+            label: "Expedited & Specialized (ES)",
+            href: "/services/expedited-specialized",
+            description: "Priority freight and specialized vehicle execution.",
             icon: "zap",
+            children: [
+              { label: "Expedited", href: "/services/expedited-specialized#section-expedited" },
+              {
+                label: "Specialized Vehicle Programs",
+                href: "/services/expedited-specialized#section-specialized-vehicle-programs",
+              },
+            ],
           },
           {
             label: "Hazardous Materials (HAZMAT)",
@@ -101,10 +108,10 @@ export const NAV = {
             description: "Cross-border execution + global modes as needed.",
             icon: "globe",
             children: [
-              { label: "Canada ↔ USA", href: "/services/cross-border#canada-us" },
-              { label: "Mexico Cross-Border", href: "/services/cross-border#mexico" },
-              { label: "Ocean Freight", href: "/services/cross-border#ocean" },
-              { label: "Air Freight", href: "/services/cross-border#air" },
+              { label: "Canada ↔ USA", href: "/services/cross-border#section-canada-us" },
+              { label: "Mexico Cross-Border", href: "/services/cross-border#section-mexico-cross-border" },
+              { label: "Ocean Freight", href: "/services/cross-border#section-ocean-freight" },
+              { label: "Air Freight", href: "/services/cross-border#section-air-freight" },
             ],
           },
         ],
@@ -118,10 +125,10 @@ export const NAV = {
             description: "Warehousing, managed capacity, dedicated, and projects.",
             icon: "warehouse",
             children: [
-              { label: "Warehousing & Distribution", href: "/services/value-added#warehousing" },
-              { label: "Managed Capacity", href: "/services/value-added#managed-capacity" },
-              { label: "Dedicated / Contract", href: "/services/value-added#dedicated" },
-              { label: "Project-Specific / Oversize", href: "/services/value-added#projects" },
+              { label: "Warehousing & Distribution", href: "/services/value-added#section-warehousing-distribution" },
+              { label: "Managed Capacity", href: "/services/value-added#section-managed-capacity" },
+              { label: "Dedicated / Contract", href: "/services/value-added#section-dedicated-contract" },
+              { label: "Project-Specific / Oversize", href: "/services/value-added#section-project-oversize-programs" },
             ],
           },
         ],

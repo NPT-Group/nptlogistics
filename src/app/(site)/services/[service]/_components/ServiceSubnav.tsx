@@ -16,6 +16,16 @@ const EQUIPMENT_META = {
   flatbed: { code: "FB", hint: "Open-deck securement freight" },
   "rgn-oversize": { code: "RGN", hint: "Permit and heavy-haul freight" },
   "roll-tite-conestoga": { code: "CON", hint: "Covered-deck protection" },
+  expedited: { code: "EXP", hint: "Priority timeline execution" },
+  "specialized-vehicle-programs": { code: "SVP", hint: "Constraint-controlled transport" },
+  "canada-us": { code: "CAUS", hint: "Cross-border lane execution" },
+  "mexico-cross-border": { code: "MEX", hint: "Border handoff control" },
+  "ocean-freight": { code: "OCN", hint: "FCL and LCL planning" },
+  "air-freight": { code: "AIR", hint: "Priority international cargo" },
+  "warehousing-distribution": { code: "W&D", hint: "Inventory and outbound flow control" },
+  "managed-capacity": { code: "MNG", hint: "Procurement and optimization governance" },
+  "dedicated-contract": { code: "DED", hint: "Embedded capacity and SLA execution" },
+  "project-oversize-programs": { code: "PRJ", hint: "Permit and project-control logistics" },
 } as const;
 
 function prefersReducedMotion() {
@@ -30,7 +40,8 @@ function findServiceShell(el: HTMLElement | null) {
 }
 
 export function ServiceSubnav({ model }: { model: ServicePageModel }) {
-  const ids = React.useMemo(() => model.sections.map((s) => `section-${s.key}`), [model.sections]);
+  const sections = model.sections ?? [];
+  const ids = React.useMemo(() => sections.map((s) => `section-${s.key}`), [sections]);
   const [activeId, setActiveId] = React.useState(ids[0] ?? "");
   const [isPinned, setIsPinned] = React.useState(false);
   const btnRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
@@ -161,6 +172,27 @@ export function ServiceSubnav({ model }: { model: ServicePageModel }) {
     [ids, scrollTo],
   );
 
+  const subnavAuraClass =
+    model.key === "cross-border"
+      ? "bg-[radial-gradient(560px_140px_at_50%_-18%,rgba(2,132,199,0.24),transparent_66%)]"
+      : model.key === "expedited-specialized"
+        ? "bg-[radial-gradient(560px_150px_at_50%_-18%,rgba(217,70,239,0.23),transparent_67%)]"
+      : model.key === "value-added"
+        ? "bg-[radial-gradient(560px_140px_at_50%_-18%,rgba(5,150,105,0.26),transparent_66%)]"
+        : "bg-[radial-gradient(500px_130px_at_50%_-20%,rgba(220,38,38,0.24),transparent_65%)]";
+
+  const subnavShellClass =
+    model.key === "value-added"
+      ? "bg-[linear-gradient(120deg,rgba(16,185,129,0.11),rgba(79,70,229,0.07),rgba(255,255,255,0.03))] shadow-[0_20px_50px_rgba(2,6,23,0.46),inset_0_1px_0_rgba(255,255,255,0.2)]"
+      : model.key === "expedited-specialized"
+        ? "bg-[linear-gradient(120deg,rgba(217,70,239,0.11),rgba(244,63,94,0.08),rgba(255,255,255,0.03))] shadow-[0_20px_50px_rgba(2,6,23,0.45),inset_0_1px_0_rgba(255,255,255,0.2)]"
+      : "bg-[linear-gradient(120deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] shadow-[0_20px_50px_rgba(2,6,23,0.42),inset_0_1px_0_rgba(255,255,255,0.24)]";
+
+  const subnavGridClass =
+    model.key === "expedited-specialized"
+      ? "relative grid gap-2 sm:grid-cols-2 lg:grid-cols-2"
+      : "relative grid gap-2 sm:grid-cols-2 lg:grid-cols-4";
+
   return (
     <div
       id="service-subnav"
@@ -180,21 +212,17 @@ export function ServiceSubnav({ model }: { model: ServicePageModel }) {
         <div
           className={cn(
             "relative overflow-hidden rounded-2xl border border-white/10",
-            "bg-[linear-gradient(120deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))]",
+            subnavShellClass,
             "p-1.5 sm:p-2",
-            "shadow-[0_20px_50px_rgba(2,6,23,0.42),inset_0_1px_0_rgba(255,255,255,0.24)]",
           )}
           role="tablist"
           aria-label={model.subnavLabel}
         >
           {/* Premium radial gradient overlay */}
-          <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(500px_130px_at_50%_-20%,rgba(220,38,38,0.24),transparent_65%)]"
-            aria-hidden="true"
-          />
+          <div className={cn("pointer-events-none absolute inset-0", subnavAuraClass)} aria-hidden="true" />
 
-          <div className="relative grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {model.sections.map((s, i) => {
+          <div className={subnavGridClass}>
+            {sections.map((s, i) => {
               const id = `section-${s.key}`;
               const isActive = activeId === id;
               const meta = EQUIPMENT_META[s.key];
