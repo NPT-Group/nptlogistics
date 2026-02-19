@@ -302,7 +302,7 @@ export default function AdminJobsListClient({
         {/* Header / Filters */}
         <div
           className={cn(
-            "mb-6 rounded-3xl border shadow-[var(--dash-shadow)]",
+            "mb-6 overflow-hidden rounded-3xl border shadow-[var(--dash-shadow)]",
             "border-[var(--dash-border)] bg-[var(--dash-surface)]",
           )}
         >
@@ -414,7 +414,6 @@ export default function AdminJobsListClient({
                   { value: EJobPostingStatus.CLOSED, label: "Closed" },
                   { value: EJobPostingStatus.ARCHIVED, label: "Archived" },
                 ]}
-                className="z-[80]"
               />
 
               <SoftButton

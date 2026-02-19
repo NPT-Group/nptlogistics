@@ -240,7 +240,6 @@ export default function AdminJobApplicationsForJobClient({
                   { value: EJobApplicationStatus.VIEWED, label: "Viewed" },
                   { value: EJobApplicationStatus.ARCHIVED, label: "Archived" },
                 ]}
-                className="z-[80]"
               />
 
               <SoftButton

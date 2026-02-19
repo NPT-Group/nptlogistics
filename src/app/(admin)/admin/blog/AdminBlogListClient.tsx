@@ -264,8 +264,7 @@ export default function AdminBlogListClient({
         {/* Header / Filters */}
         <div
           className={cn(
-            "mb-6 rounded-3xl border shadow-[var(--dash-shadow)]",
-            // IMPORTANT: no overflow-hidden so select dropdown isn't clipped
+            "mb-6 overflow-hidden rounded-3xl border shadow-[var(--dash-shadow)]",
             "border-[var(--dash-border)] bg-[var(--dash-surface)]",
           )}
         >
@@ -361,7 +360,6 @@ export default function AdminBlogListClient({
                   { value: "PUBLISHED", label: "Published" },
                   { value: "ARCHIVED", label: "Archived" },
                 ]}
-                className="z-[80]"
               />
 
               <SoftButton
