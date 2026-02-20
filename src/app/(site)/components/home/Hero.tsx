@@ -8,7 +8,6 @@ import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 
 const VIDEO_DESKTOP = "/hero/hero-desktop.mp4";
-const VIDEO_MOBILE = "/hero/hero-mobile.mp4";
 const POSTER = "/hero/hero-poster.png";
 
 const focusRing =
@@ -17,18 +16,12 @@ const focusRing =
 export function Hero() {
   const reduceMotion = useReducedMotion();
   const desktopVideoRef = React.useRef<HTMLVideoElement | null>(null);
-  const mobileVideoRef = React.useRef<HTMLVideoElement | null>(null);
   const [desktopVideoState, setDesktopVideoState] = React.useState<"loading" | "ready" | "failed">(
-    "loading",
-  );
-  const [mobileVideoState, setMobileVideoState] = React.useState<"loading" | "ready" | "failed">(
     "loading",
   );
 
   const markDesktopReady = React.useCallback(() => setDesktopVideoState("ready"), []);
-  const markMobileReady = React.useCallback(() => setMobileVideoState("ready"), []);
   const markDesktopFailed = React.useCallback(() => setDesktopVideoState("failed"), []);
-  const markMobileFailed = React.useCallback(() => setMobileVideoState("failed"), []);
 
   // Watchdog: some browsers can fail silently on bad src.
   React.useEffect(() => {
@@ -41,17 +34,6 @@ export function Hero() {
     }, 2500);
     return () => window.clearTimeout(timer);
   }, [desktopVideoState]);
-
-  React.useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const el = mobileVideoRef.current;
-      if (!el || mobileVideoState !== "loading") return;
-      if (el.error || el.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
-        setMobileVideoState("failed");
-      }
-    }, 2500);
-    return () => window.clearTimeout(timer);
-  }, [mobileVideoState]);
 
   const stagger: Variants = reduceMotion
     ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
@@ -72,13 +54,11 @@ export function Hero() {
             aria-hidden="true"
           />
         ) : null}
-        {mobileVideoState === "failed" ? (
-          <div
-            className="absolute inset-0 block bg-cover bg-center md:hidden"
-            style={{ backgroundImage: `url(${POSTER})` }}
-            aria-hidden="true"
-          />
-        ) : null}
+        <div
+          className="absolute inset-0 block bg-cover bg-center md:hidden"
+          style={{ backgroundImage: `url(${POSTER})` }}
+          aria-hidden="true"
+        />
 
         <video
           ref={desktopVideoRef}
@@ -93,22 +73,6 @@ export function Hero() {
           onCanPlay={markDesktopReady}
           onError={markDesktopFailed}
           src={VIDEO_DESKTOP}
-          aria-hidden="true"
-        />
-
-        <video
-          ref={mobileVideoRef}
-          className="absolute inset-0 block h-full w-full object-cover md:hidden"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          disablePictureInPicture
-          onLoadedData={markMobileReady}
-          onCanPlay={markMobileReady}
-          onError={markMobileFailed}
-          src={VIDEO_MOBILE}
           aria-hidden="true"
         />
 

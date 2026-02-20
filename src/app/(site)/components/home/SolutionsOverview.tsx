@@ -217,7 +217,7 @@ function ServiceCard({
 
       <div
         className={cn(
-          "absolute top-[56%] right-5 bottom-[12%] left-5 grid grid-rows-[auto_1fr_auto] gap-y-2 text-white min-[680px]:top-[58%] min-[680px]:right-4 min-[680px]:bottom-[8%] min-[680px]:left-4 min-[680px]:gap-y-2 sm:top-[58%] sm:right-[30px] sm:bottom-[10%] sm:left-[30px] sm:gap-y-2.5 md:top-[58%] md:right-4 md:bottom-[8%] md:left-4 md:gap-y-2",
+          "absolute top-[56%] right-5 bottom-[14%] left-5 grid grid-rows-[auto_1fr_auto] gap-y-2 text-white min-[680px]:top-[58%] min-[680px]:right-4 min-[680px]:bottom-[9%] min-[680px]:left-4 min-[680px]:gap-y-2 sm:top-[58%] sm:right-[30px] sm:bottom-[10%] sm:left-[30px] sm:gap-y-2.5 md:top-[58%] md:right-4 md:bottom-[8%] md:left-4 md:gap-y-2",
           isFourGridCategory && "lg:top-[58%] lg:right-4 lg:bottom-[8%] lg:left-4 lg:gap-y-2",
         )}
       >
@@ -245,7 +245,7 @@ function ServiceCard({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 items-end gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-x-6 sm:gap-y-0">
+        <div className="-translate-y-3 grid grid-cols-1 items-end gap-y-2 pb-4 sm:translate-y-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-x-6 sm:gap-y-0 sm:pb-0">
           {card.bestFor && (
             <p
               className={cn(
@@ -258,7 +258,7 @@ function ServiceCard({
           )}
           <span
             className={cn(
-              "inline-flex h-10 w-fit min-w-[112px] shrink-0 items-center justify-center gap-2 border border-white px-4 text-[13px] font-semibold text-white min-[680px]:h-9 min-[680px]:w-[84px] min-[680px]:px-2.5 min-[680px]:text-[12px] sm:ml-2 sm:h-11 sm:w-[106px] sm:min-w-0 sm:px-4 sm:text-[14px] md:h-9 md:w-[84px] md:px-2.5 md:text-[12px]",
+              "mb-2 inline-flex h-10 w-fit min-w-[112px] shrink-0 items-center justify-center gap-2 rounded-md border border-white px-4 text-[13px] font-semibold text-white min-[680px]:mb-1 min-[680px]:h-9 min-[680px]:w-[84px] min-[680px]:px-2.5 min-[680px]:text-[12px] sm:mb-0 sm:ml-2 sm:h-11 sm:w-[106px] sm:min-w-0 sm:px-4 sm:text-[14px] md:h-9 md:w-[84px] md:px-2.5 md:text-[12px]",
               isFourGridCategory && "lg:h-9 lg:w-[84px] lg:px-2.5 lg:text-[12px]",
               "transition-all duration-300 group-hover:gap-2.5 hover:bg-white/10",
               "[&>.arrow]:inline-block [&>.arrow]:transition-all [&>.arrow]:duration-300 [&>.arrow]:ease-[cubic-bezier(0.34,1.56,0.64,1)]",

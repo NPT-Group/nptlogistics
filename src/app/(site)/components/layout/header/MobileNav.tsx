@@ -7,7 +7,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import { cn } from "@/lib/cn";
 import { NAV, type NavLink } from "@/config/navigation";
@@ -209,87 +209,90 @@ export function MobileNav() {
         </button>
       </Dialog.Trigger>
 
-      <AnimatePresence>
-        {open ? (
-          <Dialog.Portal forceMount>
-            <Dialog.Overlay asChild>
-              <motion.div
-                className="fixed inset-0 z-50 bg-black/55 backdrop-blur-sm"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.22 }}
-              />
-            </Dialog.Overlay>
+      <Dialog.Portal>
+        <Dialog.Overlay forceMount asChild>
+          <motion.div
+            className={cn(
+              "fixed inset-0 z-[70] bg-black/55",
+              open ? "pointer-events-auto" : "pointer-events-none",
+            )}
+            initial={false}
+            animate={{ opacity: open ? 1 : 0 }}
+            transition={{
+              duration: open ? 0.3 : 0.22,
+              ease: open ? [0.16, 1, 0.3, 1] : [0.4, 0, 1, 1],
+            }}
+          />
+        </Dialog.Overlay>
 
-            <Dialog.Content asChild>
-              <motion.div
-                className={cn(
-                  "fixed inset-x-0 top-0 z-50",
-                  "max-h-[100svh] w-full",
-                  "overflow-hidden outline-none",
-                  // ✅ Keep NAVY when open (sheet)
-                  "bg-[color:var(--color-nav-bg)]",
-                  "backdrop-blur",
-                  "shadow-[0_4px_12px_rgba(0,0,0,0.3)]",
-                )}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.22 }}
-              >
-                <VisuallyHidden>
-                  <Dialog.Title>Navigation</Dialog.Title>
-                  <Dialog.Description>Mobile navigation menu</Dialog.Description>
-                </VisuallyHidden>
+        <Dialog.Content forceMount asChild>
+          <div
+            className={cn(
+              "fixed inset-x-0 top-0 z-[70] w-full outline-none",
+              open ? "pointer-events-auto" : "pointer-events-none",
+            )}
+            aria-hidden={!open}
+          >
+            <VisuallyHidden>
+              <Dialog.Title>Navigation</Dialog.Title>
+              <Dialog.Description>Mobile navigation menu</Dialog.Description>
+            </VisuallyHidden>
 
-                <div className="h-16 border-b border-[color:var(--color-nav-border)] px-5">
-                  <div className="flex h-16 items-center justify-between">
-                    <Link
-                      href="/"
-                      className={cn("inline-flex items-center rounded-md px-1 py-1", focusRingMenu)}
-                      aria-label="Home"
-                      onClick={closeAll}
+            <motion.div
+              className={cn(
+                "max-h-[100svh] overflow-hidden",
+                "bg-[color:var(--color-nav-bg)]",
+                "shadow-[0_4px_12px_rgba(0,0,0,0.3)]",
+              )}
+              initial={false}
+              animate={{
+                scaleY: open ? 1 : 0,
+                opacity: open ? 1 : 0,
+              }}
+              transition={{
+                duration: open ? 0.42 : 0.3,
+                ease: open ? [0.16, 1, 0.3, 1] : [0.4, 0, 1, 1],
+              }}
+              style={{ transformOrigin: "top", willChange: "transform, opacity" }}
+            >
+              <div className="h-16 border-b border-[color:var(--color-nav-border)] px-5">
+                <div className="flex h-16 items-center justify-between">
+                  <Link
+                    href="/"
+                    className={cn("inline-flex items-center rounded-md px-1 py-1", focusRingMenu)}
+                    aria-label="Home"
+                    onClick={closeAll}
+                  >
+                    <Image
+                      src="/brand/NPTlogo2.png"
+                      alt="NPT Logistics"
+                      width={220}
+                      height={80}
+                      className="h-auto w-[50px] object-contain sm:w-[50px] md:w-[50px]"
+                      priority
+                    />
+                  </Link>
+
+                  <Dialog.Close asChild>
+                    <button
+                      type="button"
+                      className={cn(
+                        "inline-flex h-10 w-10 items-center justify-center rounded-full",
+                        "text-[color:var(--color-nav-text)]",
+                        "hover:bg-white/10",
+                        focusRingNav,
+                      )}
+                      aria-label="Close menu"
                     >
-                      <Image
-                        src="/brand/NPTlogo2.png"
-                        alt="NPT Logistics"
-                        width={220}
-                        height={80}
-                        className="h-auto w-[50px] object-contain sm:w-[50px] md:w-[50px]"
-                        priority
-                      />
-                    </Link>
-
-                    <Dialog.Close asChild>
-                      <button
-                        type="button"
-                        className={cn(
-                          // same size/shape as hamburger to prevent perceived shifting
-                          "inline-flex h-10 w-10 items-center justify-center rounded-full",
-                          "text-[color:var(--color-nav-text)]",
-                          "hover:bg-white/10",
-                          focusRingNav,
-                        )}
-                        aria-label="Close menu"
-                      >
-                        <X className="h-5 w-5" aria-hidden />
-                      </button>
-                    </Dialog.Close>
-                  </div>
+                      <X className="h-5 w-5" aria-hidden />
+                    </button>
+                  </Dialog.Close>
                 </div>
+              </div>
 
-                {/* Body - rolls out smoothly like carpet */}
-                <motion.div
-                  className="mt-4 px-5 pb-6"
-                  initial={{ scaleY: 0, opacity: 0 }}
-                  animate={{ scaleY: 1, opacity: 1 }}
-                  exit={{ scaleY: 0, opacity: 0 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
-                  style={{ transformOrigin: "top" }}
-                >
-                  {/* CTAs */}
-                  <div className="grid gap-3">
+              <div className="mt-4 px-5 pb-6">
+                {/* CTAs */}
+                <div className="grid gap-3">
                     <div className="grid grid-cols-2 gap-3">
                       <Link
                         href="/tracking"
@@ -499,12 +502,11 @@ export function MobileNav() {
                       version.
                     </div>
                   </div>
-                </motion.div>
-              </motion.div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        ) : null}
-      </AnimatePresence>
+                </div>
+            </motion.div>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
     </Dialog.Root>
   );
 }
