@@ -219,8 +219,8 @@ export function MobileNav() {
             initial={false}
             animate={{ opacity: open ? 1 : 0 }}
             transition={{
-              duration: open ? 0.3 : 0.22,
-              ease: open ? [0.16, 1, 0.3, 1] : [0.4, 0, 1, 1],
+              duration: 0.50,
+              ease: [0.16, 1, 0.3, 1],
             }}
           />
         </Dialog.Overlay>
@@ -250,8 +250,8 @@ export function MobileNav() {
                 opacity: open ? 1 : 0,
               }}
               transition={{
-                duration: open ? 0.42 : 0.3,
-                ease: open ? [0.16, 1, 0.3, 1] : [0.4, 0, 1, 1],
+                duration: 0.50,
+                ease: [0.16, 1, 0.3, 1],
               }}
               style={{ transformOrigin: "top", willChange: "transform, opacity" }}
             >
