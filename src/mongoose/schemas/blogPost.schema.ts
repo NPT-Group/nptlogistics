@@ -75,3 +75,21 @@ blogPostSchema.virtual("comments", {
 // Useful indexes
 blogPostSchema.index({ status: 1, publishedAt: -1 });
 blogPostSchema.index({ "author.id": 1, createdAt: -1 });
+
+// text search index (for q / relevance)
+blogPostSchema.index(
+  { title: "text", excerpt: "text", slug: "text" },
+  {
+    name: "blogpost_text_idx",
+    weights: { title: 10, excerpt: 4, slug: 2 },
+  },
+);
+
+// for "most viewed" sort on published posts
+blogPostSchema.index(
+  { status: 1, viewCount: -1, publishedAt: -1 },
+  { name: "blogpost_status_viewCount_idx" },
+);
+
+// for title sort on published posts (small win)
+blogPostSchema.index({ status: 1, title: 1 }, { name: "blogpost_status_title_idx" });
