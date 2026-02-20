@@ -45,7 +45,7 @@ export function ServiceFinalCta({ model }: { model: ServicePageModel }) {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,250,252,0.9),rgba(241,245,249,0.96))]" />
       </div>
 
-      <Container className="relative max-w-[1360px] px-4 py-10 sm:px-6 sm:py-12">
+      <Container className="relative max-w-[1360px] px-4 py-10 sm:px-6 sm:py-12 md:py-14">
         <div
           className={cn(
             "relative isolate mx-auto overflow-hidden rounded-[28px]",
@@ -67,22 +67,22 @@ export function ServiceFinalCta({ model }: { model: ServicePageModel }) {
 
           <div className="relative grid gap-7 lg:grid-cols-12 lg:items-center lg:gap-8">
             <div className="lg:col-span-6">
-              <div className="grid min-h-[220px] grid-cols-[190px_1fr] items-end gap-1.5 sm:min-h-[248px] sm:grid-cols-[226px_1fr] sm:gap-2.5">
-                <div className="relative -mb-6 -ml-5 h-[250px] w-[190px] self-end sm:-mb-7 sm:-ml-8 sm:h-[286px] sm:w-[226px] lg:-ml-10">
+              <div className="grid min-h-[220px] grid-cols-1 items-center gap-3 sm:min-h-[248px] sm:grid-cols-[210px_1fr] sm:items-end sm:gap-2.5 md:grid-cols-[226px_1fr]">
+                <div className="relative mx-auto hidden h-[214px] w-[170px] sm:-mb-6 sm:-ml-6 sm:mx-0 sm:block sm:h-[250px] sm:w-[190px] md:-mb-7 md:-ml-8 md:h-[286px] md:w-[226px] lg:-ml-10">
                   <Image
                     src="/services/Curtis.png"
                     alt="Curtis from NPT Logistics"
                     fill
                     className="object-contain object-bottom"
-                    sizes="(max-width: 640px) 190px, 226px"
+                    sizes="(max-width: 640px) 170px, (max-width: 768px) 190px, 226px"
                   />
                 </div>
-                <div className="-ml-1 flex h-full flex-col justify-center pb-1 sm:-ml-2">
-                  <div className="h-[2px] w-14 bg-[color:var(--color-brand-500)]" />
+                <div className="flex h-full flex-col justify-center pb-1 text-center sm:-ml-1 sm:text-left md:-ml-2">
+                  <div className="mx-auto h-[2px] w-14 bg-[color:var(--color-brand-500)] sm:mx-0" />
                   <div className="mt-3 text-xs font-semibold tracking-wide text-[color:var(--color-muted-light)]">
                     Need guidance?
                   </div>
-                  <h2 className="mt-2 max-w-[460px] text-[22px] leading-tight font-semibold text-[color:var(--color-text-light)] sm:text-[26px]">
+                  <h2 className="mt-2 max-w-[460px] text-[21px] leading-tight font-semibold text-[color:var(--color-text-light)] sm:text-[25px] md:text-[26px]">
                     {model.finalCta.title}
                   </h2>
                   <p className="mt-2 max-w-[430px] text-[13.5px] leading-relaxed text-[color:var(--color-muted-light)] sm:text-sm">
@@ -97,15 +97,18 @@ export function ServiceFinalCta({ model }: { model: ServicePageModel }) {
                 className={cn(
                   "rounded-2xl border border-[color:var(--color-border-light)]/85",
                   "bg-[linear-gradient(155deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86))]",
-                  "p-4 sm:p-5",
+                  "p-4 sm:p-5 md:p-6",
                   "shadow-[0_10px_26px_rgba(2,6,23,0.06)]",
                 )}
               >
-                <div className="grid grid-cols-3 gap-2.5">
-                  {model.finalCta.proof.map((p) => (
+                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+                  {model.finalCta.proof.map((p, idx) => (
                     <div
                       key={p.value}
-                      className="rounded-xl border border-[color:var(--color-border-light)] bg-white px-2 py-2 text-center"
+                      className={cn(
+                        "rounded-xl border border-[color:var(--color-border-light)] bg-white px-2 py-2 text-center",
+                        idx === 2 && "col-span-2 sm:col-span-1",
+                      )}
                     >
                       <div className="text-[13px] font-semibold text-[color:var(--color-text-light)]">
                         {p.value}
@@ -129,7 +132,7 @@ export function ServiceFinalCta({ model }: { model: ServicePageModel }) {
                       })
                     }
                     className={cn(
-                      "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold",
+                      "inline-flex h-12 items-center justify-center rounded-md px-5 text-sm font-semibold md:h-11",
                       "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",
                       "shadow-[0_8px_22px_rgba(220,38,38,0.25)]",
                       focusRing,
@@ -150,7 +153,7 @@ export function ServiceFinalCta({ model }: { model: ServicePageModel }) {
                       });
                     }}
                     className={cn(
-                      "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold",
+                      "inline-flex h-12 items-center justify-center rounded-md px-5 text-sm font-semibold md:h-11",
                       "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] hover:bg-[color:var(--color-surface-0-light)]",
                       focusRing,
                     )}

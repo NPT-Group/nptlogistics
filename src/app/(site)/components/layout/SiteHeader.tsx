@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
+import { trackCtaClick } from "@/lib/analytics/cta";
 import { DesktopNav } from "./header/DesktopNav";
 import { MobileNav } from "./header/MobileNav";
 
@@ -39,6 +40,14 @@ export function SiteHeader() {
           {/* Logo (NO hover background) */}
           <Link
             href="/"
+            onClick={() =>
+              trackCtaClick({
+                ctaId: "header_home_logo",
+                location: "site_header:brand",
+                destination: "/",
+                label: "NPT Logistics",
+              })
+            }
             className={cn("flex cursor-pointer items-center rounded-md px-2 py-1.5", focusRing)}
             aria-label="NPT Logistics home"
           >
@@ -62,6 +71,14 @@ export function SiteHeader() {
               {/* Track Shipment */}
               <Link
                 href="/tracking"
+                onClick={() =>
+                  trackCtaClick({
+                    ctaId: "header_track_shipment",
+                    location: "site_header:actions",
+                    destination: "/tracking",
+                    label: "Track Shipment",
+                  })
+                }
                 className={cn(
                   "hidden h-10 cursor-pointer items-center justify-center rounded-md px-4 text-sm font-medium lg:inline-flex",
                   "border border-[color:var(--color-nav-border)]",
@@ -76,6 +93,14 @@ export function SiteHeader() {
               {/* Employee Portal */}
               <Link
                 href="/employee-portal"
+                onClick={() =>
+                  trackCtaClick({
+                    ctaId: "header_employee_portal",
+                    location: "site_header:actions",
+                    destination: "/employee-portal",
+                    label: "Employee Portal",
+                  })
+                }
                 className={cn(
                   "hidden h-10 cursor-pointer items-center justify-center rounded-md px-4 text-sm font-medium lg:inline-flex",
                   "border border-[color:var(--color-nav-border)]",
@@ -90,6 +115,14 @@ export function SiteHeader() {
               {/* Request a Quote (LAST) */}
               <Link
                 href="/quote"
+                onClick={() =>
+                  trackCtaClick({
+                    ctaId: "header_request_quote",
+                    location: "site_header:actions",
+                    destination: "/quote",
+                    label: "Request a Quote",
+                  })
+                }
                 className={cn(
                   "inline-flex h-10 cursor-pointer items-center justify-center rounded-md px-4 text-sm font-semibold",
                   "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",

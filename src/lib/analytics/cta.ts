@@ -7,6 +7,15 @@ type CtaClickPayload = {
   label?: string;
 };
 
+export function toCtaSlug(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
 export function trackCtaClick(payload: CtaClickPayload) {
   if (typeof window === "undefined") return;
 

@@ -3,6 +3,7 @@
 import React from "react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { usePathname, useRouter } from "next/navigation";
+import { trackCtaClick } from "@/lib/analytics/cta";
 import { NAV } from "@/config/navigation";
 import { DesktopRichDropdown, SolutionsMegaMenu } from "./NavMenuParts";
 
@@ -52,6 +53,12 @@ export function DesktopNav() {
 
   const navigateToSolutions = React.useCallback(() => {
     closeMenu();
+    trackCtaClick({
+      ctaId: "nav_desktop_solutions_overview",
+      location: "nav_desktop:solutions_trigger",
+      destination: "/#solutions",
+      label: "Solutions",
+    });
 
     if (pathname === "/") {
       const section = document.getElementById("solutions");
@@ -69,6 +76,12 @@ export function DesktopNav() {
 
   const navigateToIndustries = React.useCallback(() => {
     closeMenu();
+    trackCtaClick({
+      ctaId: "nav_desktop_industries_overview",
+      location: "nav_desktop:industries_trigger",
+      destination: "/#industries",
+      label: "Industries",
+    });
 
     if (pathname === "/") {
       const section = document.getElementById("industries");
@@ -86,6 +99,12 @@ export function DesktopNav() {
 
   const navigateToCareers = React.useCallback(() => {
     closeMenu();
+    trackCtaClick({
+      ctaId: "nav_desktop_careers_overview",
+      location: "nav_desktop:careers_trigger",
+      destination: "/careers#overview",
+      label: "Careers",
+    });
 
     if (pathname === "/careers") {
       const section = document.getElementById("overview");

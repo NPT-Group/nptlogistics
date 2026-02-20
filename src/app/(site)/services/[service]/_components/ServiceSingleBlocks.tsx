@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { trackCtaClick, toCtaSlug } from "@/lib/analytics/cta";
 import { cn } from "@/lib/cn";
 
 const focusRing =
@@ -18,7 +19,12 @@ export function SinglePanel({
   className?: string;
 }) {
   return (
-    <section className={cn("rounded-2xl border border-[color:var(--color-border-light)] bg-white p-6 sm:p-7", className)}>
+    <section
+      className={cn(
+        "rounded-2xl border border-[color:var(--color-border-light)] bg-white p-5 sm:p-6 md:p-7",
+        className,
+      )}
+    >
       <h2 className="text-[1.22rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.34rem]">
         {title}
       </h2>
@@ -109,7 +115,7 @@ export function ConversionRail({
   onSecondaryClick: () => void;
 }) {
   return (
-    <section className="rounded-2xl border border-[color:var(--color-border-light)] bg-white p-6 sm:p-7">
+    <section className="rounded-2xl border border-[color:var(--color-border-light)] bg-white p-5 sm:p-6 md:p-7">
       <h2 className="text-[1.2rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.3rem]">
         {title}
       </h2>
@@ -130,7 +136,7 @@ export function ConversionRail({
           href={primary.href}
           onClick={onPrimaryClick}
           className={cn(
-            "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold text-white",
+            "inline-flex h-12 items-center justify-center rounded-md px-5 text-sm font-semibold text-white md:h-11",
             "shadow-[0_8px_20px_rgba(2,6,23,0.16)]",
             focusRing,
           )}
@@ -142,7 +148,7 @@ export function ConversionRail({
           href={secondary.href}
           onClick={onSecondaryClick}
           className={cn(
-            "inline-flex h-11 items-center justify-center rounded-md border border-[color:var(--color-border-light)] bg-white px-5 text-sm font-semibold text-[color:var(--color-text-light)] hover:bg-[color:var(--color-surface-0-light)]",
+            "inline-flex h-12 items-center justify-center rounded-md border border-[color:var(--color-border-light)] bg-white px-5 text-sm font-semibold text-[color:var(--color-text-light)] hover:bg-[color:var(--color-surface-0-light)] md:h-11",
             focusRing,
           )}
         >
@@ -156,12 +162,14 @@ export function ConversionRail({
 export function RelatedServicesList({
   title,
   items,
+  trackingContext,
 }: {
   title: string;
   items: Array<{ label: string; href: string; reason: string }>;
+  trackingContext?: { serviceKey: string; location: string };
 }) {
   return (
-    <section className="rounded-2xl border border-[color:var(--color-border-light)] bg-white p-6 sm:p-7">
+    <section className="rounded-2xl border border-[color:var(--color-border-light)] bg-white p-5 sm:p-6 md:p-7">
       <h2 className="text-[1.16rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.24rem]">
         {title}
       </h2>
@@ -170,6 +178,15 @@ export function RelatedServicesList({
           <Link
             key={item.href}
             href={item.href}
+            onClick={() => {
+              if (!trackingContext) return;
+              trackCtaClick({
+                ctaId: `service_single_related_${trackingContext.serviceKey}_${toCtaSlug(item.label)}`,
+                location: trackingContext.location,
+                destination: item.href,
+                label: item.label,
+              });
+            }}
             className={cn(
               "rounded-xl border border-[color:var(--color-border-light)] bg-[color:var(--color-surface-0-light)] px-4 py-3 transition",
               "hover:border-[color:var(--color-brand-500)]/40 hover:bg-white",

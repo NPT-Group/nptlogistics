@@ -338,7 +338,11 @@ export function SolutionsMegaMenu({
                       </div>
                       <div className="grid gap-2">
                         {cat.links.map((l) => (
-                          <MenuLink key={l.href} {...l} onNavigate={closeMenu} />
+                          <MenuLink
+                            key={l.href}
+                            {...l}
+                            onNavigate={closeMenu}
+                          />
                         ))}
                       </div>
                     </div>

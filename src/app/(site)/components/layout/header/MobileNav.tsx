@@ -8,6 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { trackCtaClick } from "@/lib/analytics/cta";
 import { cn } from "@/lib/cn";
 import { NAV, type NavLink } from "@/config/navigation";
 import { focusRingNav, focusRingMenu, NAV_DESKTOP_MEDIA_QUERY } from "./constants";
@@ -292,7 +293,15 @@ export function MobileNav() {
                     <div className="grid grid-cols-2 gap-3">
                       <Link
                         href="/tracking"
-                        onClick={closeAll}
+                        onClick={() => {
+                          closeAll();
+                          trackCtaClick({
+                            ctaId: "nav_mobile_track_shipment",
+                            location: "nav_mobile:actions",
+                            destination: "/tracking",
+                            label: "Track Shipment",
+                          });
+                        }}
                         className={cn(
                           "inline-flex h-11 items-center justify-center rounded-xl border px-4 text-sm font-semibold",
                           "border border-[color:var(--color-nav-border)]",
@@ -305,7 +314,15 @@ export function MobileNav() {
 
                       <Link
                         href="/employee-portal"
-                        onClick={closeAll}
+                        onClick={() => {
+                          closeAll();
+                          trackCtaClick({
+                            ctaId: "nav_mobile_employee_portal",
+                            location: "nav_mobile:actions",
+                            destination: "/employee-portal",
+                            label: "Employee Portal",
+                          });
+                        }}
                         className={cn(
                           "inline-flex h-11 items-center justify-center rounded-xl border px-4 text-sm font-semibold",
                           "border border-[color:var(--color-nav-border)]",
@@ -319,7 +336,15 @@ export function MobileNav() {
 
                     <Link
                       href="/quote"
-                      onClick={closeAll}
+                      onClick={() => {
+                        closeAll();
+                        trackCtaClick({
+                          ctaId: "nav_mobile_request_quote",
+                          location: "nav_mobile:actions",
+                          destination: "/quote",
+                          label: "Request a Quote",
+                        });
+                      }}
                       className={cn(
                         "inline-flex h-11 items-center justify-center rounded-xl px-4 text-sm font-semibold",
                         "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",

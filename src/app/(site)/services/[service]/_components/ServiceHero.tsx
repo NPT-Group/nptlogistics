@@ -128,7 +128,7 @@ export function ServiceHero({ model }: { model: ServicePageModel }) {
                 })
               }
               className={cn(
-                "inline-flex h-11 items-center justify-center rounded-md px-6 text-sm font-semibold",
+                "inline-flex h-12 items-center justify-center rounded-md px-6 text-sm font-semibold md:h-11",
                 isCrossBorder
                   ? "border border-cyan-300/55 bg-[linear-gradient(180deg,rgba(14,165,233,0.88),rgba(2,132,199,0.88))] text-white shadow-[0_14px_28px_rgba(14,116,144,0.34)] hover:bg-[linear-gradient(180deg,rgba(14,165,233,0.96),rgba(2,132,199,0.96))]"
                   : isValueAdded
@@ -161,7 +161,7 @@ export function ServiceHero({ model }: { model: ServicePageModel }) {
                 })
               }
               className={cn(
-                "inline-flex h-11 items-center justify-center rounded-md px-6 text-sm font-semibold",
+                "inline-flex h-12 items-center justify-center rounded-md px-6 text-sm font-semibold md:h-11",
                 isCrossBorder
                   ? "border border-cyan-300/45 bg-[rgba(2,6,23,0.18)] text-cyan-100 hover:bg-[rgba(6,182,212,0.14)]"
                   : isValueAdded
