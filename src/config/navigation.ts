@@ -215,7 +215,7 @@ export const NAV = {
       },
       {
         label: "Blog / Insights",
-        href: "/resources/blog",
+        href: "/blog",
         description: "Industry updates and practical insights.",
         icon: "package",
       },
@@ -241,7 +241,7 @@ export const NAV = {
       title: "Careers",
       description: "Join a team that values discipline, safety, and operational excellence.",
       ctaLabel: "View job listings",
-      ctaHref: "/careers/jobs",
+      ctaHref: "/careers#jobs",
     },
     links: [
       {
@@ -252,13 +252,13 @@ export const NAV = {
       },
       {
         label: "Driver Opportunities",
-        href: "/careers/drivers",
+        href: "/careers#drive",
         description: "Driver roles and requirements.",
         icon: "truck",
       },
       {
         label: "Job Listings",
-        href: "/careers/jobs",
+        href: "/careers#jobs",
         description: "Open corporate and operations roles.",
         icon: "briefcase",
       },

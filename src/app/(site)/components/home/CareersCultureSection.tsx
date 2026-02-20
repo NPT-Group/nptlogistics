@@ -189,12 +189,12 @@ export function CareersCultureSection() {
                   View Open Roles
                 </Link>
                 <Link
-                  href="/careers#drivers"
+                  href="/careers#drive"
                   onClick={() =>
                     trackCtaClick({
                       ctaId: "careers_secondary_driver_opportunities",
                       location: "careers_culture",
-                      destination: "/careers#drivers",
+                      destination: "/careers#drive",
                       label: "Driver Opportunities",
                     })
                   }

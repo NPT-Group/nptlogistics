@@ -9,6 +9,9 @@ import Image from "next/image";
 
 import { NAV_OFFSET } from "@/constants/ui";
 import { trackCtaClick } from "@/lib/analytics/cta";
+import { Container } from "@/app/(site)/components/layout/Container";
+import { Section } from "@/app/(site)/components/layout/Section";
+import { cn } from "@/lib/cn";
 
 type CategoryItem = {
   id: string;
@@ -16,10 +19,6 @@ type CategoryItem = {
   slug: string;
   postCount?: number;
 };
-
-function cx(...v: Array<string | false | null | undefined>) {
-  return v.filter(Boolean).join(" ");
-}
 
 function fmtDate(d?: any) {
   if (!d) return "";
@@ -47,7 +46,7 @@ function BannerImg({
   priority?: boolean;
   sizes?: string;
 }) {
-  if (!url) return <div className={cx("bg-gray-100", className)} />;
+  if (!url) return <div className={cn("bg-gray-100", className)} />;
 
   return (
     <Image
@@ -56,7 +55,7 @@ function BannerImg({
       fill
       priority={priority}
       sizes={sizes}
-      className={cx("object-cover", className)}
+      className={cn("object-cover", className)}
     />
   );
 }
@@ -137,7 +136,7 @@ export default function BlogIndexClient({
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-white">
       {/* HERO */}
-      <div className="relative overflow-hidden">
+      <Section className="relative overflow-hidden !py-0" variant="light">
         {/* background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800" />
@@ -153,8 +152,8 @@ export default function BlogIndexClient({
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/55 to-slate-950/15" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-6 py-14">
-          <div className="max-w-2xl">
+        <Container className="relative z-10 max-w-[1440px] px-4 py-14 sm:px-6 lg:px-6">
+          <div className="max-w-2xl text-white">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
               <span className="h-1.5 w-1.5 rounded-full bg-white/80" />
               North American Logistics Insights
@@ -200,7 +199,7 @@ export default function BlogIndexClient({
                   <button
                     key={c.id}
                     onClick={() => selectCategory(c.id)}
-                    className={cx(
+                    className={cn(
                       "flex items-center justify-between rounded-2xl border px-3 py-2 text-left text-sm transition",
                       active
                         ? "border-white/25 bg-white/10"
@@ -225,11 +224,12 @@ export default function BlogIndexClient({
               </button>
             </div>
           </div>
-        </div>
-      </div>
+        </Container>
+      </Section>
 
       {/* CONTENT */}
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <Section className="py-10" variant="light">
+      <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           {/* LEFT */}
           <div>
@@ -395,7 +395,7 @@ export default function BlogIndexClient({
                       if (hasFilters) clearFilters();
                       else selectCategory(null);
                     }}
-                    className={cx(
+                    className={cn(
                       "text-xs font-semibold",
                       hasFilters || !activeCategoryId
                         ? "text-slate-900"
@@ -413,7 +413,7 @@ export default function BlogIndexClient({
                       <button
                         key={c.id}
                         onClick={() => selectCategory(c.id)}
-                        className={cx(
+                        className={cn(
                           "w-full rounded-2xl border px-3 py-2 text-left text-sm transition",
                           active
                             ? "border-slate-900/15 bg-slate-50"
@@ -468,7 +468,8 @@ export default function BlogIndexClient({
             </div>
           </aside>
         </div>
-      </div>
+      </Container>
+      </Section>
     </div>
   );
 }

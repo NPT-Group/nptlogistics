@@ -1,13 +1,14 @@
-import type { PropsWithChildren } from "react";
+import type { ComponentPropsWithoutRef, PropsWithChildren } from "react";
 import { cn } from "@/lib/cn";
 
 type SectionProps = PropsWithChildren<{
   id?: string;
   variant?: "dark" | "light";
   className?: string;
-}>;
+}> &
+  Omit<ComponentPropsWithoutRef<"section">, "id" | "className">;
 
-export function Section({ id, variant = "dark", className, children }: SectionProps) {
+export function Section({ id, variant = "dark", className, children, ...rest }: SectionProps) {
   return (
     <section
       id={id}
@@ -19,6 +20,7 @@ export function Section({ id, variant = "dark", className, children }: SectionPr
           "bg-[color:var(--color-surface-0-light)] text-[color:var(--color-text-light)]",
         className,
       )}
+      {...rest}
     >
       {children}
     </section>

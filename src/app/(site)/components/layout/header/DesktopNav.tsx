@@ -84,6 +84,23 @@ export function DesktopNav() {
     router.push("/#industries");
   }, [closeMenu, pathname, router]);
 
+  const navigateToCareers = React.useCallback(() => {
+    closeMenu();
+
+    if (pathname === "/careers") {
+      const section = document.getElementById("overview");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (window.location.hash !== "#overview") {
+          window.history.replaceState(null, "", "#overview");
+        }
+        return;
+      }
+    }
+
+    router.push("/careers#overview");
+  }, [closeMenu, pathname, router]);
+
   React.useEffect(() => {
     return () => {
       if (openTimer.current) window.clearTimeout(openTimer.current);
@@ -149,6 +166,7 @@ export function DesktopNav() {
             scheduleClose={scheduleClose}
             cancelClose={cancelClose}
             closeMenu={closeMenu}
+            onPrimaryAction={navigateToCareers}
           />
         </NavigationMenu.List>
       </NavigationMenu.Root>

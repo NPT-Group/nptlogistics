@@ -19,6 +19,9 @@ import {
 import { NAV_OFFSET } from "@/constants/ui";
 import { EEmploymentType } from "@/types/jobPosting.types";
 import { trackCtaClick } from "@/lib/analytics/cta";
+import { Container } from "@/app/(site)/components/layout/Container";
+import { Section } from "@/app/(site)/components/layout/Section";
+import { cn } from "@/lib/cn";
 
 function pillLabel(v?: string) {
   return (v || "")
@@ -143,9 +146,10 @@ export default function CareersClient({
     1) HERO / OVERVIEW
     Anchor: #overview
    ========================= */}
-      <section
+      <Section
         id="overview"
         className="relative overflow-hidden border-b border-slate-200/70"
+        variant="light"
         style={{ scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
       >
         {/* background banner */}
@@ -176,15 +180,15 @@ export default function CareersClient({
 
         {/* Content */}
         <div className="relative">
-          <div className="mx-auto max-w-6xl px-6">
+          <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
             <div
-              className={[
+              className={cn(
                 "relative z-10 flex flex-col justify-center",
                 // shorter height
                 "min-h-[44svh] sm:min-h-[42svh]",
                 // reduced padding
                 "pt-8 pb-8 sm:pt-10 sm:pb-10",
-              ].join(" ")}
+              )}
             >
               {/* Badge */}
               <span className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/18 bg-white/10 px-3 py-1 text-xs text-white backdrop-blur">
@@ -218,11 +222,11 @@ export default function CareersClient({
                     });
                     scrollToId("jobs");
                   }}
-                  className={[
+                  className={cn(
                     "inline-flex h-10 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold",
                     "bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
                     focusRing,
-                  ].join(" ")}
+                  )}
                 >
                   View Job Listings <ArrowRight className="h-4 w-4" />
                 </button>
@@ -238,12 +242,12 @@ export default function CareersClient({
                     });
                     scrollToId("drive");
                   }}
-                  className={[
+                  className={cn(
                     "inline-flex h-10 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold",
                     "border border-white/22 bg-white/10 text-white shadow-sm transition hover:bg-white/15",
                     "backdrop-blur",
                     focusRing,
-                  ].join(" ")}
+                  )}
                 >
                   Driver Opportunities <ArrowRight className="h-4 w-4" />
                 </button>
@@ -265,20 +269,22 @@ export default function CareersClient({
                 </div>
               </div>
             </div>
-          </div>
+          </Container>
         </div>
-      </section>
+      </Section>
 
       {/* =========================
           2) DRIVE FOR NPT
           Anchor: #drive
          ========================= */}
-      <section
+      <Section
         id="drive"
-        className="mx-auto max-w-6xl px-6 py-12"
+        className="py-12"
+        variant="light"
         style={{ scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
       >
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+          <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Drive for NPT</h2>
 
@@ -320,11 +326,11 @@ export default function CareersClient({
                   label: "Apply via Drivedock",
                 })
               }
-              className={[
+              className={cn(
                 "mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-semibold",
                 "bg-slate-900 text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
                 focusRing,
-              ].join(" ")}
+              )}
             >
               Apply via Drivedock <ExternalLink className="h-4 w-4" />
             </a>
@@ -333,19 +339,21 @@ export default function CareersClient({
               Opens in a new tab. No internal driver application forms.
             </div>
           </div>
-        </div>
-      </section>
+          </div>
+        </Container>
+      </Section>
 
       {/* =========================
           3) JOB LISTINGS (NON-DRIVER)
           Anchor: #jobs
          ========================= */}
-      <section
+      <Section
         id="jobs"
-        className="border-t border-slate-200/70 bg-white"
+        className="border-t border-slate-200/70 bg-white py-12"
+        variant="light"
         style={{ scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
       >
-        <div className="mx-auto max-w-6xl px-6 py-12">
+        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Job Openings</h2>
@@ -371,11 +379,11 @@ export default function CareersClient({
                     onChange={(e) => setQ(e.target.value)}
                     onKeyDown={(e) => (e.key === "Enter" ? apply() : null)}
                     placeholder="Search roles…"
-                    className={[
+                    className={cn(
                       "h-10 w-full rounded-2xl border border-slate-200 bg-white px-4 pl-10 text-[15px] text-slate-900",
                       "shadow-sm transition outline-none placeholder:text-slate-400 focus:border-slate-300",
                       focusRing,
-                    ].join(" ")}
+                    )}
                   />
                 </div>
 
@@ -386,11 +394,11 @@ export default function CareersClient({
                     onChange={(e) => setDepartment(e.target.value)}
                     onKeyDown={(e) => (e.key === "Enter" ? apply() : null)}
                     placeholder="Department"
-                    className={[
+                    className={cn(
                       "h-10 w-full rounded-2xl border border-slate-200 bg-white px-4 pl-10 text-[15px] text-slate-900",
                       "shadow-sm transition outline-none placeholder:text-slate-400 focus:border-slate-300",
                       focusRing,
-                    ].join(" ")}
+                    )}
                   />
                 </div>
 
@@ -401,11 +409,11 @@ export default function CareersClient({
                     onChange={(e) => setLocation(e.target.value)}
                     onKeyDown={(e) => (e.key === "Enter" ? apply() : null)}
                     placeholder="Location"
-                    className={[
+                    className={cn(
                       "h-10 w-full rounded-2xl border border-slate-200 bg-white px-4 pl-10 text-[15px] text-slate-900",
                       "shadow-sm transition outline-none placeholder:text-slate-400 focus:border-slate-300",
                       focusRing,
-                    ].join(" ")}
+                    )}
                   />
                 </div>
 
@@ -413,11 +421,11 @@ export default function CareersClient({
                   <select
                     value={employmentType}
                     onChange={(e) => setEmploymentType(e.target.value)}
-                    className={[
+                    className={cn(
                       "h-10 w-full appearance-none rounded-2xl border border-slate-200 bg-white px-4 pr-10 text-[15px] text-slate-900",
                       "shadow-sm transition outline-none focus:border-slate-300",
                       focusRing,
-                    ].join(" ")}
+                    )}
                   >
                     <option value="">Employment type</option>
                     {Object.values(EEmploymentType).map((v) => (
@@ -435,11 +443,11 @@ export default function CareersClient({
                   <button
                     onClick={apply}
                     disabled={isPending}
-                    className={[
+                    className={cn(
                       "inline-flex h-10 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-semibold",
                       "border border-slate-200 bg-white text-slate-900 shadow-sm transition hover:bg-slate-50 disabled:opacity-60",
                       focusRing,
-                    ].join(" ")}
+                    )}
                   >
                     Apply
                   </button>
@@ -447,11 +455,11 @@ export default function CareersClient({
                   <button
                     onClick={clearAll}
                     disabled={isPending || !activeFilters}
-                    className={[
+                    className={cn(
                       "inline-flex h-10 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-semibold",
                       "border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50",
                       focusRing,
-                    ].join(" ")}
+                    )}
                     title="Clear filters"
                   >
                     <X className="h-4 w-4" />
@@ -495,10 +503,10 @@ export default function CareersClient({
                         label: j.title ? `Open job: ${j.title}` : "Open job",
                       })
                     }
-                    className={[
+                    className={cn(
                       "group block px-5 py-4 transition",
                       "hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-ring)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-                    ].join(" ")}
+                    )}
                   >
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0">
@@ -567,10 +575,10 @@ export default function CareersClient({
                 qs.set("page", String(Math.max(1, (meta.page ?? 1) - 1)));
                 startTransition(() => router.push(`/careers?${qs.toString()}#jobs`));
               }}
-              className={[
+              className={cn(
                 "rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50",
                 focusRing,
-              ].join(" ")}
+              )}
             >
               Prev
             </button>
@@ -591,10 +599,10 @@ export default function CareersClient({
                 qs.set("page", String((meta.page ?? 1) + 1));
                 startTransition(() => router.push(`/careers?${qs.toString()}#jobs`));
               }}
-              className={[
+              className={cn(
                 "rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50",
                 focusRing,
-              ].join(" ")}
+              )}
             >
               Next
             </button>
@@ -613,17 +621,17 @@ export default function CareersClient({
                 });
                 scrollToId("drive");
               }}
-              className={[
+              className={cn(
                 "font-semibold text-slate-900 underline underline-offset-2",
                 focusRing,
-              ].join(" ")}
+              )}
             >
               Driver Opportunities
             </button>
             .
           </div>
-        </div>
-      </section>
+        </Container>
+      </Section>
     </div>
   );
 }

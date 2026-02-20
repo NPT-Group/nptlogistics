@@ -104,7 +104,7 @@ const AUDIENCE_CARDS = [
     title: "I Want to Work at NPT",
     description:
       "View open roles and join a team built on safety, discipline, and operational excellence.",
-    href: "/careers/jobs",
+    href: "/careers#jobs",
     label: "View Jobs",
   },
 ] as const;
