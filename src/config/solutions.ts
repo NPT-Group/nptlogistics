@@ -132,7 +132,7 @@ export const SOLUTIONS_DATA = {
         description: "Refrigerated and controlled-temperature freight.",
         icon: "snowflake",
         bestFor: "Perishables, pharmaceuticals",
-        image: "/solutions/card-refrigerated.jpg",
+        image: "/solutions/card-refrigerated.png",
       },
     ],
   },

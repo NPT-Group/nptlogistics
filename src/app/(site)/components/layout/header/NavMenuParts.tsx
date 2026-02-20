@@ -3,6 +3,7 @@
 import React from "react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { NAV, type NavLink } from "@/config/navigation";
@@ -71,12 +72,32 @@ function MenuLink({
   children,
   onNavigate,
 }: NavLink & { onNavigate?: () => void }) {
+  const pathname = usePathname();
+  const handleLinkClick = React.useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, targetHref: string) => {
+      onNavigate?.();
+
+      const [targetPath, targetHash = ""] = targetHref.split("#");
+      const isCareersOverviewTarget =
+        targetPath === "/careers" && (targetHash === "" || targetHash === "overview");
+
+      if (!isCareersOverviewTarget || pathname !== "/careers") return;
+
+      event.preventDefault();
+      if (window.location.hash !== "#overview") {
+        window.history.replaceState(null, "", "#overview");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [onNavigate, pathname],
+  );
+
   return (
     <div className="rounded-xl">
       <NavigationMenu.Link asChild>
         <Link
           href={href}
-          onClick={onNavigate}
+          onClick={(event) => handleLinkClick(event, href)}
           className={cn(
             "group block cursor-pointer rounded-2xl p-3 transition",
             "border border-transparent",
@@ -118,7 +139,7 @@ function MenuLink({
             <NavigationMenu.Link key={child.href} asChild>
               <Link
                 href={child.href}
-                onClick={onNavigate}
+                onClick={(event) => handleLinkClick(event, child.href)}
                 className={cn(
                   "group block cursor-pointer rounded-xl px-3 py-2 text-sm transition",
                   "text-[color:var(--color-menu-muted)]",

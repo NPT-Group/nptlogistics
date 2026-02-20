@@ -6,6 +6,7 @@ import * as Accordion from "@radix-ui/react-accordion";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { NAV, type NavLink } from "@/config/navigation";
@@ -73,10 +74,30 @@ function MobileRowLink({
   icon?: NavLink["icon"];
   onNavigate: () => void;
 }) {
+  const pathname = usePathname();
+  const handleClick = React.useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>) => {
+      onNavigate();
+
+      const [targetPath, targetHash = ""] = href.split("#");
+      const isCareersOverviewTarget =
+        targetPath === "/careers" && (targetHash === "" || targetHash === "overview");
+
+      if (!isCareersOverviewTarget || pathname !== "/careers") return;
+
+      event.preventDefault();
+      if (window.location.hash !== "#overview") {
+        window.history.replaceState(null, "", "#overview");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [href, onNavigate, pathname],
+  );
+
   return (
     <Link
       href={href}
-      onClick={onNavigate}
+      onClick={handleClick}
       className={cn(
         "group flex items-center gap-3 rounded-xl px-3 py-2.5 transition",
         "border border-transparent",

@@ -55,7 +55,8 @@ export function ServiceSubnav({ model }: { model: ServicePageModel }) {
     const style = getComputedStyle(source);
     const headerH = parseFloat(style.getPropertyValue("--service-header-h")) || 0;
     const subnavH = parseFloat(style.getPropertyValue("--service-subnav-h")) || 0;
-    return headerH + subnavH;
+    const isDesktopSticky = window.matchMedia("(min-width: 768px)").matches;
+    return headerH + (isDesktopSticky ? subnavH : 0);
   }, []);
 
   // Measure subnav height and set CSS var on the service shell.
@@ -198,7 +199,7 @@ export function ServiceSubnav({ model }: { model: ServicePageModel }) {
       id="service-subnav"
       ref={barRef}
       className={cn(
-        "sticky z-30 border-y border-white/10 bg-[color:var(--color-footer-bg)]/95 backdrop-blur transition-all duration-300",
+        "z-30 border-y border-white/10 bg-[color:var(--color-footer-bg)]/95 backdrop-blur transition-all duration-300 md:sticky",
         isPinned && "bg-[color:var(--color-footer-bg)]/98 backdrop-blur-md",
       )}
       style={{ top: SERVICE_SUBNAV_TOP_PX }}
