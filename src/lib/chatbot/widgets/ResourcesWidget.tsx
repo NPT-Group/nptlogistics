@@ -1,39 +1,23 @@
-// src/lib/chatbot/widgets/ServicesWidget.tsx
+// src/lib/chatbot/widgets/ResourcesWidget.tsx
 "use client";
 
-export default function ServicesWidget({ actionProvider }: any) {
+export default function ResourcesWidget({ actionProvider }: any) {
   return (
     <div className="flex flex-wrap gap-2">
       <button
-        onClick={() => actionProvider.startSolutions()}
+        onClick={() => actionProvider.goToFromNav("Shipping Guides", "/resources/guides")}
         className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
         type="button"
       >
-        Browse solutions
+        Shipping Guides
       </button>
 
       <button
-        onClick={() => actionProvider.goToTruckload()}
+        onClick={() => actionProvider.goToFromNav("FAQs", "/resources/faqs")}
         className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
         type="button"
       >
-        Truckload (TL)
-      </button>
-
-      <button
-        onClick={() => actionProvider.goToLtl()}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
-      >
-        LTL
-      </button>
-
-      <button
-        onClick={() => actionProvider.goToCrossBorder()}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
-      >
-        Cross-border
+        FAQs
       </button>
 
       <button
@@ -42,6 +26,14 @@ export default function ServicesWidget({ actionProvider }: any) {
         type="button"
       >
         Start a quote
+      </button>
+
+      <button
+        onClick={() => actionProvider.showContact()}
+        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
+        type="button"
+      >
+        Contact an agent
       </button>
     </div>
   );

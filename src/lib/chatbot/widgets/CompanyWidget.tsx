@@ -1,47 +1,47 @@
-// src/lib/chatbot/widgets/ServicesWidget.tsx
+// src/lib/chatbot/widgets/CompanyWidget.tsx
 "use client";
 
-export default function ServicesWidget({ actionProvider }: any) {
+export default function CompanyWidget({ actionProvider }: any) {
   return (
     <div className="flex flex-wrap gap-2">
       <button
-        onClick={() => actionProvider.startSolutions()}
+        onClick={() => actionProvider.goToFromNav("About NPT", "/company/about")}
         className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
         type="button"
       >
-        Browse solutions
+        About NPT
       </button>
 
       <button
-        onClick={() => actionProvider.goToTruckload()}
+        onClick={() => actionProvider.goToFromNav("Locations & Network", "/company/locations")}
         className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
         type="button"
       >
-        Truckload (TL)
+        Locations & Network
       </button>
 
       <button
-        onClick={() => actionProvider.goToLtl()}
+        onClick={() => actionProvider.goToFromNav("Safety & Compliance", "/company/safety")}
         className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
         type="button"
       >
-        LTL
+        Safety & Compliance
       </button>
 
       <button
-        onClick={() => actionProvider.goToCrossBorder()}
+        onClick={() => actionProvider.goToFromNav("Blog / Insights", "/blog")}
         className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
         type="button"
       >
-        Cross-border
+        Blog / Insights
       </button>
 
       <button
-        onClick={() => actionProvider.startQuote()}
+        onClick={() => actionProvider.goToFromNav("Contact", "/contact")}
         className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
         type="button"
       >
-        Start a quote
+        Contact
       </button>
     </div>
   );

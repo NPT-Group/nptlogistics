@@ -1,5 +1,6 @@
 // src/lib/chatbot/ActionProvider.tsx
 import { FAQ, CONTACT_INFO } from "./knowledgeBase";
+import { findNavHref, getSectionCtas } from "./navIndex";
 
 type PageActions = {
   goTo: (href: string) => void;
@@ -39,29 +40,26 @@ export function makeActionProvider(pageActions?: PageActions) {
       }));
     };
 
-    // --- Universal navigation helpers --------------------------------------
+    // --- NAV helpers --------------------------------------------------------
 
     goTo = (href: string) => {
-      // Primary: Next router push via pageActions
       if (pageActions?.goTo) {
         pageActions.goTo(href);
         return;
       }
-
-      // Fallback: hard navigation
-      if (typeof window !== "undefined") {
-        window.location.href = href;
-      }
+      if (typeof window !== "undefined") window.location.href = href;
     };
 
-    scrollToSection = (anchorId: string) => {
-      // Preferred: page listens to command store (your useChatActions implementation)
-      if (pageActions?.scrollTo) {
-        pageActions.scrollTo(anchorId);
-        return;
-      }
+    goToFromNav = (query: string, fallbackHref?: string) => {
+      const href = findNavHref(query) || fallbackHref;
+      if (href) return this.goTo(href);
+    };
 
-      // Fallback: try DOM
+    // --- Universal UI helpers ----------------------------------------------
+
+    scrollToSection = (anchorId: string) => {
+      if (pageActions?.scrollTo) return pageActions.scrollTo(anchorId);
+
       if (typeof document !== "undefined") {
         const el =
           document.getElementById(anchorId) ||
@@ -95,10 +93,34 @@ export function makeActionProvider(pageActions?: PageActions) {
       );
     };
 
+    startSolutions = () => {
+      this.addMessage(
+        this.createChatBotMessage("Which solution are you looking for?", {
+          widget: "solutionsWidget",
+        }),
+      );
+    };
+
     startServicesHelp = () => {
       this.addMessage(
         this.createChatBotMessage("I can help you pick the right service. Start here:", {
           widget: "servicesWidget",
+        }),
+      );
+    };
+
+    showCompany = () => {
+      this.addMessage(
+        this.createChatBotMessage("Here are a few helpful company links:", {
+          widget: "companyWidget",
+        }),
+      );
+    };
+
+    showResources = () => {
+      this.addMessage(
+        this.createChatBotMessage("Resources that might help:", {
+          widget: "resourcesWidget",
         }),
       );
     };
@@ -112,20 +134,22 @@ export function makeActionProvider(pageActions?: PageActions) {
     };
 
     showIndustries = () => {
+      const { industries } = getSectionCtas();
       this.addMessage(
-        this.createChatBotMessage(
-          "We support automotive, manufacturing, retail, food & beverage, industrial energy, and steel & aluminum sectors.",
-          { widget: "industriesWidget" },
-        ),
+        this.createChatBotMessage("Pick an industry (or view them all):", {
+          widget: "industriesWidget",
+          props: { viewAllHref: industries },
+        }),
       );
     };
 
     showCareers = () => {
+      const { careers } = getSectionCtas();
       this.addMessage(
-        this.createChatBotMessage(
-          "We’re hiring drivers, dispatch, cross-border specialists, and operations professionals.",
-          { widget: "careersWidget" },
-        ),
+        this.createChatBotMessage("Want to see driver roles or job listings?", {
+          widget: "careersWidget",
+          props: { careersHref: careers },
+        }),
       );
     };
 
@@ -138,6 +162,18 @@ export function makeActionProvider(pageActions?: PageActions) {
       );
     };
 
+    // --- Specific solution helpers (NAV-driven) ----------------------------
+
+    goToTruckload = () => this.goToFromNav("Truckload (TL)", "/services/truckload");
+    goToLtl = () => this.goToFromNav("Less-Than-Truckload (LTL)", "/services/ltl");
+    goToIntermodal = () => this.goToFromNav("Intermodal", "/services/intermodal");
+    goToExpedited = () =>
+      this.goToFromNav("Expedited & Specialized (ES)", "/services/expedited-specialized");
+    goToHazmat = () => this.goToFromNav("Hazardous Materials (HAZMAT)", "/services/hazmat");
+    goToTemp = () => this.goToFromNav("Temperature-Controlled", "/services/temperature-controlled");
+    goToCrossBorder = () => this.goToFromNav("Cross-Border & Global", "/services/cross-border");
+    goToValueAdded = () => this.goToFromNav("Logistics & Value-Added", "/services/value-added");
+
     // --- FAQ ---------------------------------------------------------------
 
     searchFaq = (query: string) => {
@@ -147,6 +183,20 @@ export function makeActionProvider(pageActions?: PageActions) {
         FAQ.find((f) => f.question.toLowerCase().includes(q)) ||
         FAQ.find((f) => (f.tags || []).some((t) => q.includes(t)));
 
+      // If no FAQ match, try NAV as a “smart router”
+      if (!match) {
+        const href = findNavHref(query);
+        if (href) {
+          this.addMessage(
+            this.createChatBotMessage("I think this page will help:", {
+              widget: "singleLinkWidget",
+              props: { label: "Open page", href },
+            }),
+          );
+          return;
+        }
+      }
+
       if (match) {
         this.addMessage(this.createChatBotMessage(match.answer));
         return;
@@ -154,7 +204,7 @@ export function makeActionProvider(pageActions?: PageActions) {
 
       this.addMessage(
         this.createChatBotMessage(
-          `I’m not sure yet (we’re still building the help content). You can contact us at ${CONTACT_INFO.email} or ${CONTACT_INFO.phone}.`,
+          `I’m not sure. For any inquiry, you can contact us at ${CONTACT_INFO.email} or ${CONTACT_INFO.phone}.`,
           { widget: "contactWidget" },
         ),
       );
@@ -167,9 +217,6 @@ export function makeActionProvider(pageActions?: PageActions) {
       this.goTo("/quote");
     };
 
-    // Kept for compatibility (if anything still calls it)
-    goToQuotePage = () => {
-      this.goTo("/quote");
-    };
+    goToQuotePage = () => this.goTo("/quote");
   };
 }

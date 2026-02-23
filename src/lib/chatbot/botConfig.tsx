@@ -11,7 +11,12 @@ import QuoteWidget from "./widgets/QuoteWidget";
 import IndustriesWidget from "./widgets/IndustriesWidget";
 import CareersWidget from "./widgets/CareersWidget";
 import WhyNptWidget from "./widgets/WhyNptWidget";
-import TrackingWidget from "./widgets/TrackingWidget"; // ✅ add
+import TrackingWidget from "./widgets/TrackingWidget";
+
+import SolutionsWidget from "./widgets/SolutionsWidget";
+import CompanyWidget from "./widgets/CompanyWidget";
+import ResourcesWidget from "./widgets/ResourcesWidget";
+import SingleLinkWidget from "./widgets/SingleLinkWidget";
 
 type BotConfig = {
   botName: string;
@@ -42,6 +47,10 @@ export const botConfig: BotConfig = {
     { widgetName: "startWidget", widgetFunc: (props) => <StartWidget {...props} /> },
     { widgetName: "quoteWidget", widgetFunc: (props) => <QuoteWidget {...props} /> },
     { widgetName: "servicesWidget", widgetFunc: (props) => <ServicesWidget {...props} /> },
+    { widgetName: "solutionsWidget", widgetFunc: (props) => <SolutionsWidget {...props} /> },
+    { widgetName: "companyWidget", widgetFunc: (props) => <CompanyWidget {...props} /> },
+    { widgetName: "resourcesWidget", widgetFunc: (props) => <ResourcesWidget {...props} /> },
+    { widgetName: "singleLinkWidget", widgetFunc: (props) => <SingleLinkWidget {...props} /> },
     { widgetName: "contactWidget", widgetFunc: (props) => <ContactWidget {...props} /> },
     { widgetName: "industriesWidget", widgetFunc: (props) => <IndustriesWidget {...props} /> },
     { widgetName: "careersWidget", widgetFunc: (props) => <CareersWidget {...props} /> },

@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
       catMap.set(String(c._id), { id: String(c._id), name: c.name, slug: c.slug });
     }
 
-    // ✅ Map schema fields -> what BlogIndexClient currently expects
+    // Map schema fields -> what BlogIndexClient currently expects
     const items = rows.map((r: any) => ({
       id: String(r._id),
       slug: r.slug,
