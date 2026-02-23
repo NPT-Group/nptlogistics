@@ -15,7 +15,6 @@ const TOOLTIP_KEY = "npt_chatbot_tooltip_dismissed";
 
 export default function GuidedChatbot() {
   const pageActions = useChatActions();
-  const ActionProvider = React.useMemo(() => makeActionProvider(pageActions), [pageActions]);
 
   const [open, setOpen] = React.useState(false);
   const [showTooltip, setShowTooltip] = React.useState(false);
@@ -24,15 +23,11 @@ export default function GuidedChatbot() {
 
   // Show tooltip once (per session) after a short delay
   React.useEffect(() => {
-    // If user already dismissed this session, skip
     const dismissed = typeof window !== "undefined" && sessionStorage.getItem(TOOLTIP_KEY) === "1";
     if (dismissed) return;
 
     const t = window.setTimeout(() => {
-      // Only show if chat isn't already open
       setShowTooltip(true);
-
-      // Auto-hide after a bit
       const t2 = window.setTimeout(() => setShowTooltip(false), 7000);
       return () => window.clearTimeout(t2);
     }, 1800);
@@ -43,7 +38,7 @@ export default function GuidedChatbot() {
   // Close on Esc
   React.useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") window.setTimeout(() => setOpen(false), 120);
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -55,7 +50,8 @@ export default function GuidedChatbot() {
       if (!open) return;
       const el = panelRef.current;
       if (!el) return;
-      if (e.target instanceof Node && !el.contains(e.target)) setOpen(false);
+      if (e.target instanceof Node && !el.contains(e.target))
+        window.setTimeout(() => setOpen(false), 120);
     }
     window.addEventListener("mousedown", onMouseDown);
     return () => window.removeEventListener("mousedown", onMouseDown);
@@ -67,7 +63,7 @@ export default function GuidedChatbot() {
     try {
       sessionStorage.setItem(TOOLTIP_KEY, "1");
     } catch {
-      // Ignore (probably quota exceeded or in private mode)
+      // Ignore
     }
   }
 
@@ -76,9 +72,28 @@ export default function GuidedChatbot() {
     try {
       sessionStorage.setItem(TOOLTIP_KEY, "1");
     } catch {
-      // Ignore (probably quota exceeded or in private mode)
+      // Ignore
     }
   }
+
+  /**
+   * ✅ Wrap pageActions so ANY navigation from the bot auto-closes the panel.
+   * This covers actionProvider.goTo(), goToFromNav(), prefillAndGoToQuote(), etc.
+   */
+  const pageActionsWithAutoClose = React.useMemo(() => {
+    return {
+      ...pageActions,
+      goTo: (href: string) => {
+        pageActions.goTo(href);
+        window.setTimeout(() => setOpen(false), 120);
+      },
+    };
+  }, [pageActions]);
+
+  const ActionProvider = React.useMemo(
+    () => makeActionProvider(pageActionsWithAutoClose),
+    [pageActionsWithAutoClose],
+  );
 
   return (
     <div className="fixed right-5 bottom-5 z-50">
@@ -168,13 +183,12 @@ export default function GuidedChatbot() {
                   </div>
                 </div>
 
-                {/* little pointer */}
                 <div className="absolute right-6 -bottom-2 h-4 w-4 rotate-45 border-r border-b border-gray-200 bg-white" />
               </div>
             </div>
           )}
 
-          {/* Circular launcher (polished to match site theme) */}
+          {/* Circular launcher */}
           <button
             type="button"
             onClick={openChat}
@@ -190,7 +204,6 @@ export default function GuidedChatbot() {
               boxShadow: "0 14px 30px rgba(0,0,0,0.28), 0 1px 0 rgba(255,255,255,0.06) inset",
             }}
           >
-            {/* Brand accent ring */}
             <span
               className="pointer-events-none absolute -inset-[2px] rounded-full opacity-70 transition group-hover:opacity-100"
               style={{
@@ -207,7 +220,6 @@ export default function GuidedChatbot() {
               }}
             />
 
-            {/* Ping dot (subtle + cleaner) */}
             <span className="absolute -top-0.5 -right-0.5 inline-flex h-3.5 w-3.5">
               <span
                 className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-40"
@@ -215,13 +227,10 @@ export default function GuidedChatbot() {
               />
               <span
                 className="relative inline-flex h-3.5 w-3.5 rounded-full ring-2"
-                style={{
-                  background: "rgb(220,38,38)", // brand-600
-                }}
+                style={{ background: "rgb(220,38,38)" }}
               />
             </span>
 
-            {/* Icon badge */}
             <span
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-full transition group-hover:scale-[1.02]"
               style={{

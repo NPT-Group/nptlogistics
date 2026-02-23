@@ -16,7 +16,7 @@ import TrackingWidget from "./widgets/TrackingWidget";
 import SolutionsWidget from "./widgets/SolutionsWidget";
 import CompanyWidget from "./widgets/CompanyWidget";
 import ResourcesWidget from "./widgets/ResourcesWidget";
-import SingleLinkWidget from "./widgets/SingleLinkWidget";
+import PageSuggestionsWidget from "./widgets/PageSuggestionsWidget";
 
 type BotConfig = {
   botName: string;
@@ -50,7 +50,11 @@ export const botConfig: BotConfig = {
     { widgetName: "solutionsWidget", widgetFunc: (props) => <SolutionsWidget {...props} /> },
     { widgetName: "companyWidget", widgetFunc: (props) => <CompanyWidget {...props} /> },
     { widgetName: "resourcesWidget", widgetFunc: (props) => <ResourcesWidget {...props} /> },
-    { widgetName: "singleLinkWidget", widgetFunc: (props) => <SingleLinkWidget {...props} /> },
+    {
+      widgetName: "pageSuggestionsWidget",
+      widgetFunc: (props) => <PageSuggestionsWidget {...props} />,
+    },
+
     { widgetName: "contactWidget", widgetFunc: (props) => <ContactWidget {...props} /> },
     { widgetName: "industriesWidget", widgetFunc: (props) => <IndustriesWidget {...props} /> },
     { widgetName: "careersWidget", widgetFunc: (props) => <CareersWidget {...props} /> },

@@ -3,13 +3,17 @@
 
 import { NAV } from "@/config/navigation";
 
-const INDUSTRIES = NAV.industries.intro.ctaHref; // "/#industries"
+export default function IndustriesWidget({ actionProvider, ...rest }: any) {
+  const viewAllHref =
+    rest?.payload?.viewAllHref ||
+    rest?.props?.viewAllHref ||
+    rest?.viewAllHref ||
+    NAV.industries.intro.ctaHref; // fallback
 
-export default function IndustriesWidget({ actionProvider }: any) {
   return (
     <div className="flex flex-wrap gap-2">
       <button
-        onClick={() => actionProvider.goTo(INDUSTRIES)}
+        onClick={() => actionProvider.goTo(viewAllHref)}
         className="rounded-full border px-3 py-1 text-sm"
         type="button"
       >

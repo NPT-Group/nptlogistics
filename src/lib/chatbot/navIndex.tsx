@@ -4,10 +4,12 @@ import { NAV, type NavLink, type NavSection } from "@/config/navigation";
 export type NavIndexItem = {
   sectionKey: keyof typeof NAV;
   sectionLabel: string;
+
   label: string;
   href: string;
   description?: string;
   icon?: NavLink["icon"];
+
   keywords: string[];
 };
 
@@ -15,23 +17,28 @@ function norm(s: string) {
   return (s || "").toLowerCase().trim();
 }
 
+function tokenize(s: string) {
+  return norm(s)
+    .replace(/[^\w\s↔-]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
 function keywordsFor(item: { label: string; description?: string; href: string }) {
   const words = new Set<string>();
 
-  const addWords = (txt: string) => {
-    norm(txt)
-      .replace(/[^\w\s↔-]/g, " ")
-      .split(/\s+/)
-      .filter(Boolean)
-      .forEach((w) => words.add(w));
+  const add = (txt?: string) => {
+    if (!txt) return;
+    tokenize(txt).forEach((w) => words.add(w));
   };
 
-  addWords(item.label);
-  if (item.description) addWords(item.description);
-  addWords(item.href);
+  add(item.label);
+  add(item.description);
+  add(item.href);
 
-  // Add a few useful synonyms
   const l = norm(item.label);
+
+  // Helpful synonyms
   if (l.includes("truckload") || l.includes("(tl)"))
     ["tl", "ftl", "truckload"].forEach((k) => words.add(k));
   if (l.includes("less-than-truckload") || l.includes("(ltl)"))
@@ -48,7 +55,7 @@ function keywordsFor(item: { label: string; description?: string; href: string }
   if (l.includes("warehousing"))
     ["warehouse", "storage", "distribution", "3pl"].forEach((k) => words.add(k));
   if (l.includes("faq")) ["faqs", "help", "questions"].forEach((k) => words.add(k));
-  if (l.includes("guides")) ["guide", "shipping guides", "resources"].forEach((k) => words.add(k));
+  if (l.includes("guides")) ["guide", "shipping", "resources"].forEach((k) => words.add(k));
 
   return Array.from(words);
 }
@@ -90,9 +97,11 @@ export function buildNavIndex() {
   const items: NavIndexItem[] = [];
 
   (Object.keys(NAV) as Array<keyof typeof NAV>).forEach((sectionKey) => {
-    const section = NAV[sectionKey] as NavSection & any;
+    const section = NAV[sectionKey] as unknown as NavSection & {
+      categories?: Array<{ title: string; links: readonly NavLink[] }>;
+    };
 
-    // Section intro CTA
+    // Intro CTA as an indexable item
     items.push({
       sectionKey,
       sectionLabel: section.label,
@@ -107,10 +116,10 @@ export function buildNavIndex() {
       }),
     });
 
-    // Solutions uses "categories", others use "links"
+    // Solutions has categories; others have links
     const links: readonly NavLink[] =
       sectionKey === "solutions"
-        ? (section.categories || []).flatMap((c: any) => c.links || [])
+        ? (section.categories || []).flatMap((c) => c.links || [])
         : section.links || [];
 
     links.forEach((l) => pushLink(items, sectionKey, section.label, l));
@@ -121,34 +130,66 @@ export function buildNavIndex() {
 
 export const NAV_INDEX = buildNavIndex();
 
-export function findNavHref(query: string) {
+export type NavMatch = {
+  label: string;
+  href: string;
+  description?: string;
+  sectionLabel: string;
+  sectionKey: keyof typeof NAV;
+  score: number;
+};
+
+export function searchNavMatches(query: string, limit = 3): NavMatch[] {
   const q = norm(query);
-  if (!q) return null;
+  if (!q) return [];
 
-  // 1) exact label match
-  const exact = NAV_INDEX.find((i) => norm(i.label) === q);
-  if (exact) return exact.href;
+  const terms = tokenize(q);
 
-  // 2) contains label
-  const contains = NAV_INDEX.find((i) => norm(i.label).includes(q));
-  if (contains) return contains.href;
+  const scored = NAV_INDEX.map((item) => {
+    const labelN = norm(item.label);
+    const hrefN = norm(item.href);
 
-  // 3) keyword hit scoring
-  const terms = q.split(/\s+/).filter(Boolean);
-  let best: { href: string; score: number } | null = null;
-
-  for (const item of NAV_INDEX) {
     let score = 0;
-    for (const t of terms) {
-      if (item.keywords.includes(t)) score += 2;
-      if (norm(item.label).includes(t)) score += 3;
-      if (norm(item.href).includes(t)) score += 1;
-    }
-    if (!best || score > best.score) best = { href: item.href, score };
-  }
 
-  if (best && best.score >= 3) return best.href;
-  return null;
+    // Strong signals
+    if (labelN === q) score += 24;
+    if (labelN.includes(q)) score += 12;
+
+    // Term-based scoring
+    for (const t of terms) {
+      if (labelN.includes(t)) score += 5;
+      if (item.keywords.includes(t)) score += 4;
+      if (hrefN.includes(t)) score += 1;
+    }
+
+    // Slight preference for non-anchor pages unless query includes "section" etc.
+    if (item.href.includes("#")) score -= 0.5;
+
+    return { item, score };
+  });
+
+  return scored
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, Math.max(1, limit))
+    .map((s) => ({
+      label: s.item.label,
+      href: s.item.href,
+      description: s.item.description,
+      sectionLabel: s.item.sectionLabel,
+      sectionKey: s.item.sectionKey,
+      score: s.score,
+    }));
+}
+
+/**
+ * A "confident" single href.
+ * Used for suggestion widgets; we still do NOT auto-navigate.
+ */
+export function findNavHref(query: string) {
+  const top = searchNavMatches(query, 1)[0];
+  if (!top) return null;
+  return top.score >= 7 ? top.href : null;
 }
 
 export function getSectionCtas() {
@@ -158,4 +199,11 @@ export function getSectionCtas() {
     company: NAV.company.intro.ctaHref,
     careers: NAV.careers.intro.ctaHref,
   };
+}
+
+export function getSolutionsTopLinks() {
+  const solutions = NAV.solutions as unknown as {
+    categories: Array<{ title: string; links: readonly NavLink[] }>;
+  };
+  return (solutions.categories || []).flatMap((c) => c.links || []);
 }
