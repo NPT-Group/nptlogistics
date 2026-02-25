@@ -201,12 +201,7 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
 
   return (
     <div className={className}>
-      <div
-        className={[
-          "rounded-2xl border border-slate-200 bg-white p-3 shadow-sm",
-          status === "error" ? "border-red-200 bg-red-50" : "",
-        ].join(" ")}
-      >
+      <div className={[status === "error" ? "border-red-200 bg-red-50" : ""].join(" ")}>
         {/* Turnstile mounts here */}
         <div ref={containerRef} />
 

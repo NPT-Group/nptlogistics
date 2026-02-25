@@ -20,18 +20,20 @@ import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider
 import { ConfirmModal, type ConfirmTone } from "@/app/(admin)/components/ui/ConfirmModal";
 import { SoftButton } from "@/app/(admin)/components/ui/Buttons";
 import { ExternalLink, FileText, AlertTriangle } from "lucide-react";
+import BlockNoteSkeleton from "@/components/blocknote/BlockNoteSkeleton";
 
-const BlockNote = dynamic(() => import("@/components/BlockNote"), {
+const BlockNote = dynamic(() => import("@/components/blocknote/BlockNote"), {
   ssr: false,
   loading: () => (
-    <div
-      className={cn(
-        "rounded-3xl border p-5 text-sm shadow-[var(--dash-shadow)]",
-        "border-[var(--dash-border)] bg-[var(--dash-surface)] text-[var(--dash-muted)]",
-      )}
-    >
-      Loading editor…
-    </div>
+    <BlockNoteSkeleton
+      variant="admin"
+      paddingClassName="p-5"
+      heightClassName="min-h-[520px]"
+      lines={12}
+      showToolbar={true}
+      showTitleLine={false}
+      className="rounded-3xl"
+    />
   ),
 });
 
@@ -488,25 +490,16 @@ export default function BlogEditor(props: Props) {
             </div>
 
             <div className="p-5">
-              <div
-                className={cn(
-                  "rounded-3xl border shadow-[var(--dash-shadow)]/12",
-                  "border-[var(--dash-border)] bg-[var(--dash-bg)]",
-                )}
-              >
-                <div className="p-4">
-                  <BlockNote
-                    onChange={setDoc}
-                    uploadFile={uploadBlogMediaToTemp}
-                    initialContent={doc ?? undefined}
-                    chrome={{
-                      borderColor: "var(--dash-border)",
-                      background: isDark ? "rgba(255,255,255,0.04)" : "white",
-                      className: "rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12",
-                    }}
-                  />
-                </div>
-              </div>
+              <BlockNote
+                onChange={setDoc}
+                uploadFile={uploadBlogMediaToTemp}
+                initialContent={doc ?? undefined}
+                chrome={{
+                  borderColor: "var(--dash-border)",
+                  background: isDark ? "rgba(255,255,255,0.04)" : "white",
+                  className: "rounded-3xl border p-2 sm:p-4 shadow-[var(--dash-shadow)]/12",
+                }}
+              />
 
               <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-[var(--dash-muted)]">
                 <span className="rounded-full border border-[var(--dash-border)] bg-[var(--dash-bg)] px-2.5 py-1">

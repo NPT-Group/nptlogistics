@@ -109,6 +109,13 @@ const SORT_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "createdAt:desc", label: "Recently added" },
 ];
 
+const DEFAULTS = {
+  page: 1,
+  pageSize: 12,
+  sortBy: "publishedAt" as SortBy,
+  sortDir: "desc" as SortDir,
+};
+
 function buildUrlParams(q: Query) {
   const qs = new URLSearchParams();
 
@@ -118,11 +125,15 @@ function buildUrlParams(q: Query) {
   if (q.workplaceType) qs.set("workplaceType", q.workplaceType);
   if (q.employmentType) qs.set("employmentType", q.employmentType);
 
-  qs.set("page", String(clampPage(q.page)));
-  qs.set("pageSize", String(q.pageSize || 12));
+  // Only include non-default pagination/sort in the URL
+  const page = clampPage(q.page);
+  const pageSize = q.pageSize || DEFAULTS.pageSize;
 
-  if (q.sortBy) qs.set("sortBy", q.sortBy);
-  if (q.sortDir) qs.set("sortDir", q.sortDir);
+  if (page !== DEFAULTS.page) qs.set("page", String(page));
+  if (pageSize !== DEFAULTS.pageSize) qs.set("pageSize", String(pageSize));
+
+  if (q.sortBy !== DEFAULTS.sortBy) qs.set("sortBy", q.sortBy);
+  if (q.sortDir !== DEFAULTS.sortDir) qs.set("sortDir", q.sortDir);
 
   return qs;
 }
@@ -208,7 +219,14 @@ export default function CareersClient({
       merged.sortDir = (merged.sortDir || "desc") as SortDir;
 
       const qs = buildUrlParams(merged);
-      const nextUrl = `/careers?${qs.toString()}#jobs`;
+      const qsStr = qs.toString();
+      const hash = opts?.scroll
+        ? "#jobs"
+        : typeof window !== "undefined"
+          ? window.location.hash
+          : "";
+
+      const nextUrl = `/careers${qsStr ? `?${qsStr}` : ""}${hash || ""}`;
 
       if (replaceUrl) {
         if (lastUrlRef.current !== nextUrl) {
@@ -254,17 +272,18 @@ export default function CareersClient({
   React.useEffect(() => {
     if (writingUrlRef.current) return;
 
-    const nextPage = clampPage(Number(sp.get("page") ?? "1"));
+    const nextPage = clampPage(Number(sp.get("page") ?? String(DEFAULTS.page)));
     const nextPageSize =
-      Number(sp.get("pageSize") ?? String(queryRef.current.pageSize ?? 12)) || 12;
+      Number(sp.get("pageSize") ?? String(queryRef.current.pageSize ?? DEFAULTS.pageSize)) ||
+      DEFAULTS.pageSize;
 
-    const rawSortBy = sp.get("sortBy") ?? "publishedAt";
-    const rawSortDir = sp.get("sortDir") ?? "desc";
+    const rawSortBy = sp.get("sortBy") ?? DEFAULTS.sortBy;
+    const rawSortDir = sp.get("sortDir") ?? DEFAULTS.sortDir;
 
     const allowedSort = new Set<SortBy>(["publishedAt", "title", "createdAt"]);
     const nextSortBy: SortBy = allowedSort.has(rawSortBy as SortBy)
       ? (rawSortBy as SortBy)
-      : "publishedAt";
+      : DEFAULTS.sortBy;
     const nextSortDir: SortDir = rawSortDir === "asc" ? "asc" : "desc";
 
     const next: Query = {
@@ -279,22 +298,24 @@ export default function CareersClient({
       sortDir: nextSortDir,
     };
 
-    setQuery((prev) => {
-      const changed =
-        prev.page !== next.page ||
-        prev.pageSize !== next.pageSize ||
-        prev.q !== next.q ||
-        prev.department !== next.department ||
-        prev.location !== next.location ||
-        prev.workplaceType !== next.workplaceType ||
-        prev.employmentType !== next.employmentType ||
-        prev.sortBy !== next.sortBy ||
-        prev.sortDir !== next.sortDir;
+    const prev = queryRef.current;
 
-      if (!changed) return prev;
-      return next;
-    });
+    const changed =
+      prev.page !== next.page ||
+      prev.pageSize !== next.pageSize ||
+      prev.q !== next.q ||
+      prev.department !== next.department ||
+      prev.location !== next.location ||
+      prev.workplaceType !== next.workplaceType ||
+      prev.employmentType !== next.employmentType ||
+      prev.sortBy !== next.sortBy ||
+      prev.sortDir !== next.sortDir;
 
+    // If nothing changed, do nothing.
+    // This prevents a "setQInput(...)" -> debounce -> runFetch -> router.replace chain on client nav.
+    if (!changed) return;
+
+    setQuery(next);
     setQInput(next.q);
     setDeptInput(next.department);
     setLocInput(next.location);
@@ -445,7 +466,7 @@ export default function CareersClient({
                   }}
                   className={cn(
                     "inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold",
-                    "bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
+                    "cursor-pointer bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
                     focusRing,
                   )}
                 >
@@ -465,7 +486,7 @@ export default function CareersClient({
                   }}
                   className={cn(
                     "inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold",
-                    "border border-white/22 bg-white/10 text-white shadow-sm backdrop-blur transition hover:bg-white/15",
+                    "cursor-pointer border border-white/22 bg-white/10 text-white shadow-sm backdrop-blur transition hover:bg-white/15",
                     focusRing,
                   )}
                 >
@@ -541,7 +562,7 @@ export default function CareersClient({
                   type="button"
                   onClick={() => scrollToId("jobs")}
                   className={cn(
-                    "hidden items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50 sm:inline-flex",
+                    "hidden cursor-pointer items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50 sm:inline-flex",
                     focusRing,
                   )}
                 >
@@ -1089,7 +1110,7 @@ export default function CareersClient({
                     scrollToId("drive");
                   }}
                   className={cn(
-                    "font-semibold text-slate-900 underline underline-offset-2",
+                    "cursor-pointer font-semibold text-slate-900 underline underline-offset-2",
                     focusRing,
                   )}
                 >

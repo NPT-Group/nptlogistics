@@ -21,18 +21,21 @@ import { uploadToS3Presigned, type UploadResult } from "@/lib/utils/s3Helper";
 import JobPostingSidebar from "./JobPostingSidebar";
 import { AlertTriangle, Briefcase, CheckCircle2, ExternalLink } from "lucide-react";
 import { getAllowedJobActions } from "@/lib/utils/jobs/jobStatusTransitions";
+import BlockNoteSkeleton from "@/components/blocknote/BlockNoteSkeleton";
 
-const BlockNote = dynamic(() => import("@/components/BlockNote"), {
+const BlockNote = dynamic(() => import("@/components/blocknote/BlockNote"), {
   ssr: false,
   loading: () => (
-    <div
-      className={cn(
-        "rounded-3xl border p-5 text-sm shadow-[var(--dash-shadow)]",
-        "border-[var(--dash-border)] bg-[var(--dash-surface)] text-[var(--dash-muted)]",
-      )}
-    >
-      Loading editor…
-    </div>
+    <BlockNoteSkeleton
+      variant="admin"
+      paddingClassName="p-5"
+      heightClassName="min-h-[520px]"
+      lines={12}
+      showToolbar={true}
+      showTitleLine={false}
+      // optional: match your editor chrome spacing
+      className="rounded-3xl"
+    />
   ),
 });
 
@@ -662,29 +665,20 @@ export default function JobEditor(props: Props) {
             </div>
 
             <div className="p-5">
-              <div
-                className={cn(
-                  "rounded-3xl border shadow-[var(--dash-shadow)]/12",
-                  "border-[var(--dash-border)] bg-[var(--dash-bg)]",
-                )}
-              >
-                <div className="p-4">
-                  <BlockNote
-                    onChange={(v: any) => {
-                      setSuccess(null);
-                      setError(null);
-                      setDoc(v);
-                    }}
-                    uploadFile={uploadJobsMediaToTemp}
-                    initialContent={doc ?? undefined}
-                    chrome={{
-                      borderColor: "var(--dash-border)",
-                      background: isDark ? "rgba(255,255,255,0.04)" : "white",
-                      className: "rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12",
-                    }}
-                  />
-                </div>
-              </div>
+              <BlockNote
+                onChange={(v: any) => {
+                  setSuccess(null);
+                  setError(null);
+                  setDoc(v);
+                }}
+                uploadFile={uploadJobsMediaToTemp}
+                initialContent={doc ?? undefined}
+                chrome={{
+                  borderColor: "var(--dash-border)",
+                  background: isDark ? "rgba(255,255,255,0.04)" : "white",
+                  className: "rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12",
+                }}
+              />
             </div>
           </section>
 

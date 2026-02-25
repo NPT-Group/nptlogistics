@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import dynamic from "next/dynamic";
+// import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -31,8 +31,22 @@ import { uploadToS3PresignedPublic } from "@/lib/utils/s3ClientUpload";
 import { NEXT_PUBLIC_NPT_HR_EMAIL } from "@/config/env";
 import { publicCountJobView } from "@/lib/utils/jobs/publicJobsApi";
 import { trackCtaClick } from "@/lib/analytics/cta";
+import { CheckBox } from "../../components/ui/CheckBox";
+import dynamic from "next/dynamic";
+import BlockNoteSkeleton from "@/components/blocknote/BlockNoteSkeleton";
 
-const BlockNote = dynamic(() => import("@/components/BlockNote"), { ssr: false });
+const BlockNote = dynamic(() => import("@/components/blocknote/BlockNote"), {
+  ssr: false,
+  loading: () => (
+    <BlockNoteSkeleton
+      variant="public"
+      paddingClassName="p-4 sm:p-6"
+      heightClassName="min-h-[320px]"
+      lines={9}
+      showToolbar={false} // public read-only: usually no toolbar
+    />
+  ),
+});
 
 function fmtMoney(n?: number) {
   if (typeof n !== "number" || !Number.isFinite(n)) return "";
@@ -71,9 +85,11 @@ function fmtComp(comp: any) {
   if (!hasRange && !comp?.note) return "";
 
   const range = hasRange
-    ? `${comp.currency || ""} ${comp.min ? fmtMoney(comp.min) : ""}${comp.min && comp.max ? " – " : ""}${
-        comp.max ? fmtMoney(comp.max) : ""
-      }${comp.interval ? ` / ${String(comp.interval).toLowerCase()}` : ""}`.trim()
+    ? `${comp.currency || ""} ${comp.min ? fmtMoney(comp.min) : ""}${
+        comp.min && comp.max ? " – " : ""
+      }${comp.max ? fmtMoney(comp.max) : ""}${
+        comp.interval ? ` / ${String(comp.interval).toLowerCase()}` : ""
+      }`.trim()
     : "";
 
   const note = comp?.note ? String(comp.note) : "";
@@ -175,7 +191,6 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
     (t: string) => {
       setTurnstileToken(t);
 
-      // Optional: confirm verification completions rate
       trackCtaClick({
         ctaId: `job_apply_turnstile_verified_${slug}`,
         location: "job_apply_form",
@@ -189,13 +204,20 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
   const focusRing =
     "focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-ring)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
+  /**
+   * NOTE: In CSS Grid, children default to min-width:auto, which can cause overflow
+   * when any descendant has an intrinsic width (iframes, file inputs, long strings).
+   * We aggressively apply min-w-0/max-w-full and add overflow-x-hidden at key wrappers.
+   */
   const fieldBase =
-    "w-full rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 " +
-    "placeholder:text-slate-400 shadow-sm outline-none transition " +
-    "focus:border-[color:var(--color-brand-600)]/35";
+    "min-w-0 w-full max-w-full rounded-2xl border border-slate-200/80 bg-white " +
+    "px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition " +
+    "focus:border-[color:var(--color-brand-600)]/35 " +
+    "sm:px-4 sm:py-2.5";
 
   const fileBase =
-    "mt-1 block w-full rounded-xl border border-slate-200/70 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm " +
+    "min-w-0 mt-1 block w-full max-w-full rounded-xl border border-slate-200/70 bg-white " +
+    "px-3 py-2 text-sm text-slate-700 shadow-sm " +
     "file:mr-3 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white " +
     "hover:file:bg-slate-800";
 
@@ -263,7 +285,6 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
   }
 
   async function submit() {
-    // Track the attempt up-front (even if validation fails)
     trackCtaClick({
       ctaId: `job_apply_submit_attempt_${slug}`,
       location: "job_apply_form",
@@ -378,8 +399,8 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-white">
-      <div className="mx-auto max-w-6xl px-6 py-8">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-50 via-white to-white">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
         <button
           type="button"
           onClick={() => {
@@ -400,12 +421,12 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
           Back to jobs
         </button>
 
-        <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_420px]">
+        <div className="mt-5 grid min-w-0 gap-6 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)] lg:gap-8">
           {/* Left: Job details */}
           <section className="min-w-0">
             <div className="overflow-hidden rounded-[28px] border border-slate-200/70 bg-white shadow-sm">
               {/* Cover image */}
-              <div className="relative h-52 w-full bg-slate-50 sm:h-64">
+              <div className="relative h-44 w-full bg-slate-50 sm:h-52 lg:h-64">
                 {coverUrl ? (
                   <Image
                     src={coverUrl}
@@ -427,7 +448,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
               </div>
 
               {/* Header content */}
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
                   {job.title}
                 </div>
@@ -513,15 +534,15 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
               </div>
             </div>
 
-            <div className="mt-6 rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm">
-              <div className="text-sm font-semibold text-slate-900">Role description</div>
+            <div className="mt-5 rounded-[28px] border border-slate-200/70 bg-white p-4 shadow-sm sm:mt-6 sm:p-6">
+              <div className="text-sm font-semibold text-slate-900">Role description</div>{" "}
               <div className="mt-4">
-                <BlockNote initialContent={job.description as any} editable={false} />
-              </div>
+                <BlockNote initialContent={job.description as any} editable={false} />{" "}
+              </div>{" "}
             </div>
 
             {Array.isArray(job.benefitsPreview) && job.benefitsPreview.length ? (
-              <div className="mt-6 rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm">
+              <div className="mt-5 rounded-[28px] border border-slate-200/70 bg-white p-4 shadow-sm sm:mt-6 sm:p-6">
                 <div className="text-sm font-semibold text-slate-900">Benefits</div>
                 <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                   {job.benefitsPreview.map((b, idx) => (
@@ -538,8 +559,8 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
           </section>
 
           {/* Right: Apply */}
-          <aside className="lg:sticky lg:top-6">
-            <div className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm">
+          <aside className="w-full max-w-full min-w-0 lg:sticky lg:top-6">
+            <div className="max-w-full min-w-0 overflow-hidden rounded-[28px] border border-slate-200/70 bg-white p-4 shadow-sm sm:p-6">
               <div className="text-lg font-semibold tracking-tight text-slate-900">Apply</div>
               <div className="mt-1 text-sm text-slate-500">
                 Submit your details and upload your resume. We’ll review and follow up.
@@ -549,21 +570,23 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
               <div ref={noticeRef} />
 
               {err ? (
-                <div className="mt-4 flex items-start gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
-                  <AlertTriangle className="mt-0.5 h-4 w-4" />
-                  <div className="flex-1">{err}</div>
+                <div className="mt-4 flex min-w-0 items-start gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <div className="min-w-0 flex-1 break-words">{err}</div>
                 </div>
               ) : null}
 
               {ok ? (
-                <div className="mt-4 flex items-start gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4" />
-                  <div className="flex-1">Application submitted successfully. Thank you!</div>
+                <div className="mt-4 flex min-w-0 items-start gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+                  <div className="min-w-0 flex-1 break-words">
+                    Application submitted successfully. Thank you!
+                  </div>
                 </div>
               ) : null}
 
-              <div className="mt-5 grid gap-3">
-                <div className="grid gap-3 sm:grid-cols-2">
+              <div className="mt-4 grid min-w-0 gap-2.5 sm:mt-5 sm:gap-3">
+                <div className="grid min-w-0 gap-2.5 sm:grid-cols-2 sm:gap-3">
                   <input
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
@@ -597,7 +620,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                   disabled={busy}
                 />
 
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid min-w-0 gap-2.5 sm:grid-cols-2 sm:gap-3">
                   <input
                     value={currentLocation}
                     onChange={(e) => setCurrentLocation(e.target.value)}
@@ -620,14 +643,15 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                   placeholder="Cover letter (optional)"
                   rows={4}
                   className={[
-                    "w-full rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition outline-none placeholder:text-slate-400",
+                    "w-full max-w-full min-w-0 rounded-2xl border border-slate-200/80 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition outline-none placeholder:text-slate-400",
                     "focus:border-[color:var(--color-brand-600)]/35",
+                    "sm:px-4 sm:py-3",
                     focusRing,
                   ].join(" ")}
                   disabled={busy}
                 />
 
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid min-w-0 gap-2.5 sm:grid-cols-2 sm:gap-3">
                   <input
                     value={linkedInUrl}
                     onChange={(e) => setLinkedInUrl(e.target.value)}
@@ -645,10 +669,10 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                 </div>
 
                 {/* Light screening */}
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
                   <div className="text-sm font-semibold text-slate-900">A few quick questions</div>
-                  <div className="mt-3 grid gap-3">
-                    <div>
+                  <div className="mt-3 grid min-w-0 gap-2.5 sm:gap-3">
+                    <div className="grid min-w-0 gap-2">
                       <div className="text-xs font-semibold text-slate-700">
                         Commute mode (optional)
                       </div>
@@ -661,48 +685,36 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                       />
                     </div>
 
-                    <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
-                      <input
-                        type="checkbox"
-                        checked={canWorkOnsite}
-                        onChange={(e) => setCanWorkOnsite(e.target.checked)}
-                        disabled={busy}
-                        className="mt-1 h-4 w-4 rounded border-slate-300"
-                      />
-                      <span>
-                        I can work onsite if required.
-                        <div className="mt-1 text-xs text-slate-500">
-                          Some roles may require onsite work depending on location and schedule.
-                        </div>
-                      </span>
-                    </label>
+                    <CheckBox
+                      checked={canWorkOnsite}
+                      onCheckedChange={(v) => setCanWorkOnsite(v)}
+                      disabled={busy}
+                      label="I can work onsite if required."
+                      description="Some roles may require onsite work depending on location and schedule."
+                      // Optional style overrides (example):
+                      // variant="default"
+                      // classes={{ root: "bg-white" }}
+                    />
 
-                    <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
-                      <input
-                        type="checkbox"
-                        checked={hasReferences}
-                        onChange={(e) => setHasReferences(e.target.checked)}
-                        disabled={busy}
-                        className="mt-1 h-4 w-4 rounded border-slate-300"
-                      />
-                      <span>
-                        I can provide references upon request.
-                        <div className="mt-1 text-xs text-slate-500">
-                          You won’t be asked to share references here—just confirming availability.
-                        </div>
-                      </span>
-                    </label>
+                    <CheckBox
+                      checked={hasReferences}
+                      onCheckedChange={(v) => setHasReferences(v)}
+                      disabled={busy}
+                      label="I can provide references upon request."
+                      description="You won’t be asked to share references here—just confirming availability."
+                    />
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                    <UploadCloud className="h-4 w-4" />
-                    Attach files
+                {/* Attach files */}
+                <div className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
+                  <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-slate-900">
+                    <UploadCloud className="h-4 w-4 shrink-0" />
+                    <span className="min-w-0">Attach files</span>
                   </div>
 
-                  <div className="mt-3 grid gap-3">
-                    <div>
+                  <div className="mt-3 grid min-w-0 gap-2.5 sm:gap-3">
+                    <div className="min-w-0">
                       <div className="text-xs font-semibold text-slate-700">
                         Resume (PDF/DOC/DOCX) *
                       </div>
@@ -728,11 +740,13 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                         className={[fileBase, focusRing].join(" ")}
                       />
                       {resumeFile ? (
-                        <div className="mt-1 text-xs text-slate-500">{resumeFile.name}</div>
+                        <div className="mt-1 max-w-full min-w-0 truncate text-xs text-slate-500">
+                          {resumeFile.name}
+                        </div>
                       ) : null}
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
                       <div className="text-xs font-semibold text-slate-700">Photo (optional)</div>
                       <input
                         ref={photoInputRef}
@@ -756,20 +770,28 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                         className={[fileBase, focusRing].join(" ")}
                       />
                       {photoFile ? (
-                        <div className="mt-1 text-xs text-slate-500">{photoFile.name}</div>
+                        <div className="mt-1 max-w-full min-w-0 truncate text-xs text-slate-500">
+                          {photoFile.name}
+                        </div>
                       ) : null}
                     </div>
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                  <div className="text-xs font-semibold text-slate-700">Verification</div>
-                  <TurnstileWidget
-                    key={turnstileInstanceKey}
-                    action="job_apply"
-                    onToken={handleTurnstileToken}
-                    className="mt-2"
-                  />
+                {/* Verification */}
+                <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
+                  <div className="min-w-0 text-sm font-semibold text-slate-900">Verification</div>
+
+                  {/* This wrapper is the key: if Turnstile injects an iframe with a hard width, we prevent it from widening the grid item */}
+                  <div className="mt-2 max-w-full min-w-0 overflow-hidden">
+                    <TurnstileWidget
+                      key={turnstileInstanceKey}
+                      action="job_apply"
+                      onToken={handleTurnstileToken}
+                      className="max-w-full"
+                    />
+                  </div>
+
                   <div className="mt-2 text-[11px] text-slate-500">
                     This helps prevent spam submissions.
                   </div>
@@ -780,7 +802,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                   disabled={busy || !job.allowApplications}
                   onClick={submit}
                   className={[
-                    "inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60",
+                    "inline-flex w-full min-w-0 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60",
                     focusRing,
                   ].join(" ")}
                 >
@@ -788,19 +810,19 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                 </button>
 
                 {!job.allowApplications ? (
-                  <div className="text-xs text-slate-500">
+                  <div className="min-w-0 text-xs break-words text-slate-500">
                     Applications are currently disabled for this posting.
                   </div>
                 ) : null}
               </div>
             </div>
 
-            <div className="mt-4 rounded-[28px] border border-slate-200/70 bg-white p-5 text-sm text-slate-600 shadow-sm">
-              <div className="flex items-center gap-2 font-semibold text-slate-900">
-                <Mail className="h-4 w-4" />
+            <div className="mt-4 max-w-full min-w-0 overflow-hidden rounded-[28px] border border-slate-200/70 bg-white p-4 text-sm text-slate-600 shadow-sm sm:p-5">
+              <div className="flex min-w-0 items-center gap-2 font-semibold text-slate-900">
+                <Mail className="h-4 w-4 shrink-0" />
                 Questions?
               </div>
-              <div className="mt-2">
+              <div className="mt-2 min-w-0 break-words">
                 If you need help applying, contact{" "}
                 <a
                   href={`mailto:${NEXT_PUBLIC_NPT_HR_EMAIL}?subject=${encodeURIComponent(
@@ -814,15 +836,15 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                       label: "Email HR (mailto)",
                     })
                   }
-                  className="font-medium text-[color:var(--color-brand-600)] hover:underline"
+                  className="font-medium break-words text-[color:var(--color-brand-600)] hover:underline"
                 >
                   {NEXT_PUBLIC_NPT_HR_EMAIL}
                 </a>
                 .
               </div>
-              <div className="mt-3 flex items-center gap-2 text-xs text-slate-600">
-                <Phone className="h-3.5 w-3.5" />
-                Include the job title in your message.
+              <div className="mt-3 flex min-w-0 items-center gap-2 text-xs text-slate-600">
+                <Phone className="h-3.5 w-3.5 shrink-0" />
+                <span className="min-w-0 break-words">Include the job title in your message.</span>
               </div>
             </div>
           </aside>

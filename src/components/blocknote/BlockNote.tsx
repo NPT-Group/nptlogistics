@@ -3,6 +3,7 @@
 
 import "@mantine/core/styles.css";
 import "@blocknote/mantine/style.css";
+import "./blocknote.css";
 import * as React from "react";
 import { BlockNoteView } from "@blocknote/mantine";
 import { useCreateBlockNote } from "@blocknote/react";
@@ -109,16 +110,17 @@ export default function BlockNote({
 
   return (
     <MantineProvider defaultColorScheme="light">
-      <div className="bn-scope">
+      <div className="bn-scope w-full min-w-0">
         <div
-          className={chrome?.className}
+          className={["w-full min-w-0", editable ? "bn-editable" : "bn-readonly", chrome?.className]
+            .filter(Boolean)
+            .join(" ")}
           style={{
             ...(chrome?.style ?? {}),
             borderColor,
             background,
           }}
         >
-          {/* Keep BlockNote itself on light theme for CSS stability */}
           <BlockNoteView editor={editor} editable={editable} theme="light" />
         </div>
       </div>
