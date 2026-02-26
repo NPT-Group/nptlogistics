@@ -10,12 +10,10 @@ function GuideCard({
   guide,
   index,
   variants,
-  reduceMotion,
 }: {
   guide: ShippingGuide;
   index: number;
   variants: Variants;
-  reduceMotion: boolean | null;
 }) {
   return (
     <motion.article
@@ -146,7 +144,6 @@ export function ShippingGuidesSection() {
                 guide={guide}
                 index={index}
                 variants={fadeUp}
-                reduceMotion={reduceMotion}
               />
             ))}
           </div>
