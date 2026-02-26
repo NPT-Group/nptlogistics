@@ -12,11 +12,28 @@
 // Browser-safe helpers only call HTTP APIs exposed by our Next.js backend.
 // -----------------------------------------------------------------------------
 
-import { APP_AWS_ACCESS_KEY_ID, APP_AWS_BUCKET_NAME, APP_AWS_REGION, APP_AWS_SECRET_ACCESS_KEY } from "@/config/env";
-import { S3Client, PutObjectCommand, DeleteObjectCommand, CopyObjectCommand, HeadObjectCommand, GetObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import {
+  APP_AWS_ACCESS_KEY_ID,
+  APP_AWS_BUCKET_NAME,
+  APP_AWS_REGION,
+  APP_AWS_SECRET_ACCESS_KEY,
+} from "@/config/env";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  CopyObjectCommand,
+  HeadObjectCommand,
+  GetObjectCommand,
+  DeleteObjectsCommand,
+} from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { DEFAULT_PRESIGN_EXPIRY_SECONDS, S3_SUBMISSIONS_FOLDER, S3_TEMP_FOLDER } from "@/constants/aws";
+import {
+  DEFAULT_PRESIGN_EXPIRY_SECONDS,
+  S3_SUBMISSIONS_FOLDER,
+  S3_TEMP_FOLDER,
+} from "@/constants/aws";
 import { ES3Folder, ES3Namespace, IPresignResponse } from "@/types/aws.types";
 import { EFileMimeType, type IFileAsset } from "@/types/shared.types";
 
@@ -83,14 +100,25 @@ export async function deleteS3Objects(keys: string[]): Promise<void> {
         }
       }
     } catch (err: any) {
-      console.error(`DeleteObjects batch failed (${i}-${i + slice.length - 1}):`, err?.name, err?.message, err);
+      console.error(
+        `DeleteObjects batch failed (${i}-${i + slice.length - 1}):`,
+        err?.name,
+        err?.message,
+        err,
+      );
       // continue with next batches; best-effort cleanup
     }
   }
 }
 
 /** Move via copy+delete (S3 has no native move). */
-export async function moveS3Object({ fromKey, toKey }: { fromKey: string; toKey: string }): Promise<{ url: string; key: string }> {
+export async function moveS3Object({
+  fromKey,
+  toKey,
+}: {
+  fromKey: string;
+  toKey: string;
+}): Promise<{ url: string; key: string }> {
   const Bucket = APP_AWS_BUCKET_NAME;
 
   await s3.send(
@@ -118,7 +146,15 @@ export async function s3ObjectExists(key: string): Promise<boolean> {
 }
 
 /** Server-side: create a presigned PUT URL for the exact key + Content-Type. */
-export async function getPresignedPutUrl({ key, fileType, expiresIn = DEFAULT_PRESIGN_EXPIRY_SECONDS }: { key: string; fileType: string; expiresIn?: number }): Promise<{ url: string }> {
+export async function getPresignedPutUrl({
+  key,
+  fileType,
+  expiresIn = DEFAULT_PRESIGN_EXPIRY_SECONDS,
+}: {
+  key: string;
+  fileType: string;
+  expiresIn?: number;
+}): Promise<{ url: string }> {
   const command = new PutObjectCommand({
     Bucket: APP_AWS_BUCKET_NAME,
     Key: key,
@@ -141,10 +177,12 @@ export const keyJoin = (...parts: Array<string | null | undefined>) =>
     .join("/");
 
 /** Public URL for a given S3 key (no ACL change implied). */
-export const publicUrlForKey = (key: string) => `https://${APP_AWS_BUCKET_NAME}.s3.${APP_AWS_REGION}.amazonaws.com/${trimSlashes(key)}`;
+export const publicUrlForKey = (key: string) =>
+  `https://${APP_AWS_BUCKET_NAME}.s3.${APP_AWS_REGION}.amazonaws.com/${trimSlashes(key)}`;
 
 /** Is this a temp object? (Namespace-agnostic) */
-export const isTempKey = (key?: string) => Boolean(key && trimSlashes(key).startsWith(trimSlashes(`${S3_TEMP_FOLDER}/`)));
+export const isTempKey = (key?: string) =>
+  Boolean(key && trimSlashes(key).startsWith(trimSlashes(`${S3_TEMP_FOLDER}/`)));
 
 /** Build a temp prefix with arbitrary subfolders. */
 export const makeTempPrefix = (...parts: string[]) => keyJoin(S3_TEMP_FOLDER, ...parts);
@@ -153,7 +191,11 @@ export const makeTempPrefix = (...parts: string[]) => keyJoin(S3_TEMP_FOLDER, ..
 export const makeFinalPrefix = (...parts: string[]) => keyJoin(S3_SUBMISSIONS_FOLDER, ...parts);
 
 /** Convenience: make a final prefix for any entity (namespace/id/folder). */
-export const makeEntityFinalPrefix = (namespace: ES3Namespace | string, id: string, folder: ES3Folder | string) => makeFinalPrefix(namespace, id, folder);
+export const makeEntityFinalPrefix = (
+  namespace: ES3Namespace | string,
+  id: string,
+  folder: ES3Folder | string,
+) => makeFinalPrefix(namespace, id, folder);
 
 /* ───────────────── File-asset finalization (generic) ───────────────── */
 
@@ -178,13 +220,19 @@ export async function finalizeAsset(asset: IFileAsset, finalFolder: string): Pro
 }
 
 /** Safe wrapper that tolerates undefined asset. */
-export async function finalizeAssetSafe(asset: IFileAsset | undefined, finalFolder: string): Promise<IFileAsset | undefined> {
+export async function finalizeAssetSafe(
+  asset: IFileAsset | undefined,
+  finalFolder: string,
+): Promise<IFileAsset | undefined> {
   if (!asset) return asset;
   return finalizeAsset(asset, finalFolder);
 }
 
 /** Finalize a vector of assets (only those that are temp). */
-export async function finalizeAssetVector(vec: IFileAsset[] | undefined, dest: string): Promise<IFileAsset[] | undefined> {
+export async function finalizeAssetVector(
+  vec: IFileAsset[] | undefined,
+  dest: string,
+): Promise<IFileAsset[] | undefined> {
   if (!Array.isArray(vec)) return vec;
   const out: IFileAsset[] = [];
   for (const a of vec) out.push(isTempKey(a?.s3Key) ? await finalizeAsset(a, dest) : a);
@@ -220,7 +268,12 @@ export async function finalizeAssetWithCache(
  * - Always returns an array (never `undefined`) to simplify calling code.
  * - Uses the same temp->final cache and `onMoved` hook as the single-asset helper.
  */
-export async function finalizeVectorWithCache(vec: IFileAsset[] | undefined, dest: string, cache: Map<string, IFileAsset>, onMoved?: (finalKey: string) => void): Promise<IFileAsset[]> {
+export async function finalizeVectorWithCache(
+  vec: IFileAsset[] | undefined,
+  dest: string,
+  cache: Map<string, IFileAsset>,
+  onMoved?: (finalKey: string) => void,
+): Promise<IFileAsset[]> {
   if (!Array.isArray(vec)) return [];
   const out: IFileAsset[] = [];
   for (const a of vec) {
@@ -231,15 +284,56 @@ export async function finalizeVectorWithCache(vec: IFileAsset[] | undefined, des
 }
 
 /**
- * Deep-scan an arbitrary object graph and collect any `s3Key` string fields.
+ * S3 URL Parser
+ * Extracts the S3 object key from various S3 URL formats
+ */
+export function tryParseS3KeyFromUrl(u: string): string | undefined {
+  try {
+    const url = new URL(u);
+
+    // Handles: https://bucket.s3.region.amazonaws.com/<key>
+    // Also works for most S3 virtual-host style URLs.
+    const host = url.hostname.toLowerCase();
+    if (!host.includes("amazonaws.com")) return;
+
+    const key = url.pathname.replace(/^\/+/, "").trim();
+    return key || undefined;
+  } catch {
+    return;
+  }
+}
+
+/**
+ * @fileoverview S3 key collection utilities for extracting S3 object keys from complex data structures.
+ */
+
+/**
+ * Recursively collects all S3 keys from a given input object or data structure.
  *
- * - Handles arrays + objects
- * - Dedupes keys
- * - Guards against cycles via `seen`
+ * This function traverses through nested objects, arrays, and properties to extract
+ * S3 keys in two ways:
+ * 1. Directly from `s3Key` string fields
+ * 2. By parsing S3 keys from `url` fields that point to S3 resources
  *
- * Use cases:
- * - Deleting all S3 objects referenced by a document (terminated onboarding deletion)
- * - Auditing or reporting referenced assets
+ * The function handles circular references by tracking visited objects and only
+ * processes objects that haven't been seen before.
+ *
+ * @param input - The input value to search through. Can be any type (object, array, primitive, etc.)
+ * @returns An array of unique S3 keys (strings) found in the input structure. Trimmed and non-empty keys only.
+ *
+ * @example
+ * ```typescript
+ * const data = {
+ *   s3Key: "uploads/file1.pdf",
+ *   url: "https://mybucket.s3.amazonaws.com/uploads/file2.pdf",
+ *   nested: {
+ *     s3Key: "images/photo.jpg"
+ *   }
+ * };
+ *
+ * const keys = collectS3KeysDeep(data);
+ * // Returns: ["uploads/file1.pdf", "uploads/file2.pdf", "images/photo.jpg"]
+ * ```
  */
 export function collectS3KeysDeep(input: unknown): string[] {
   const out = new Set<string>();
@@ -248,29 +342,31 @@ export function collectS3KeysDeep(input: unknown): string[] {
   const walk = (v: unknown) => {
     if (!v || typeof v !== "object") return;
 
-    // Cycle guard
     if (seen.has(v as object)) return;
     seen.add(v as object);
 
-    // Arrays
     if (Array.isArray(v)) {
       for (const item of v) walk(item);
       return;
     }
 
-    // Objects
     const obj = v as Record<string, unknown>;
 
-    // Common file asset shape: { s3Key, url, mimeType, ... }
+    // 1) s3Key fields
     const maybeKey = obj["s3Key"];
     if (typeof maybeKey === "string") {
       const k = maybeKey.trim();
       if (k) out.add(k);
     }
 
-    for (const key of Object.keys(obj)) {
-      walk(obj[key]);
+    // 2) url fields pointing to S3 (so we still "see" keys even if asset was dropped)
+    const maybeUrl = obj["url"];
+    if (typeof maybeUrl === "string" && maybeUrl) {
+      const k = tryParseS3KeyFromUrl(maybeUrl);
+      if (k) out.add(k);
     }
+
+    for (const key of Object.keys(obj)) walk(obj[key]);
   };
 
   walk(input);
@@ -327,7 +423,14 @@ export async function uploadToS3Presigned({
   namespace,
   folder,
   docId = "unknown",
-  allowedMimeTypes = [EFileMimeType.JPEG, EFileMimeType.JPG, EFileMimeType.PNG, EFileMimeType.PDF, EFileMimeType.DOC, EFileMimeType.DOCX],
+  allowedMimeTypes = [
+    EFileMimeType.JPEG,
+    EFileMimeType.JPG,
+    EFileMimeType.PNG,
+    EFileMimeType.PDF,
+    EFileMimeType.DOC,
+    EFileMimeType.DOCX,
+  ],
   maxSizeMB = 10,
 }: UploadToS3Options): Promise<UploadResult> {
   if (!namespace) throw new Error("Missing namespace");
@@ -421,7 +524,9 @@ export async function loadImageBytesFromAsset(asset?: IFileAsset): Promise<Uint8
  * - Filters non-temp keys with `isTempKey`.
  * - No-ops if none remain.
  */
-export async function deleteTempFiles(keys: string[]): Promise<{ deleted?: string[]; failed?: string[] }> {
+export async function deleteTempFiles(
+  keys: string[],
+): Promise<{ deleted?: string[]; failed?: string[] }> {
   if (!Array.isArray(keys) || keys.length === 0) return { deleted: [] };
   const tempKeys = keys.filter((k) => isTempKey(k));
   if (tempKeys.length === 0) return { deleted: [] };
@@ -551,4 +656,78 @@ export async function getDownloadUrlFromS3Key({
 
   const { data } = await res.json();
   return data.url as string;
+}
+
+function isObject(v: unknown): v is Record<string, any> {
+  return Boolean(v && typeof v === "object");
+}
+
+export function isLikelyFileAsset(v: any): v is IFileAsset {
+  return Boolean(
+    v &&
+    typeof v === "object" &&
+    typeof v.s3Key === "string" &&
+    typeof v.url === "string" &&
+    (typeof v.mimeType === "string" || v.mimeType == null),
+  );
+}
+
+/**
+ * Normalize an asset object:
+ * - Flattens nested `asset.asset.asset...`
+ * - Ensures `url` always matches `publicUrlForKey(s3Key)` when s3Key exists
+ * - Removes putUrl
+ */
+export function normalizeFileAsset(asset: any): IFileAsset | undefined {
+  if (!isObject(asset)) return undefined;
+
+  // Start from the outermost asset
+  let out: any = { ...asset };
+
+  // Strip putUrl at every step
+  if ("putUrl" in out) delete out.putUrl;
+
+  // Flatten nested asset chains, but NEVER let an inner temp override an outer final.
+  // We merge "useful missing fields" from inner, but keep best s3Key.
+  let cur: any = out;
+  while (isObject(cur.asset)) {
+    const inner = cur.asset;
+
+    // remove putUrl from inner too
+    if (isObject(inner) && "putUrl" in inner) delete (inner as any).putUrl;
+
+    const outerKey = typeof cur.s3Key === "string" ? cur.s3Key : undefined;
+    const innerKey = typeof inner.s3Key === "string" ? inner.s3Key : undefined;
+
+    const outerFinal = outerKey && !isTempKey(outerKey);
+    const innerFinal = innerKey && !isTempKey(innerKey);
+
+    // choose "best" key
+    const bestKey =
+      (outerFinal ? outerKey : undefined) ||
+      (innerFinal ? innerKey : undefined) ||
+      outerKey ||
+      innerKey;
+
+    // merge fields (inner fills blanks) but keep bestKey
+    cur = {
+      ...inner,
+      ...cur,
+      s3Key: bestKey,
+    };
+
+    // continue flattening
+    out = cur;
+    if ("asset" in out) delete out.asset;
+  }
+
+  // Ensure url always matches s3Key when present
+  if (typeof out.s3Key === "string" && out.s3Key) {
+    out.url = publicUrlForKey(out.s3Key);
+  }
+
+  // final safety: never keep nested asset
+  if ("asset" in out) delete out.asset;
+
+  return out as IFileAsset;
 }

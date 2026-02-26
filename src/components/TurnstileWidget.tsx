@@ -197,7 +197,7 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
         widgetIdRef.current = null;
       }
     };
-  }, [siteKey, action]); // ✅ NOTE: callbacks intentionally excluded
+  }, [siteKey, action]); // NOTE: callbacks intentionally excluded
 
   return (
     <div className={className}>

@@ -77,7 +77,7 @@ export default function GuidedChatbot() {
   }
 
   /**
-   * ✅ Wrap pageActions so ANY navigation from the bot auto-closes the panel.
+   * Wrap pageActions so ANY navigation from the bot auto-closes the panel.
    * This covers actionProvider.goTo(), goToFromNav(), prefillAndGoToQuote(), etc.
    */
   const pageActionsWithAutoClose = React.useMemo(() => {

@@ -19,7 +19,7 @@ import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider
 
 import { ConfirmModal, type ConfirmTone } from "@/app/(admin)/components/ui/ConfirmModal";
 import { SoftButton } from "@/app/(admin)/components/ui/Buttons";
-import { ExternalLink, FileText, AlertTriangle } from "lucide-react";
+import { ExternalLink, FileText, AlertTriangle, CheckCircle2 } from "lucide-react";
 import BlockNoteSkeleton from "@/components/blocknote/BlockNoteSkeleton";
 
 const BlockNote = dynamic(() => import("@/components/blocknote/BlockNote"), {
@@ -219,10 +219,22 @@ export default function BlogEditor(props: Props) {
   const [categorySearch, setCategorySearch] = React.useState("");
 
   const [saving, setSaving] = React.useState(false);
-  const [error, setError] = React.useState<{ message: string; nonce: number } | null>(null);
-  const errorRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Danger confirm modal
+  const [error, setError] = React.useState<{ message: string; nonce: number } | null>(null);
+  const [success, setSuccess] = React.useState<{ message: string; nonce: number } | null>(null);
+
+  const headerRef = React.useRef<HTMLDivElement | null>(null);
+  const errorRef = React.useRef<HTMLDivElement | null>(null);
+  const successRef = React.useRef<HTMLDivElement | null>(null);
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    requestAnimationFrame(() => {
+      headerRef.current?.focus?.();
+    });
+  }
+
+  // Confirm modal (used for secondary + danger)
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmActionRef = React.useRef<null | (() => Promise<void>)>(null);
   const [confirmTone, setConfirmTone] = React.useState<ConfirmTone>("danger");
@@ -283,11 +295,23 @@ export default function BlogEditor(props: Props) {
     if (!error) return;
     requestAnimationFrame(() => {
       errorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      errorRef.current?.focus?.();
+      (errorRef.current as any)?.focus?.();
     });
   }, [error?.nonce]);
 
+  React.useEffect(() => {
+    if (!success) return;
+    scrollToTop();
+  }, [success?.nonce]);
+
+  React.useEffect(() => {
+    if (!success) return;
+    if (isDirty) setSuccess(null);
+  }, [isDirty]);
+
   async function onCreateCategory(name: string) {
+    setError(null);
+    setSuccess(null);
     const created = await adminCreateCategory(name);
     await refreshCategories();
     setCategoryIds((prev) =>
@@ -297,11 +321,14 @@ export default function BlogEditor(props: Props) {
 
   async function onPickBanner(file: File) {
     setError(null);
+    setSuccess(null);
     const asset = await uploadBannerToTemp(file);
     setBannerImage(asset);
   }
 
   function onRemoveBanner() {
+    setSuccess(null);
+    setError(null);
     setBannerImage(undefined);
   }
 
@@ -331,18 +358,46 @@ export default function BlogEditor(props: Props) {
     };
   }
 
-  async function runAction(fn: (p: SubmitPayload) => Promise<void>) {
+  async function runAction(fn: (p: SubmitPayload) => Promise<void>, successMessage: string) {
     setError(null);
+    setSuccess(null);
     setSaving(true);
     try {
       const payload = buildPayload();
       await fn(payload);
       markSavedNow();
+
+      setSuccess({ message: successMessage, nonce: Date.now() });
+      requestAnimationFrame(() => {
+        successRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
     } catch (e: any) {
       setError({ message: e?.message || "Failed to save.", nonce: Date.now() });
     } finally {
       setSaving(false);
     }
+  }
+
+  async function confirmSecondary(): Promise<void> {
+    if (props.secondaryDisabled) return;
+
+    const isPublish = props.secondaryActionKind === "PUBLISH";
+    const tone: ConfirmTone = isPublish ? "neutral" : "danger";
+
+    const title = isPublish ? "Publish this post?" : "Unpublish this post?";
+    const body = isPublish
+      ? "This will make the post publicly visible."
+      : "This will remove the post from public listings.";
+
+    const successMsg = isPublish ? "Post published." : "Post unpublished.";
+
+    confirmActionRef.current = async () => runAction(props.onSaveSecondary, successMsg);
+
+    setConfirmTone(tone);
+    setConfirmTitle(title);
+    setConfirmDesc(body);
+    setConfirmLabel(props.secondaryLabel);
+    setConfirmOpen(true);
   }
 
   function confirmDanger() {
@@ -353,9 +408,7 @@ export default function BlogEditor(props: Props) {
       props.dangerConfirmBody ??
       "This will archive the post and remove it from public listings. You can publish again later to restore it.";
 
-    confirmActionRef.current = async () => {
-      await runAction(props.onDanger!);
-    };
+    confirmActionRef.current = async () => runAction(props.onDanger!, "Post archived.");
 
     setConfirmTone("danger");
     setConfirmTitle(title);
@@ -400,6 +453,8 @@ export default function BlogEditor(props: Props) {
       <div className="mx-auto max-w-7xl px-6 py-6">
         {/* Header */}
         <div
+          ref={headerRef}
+          tabIndex={-1}
           className={cn(
             "mb-6 rounded-3xl border shadow-[var(--dash-shadow)]",
             "border-[var(--dash-border)] bg-[var(--dash-surface)]",
@@ -448,6 +503,21 @@ export default function BlogEditor(props: Props) {
               <ChangePill saving={saving} isDirty={isDirty} />
             </div>
 
+            {success ? (
+              <div
+                ref={successRef}
+                className={cn(
+                  "mt-4 flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm",
+                  isDark
+                    ? "border-emerald-400/25 bg-emerald-500/15 text-emerald-50"
+                    : "border-emerald-200 bg-emerald-50 text-emerald-900",
+                )}
+              >
+                <CheckCircle2 className="mt-0.5 h-4 w-4" />
+                <div className="flex-1">{success.message}</div>
+              </div>
+            ) : null}
+
             {error ? (
               <div
                 ref={errorRef}
@@ -491,7 +561,11 @@ export default function BlogEditor(props: Props) {
 
             <div className="p-5">
               <BlockNote
-                onChange={setDoc}
+                onChange={(v: any) => {
+                  setSuccess(null);
+                  setError(null);
+                  setDoc(v);
+                }}
                 uploadFile={uploadBlogMediaToTemp}
                 initialContent={doc ?? undefined}
                 chrome={{
@@ -515,29 +589,53 @@ export default function BlogEditor(props: Props) {
           {/* Sidebar */}
           <BlogPostSidebar
             title={title}
-            setTitle={setTitle}
+            setTitle={(v) => {
+              setSuccess(null);
+              setError(null);
+              setTitle(v);
+            }}
             slug={slug}
-            setSlug={setSlug}
+            setSlug={(v) => {
+              setSuccess(null);
+              setError(null);
+              setSlug(v);
+            }}
             excerpt={excerpt}
-            setExcerpt={setExcerpt}
+            setExcerpt={(v) => {
+              setSuccess(null);
+              setError(null);
+              setExcerpt(v);
+            }}
             publishedAt={publishedAt}
-            setPublishedAt={setPublishedAt}
+            setPublishedAt={(v) => {
+              setSuccess(null);
+              setError(null);
+              setPublishedAt(v);
+            }}
             publishAtEnabled={publishAtEnabled}
             bannerImage={bannerImage}
             onPickBanner={onPickBanner}
             onRemoveBanner={onRemoveBanner}
             categories={categories}
             categoryIds={categoryIds}
-            setCategoryIds={setCategoryIds}
+            setCategoryIds={(ids) => {
+              setSuccess(null);
+              setError(null);
+              setCategoryIds(ids);
+            }}
             categorySearch={categorySearch}
-            setCategorySearch={setCategorySearch}
+            setCategorySearch={(v) => {
+              setSuccess(null);
+              setError(null);
+              setCategorySearch(v);
+            }}
             onCreateCategory={onCreateCategory}
             saving={saving}
             primaryLabel={props.primaryLabel}
             secondaryLabel={props.secondaryLabel}
             secondaryDisabled={props.secondaryDisabled}
-            onPrimary={() => runAction(props.onSavePrimary)}
-            onSecondary={() => runAction(props.onSaveSecondary)}
+            onPrimary={() => runAction(props.onSavePrimary, "Changes saved.")}
+            onSecondary={confirmSecondary}
             dangerLabel={props.dangerLabel}
             dangerDisabled={props.dangerDisabled}
             onDanger={props.onDanger ? confirmDanger : undefined}

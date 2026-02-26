@@ -9,7 +9,7 @@ import { BlockNoteView } from "@blocknote/mantine";
 import { useCreateBlockNote } from "@blocknote/react";
 import type { PartialBlock } from "@blocknote/core";
 import { MantineProvider } from "@mantine/core";
-import type { UploadResult } from "@/lib/utils/s3Helper";
+import { isTempKey, publicUrlForKey, type UploadResult } from "@/lib/utils/s3Helper";
 
 type Props = {
   initialContent?: PartialBlock[];
@@ -52,11 +52,20 @@ function injectAssetsIntoBlocks(
       const props: any = next.props || {};
       const url: string | undefined = typeof props.url === "string" ? props.url : undefined;
 
-      // If we have a url and no asset yet, inject it (your existing behavior)
+      // If we have a url and no asset yet, inject it
       if (url && !props.asset) {
         const asset = urlToAsset.get(url);
         if (asset) {
           props.asset = asset;
+        }
+      }
+
+      // guard: if asset has a FINAL s3Key, force url to match it
+      if (props.asset && typeof props.asset.s3Key === "string" && props.asset.s3Key) {
+        if (!isTempKey(props.asset.s3Key)) {
+          const finalUrl = publicUrlForKey(props.asset.s3Key);
+          props.asset.url = finalUrl;
+          props.url = finalUrl;
         }
       }
 
