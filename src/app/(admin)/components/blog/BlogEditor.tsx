@@ -10,7 +10,7 @@ import type { BlockNoteDocJSON, IFileAsset } from "@/types/shared.types";
 
 import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { IMAGE_MIME_TYPES, VIDEO_MIME_TYPES } from "@/types/shared.types";
-import { uploadToS3Presigned, type UploadResult } from "@/lib/utils/s3Helper";
+import { uploadToS3PresignedPublic } from "@/lib/utils/s3Helper/client";
 
 import BlogPostSidebar from "@/app/(admin)/components/blog/BlogPostSidebar";
 import { adminCreateCategory, adminFetchCategories } from "@/lib/utils/blog/adminBlogApi";
@@ -87,17 +87,7 @@ type Props = {
   previewUrl?: string | null;
 };
 
-function fileToAsset(r: UploadResult): IFileAsset {
-  return {
-    url: r.url,
-    s3Key: r.s3Key,
-    mimeType: r.mimeType,
-    sizeBytes: r.sizeBytes,
-    originalName: r.originalName,
-  };
-}
-
-async function uploadBlogMediaToTemp(file: File): Promise<UploadResult> {
+async function uploadBlogMediaToTemp(file: File): Promise<IFileAsset> {
   const mt = (file.type || "").toLowerCase();
   const folder = mt.startsWith("image/")
     ? ES3Folder.MEDIA_IMAGES
@@ -109,7 +99,7 @@ async function uploadBlogMediaToTemp(file: File): Promise<UploadResult> {
 
   const allowedMimeTypes = folder === ES3Folder.MEDIA_IMAGES ? IMAGE_MIME_TYPES : VIDEO_MIME_TYPES;
 
-  return uploadToS3Presigned({
+  return uploadToS3PresignedPublic({
     file,
     namespace: ES3Namespace.BLOG_POSTS,
     folder,
@@ -121,7 +111,7 @@ async function uploadBlogMediaToTemp(file: File): Promise<UploadResult> {
 async function uploadBannerToTemp(file: File): Promise<IFileAsset> {
   if (!file.type.toLowerCase().startsWith("image/")) throw new Error("Banner must be an image.");
 
-  const up = await uploadToS3Presigned({
+  const up = await uploadToS3PresignedPublic({
     file,
     namespace: ES3Namespace.BLOG_POSTS,
     folder: ES3Folder.MEDIA_IMAGES,
@@ -129,7 +119,7 @@ async function uploadBannerToTemp(file: File): Promise<IFileAsset> {
     maxSizeMB: 10,
   });
 
-  return fileToAsset(up);
+  return up;
 }
 
 function ChangePill({ saving, isDirty }: { saving: boolean; isDirty: boolean }) {
@@ -227,14 +217,7 @@ export default function BlogEditor(props: Props) {
   const errorRef = React.useRef<HTMLDivElement | null>(null);
   const successRef = React.useRef<HTMLDivElement | null>(null);
 
-  function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    requestAnimationFrame(() => {
-      headerRef.current?.focus?.();
-    });
-  }
-
-  // Confirm modal (used for secondary + danger)
+  // Confirm modal (secondary + danger)
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmActionRef = React.useRef<null | (() => Promise<void>)>(null);
   const [confirmTone, setConfirmTone] = React.useState<ConfirmTone>("danger");
@@ -280,16 +263,10 @@ export default function BlogEditor(props: Props) {
     setIsDirty(false);
   }
 
-  async function refreshCategories() {
-    const items = await adminFetchCategories();
-    setCategories(items);
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    requestAnimationFrame(() => headerRef.current?.focus?.());
   }
-
-  React.useEffect(() => {
-    refreshCategories().catch((e) =>
-      setError({ message: e?.message || "Failed to load categories", nonce: Date.now() }),
-    );
-  }, []);
 
   React.useEffect(() => {
     if (!error) return;
@@ -308,6 +285,17 @@ export default function BlogEditor(props: Props) {
     if (!success) return;
     if (isDirty) setSuccess(null);
   }, [isDirty]);
+
+  async function refreshCategories() {
+    const items = await adminFetchCategories();
+    setCategories(items);
+  }
+
+  React.useEffect(() => {
+    refreshCategories().catch((e) =>
+      setError({ message: e?.message || "Failed to load categories", nonce: Date.now() }),
+    );
+  }, []);
 
   async function onCreateCategory(name: string) {
     setError(null);
@@ -328,7 +316,6 @@ export default function BlogEditor(props: Props) {
 
   function onRemoveBanner() {
     setSuccess(null);
-    setError(null);
     setBannerImage(undefined);
   }
 
@@ -358,7 +345,10 @@ export default function BlogEditor(props: Props) {
     };
   }
 
-  async function runAction(fn: (p: SubmitPayload) => Promise<void>, successMessage: string) {
+  async function runAction(
+    fn: (p: SubmitPayload) => Promise<void>,
+    successMessage: string,
+  ): Promise<void> {
     setError(null);
     setSuccess(null);
     setSaving(true);
@@ -366,7 +356,6 @@ export default function BlogEditor(props: Props) {
       const payload = buildPayload();
       await fn(payload);
       markSavedNow();
-
       setSuccess({ message: successMessage, nonce: Date.now() });
       requestAnimationFrame(() => {
         successRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -381,22 +370,33 @@ export default function BlogEditor(props: Props) {
   async function confirmSecondary(): Promise<void> {
     if (props.secondaryDisabled) return;
 
-    const isPublish = props.secondaryActionKind === "PUBLISH";
-    const tone: ConfirmTone = isPublish ? "neutral" : "danger";
+    const kind = props.secondaryActionKind;
+    const isPublish = kind === "PUBLISH";
+    const isUnpublish = kind === "UNPUBLISH";
 
-    const title = isPublish ? "Publish this post?" : "Unpublish this post?";
-    const body = isPublish
-      ? "This will make the post publicly visible."
-      : "This will remove the post from public listings.";
+    const tone: ConfirmTone = isUnpublish ? "danger" : "neutral";
 
-    const successMsg = isPublish ? "Post published." : "Post unpublished.";
+    let title = "Confirm action";
+    let body: React.ReactNode = "Are you sure you want to continue?";
+    const label = props.secondaryLabel;
+    let successMsg = "Action completed.";
+
+    if (isPublish) {
+      title = "Publish this post?";
+      body = "This will publish the post and make it visible publicly.";
+      successMsg = "Post published.";
+    } else if (isUnpublish) {
+      title = "Unpublish this post?";
+      body = "This will unpublish the post and remove it from public listings.";
+      successMsg = "Post unpublished.";
+    }
 
     confirmActionRef.current = async () => runAction(props.onSaveSecondary, successMsg);
 
     setConfirmTone(tone);
     setConfirmTitle(title);
     setConfirmDesc(body);
-    setConfirmLabel(props.secondaryLabel);
+    setConfirmLabel(label);
     setConfirmOpen(true);
   }
 
@@ -634,7 +634,7 @@ export default function BlogEditor(props: Props) {
             primaryLabel={props.primaryLabel}
             secondaryLabel={props.secondaryLabel}
             secondaryDisabled={props.secondaryDisabled}
-            onPrimary={() => runAction(props.onSavePrimary, "Changes saved.")}
+            onPrimary={async () => runAction(props.onSavePrimary, "Changes saved.")}
             onSecondary={confirmSecondary}
             dangerLabel={props.dangerLabel}
             dangerDisabled={props.dangerDisabled}

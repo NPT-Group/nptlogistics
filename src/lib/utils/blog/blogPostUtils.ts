@@ -9,12 +9,10 @@ import {
   makeEntityFinalPrefix,
   isTempKey,
   keyJoin,
-  publicUrlForKey,
-  moveS3Object,
   collectS3KeysDeep,
-  deleteS3Objects,
   diffS3KeysToDelete,
 } from "@/lib/utils/s3Helper";
+import { publicUrlForKey, moveS3Object, deleteS3Objects } from "@/lib/utils/s3Helper/server";
 
 /* -------------------------------------------------------------------------- */
 /* Slug                                                                       */

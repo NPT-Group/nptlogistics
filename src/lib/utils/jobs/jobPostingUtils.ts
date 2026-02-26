@@ -3,13 +3,15 @@ import type { IFileAsset } from "@/types/shared.types";
 import type { BlockNoteDocJSON } from "@/types/shared.types";
 import { slugify, trim } from "@/lib/utils/stringUtils";
 import {
-  finalizeAssetWithCache,
   makeEntityFinalPrefix,
   diffS3KeysToDelete,
-  deleteS3Objects,
-  publicUrlForKey,
   normalizeFileAsset,
 } from "@/lib/utils/s3Helper";
+import {
+  finalizeAssetWithCache,
+  deleteS3Objects,
+  publicUrlForKey,
+} from "@/lib/utils/s3Helper/server";
 import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { JobPostingModel } from "@/mongoose/models/JobPosting";
 import {
@@ -18,6 +20,8 @@ import {
   EFileMimeType,
   MIME_TO_EXT_MAP,
 } from "@/types/shared.types";
+
+const normalize = (asset: any) => normalizeFileAsset(asset, publicUrlForKey);
 
 /** Ensure unique slug for JobPosting collection. */
 export async function ensureUniqueJobSlug(requested: string): Promise<string> {
@@ -103,7 +107,7 @@ function stripPutUrlDeep<T>(input: T): T {
     if (Array.isArray(v)) return v.map(walk);
 
     // if it's an asset, normalize (removes putUrl + flattens)
-    if (isLikelyFileAsset(v)) return normalizeFileAsset(v) ?? v;
+    if (isLikelyFileAsset(v)) return normalize(v) ?? v;
 
     const out: any = { ...v };
     if ("putUrl" in out) delete out.putUrl;
@@ -111,7 +115,7 @@ function stripPutUrlDeep<T>(input: T): T {
     for (const k of Object.keys(out)) out[k] = walk(out[k]);
 
     if (out.asset && typeof out.asset === "object") {
-      const norm = normalizeFileAsset(out.asset);
+      const norm = normalize(out.asset);
       if (norm) out.asset = norm;
       if ("putUrl" in out.asset) delete out.asset.putUrl;
     }
@@ -139,7 +143,7 @@ function hydrateAssetFromUrlDeep<T>(input: T): T {
 
     // LEAF: if it's already an asset, normalize it and stop
     if (isLikelyFileAsset(v)) {
-      return normalizeFileAsset(v) ?? v;
+      return normalize(v) ?? v;
     }
 
     const out: any = { ...v };
@@ -149,7 +153,7 @@ function hydrateAssetFromUrlDeep<T>(input: T): T {
 
     // If this object has an `asset`, normalize it (and flatten)
     if (out.asset && typeof out.asset === "object") {
-      const norm = normalizeFileAsset(out.asset);
+      const norm = normalize(out.asset);
       if (norm) out.asset = norm;
       if ("putUrl" in out.asset) delete out.asset.putUrl;
     }
@@ -158,7 +162,7 @@ function hydrateAssetFromUrlDeep<T>(input: T): T {
     if (typeof out.url === "string" && out.url && !out.asset) {
       const inferredKey = tryParseS3KeyFromUrl(out.url);
       if (inferredKey) {
-        out.asset = normalizeFileAsset({
+        out.asset = normalize({
           s3Key: inferredKey,
           url: publicUrlForKey(inferredKey),
           mimeType: inferMimeFromKey(inferredKey) || "application/octet-stream",

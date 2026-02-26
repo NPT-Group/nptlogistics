@@ -11,7 +11,7 @@ import {
 } from "@/types/shared.types";
 import { successResponse, errorResponse } from "@/lib/utils/apiResponse";
 import { parseJsonBody } from "@/lib/utils/reqParser";
-import { getPresignedPutUrl } from "@/lib/utils/s3Helper";
+import { getPresignedPutUrl } from "@/lib/utils/s3Helper/server";
 import { APP_AWS_BUCKET_NAME, APP_AWS_REGION } from "@/config/env";
 import { DEFAULT_FILE_SIZE_LIMIT_MB, S3_TEMP_FOLDER } from "@/constants/aws";
 

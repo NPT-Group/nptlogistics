@@ -9,7 +9,9 @@ import { BlockNoteView } from "@blocknote/mantine";
 import { useCreateBlockNote } from "@blocknote/react";
 import type { PartialBlock } from "@blocknote/core";
 import { MantineProvider } from "@mantine/core";
-import { isTempKey, publicUrlForKey, type UploadResult } from "@/lib/utils/s3Helper";
+
+import type { IFileAsset } from "@/types/shared.types";
+import { isTempKey } from "@/lib/utils/s3Helper/shared";
 
 type Props = {
   initialContent?: PartialBlock[];
@@ -17,10 +19,12 @@ type Props = {
   editable?: boolean;
 
   /**
-   * Upload handler must return full UploadResult.
-   * BlockNote will use result.url to render, and we'll inject result into block props.
+   * Upload handler must return an IFileAsset.
+   * BlockNote will use asset.url to render, and we'll inject the asset into block props.
+   *
+   * IMPORTANT: callers should use `uploadToS3PresignedPublic(...)` and return its result.
    */
-  uploadFile?: (file: File) => Promise<UploadResult>;
+  uploadFile?: (file: File) => Promise<IFileAsset>;
 
   /**
    * Optional wrapper styling overrides (admin can pass these; public pages can ignore).
@@ -39,7 +43,7 @@ type Props = {
 
 function injectAssetsIntoBlocks(
   blocks: PartialBlock[],
-  urlToAsset: Map<string, UploadResult>,
+  urlToAsset: Map<string, IFileAsset>,
 ): PartialBlock[] {
   const walk = (b: PartialBlock[]): PartialBlock[] =>
     b.map((block) => {
@@ -55,25 +59,20 @@ function injectAssetsIntoBlocks(
       // If we have a url and no asset yet, inject it
       if (url && !props.asset) {
         const asset = urlToAsset.get(url);
-        if (asset) {
-          props.asset = asset;
-        }
+        if (asset) props.asset = asset;
       }
 
-      // guard: if asset has a FINAL s3Key, force url to match it
-      if (props.asset && typeof props.asset.s3Key === "string" && props.asset.s3Key) {
-        if (!isTempKey(props.asset.s3Key)) {
-          const finalUrl = publicUrlForKey(props.asset.s3Key);
-          props.asset.url = finalUrl;
-          props.url = finalUrl;
-        }
-      }
-
-      // if asset exists and has a better URL, ensure props.url matches it
+      // If asset exists, ensure props.url matches the asset's url
       if (props.asset && typeof props.asset.url === "string" && props.asset.url) {
         if (typeof props.url !== "string" || props.url !== props.asset.url) {
           props.url = props.asset.url;
         }
+      }
+
+      // Soft guard: if asset says it's FINAL but url doesn't match, prefer asset.url.
+      // (No `publicUrlForKey` on the client; the server/client upload already returns the canonical URL.)
+      if (props.asset?.s3Key && !isTempKey(props.asset.s3Key) && props.asset?.url) {
+        props.url = props.asset.url;
       }
 
       next.props = props;
@@ -90,15 +89,19 @@ export default function BlockNote({
   uploadFile,
   chrome,
 }: Props) {
-  const urlToAssetRef = React.useRef<Map<string, UploadResult>>(new Map());
+  const urlToAssetRef = React.useRef<Map<string, IFileAsset>>(new Map());
 
   const editor = useCreateBlockNote({
     initialContent: initialContent ?? undefined,
     uploadFile: async (file) => {
       if (!uploadFile) throw new Error("Uploads are disabled (no uploadFile handler provided).");
-      const result = await uploadFile(file);
-      urlToAssetRef.current.set(result.url, result);
-      return result.url;
+
+      const asset = await uploadFile(file);
+
+      // Map by URL so we can inject later when BlockNote only stores the URL in props
+      if (asset?.url) urlToAssetRef.current.set(asset.url, asset);
+
+      return asset.url;
     },
   });
 

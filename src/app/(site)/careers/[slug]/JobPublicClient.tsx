@@ -27,7 +27,7 @@ import { EFileMimeType, IMAGE_MIME_TYPES } from "@/types/shared.types";
 import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 
 import TurnstileWidget from "@/components/TurnstileWidget";
-import { uploadToS3PresignedPublic } from "@/lib/utils/s3ClientUpload";
+import { uploadToS3PresignedPublic } from "@/lib/utils/s3Helper/client";
 import { NEXT_PUBLIC_NPT_HR_EMAIL } from "@/config/env";
 import { publicCountJobView } from "@/lib/utils/jobs/publicJobsApi";
 import { trackCtaClick } from "@/lib/analytics/cta";

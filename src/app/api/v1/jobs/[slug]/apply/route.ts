@@ -5,7 +5,8 @@ import connectDB from "@/lib/utils/connectDB";
 import { successResponse, errorResponse } from "@/lib/utils/apiResponse";
 import { parseJsonBody } from "@/lib/utils/reqParser";
 import { trim } from "@/lib/utils/stringUtils";
-import { finalizeAssetSafe, makeEntityFinalPrefix } from "@/lib/utils/s3Helper";
+import { makeEntityFinalPrefix } from "@/lib/utils/s3Helper";
+import { finalizeAssetSafe } from "@/lib/utils/s3Helper/server";
 
 import { JobPostingModel } from "@/mongoose/models/JobPosting";
 import { JobApplicationModel } from "@/mongoose/models/JobApplication";
