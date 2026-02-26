@@ -15,3 +15,12 @@ html {
     scroll-behavior: smooth;
   }
 }
+
+/* About Hero — truck float animation */
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-7px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-float { animation: none !important; }
+}

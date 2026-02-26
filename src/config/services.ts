@@ -505,7 +505,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_truckload_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_truckload_final_speak_expert_chat",
       },
@@ -728,7 +728,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_es_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_es_final_speak_expert_chat",
       },
@@ -1070,7 +1070,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_crossborder_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_crossborder_final_speak_expert_chat",
       },
@@ -1414,7 +1414,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_valueadded_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_valueadded_final_speak_expert_chat",
       },
@@ -1561,7 +1561,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_ltl_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_ltl_final_speak_expert_chat",
       },
@@ -1706,7 +1706,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_intermodal_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_intermodal_final_speak_expert_chat",
       },
@@ -1852,7 +1852,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_hazmat_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_hazmat_final_speak_expert_chat",
       },
@@ -1999,7 +1999,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_tempcontrolled_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_tempcontrolled_final_speak_expert_chat",
       },

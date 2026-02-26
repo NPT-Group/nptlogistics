@@ -40,6 +40,15 @@ export default function GuidedChatbot() {
     return () => window.clearTimeout(t);
   }, []);
 
+  // Open chat when any CTA dispatches npt:open-live-chat
+  React.useEffect(() => {
+    function onOpenLiveChat() {
+      openChat();
+    }
+    window.addEventListener("npt:open-live-chat", onOpenLiveChat);
+    return () => window.removeEventListener("npt:open-live-chat", onOpenLiveChat);
+  }, []);
+
   // Close on Esc
   React.useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -81,16 +90,25 @@ export default function GuidedChatbot() {
   }
 
   return (
-    <div className="fixed right-5 bottom-5 z-50">
-      {/* Chat panel (always mounted so conversation persists) */}
+    <div
+      className={[
+        "fixed right-5 bottom-5 z-50",
+        open ? "min-h-[420px] min-w-[360px]" : "",
+      ].join(" ")}
+    >
+      {/* Chat panel (always mounted so conversation persists; animate open/close) */}
       <div
         ref={panelRef}
         className={[
-          "w-[360px] max-w-[92vw] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl",
-          open ? "block" : "hidden",
+          "absolute bottom-0 right-0 w-[360px] max-w-[92vw] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl",
+          "origin-bottom-right transition-all duration-300 ease-out",
+          open
+            ? "pointer-events-auto visible translate-y-0 scale-100 opacity-100"
+            : "pointer-events-none invisible translate-y-3 scale-[0.97] opacity-0",
         ].join(" ")}
         role="dialog"
         aria-label="Chatbot"
+        aria-hidden={!open}
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">

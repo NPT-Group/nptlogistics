@@ -153,7 +153,7 @@ export function ServiceFinalCta({ model }: { model: ServicePageModel }) {
                       });
                     }}
                     className={cn(
-                      "inline-flex h-12 items-center justify-center rounded-md px-5 text-sm font-semibold md:h-11",
+                      "inline-flex h-12 cursor-pointer items-center justify-center rounded-md px-5 text-sm font-semibold md:h-11",
                       "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] hover:bg-[color:var(--color-surface-0-light)]",
                       focusRing,
                     )}

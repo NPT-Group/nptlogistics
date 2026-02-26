@@ -1,9 +1,13 @@
 "use client";
 
 import React from "react";
+import { usePathname } from "next/navigation";
 
 const HOME_PATH = "/";
+const ABOUT_US_PATH = "/about-us";
+const ABOUT_FAQS_PATH = "/about-us/faqs";
 const HOME_TOP_HASH = "#top";
+const ABOUT_HERO_HASH = "#about-hero";
 const HASH_TARGETS = {
   "#solutions": "solutions",
   "#industries": "industries",
@@ -54,6 +58,21 @@ function isHomeTopLink(pathname: string, hash: string) {
   );
 }
 
+function isAboutUsTopLink(pathname: string, hash: string) {
+  const normalizedPath = normalizePath(pathname);
+  const normalizedHash = normalizeHash(hash);
+  return (
+    normalizedPath === ABOUT_US_PATH &&
+    (normalizedHash === "" || normalizedHash === ABOUT_HERO_HASH)
+  );
+}
+
+function isFaqsTopLink(pathname: string, hash: string) {
+  const normalizedPath = normalizePath(pathname);
+  const normalizedHash = normalizeHash(hash);
+  return normalizedPath === ABOUT_FAQS_PATH && normalizedHash === "";
+}
+
 function prefersReducedMotion(): boolean {
   // Guard for older browsers + SSR safety (though this is client-only)
   if (typeof window === "undefined" || !window.matchMedia) return false;
@@ -88,6 +107,9 @@ function scrollToHomeTop(behavior: ScrollBehavior) {
 }
 
 export function SolutionsHashScroll() {
+  const pathname = usePathname();
+
+  // Same-page hash and initial load: scroll to hash target (homepage #solutions/#industries, about #locations-network/#safety-compliance, etc.)
   React.useEffect(() => {
     const handleHashRoute = (behavior: ScrollBehavior) => {
       const targetId = getHashTargetId(window.location.hash);
@@ -95,7 +117,7 @@ export function SolutionsHashScroll() {
 
       const resolved = resolveScrollBehavior(behavior);
 
-      // Double RAF ensures layout is stable before scrolling.
+      // Double RAF ensures layout is stable before scrolling (e.g. about page sections in DOM).
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           scrollToElementById(targetId, resolved);
@@ -125,8 +147,7 @@ export function SolutionsHashScroll() {
 
       const hashTargetId = getHashTargetId(url.hash);
       if (hashTargetId) {
-        // Same-page hash click should always scroll, even repeatedly.
-        // Works for both mapped home anchors and generic id hashes.
+        // Same-page hash click: scroll (home #solutions, about #locations-network, etc.).
         event.preventDefault();
         scrollToElementById(hashTargetId, resolveScrollBehavior("smooth"));
         return;
@@ -134,6 +155,26 @@ export function SolutionsHashScroll() {
 
       if (isHomeTopLink(url.pathname, url.hash)) {
         // Clicking the logo/home on the homepage should always return to hero top.
+        event.preventDefault();
+        scrollToHomeTop(resolveScrollBehavior("smooth"));
+        if (window.location.hash) {
+          window.history.replaceState(null, "", window.location.pathname + window.location.search);
+        }
+        return;
+      }
+
+      if (isAboutUsTopLink(url.pathname, url.hash)) {
+        // On the about page, clicking "About us" in the nav should scroll to the top.
+        event.preventDefault();
+        scrollToHomeTop(resolveScrollBehavior("smooth"));
+        if (window.location.hash) {
+          window.history.replaceState(null, "", window.location.pathname + window.location.search);
+        }
+        return;
+      }
+
+      if (isFaqsTopLink(url.pathname, url.hash)) {
+        // On the FAQ page, clicking "FAQs" in the nav should scroll to the top.
         event.preventDefault();
         scrollToHomeTop(resolveScrollBehavior("smooth"));
         if (window.location.hash) {
@@ -153,6 +194,36 @@ export function SolutionsHashScroll() {
       document.removeEventListener("click", onClick, true);
     };
   }, []);
+
+  // After client navigation to a path with a hash (e.g. /about-us#locations-network), scroll to the section.
+  // Next.js soft nav may not fire hashchange; pathname change ensures we run once the about page is mounted.
+  const prevPathnameRef = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    const currentPath = normalizePath(pathname ?? "");
+    const prevPath = prevPathnameRef.current;
+    prevPathnameRef.current = currentPath;
+    // Only run when pathname actually changed (client nav), not on initial mount.
+    if (prevPath === null || prevPath === currentPath) return;
+    if (typeof window === "undefined" || !window.location.hash) return;
+
+    const normalizedPath = currentPath;
+    if (
+      normalizedPath !== ABOUT_US_PATH &&
+      normalizedPath !== ABOUT_FAQS_PATH &&
+      normalizedPath !== HOME_PATH
+    )
+      return;
+
+    const targetId = getHashTargetId(window.location.hash);
+    if (!targetId) return;
+
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollToElementById(targetId, resolveScrollBehavior("smooth"));
+      });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [pathname]);
 
   return null;
 }

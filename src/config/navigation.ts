@@ -52,7 +52,10 @@ export const NAV = {
               { label: "Dry Van", href: "/services/truckload#section-dry-van" },
               { label: "Flatbed", href: "/services/truckload#section-flatbed" },
               { label: "RGN / Oversize", href: "/services/truckload#section-rgn-oversize" },
-              { label: "Roll-Tite / Conestoga", href: "/services/truckload#section-roll-tite-conestoga" },
+              {
+                label: "Roll-Tite / Conestoga",
+                href: "/services/truckload#section-roll-tite-conestoga",
+              },
             ],
           },
           {
@@ -109,7 +112,10 @@ export const NAV = {
             icon: "globe",
             children: [
               { label: "Canada ↔ USA", href: "/services/cross-border#section-canada-us" },
-              { label: "Mexico Cross-Border", href: "/services/cross-border#section-mexico-cross-border" },
+              {
+                label: "Mexico Cross-Border",
+                href: "/services/cross-border#section-mexico-cross-border",
+              },
               { label: "Ocean Freight", href: "/services/cross-border#section-ocean-freight" },
               { label: "Air Freight", href: "/services/cross-border#section-air-freight" },
             ],
@@ -125,10 +131,19 @@ export const NAV = {
             description: "Warehousing, managed capacity, dedicated, and projects.",
             icon: "warehouse",
             children: [
-              { label: "Warehousing & Distribution", href: "/services/value-added#section-warehousing-distribution" },
+              {
+                label: "Warehousing & Distribution",
+                href: "/services/value-added#section-warehousing-distribution",
+              },
               { label: "Managed Capacity", href: "/services/value-added#section-managed-capacity" },
-              { label: "Dedicated / Contract", href: "/services/value-added#section-dedicated-contract" },
-              { label: "Project-Specific / Oversize", href: "/services/value-added#section-project-oversize-programs" },
+              {
+                label: "Dedicated / Contract",
+                href: "/services/value-added#section-dedicated-contract",
+              },
+              {
+                label: "Project-Specific / Oversize",
+                href: "/services/value-added#section-project-oversize-programs",
+              },
             ],
           },
         ],
@@ -190,26 +205,26 @@ export const NAV = {
     intro: {
       title: "Company",
       description:
-        "Learn who we are, how we operate, and what we stand for — safety, compliance, and execution.",
+        "Learn who we are, how we operate, and what we stand for — discipline, compliance, and execution.",
       ctaLabel: "Contact us",
       ctaHref: "/contact",
     },
     links: [
       {
-        label: "About NPT",
-        href: "/company/about",
-        description: "Our story, mission, and values.",
+        label: "About us",
+        href: "/about-us",
+        description: "Who we are, how we operate, and what we stand for.",
         icon: "building",
       },
       {
         label: "Locations & Network",
-        href: "/company/locations",
+        href: "/about-us#locations-network",
         description: "Coverage across North America.",
         icon: "map",
       },
       {
         label: "Safety & Compliance",
-        href: "/company/safety",
+        href: "/about-us#safety-compliance",
         description: "Standards, training, and compliance focus.",
         icon: "shield",
       },
@@ -221,13 +236,13 @@ export const NAV = {
       },
       {
         label: "Shipping Guides",
-        href: "/resources/guides",
+        href: "/about-us/faqs#shipping-guides",
         description: "Helpful guides for shippers.",
         icon: "briefcase",
       },
       {
         label: "FAQs",
-        href: "/resources/faqs",
+        href: "/about-us/faqs",
         description: "Fast answers to common questions.",
         icon: "phone",
       },

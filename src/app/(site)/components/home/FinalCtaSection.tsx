@@ -127,24 +127,27 @@ export function FinalCtaSection() {
                     Request a Quote
                   </Link>
 
-                  <Link
-                    href="/contact"
-                    onClick={() =>
+                  <button
+                    type="button"
+                    onClick={() => {
                       trackCtaClick({
-                        ctaId: "final_cta_secondary_contact_operations",
+                        ctaId: "final_cta_secondary_speak_live_agent",
                         location: "final_cta",
-                        destination: "/contact",
-                        label: "Contact Operations",
-                      })
-                    }
+                        destination: "#live-chat",
+                        label: "Speak with a live agent",
+                      });
+                      if (typeof window !== "undefined") {
+                        window.dispatchEvent(new CustomEvent("npt:open-live-chat"));
+                      }
+                    }}
                     className={cn(
-                      "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold",
+                      "inline-flex h-11 cursor-pointer items-center justify-center rounded-md px-5 text-sm font-semibold",
                       "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] hover:bg-[color:var(--color-surface-0-light)]",
                       focusRing,
                     )}
                   >
-                    Contact Operations
-                  </Link>
+                    Speak with a live agent
+                  </button>
                 </div>
 
                 <div className="mt-3 text-center text-[11px] text-[color:var(--color-muted-light)]">

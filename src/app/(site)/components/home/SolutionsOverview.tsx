@@ -766,25 +766,28 @@ export function SolutionsOverview() {
                 >
                   Request a Quote
                 </Link>
-                <Link
-                  href="/contact"
-                  onClick={() =>
+                <button
+                  type="button"
+                  onClick={() => {
                     trackCtaClick({
-                      ctaId: "solutions_guidance_secondary_contact_operations",
+                      ctaId: "solutions_guidance_secondary_speak_live_agent",
                       location: "solutions_guidance_strip",
-                      destination: "/contact",
-                      label: "Contact Operations",
-                    })
-                  }
+                      destination: "#live-chat",
+                      label: "Speak with a live agent",
+                    });
+                    if (typeof window !== "undefined") {
+                      window.dispatchEvent(new CustomEvent("npt:open-live-chat"));
+                    }
+                  }}
                   className={cn(
-                    "inline-flex h-11 w-full items-center justify-center rounded-md px-5 text-sm font-semibold sm:w-auto",
+                    "inline-flex h-11 w-full cursor-pointer items-center justify-center rounded-md px-5 text-sm font-semibold sm:w-auto",
                     "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)]",
                     "hover:bg-[color:var(--color-surface-0-light)]",
                     "focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:outline-none",
                   )}
                 >
-                  Contact Operations
-                </Link>
+                  Speak with a live agent
+                </button>
               </div>
             </div>
           </div>

@@ -7,7 +7,7 @@ import { trackCtaClick } from "@/lib/analytics/cta";
 import { NAV } from "@/config/navigation";
 import { DesktopRichDropdown, SolutionsMegaMenu } from "./NavMenuParts";
 
-const NAV_OPEN_DELAY_MS = 360;
+const NAV_OPEN_DELAY_MS = 180;
 const NAV_CLOSE_DELAY_MS = 560;
 
 export function DesktopNav() {
