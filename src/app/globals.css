@@ -24,3 +24,21 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .animate-hero-float { animation: none !important; }
 }
+
+/* Industry page — truck moving effect */
+@keyframes industryTruckMove {
+  0%   { transform: translateX(-8%); }
+  100% { transform: translateX(8%); }
+}
+.animate-industry-truck-move {
+  animation: industryTruckMove 25s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-industry-truck-move { animation: none !important; }
+}
+
+/* How we support — road streaks moving backward so truck feels in motion */
+@keyframes howWeSupportRoad {
+  0%   { background-position: 0 0; }
+  100% { background-position: 48px 0; }
+}
