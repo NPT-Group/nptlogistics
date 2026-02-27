@@ -253,7 +253,7 @@ function FinishedVehiclesScene({
   dustOpacity,
   rainOpacity,
   chipOpacity,
-  accent,
+  accent: _accent,
 }: {
   jigglePx: number;
   roadRoughness: number;

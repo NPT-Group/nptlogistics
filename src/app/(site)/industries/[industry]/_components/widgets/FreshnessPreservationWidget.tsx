@@ -35,7 +35,7 @@ function computeFreshness(temp: number, days: number, product: Product): number 
 
 function getStatus(
   freshness: number,
-  inRange: boolean
+  _inRange: boolean
 ): "Preserved" | "Monitor" | "Spoilage Risk" {
   if (freshness >= 85) return "Preserved";
   if (freshness >= 60) return "Monitor";
@@ -267,14 +267,14 @@ export function FreshnessPreservationWidget({ accentColor }: { accentColor?: str
 }
 
 function FreshnessScene({
-  temp,
+  temp: _temp,
   days,
   product,
   freshness,
   inRange,
-  isPreserved,
+  isPreserved: _isPreserved,
   isSpoilage,
-  reduceMotion,
+  reduceMotion: _reduceMotion,
   accent,
 }: {
   temp: number;
@@ -295,7 +295,6 @@ function FreshnessScene({
 
   // Decay curve: line from (0, 100) to (days, freshness). X scale: 0..days -> pad.l .. pad.l+graphW. Y scale: 0..100 -> bottom..top (inverted).
   const endX = pad.l + (days / DAYS_MAX) * graphW;
-  const startY = pad.t;
   const endY = pad.t + graphH * (1 - freshness / 100);
 
   const curveColor =

@@ -267,15 +267,15 @@ export function LoadBalanceAxleWidget({ accentColor }: { accentColor?: string })
 }
 
 function FlatbedScene({
-  weight,
-  cog,
+  weight: _weight,
+  cog: _cog,
   tiltDeg,
   coilOffsetX,
   leftPressure,
   rightPressure,
   centerPressure,
   status,
-  accent,
+  accent: _accent,
   barColor,
 }: {
   weight: number;

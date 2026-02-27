@@ -8,38 +8,6 @@ export function IconThermometer() {
     </svg>
   );
 }
-export function IconTruck() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M5 18H3c-.6 0-1-.4-1-1V6c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v2" />
-      <path d="M14 9h4l3 3v4c0 .6-.4 1-1 1h-2" />
-      <circle cx="7" cy="18" r="2" />
-      <circle cx="17" cy="18" r="2" />
-    </svg>
-  );
-}
-export function IconFactory() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M2 20V10l10-5 10 5v10" />
-      <path d="M12 20V10" />
-      <path d="M2 10h20" />
-      <path d="M6 20v-4" />
-      <path d="M10 20v-4" />
-      <path d="M14 20v-4" />
-      <path d="M18 20v-4" />
-    </svg>
-  );
-}
-export function IconCart() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <circle cx="9" cy="21" r="1" />
-      <circle cx="20" cy="21" r="1" />
-      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-    </svg>
-  );
-}
 export function IconShield() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

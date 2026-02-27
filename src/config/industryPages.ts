@@ -33,20 +33,14 @@ export type IndustryHero = {
   iconKeys?: string[]; // e.g. ["truck", "package"] for scattered hero icons
 };
 
-/** Unique interactive widget per industry — engaging, original, premium */
+/** Unique interactive widget per industry — one per industry page */
 export type IndustryWidgetType =
-  | "transport-protection" // Automotive — stress-test protection (vehicles vs parts)
-  | "delivery-window" // (legacy) JIT / appointment windows
-  | "visibility-checkpoints" // Manufacturing — order-to-delivery visibility (legacy)
-  | "load-optimization" // Manufacturing & Materials — trailer load / utilization simulator
-  | "delivery-promise" // Retail — speed tiers (legacy)
-  | "demand-surge" // Retail & Consumer Goods — demand / fulfillment flow simulator
-  | "cold-chain-journey" // Food & Beverage — cold chain checkpoints (legacy)
-  | "freshness-preservation" // Food & Beverage — temperature + time decay / freshness simulator
-  | "project-phase" // Industrial & Energy — plan / execute / deliver (legacy)
-  | "heavy-haul-route" // Industrial & Energy — route complexity / compliance / escort simulator
-  | "load-type" // Steel & Aluminum — legacy axle balance
-  | "load-balance-axle"; // Steel & Aluminum — load balance & axle stress simulator
+  | "transport-protection" // Automotive
+  | "load-optimization" // Manufacturing & Materials
+  | "demand-surge" // Retail & Consumer Goods
+  | "freshness-preservation" // Food & Beverage
+  | "heavy-haul-route" // Industrial & Energy
+  | "load-balance-axle"; // Steel & Aluminum
 
 export type IndustryWhatMatters = {
   sectionTitle: string;

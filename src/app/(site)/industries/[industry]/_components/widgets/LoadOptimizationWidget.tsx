@@ -223,7 +223,7 @@ function TrailerScene({
   tiltDeg,
   stressRisk,
   overstress,
-  accent,
+  accent: _accent,
 }: {
   density: number;
   shipmentType: ShipmentType;
