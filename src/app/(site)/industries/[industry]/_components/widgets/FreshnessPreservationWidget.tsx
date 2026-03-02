@@ -86,11 +86,11 @@ export function FreshnessPreservationWidget({ accentColor }: { accentColor?: str
       fillHeight
       className="h-full shadow-[0_4px_24px_rgba(15,23,42,0.06)]"
       icon={<IconThermometer />}
-      title="Freshness Preservation Simulator"
+      title="Freshness Preservation Model"
       accentColor={accentColor}
-      howToUse="Adjust temperature and transit time. Watch freshness respond. Keep temp in the safe band to flatten decay."
+      howToUse="Adjust temperature and transit duration to evaluate freshness decay and intervention urgency."
       aria-labelledby="freshness-preservation-title"
-      didYouKnow="In-range temp = slow decay. Outside band = decay accelerates. Time multiplies the effect."
+      didYouKnow="In-band temperature slows decay; time and temperature deviation compound quality risk."
       visual={
         <div className="grid flex-1 min-h-0 gap-4 lg:grid-cols-[1fr,1.4fr]">
           {/* Left: controls */}

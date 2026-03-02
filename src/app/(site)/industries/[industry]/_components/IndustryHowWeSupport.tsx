@@ -1,329 +1,248 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { Section } from "@/app/(site)/components/layout/Section";
 import type { IndustryPageModel } from "@/config/industryPages";
 import { cn } from "@/lib/cn";
-import {
-  THEME_ACCENT,
-  THEME_BG,
-  getThemeBarGradient,
-  getThemeOrbs,
-} from "./industryTheme";
+import { THEME_ACCENT, THEME_BG, getThemeBarGradient, getThemeOrbs } from "./industryTheme";
+
+const focusRing =
+  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
+
+// Desktop trailer-bed tuning controls (px). Keep X at 0 or negative to avoid cab overlap.
+const DESKTOP_CARD_OFFSET_X = 80;
+const DESKTOP_CARD_OFFSET_Y = 10;
+const DESKTOP_CARD_BED_BASE = 130;
+const DESKTOP_CARD_SAFE_RIGHT = "34%";
 
 export function IndustryHowWeSupport({ model }: { model: IndustryPageModel }) {
   const reduceMotion = useReducedMotion();
+  const [activeCard, setActiveCard] = useState<number | null>(null);
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const { howWeSupport, hero } = model;
-
   const theme = hero.theme;
-  const sectionBg = THEME_BG[theme];
   const accentColor = THEME_ACCENT[theme];
+  const sectionBg = THEME_BG[theme];
   const orbs = getThemeOrbs(theme);
   const barGradient = getThemeBarGradient(theme);
 
-  // --- Variants ---
   const fadeUp: Variants = reduceMotion
     ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } }
     : {
-        hidden: { opacity: 0, y: 12 },
-        show: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.42, ease: "easeOut" },
-        },
+        hidden: { opacity: 0, y: 14 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
       };
-
-  const slideRight: Variants = reduceMotion
-    ? { hidden: { opacity: 1, x: 0 }, show: { opacity: 1, x: 0 } }
-    : {
-        hidden: { opacity: 0, x: -22 },
-        show: {
-          opacity: 1,
-          x: 0,
-          transition: { duration: 0.42, ease: "easeOut" },
-        },
-      };
-
   const stagger: Variants = reduceMotion
     ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
-    : {
-        hidden: {},
-        show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
-      };
+    : { hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } } };
 
-  /**
-   * PRODUCTION TUNING
-   * - Truck uses object-cover to span full width and feel like it's carrying the cards.
-   * - BED_Y positions the card row so they sit on the flatbed (visually loaded).
-   * - CAB_GUTTER keeps cards from overlapping the cab.
-   */
-  const STAGE_H = "h-[380px] lg:h-[440px]";
-  const TRUCK_H = "h-[280px] lg:h-[340px]"; // full-width strip so truck dominates
-  const BED_Y = "top-[135px] lg:top-[118px]"; // cards sit on the flatbed (bed surface lines up with card bottom)
-
-  const CAB_GUTTER = "lg:pr-[380px]"; // reserve right space for cab
-  const CARDS_NUDGE = "lg:-translate-x-2"; // align card row with bed
+  const sectionHeadingId = "how-we-support-heading";
+  const desktopExpandedCardIndex = hoveredCard ?? activeCard ?? 0;
 
   return (
     <Section
-      variant="dark"
       id="how-we-support"
+      variant="dark"
+      aria-labelledby={sectionHeadingId}
       className="relative scroll-mt-24 overflow-hidden sm:scroll-mt-28"
       style={{ backgroundColor: sectionBg }}
     >
-      {/* Orbs (behind content) */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0">
+      <div aria-hidden className="pointer-events-none absolute inset-0">
         <div
-          className="absolute -top-40 -left-40 h-[680px] w-[680px] rounded-full"
-          style={{
-            background: `radial-gradient(circle,${orbs.main},transparent 60%)`,
-          }}
+          className="absolute top-6 -left-24 h-64 w-64 rounded-full blur-3xl"
+          style={{ backgroundColor: orbs.main }}
         />
         <div
-          className="absolute -right-40 -bottom-40 h-[560px] w-[560px] rounded-full"
-          style={{
-            background: `radial-gradient(circle,${orbs.secondary},transparent 65%)`,
-          }}
+          className="absolute -right-24 bottom-10 h-72 w-72 rounded-full blur-3xl"
+          style={{ backgroundColor: orbs.secondary }}
         />
       </div>
-
-      {/* Grid (very subtle, behind content) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
-      />
-
-      {/* Road motion: fast streaks under the truck so it clearly reads as “moving” */}
-      {!reduceMotion && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-        >
-          <div
-            className="absolute inset-x-0 bottom-0 h-[120px] lg:h-[140px] opacity-50"
-            style={{
-              backgroundImage: "repeating-linear-gradient(90deg, transparent 0, transparent 20px, rgba(255,255,255,0.75) 20px, rgba(255,255,255,0.75) 28px)",
-              backgroundSize: "48px 100%",
-              animation: "howWeSupportRoad 0.5s linear infinite",
-            }}
-          />
-          <div
-            className="absolute inset-x-0 bottom-0 h-[120px] lg:h-[140px] opacity-40"
-            style={{
-              backgroundImage: "repeating-linear-gradient(90deg, transparent 0, transparent 24px, rgba(255,255,255,0.7) 24px, rgba(255,255,255,0.7) 32px)",
-              backgroundSize: "48px 100%",
-              animation: "howWeSupportRoad 0.42s linear infinite",
-            }}
-          />
-          <div
-            className="absolute inset-x-0 bottom-0 h-[120px] lg:h-[140px] opacity-35"
-            style={{
-              backgroundImage: "repeating-linear-gradient(90deg, transparent 0, transparent 16px, rgba(255,255,255,0.65) 16px, rgba(255,255,255,0.65) 24px)",
-              backgroundSize: "48px 100%",
-              animation: "howWeSupportRoad 0.58s linear infinite",
-            }}
-          />
-        </div>
-      )}
-
-      {/* Header (tight, premium) */}
       <Container className="relative max-w-[1440px] px-4 sm:px-6 lg:px-6">
         <motion.div
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.15 }}
+          viewport={{ once: true, amount: 0.18 }}
           variants={stagger}
-          className="pt-10 pb-4 sm:pt-12 sm:pb-4" // tighter than before
         >
-          <motion.header variants={fadeUp} className="mb-3 sm:mb-4">
-            <div className="mb-3 flex items-center gap-2.5">
-              <div
-                className="h-[2px] w-10 sm:w-14"
-                style={{ backgroundColor: accentColor }}
-              />
-              <span
-                className="text-[10.5px] font-bold tracking-[0.15em] uppercase"
-                style={{ color: accentColor }}
-              >
-                Our approach
-              </span>
-            </div>
-
-            <h2 className="text-[1.65rem] font-semibold leading-tight tracking-tight text-white sm:text-[2rem] lg:text-[2.25rem]">
+          <motion.header variants={fadeUp} className="max-w-3xl">
+            <div
+              className="mb-3 h-[2px] w-10 sm:w-14"
+              style={{ backgroundColor: accentColor }}
+              aria-hidden
+            />
+            <h2
+              id={sectionHeadingId}
+              className="text-[1.6rem] leading-tight font-semibold tracking-tight text-[color:var(--color-text)] sm:text-[1.95rem] lg:text-[2.2rem]"
+            >
               {howWeSupport.sectionTitle}
             </h2>
+            <p className="mt-2 text-sm leading-[1.75] text-[color:var(--color-muted)] sm:text-[15px]">
+              {howWeSupport.intro}
+            </p>
           </motion.header>
-        </motion.div>
-      </Container>
 
-      {/* =========================
-          MOBILE ONLY (narrow viewports: cards only)
-         ========================= */}
-      <div className="md:hidden">
-        <Container className="relative max-w-[1440px] px-4 sm:px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={stagger}
-            className="grid gap-4 sm:grid-cols-2"
-          >
-            {howWeSupport.steps.map((step, i) => (
-              <StepCard
-                key={i}
-                step={step}
-                variants={slideRight}
-                barGradient={barGradient}
-                reduceMotion={reduceMotion ?? false}
-                allowWidthGrow={false}
-              />
-            ))}
-          </motion.div>
-        </Container>
-
-        <div className="h-10" />
-      </div>
-
-      {/* =========================
-          TABLET + DESKTOP (truck full width + cards on bed)
-         ========================= */}
-      <div className={cn("relative z-10 hidden w-full overflow-visible md:block", STAGE_H)}>
-        {/* Truck: full width, above cards in stack so it’s visible */}
-        <motion.div
-          aria-hidden
-          className={cn("absolute left-0 right-0 bottom-0 z-10", TRUCK_H)}
-          initial={false}
-          animate={reduceMotion ? undefined : { x: [0, -6, 0] }}
-          transition={
-            reduceMotion
-              ? undefined
-              : { duration: 5.5, ease: "easeInOut", repeat: Infinity }
-          }
-        >
-          <div className="relative h-full w-full">
-            <Image
-              src="/industries/movingTruckImg.png"
-              alt=""
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover object-center brightness-[1.06] contrast-[1.02]"
-            />
-
-
-            {/* bed (sells “cards sitting on bed”) */}
-          </div>
-        </motion.div>
-
-        {/* Cards anchored to bed line (above truck so they read as “on” the bed) */}
-        <div className={cn("absolute inset-x-0 z-20", BED_Y)}>
-          <Container className="relative max-w-[1440px] px-4 sm:px-6 lg:px-6">
-            {/* Cab gutter + nudge so cards stay on bed and never enter cab */}
-            <div className={cn("relative", CAB_GUTTER, CARDS_NUDGE)}>
-              <motion.div
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, amount: 0.2 }}
-                variants={stagger}
-                className="grid gap-5 lg:grid-cols-4"
-              >
-                {howWeSupport.steps.map((step, i) => (
-                  <StepCard
-                    key={i}
-                    step={step}
-                    variants={slideRight}
-                    barGradient={barGradient}
-                    reduceMotion={reduceMotion ?? false}
-                    allowWidthGrow
+          <motion.div variants={fadeUp} className="relative mt-8 sm:mt-10">
+            <div className="grid gap-4 sm:grid-cols-2 2xl:hidden">
+              {howWeSupport.cards.map((card) => (
+                <article
+                  key={`${card.title}-stacked`}
+                  className="group relative min-h-[224px] rounded-2xl border border-white/18 bg-white/[0.06] p-5 text-left shadow-[0_8px_22px_rgba(2,6,23,0.24)] backdrop-blur-sm"
+                >
+                  <div
+                    className="absolute inset-x-0 top-0 h-[2px] opacity-90"
+                    style={{ background: barGradient }}
+                    aria-hidden
                   />
-                ))}
-              </motion.div>
+                  {card.metric ? (
+                    <span
+                      className="inline-flex items-center rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] uppercase"
+                      style={{ color: accentColor }}
+                    >
+                      {card.metric}
+                    </span>
+                  ) : null}
+                  {card.eyebrow ? (
+                    <p className="mt-2.5 text-[10px] font-semibold tracking-[0.12em] text-white/70 uppercase">
+                      {card.eyebrow}
+                    </p>
+                  ) : null}
+                  <h3 className="mt-1 text-[1.05rem] leading-tight font-semibold tracking-tight text-white sm:text-[1.1rem]">
+                    {card.title}
+                  </h3>
+                  <p className="mt-2 text-[13px] leading-[1.6] text-white/85 sm:text-[13.5px]">{card.summary}</p>
+                  <p className="mt-2 text-[12.5px] leading-[1.65] text-white/75 sm:text-[13px]">{card.details}</p>
+                </article>
+              ))}
+            </div>
 
-              {/* Contact shadow for premium depth */}
-              <div className="pointer-events-none mt-4 h-8 w-full">
+            <div className="relative left-1/2 z-10 mt-4 hidden w-screen -translate-x-1/2 2xl:block">
+              <div className="mx-auto w-full px-0">
                 <div
-                  className="mx-auto h-full max-w-[1100px] opacity-55 blur-[18px]"
+                  aria-hidden
+                  className={cn(
+                    "absolute inset-x-0 bottom-7 h-[2px] bg-[length:140px_2px] bg-repeat-x opacity-55",
+                    !reduceMotion && "animate-industry-road-flow",
+                  )}
                   style={{
-                    background:
-                      "radial-gradient(closest-side, rgba(0,0,0,0.62), transparent 70%)",
+                    backgroundImage:
+                      "linear-gradient(90deg, rgba(255,255,255,0.55) 0, rgba(255,255,255,0.55) 46%, transparent 46%, transparent 100%)",
                   }}
                 />
+                <div className="relative overflow-visible">
+                  <div
+                    className="absolute left-0 z-20 hidden items-end gap-4 pb-2 2xl:flex"
+                    style={{
+                      right: DESKTOP_CARD_SAFE_RIGHT,
+                      bottom: `${DESKTOP_CARD_BED_BASE}px`,
+                      transform: `translate(${DESKTOP_CARD_OFFSET_X}px, ${DESKTOP_CARD_OFFSET_Y}px)`,
+                    }}
+                  >
+                    {howWeSupport.cards.map((card, index) => {
+                      const expanded = desktopExpandedCardIndex === index;
+                      const collapsedCount = Math.max(1, howWeSupport.cards.length - 1);
+                      const expandedBasis = 42;
+                      const collapsedBasis = (100 - expandedBasis) / collapsedCount;
+                      return (
+                        <button
+                          key={`${card.title}-desktop`}
+                          type="button"
+                          onMouseEnter={() => setHoveredCard(index)}
+                          onMouseLeave={() =>
+                            setHoveredCard((current) => (current === index ? null : current))
+                          }
+                          onFocus={() => setActiveCard(index)}
+                          onBlur={() =>
+                            setActiveCard((current) => (current === index ? 0 : current))
+                          }
+                          onClick={() =>
+                            setActiveCard((current) => (current === index ? 0 : index))
+                          }
+                          className={cn(
+                            "group relative h-[220px] w-auto shrink-0 overflow-hidden rounded-2xl border border-white/18 bg-white/[0.06] p-4 text-left shadow-[0_8px_22px_rgba(2,6,23,0.24)] backdrop-blur-sm transition-[flex-basis,border-color,transform,box-shadow,background-color] duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] xl:h-[226px] xl:p-5",
+                            expanded && "border-white/30 bg-white/[0.09] shadow-[0_14px_30px_rgba(2,6,23,0.35)]",
+                            focusRing,
+                          )}
+                          style={{ flexBasis: `${expanded ? expandedBasis : collapsedBasis}%` }}
+                          aria-expanded={expanded}
+                          aria-label={`${card.title}. ${expanded ? "Collapse details" : "Expand details"}`}
+                        >
+                          <div
+                            className="absolute inset-x-0 top-0 h-[2px] opacity-90"
+                            style={{ background: barGradient }}
+                            aria-hidden
+                          />
+                          {card.metric ? (
+                            <span
+                              className="inline-flex items-center rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] uppercase"
+                              style={{ color: accentColor }}
+                            >
+                              {card.metric}
+                            </span>
+                          ) : null}
+                          {card.eyebrow ? (
+                            <p className="mt-2.5 text-[10px] font-semibold tracking-[0.12em] text-white/70 uppercase">
+                              {card.eyebrow}
+                            </p>
+                          ) : null}
+                          <h3
+                            className={cn(
+                              "mt-1 text-[1.05rem] leading-tight font-semibold tracking-tight text-white sm:text-[1.1rem]",
+                              expanded ? "line-clamp-none" : "line-clamp-2",
+                            )}
+                          >
+                            {card.title}
+                          </h3>
+                          <p
+                            className={cn(
+                              "mt-2 text-[13px] leading-[1.6] text-white/80 transition-opacity duration-300 sm:text-[13.5px]",
+                              expanded ? "line-clamp-4 opacity-100" : "line-clamp-2 opacity-95",
+                            )}
+                          >
+                            {card.summary}
+                          </p>
+                          <p
+                            className={cn(
+                              "text-[12.5px] leading-[1.65] text-white/70 transition-all duration-500 sm:text-[13px]",
+                              expanded
+                                ? "mt-2 line-clamp-3 opacity-100"
+                                : "mt-0 max-h-0 overflow-hidden opacity-0",
+                            )}
+                          >
+                            {card.details}
+                          </p>
+                          <span className="mt-1.5 inline-flex items-center text-[11px] font-medium text-white/80">
+                            {expanded ? "Read less" : "Read more"}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className={cn("relative", !reduceMotion && "animate-industry-truck-move")}>
+                    <Image
+                      src="/industries/movingTruck_Img.png"
+                      alt=""
+                      width={2000}
+                      height={614}
+                      className="h-[250px] w-[102vw] max-w-none -translate-x-[1vw] object-contain object-bottom select-none sm:h-[305px] lg:h-[370px]"
+                      sizes="100vw"
+                      priority={false}
+                    />
+                  </div>
+                </div>
               </div>
+              <div
+                aria-hidden
+                className="pointer-events-none absolute left-1/2 z-20 hidden h-2 w-[74%] -translate-x-1/2 rounded-full bg-black/25 blur-sm 2xl:block"
+                style={{ bottom: `${DESKTOP_CARD_BED_BASE + DESKTOP_CARD_OFFSET_Y - 2}px` }}
+              />
+              <div className="mx-auto mt-2 hidden h-[1px] w-[98vw] bg-gradient-to-r from-transparent via-white/30 to-transparent sm:mt-3 2xl:block" />
             </div>
-          </Container>
-        </div>
-      </div>
-
-      {/* tight bottom spacing */}
-      <div className="h-6 sm:h-8" />
+          </motion.div>
+        </motion.div>
+      </Container>
     </Section>
-  );
-}
-
-function StepCard({
-  step,
-  variants,
-  barGradient,
-  reduceMotion,
-  allowWidthGrow,
-}: {
-  step: { title: string; description: string };
-  variants: Variants;
-  barGradient: string;
-  reduceMotion: boolean;
-  allowWidthGrow: boolean;
-}) {
-  return (
-    <motion.article
-      variants={variants}
-      animate={
-        reduceMotion ? undefined : { y: [0, -1.5, 0] } // ultra subtle “road” bob
-      }
-      transition={
-        reduceMotion
-          ? undefined
-          : { duration: 6.0, ease: "easeInOut", repeat: Infinity }
-      }
-      className={cn(
-        "group relative overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.12)]",
-        "bg-[rgba(18,18,22,0.62)] backdrop-blur-md",
-        "shadow-[0_10px_44px_rgba(0,0,0,0.48),inset_0_1px_0_rgba(255,255,255,0.08)]",
-        "p-6",
-        "min-h-[160px]",
-        "transition-[transform,box-shadow,border-color] duration-300 ease-out",
-        "hover:border-[rgba(255,255,255,0.18)] hover:shadow-[0_14px_60px_rgba(0,0,0,0.58),inset_0_1px_0_rgba(255,255,255,0.10)]",
-        allowWidthGrow &&
-          "origin-left hover:scale-x-[1.22] hover:z-20 will-change-transform",
-      )}
-    >
-      <div
-        className="absolute left-0 right-0 top-0 h-[2px] rounded-t-2xl"
-        style={{ background: barGradient }}
-        aria-hidden
-      />
-
-      <h3 className="text-[1rem] font-semibold leading-snug tracking-tight text-white">
-        {step.title}
-      </h3>
-
-      <p
-        className={cn(
-          "mt-2.5 text-[12.5px] leading-[1.72] text-[rgba(255,255,255,0.65)] sm:text-[13px]",
-          "transition-[color] duration-200",
-          "group-hover:text-[rgba(255,255,255,0.78)]",
-          "line-clamp-3",
-          allowWidthGrow && "group-hover:line-clamp-none",
-        )}
-      >
-        {step.description}
-      </p>
-    </motion.article>
   );
 }

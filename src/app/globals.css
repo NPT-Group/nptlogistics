@@ -18,27 +18,41 @@ html {
 
 /* About Hero — truck float animation */
 @keyframes heroFloat {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-7px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .animate-hero-float { animation: none !important; }
+  .animate-hero-float {
+    animation: none !important;
+  }
 }
 
-/* Industry page — truck moving effect */
-@keyframes industryTruckMove {
-  0%   { transform: translateX(-8%); }
-  100% { transform: translateX(8%); }
-}
 .animate-industry-truck-move {
-  animation: industryTruckMove 25s ease-in-out infinite alternate;
-}
-@media (prefers-reduced-motion: reduce) {
-  .animate-industry-truck-move { animation: none !important; }
+  animation: none;
+  transform: translate3d(0, 0, 0);
 }
 
-/* How we support — road streaks moving backward so truck feels in motion */
-@keyframes howWeSupportRoad {
-  0%   { background-position: 0 0; }
-  100% { background-position: 48px 0; }
+@keyframes industryRoadFlow {
+  0% {
+    background-position-x: 0;
+  }
+  100% {
+    background-position-x: -140px;
+  }
+}
+.animate-industry-road-flow {
+  animation: industryRoadFlow 1.45s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-industry-truck-move {
+    animation: none !important;
+  }
+  .animate-industry-road-flow {
+    animation: none !important;
+  }
 }

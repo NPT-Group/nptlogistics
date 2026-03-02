@@ -74,11 +74,11 @@ export function DemandSurgeWidget({ accentColor }: { accentColor?: string }) {
       fillHeight
       className="h-full shadow-[0_4px_24px_rgba(15,23,42,0.06)]"
       icon={<IconPulse />}
-      title="Demand Surge Simulator"
+      title="Demand Surge Model"
       accentColor={accentColor}
-      howToUse="Slide demand, pick channel, and adjust distribution nodes. Watch order flow and fulfillment respond."
+      howToUse="Adjust demand, channel mix, and node count to evaluate system load, queue pressure, and fulfillment posture."
       aria-labelledby="demand-surge-title"
-      didYouKnow="More nodes spread load; e-comm adds velocity. Surge mode means we're already responding."
+      didYouKnow="Additional nodes distribute load; higher e-commerce mix increases velocity and peak sensitivity."
       visual={
         <div className="grid flex-1 min-h-0 gap-4 lg:grid-cols-[1fr,1.4fr]">
           {/* Left: controls */}

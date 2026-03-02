@@ -61,11 +61,11 @@ export function HeavyHaulRouteWidget({ accentColor }: { accentColor?: string }) 
       fillHeight
       className="h-full shadow-[0_4px_24px_rgba(15,23,42,0.06)]"
       icon={<IconRoute />}
-      title="Heavy Haul Route Planner"
+      title="Heavy-Haul Route Control Model"
       accentColor={accentColor}
-      howToUse="Adjust route complexity and load type. Watch compliance requirements and escort rules update."
+      howToUse="Adjust route complexity and load class to evaluate compliance load, permit needs, and escort posture."
       aria-labelledby="heavy-haul-route-title"
-      didYouKnow="Oversized and hazardous add permits and escort; complexity adds checkpoints and constraints."
+      didYouKnow="Oversized and hazardous loads increase control requirements; route complexity raises checkpoint density."
       visual={
         <div className="grid flex-1 min-h-0 gap-4 lg:grid-cols-[1fr,1.4fr]">
           {/* Left: controls */}

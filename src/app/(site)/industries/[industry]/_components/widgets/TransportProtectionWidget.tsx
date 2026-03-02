@@ -83,11 +83,11 @@ export function TransportProtectionWidget({ accentColor }: { accentColor?: strin
       fillHeight
       className="h-full shadow-[0_4px_24px_rgba(15,23,42,0.06)]"
       icon={<IconShield />}
-      title="Transport protection simulator"
+      title="Transport Protection Model"
       accentColor={accentColor}
-      howToUse="Slide drive conditions, pick protection level, and switch cargo type. The scene and protection score update to show risk."
+      howToUse="Set drive conditions, protection level, and cargo profile to evaluate exposure and protection posture."
       aria-labelledby="transport-protection-title"
-      didYouKnow="Open = exposed; enclosed = best. Rough conditions raise risk."
+      didYouKnow="Enclosed transport lowers environmental exposure; rougher conditions increase handling risk."
       visual={
         <div className="grid flex-1 min-h-0 gap-4 lg:grid-cols-[1fr,1.4fr]">
           {/* Left: controls */}
@@ -146,7 +146,7 @@ export function TransportProtectionWidget({ accentColor }: { accentColor?: strin
                 <PillToggle
                   value={cargo}
                   options={[
-                    { id: "vehicles", label: "Finished vehicles" },
+                    { id: "vehicles", label: "Vehicle units" },
                     { id: "parts", label: "Parts" },
                   ]}
                   onChange={setCargo}

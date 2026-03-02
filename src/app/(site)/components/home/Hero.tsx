@@ -6,6 +6,7 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
+import { HOME_CONTAINER_CLASS } from "./homeTokens";
 
 const VIDEO_DESKTOP = "/hero/hero-desktop.mp4";
 const POSTER = "/hero/hero-poster.png";
@@ -92,7 +93,7 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative">
-        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+        <Container className={HOME_CONTAINER_CLASS}>
           <motion.div
             className={cn(
               "relative z-10 flex flex-col justify-center",

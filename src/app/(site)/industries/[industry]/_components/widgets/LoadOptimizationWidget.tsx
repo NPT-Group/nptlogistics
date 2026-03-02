@@ -75,11 +75,11 @@ export function LoadOptimizationWidget({ accentColor }: { accentColor?: string }
       fillHeight
       className="h-full shadow-[0_4px_24px_rgba(15,23,42,0.06)]"
       icon={<IconCubeStack />}
-      title="Load Optimization Studio"
+      title="Load Utilization Model"
       accentColor={accentColor}
-      howToUse="Slide material density and switch FTL/LTL. The trailer fill and utilization update to show efficiency and stress."
+      howToUse="Adjust material density and shipment type to evaluate utilization, stress load, and operating posture."
       aria-labelledby="load-optimization-title"
-      didYouKnow="FTL = full trailer, clean fill. LTL = mixed loads, natural gaps. High density can trigger overstress."
+      didYouKnow="FTL typically improves cube use; mixed LTL profiles introduce natural gaps and stress variance."
       visual={
         <div className="grid flex-1 min-h-0 gap-4 lg:grid-cols-[1fr,1.4fr]">
           {/* Left: controls */}

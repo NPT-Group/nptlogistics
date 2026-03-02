@@ -4,15 +4,19 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { Section } from "@/app/(site)/components/layout/Section";
 import type { IndustryPageModel } from "@/config/industryPages";
-import { THEME_ACCENT, THEME_LIGHT_BG } from "./industryTheme";
+import { cn } from "@/lib/cn";
+import { THEME_ACCENT, THEME_BG, THEME_LIGHT_BG } from "./industryTheme";
 import { IndustrySectionWidget } from "./widgets";
 
 export function IndustryWhatMatters({ model }: { model: IndustryPageModel }) {
   const reduceMotion = useReducedMotion();
   const { whatMatters, hero } = model;
+  const variant = whatMatters.variant ?? "ops-grid";
+  const industry = model.key;
   const theme = hero.theme;
   const sectionBg = THEME_LIGHT_BG[theme];
   const accentColor = THEME_ACCENT[theme];
+  const boardSurface = THEME_BG[theme];
 
   const fadeUp: Variants = reduceMotion
     ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } }
@@ -22,13 +26,16 @@ export function IndustryWhatMatters({ model }: { model: IndustryPageModel }) {
     : { hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } } };
 
   const SECTION_HEADING_ID = "what-matters-heading";
+  const first = whatMatters.items[0];
+  const second = whatMatters.items[1];
+  const third = whatMatters.items[2];
 
   return (
     <Section
       variant="light"
       id="what-matters"
       aria-labelledby={SECTION_HEADING_ID}
-      className="relative scroll-mt-24 overflow-hidden pt-10 pb-10 sm:pt-12 sm:pb-12 lg:pt-14 lg:pb-14 sm:scroll-mt-28"
+      className="relative scroll-mt-24 overflow-hidden sm:scroll-mt-28"
       style={{ backgroundColor: sectionBg }}
     >
       <div
@@ -59,41 +66,221 @@ export function IndustryWhatMatters({ model }: { model: IndustryPageModel }) {
 
           <motion.div
             variants={stagger}
-            className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+            className={cn(
+              "mt-10 sm:mt-12",
+              variant === "timeline"
+                ? "relative grid gap-4 lg:grid-cols-12 lg:gap-6 lg:pt-8"
+                : variant === "control-board"
+                  ? "grid gap-4 lg:grid-cols-12 lg:gap-6"
+                  : "grid gap-4 lg:grid-cols-12 lg:gap-6",
+            )}
           >
-            {whatMatters.items.map((item, i) => (
-              <motion.article
-                key={i}
-                variants={fadeUp}
-                className="group relative overflow-hidden rounded-2xl border border-[color:var(--color-border-light)]/70 bg-white p-6 shadow-[0_2px_16px_rgba(2,6,23,0.06)] transition-all duration-300 hover:border-[color:var(--color-border-light)] hover:shadow-[0_8px_32px_rgba(2,6,23,0.1)] sm:p-7"
-                style={{
-                  borderLeftWidth: "3px",
-                  borderLeftColor: accentColor,
-                }}
-              >
+            {variant === "timeline" ? (
+              <>
+                {first ? (
+                  <motion.article
+                    variants={fadeUp}
+                    className={cn(
+                      "group relative overflow-hidden rounded-2xl border border-[color:var(--color-border-light)]/80 bg-white/95 p-6 shadow-[0_4px_20px_rgba(2,6,23,0.07)] transition-all duration-300 hover:shadow-[0_10px_26px_rgba(2,6,23,0.12)] sm:p-7",
+                      industry === "automotive" ? "lg:col-span-6" : "lg:col-span-3",
+                    )}
+                    style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                  >
+                    <h3 className="text-[1.13rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
+                      {first.title}
+                    </h3>
+                    <p className="mt-3 text-[13.5px] leading-[1.75] text-[color:var(--color-muted-light)] sm:text-[14px]">{first.body}</p>
+                  </motion.article>
+                ) : null}
+                {second ? (
+                  <motion.article
+                    variants={fadeUp}
+                    className={cn(
+                      "group relative overflow-hidden rounded-2xl border border-[color:var(--color-border-light)]/80 bg-white/95 p-6 shadow-[0_4px_20px_rgba(2,6,23,0.07)] transition-all duration-300 hover:shadow-[0_10px_26px_rgba(2,6,23,0.12)] sm:p-7",
+                      industry === "automotive" ? "lg:col-span-3" : "lg:col-span-6",
+                    )}
+                    style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                  >
+                    <h3 className="text-[1.06rem] font-semibold tracking-tight text-[color:var(--color-text-light)]">
+                      {second.title}
+                    </h3>
+                    <p className="mt-3 text-[13.5px] leading-[1.75] text-[color:var(--color-muted-light)] sm:text-[14px]">{second.body}</p>
+                  </motion.article>
+                ) : null}
+                {third ? (
+                  <motion.article
+                    variants={fadeUp}
+                    className="group relative overflow-hidden rounded-2xl border border-[color:var(--color-border-light)]/80 bg-white/95 p-6 shadow-[0_4px_20px_rgba(2,6,23,0.07)] transition-all duration-300 hover:shadow-[0_10px_26px_rgba(2,6,23,0.12)] sm:p-7 lg:col-span-3"
+                    style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                  >
+                    <h3 className="text-[1.06rem] font-semibold tracking-tight text-[color:var(--color-text-light)]">
+                      {third.title}
+                    </h3>
+                    <p className="mt-3 text-[13.5px] leading-[1.75] text-[color:var(--color-muted-light)] sm:text-[14px]">{third.body}</p>
+                  </motion.article>
+                ) : null}
+              </>
+            ) : null}
+
+            {variant === "control-board" ? (
+              <>
                 <div
-                  className="absolute top-0 right-0 h-24 w-24 opacity-[0.04] transition-opacity duration-300 group-hover:opacity-[0.07]"
-                  style={{ background: `radial-gradient(circle at 100% 0%, ${accentColor}, transparent 70%)` }}
-                  aria-hidden
-                />
-                <h3 className="relative text-[1.125rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]" style={{ color: "var(--color-text-light)" }}>
-                  {item.title}
-                </h3>
-                <p className="relative mt-3.5 text-[13.5px] leading-[1.75] text-[color:var(--color-muted-light)] sm:text-[14px]">
-                  {item.body}
-                </p>
-              </motion.article>
-            ))}
+                  className="rounded-2xl border border-[color:var(--color-border-light)]/80 p-4 shadow-[0_10px_28px_rgba(2,6,23,0.12)] lg:col-span-12"
+                  style={{
+                    backgroundColor: boardSurface,
+                    backgroundImage:
+                      "linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01) 45%, rgba(0,0,0,0.08))",
+                  }}
+                >
+                  <div className={cn("grid gap-4", industry === "food" ? "lg:grid-cols-12" : "lg:grid-cols-12")}>
+                    {industry === "food" ? (
+                      <>
+                        {first ? (
+                          <motion.article
+                            variants={fadeUp}
+                            className="relative overflow-hidden rounded-xl border border-white/20 bg-white/[0.06] p-6 lg:col-span-7"
+                            style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                          >
+                            <h3 className="text-[1.14rem] font-semibold tracking-tight text-white sm:text-[1.2rem]">{first.title}</h3>
+                            <p className="mt-3 text-[13.5px] leading-[1.75] text-white/80 sm:text-[14px]">{first.body}</p>
+                          </motion.article>
+                        ) : null}
+                        <div className="grid gap-4 lg:col-span-5">
+                          {second ? (
+                            <motion.article
+                              variants={fadeUp}
+                              className="relative overflow-hidden rounded-xl border border-white/20 bg-white/[0.06] p-5"
+                              style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                            >
+                              <h3 className="text-[1.06rem] font-semibold tracking-tight text-white">{second.title}</h3>
+                              <p className="mt-3 text-[13.5px] leading-[1.72] text-white/80 sm:text-[14px]">{second.body}</p>
+                            </motion.article>
+                          ) : null}
+                          {third ? (
+                            <motion.article
+                              variants={fadeUp}
+                              className="relative overflow-hidden rounded-xl border border-white/20 bg-white/[0.06] p-5"
+                              style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                            >
+                              <h3 className="text-[1.06rem] font-semibold tracking-tight text-white">{third.title}</h3>
+                              <p className="mt-3 text-[13.5px] leading-[1.72] text-white/80 sm:text-[14px]">{third.body}</p>
+                            </motion.article>
+                          ) : null}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="grid gap-4 lg:col-span-5">
+                          {first ? (
+                            <motion.article
+                              variants={fadeUp}
+                              className="relative overflow-hidden rounded-xl border border-white/20 bg-white/[0.06] p-5"
+                              style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                            >
+                              <h3 className="text-[1.06rem] font-semibold tracking-tight text-white">{first.title}</h3>
+                              <p className="mt-3 text-[13.5px] leading-[1.72] text-white/80 sm:text-[14px]">{first.body}</p>
+                            </motion.article>
+                          ) : null}
+                          {second ? (
+                            <motion.article
+                              variants={fadeUp}
+                              className="relative overflow-hidden rounded-xl border border-white/20 bg-white/[0.06] p-5"
+                              style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                            >
+                              <h3 className="text-[1.06rem] font-semibold tracking-tight text-white">{second.title}</h3>
+                              <p className="mt-3 text-[13.5px] leading-[1.72] text-white/80 sm:text-[14px]">{second.body}</p>
+                            </motion.article>
+                          ) : null}
+                        </div>
+                        {third ? (
+                          <motion.article
+                            variants={fadeUp}
+                            className="relative overflow-hidden rounded-xl border border-white/20 bg-white/[0.06] p-6 lg:col-span-7"
+                            style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                          >
+                            <h3 className="text-[1.14rem] font-semibold tracking-tight text-white sm:text-[1.2rem]">{third.title}</h3>
+                            <p className="mt-3 text-[13.5px] leading-[1.75] text-white/80 sm:text-[14px]">{third.body}</p>
+                          </motion.article>
+                        ) : null}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </>
+            ) : null}
+
+            {variant === "ops-grid" ? (
+              <>
+                {industry === "retail" ? (
+                  <>
+                    {[first, second, third].map((item) =>
+                      item ? (
+                        <motion.article
+                          key={item.title}
+                          variants={fadeUp}
+                          className="group relative overflow-hidden rounded-2xl border border-[color:var(--color-border-light)]/75 bg-white p-6 shadow-[0_2px_16px_rgba(2,6,23,0.06)] transition-all duration-300 hover:border-[color:var(--color-border-light)] hover:shadow-[0_8px_32px_rgba(2,6,23,0.1)] sm:p-7 lg:col-span-4"
+                          style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                        >
+                          <h3 className="relative text-[1.125rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
+                            {item.title}
+                          </h3>
+                          <p className="relative mt-3.5 text-[13.5px] leading-[1.75] text-[color:var(--color-muted-light)] sm:text-[14px]">{item.body}</p>
+                        </motion.article>
+                      ) : null,
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {first ? (
+                      <motion.article
+                        variants={fadeUp}
+                        className="group relative overflow-hidden rounded-2xl border border-[color:var(--color-border-light)]/75 bg-white p-6 shadow-[0_2px_16px_rgba(2,6,23,0.06)] transition-all duration-300 hover:border-[color:var(--color-border-light)] hover:shadow-[0_8px_32px_rgba(2,6,23,0.1)] sm:p-7 lg:col-span-4 lg:row-span-2"
+                        style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                      >
+                        <h3 className="relative text-[1.125rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
+                          {first.title}
+                        </h3>
+                        <p className="relative mt-3.5 text-[13.5px] leading-[1.75] text-[color:var(--color-muted-light)] sm:text-[14px]">{first.body}</p>
+                      </motion.article>
+                    ) : null}
+                    {second ? (
+                      <motion.article
+                        variants={fadeUp}
+                        className="group relative overflow-hidden rounded-2xl border border-[color:var(--color-border-light)]/75 bg-white p-6 shadow-[0_2px_16px_rgba(2,6,23,0.06)] transition-all duration-300 hover:border-[color:var(--color-border-light)] hover:shadow-[0_8px_32px_rgba(2,6,23,0.1)] sm:p-7 lg:col-span-8"
+                        style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                      >
+                        <h3 className="relative text-[1.125rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
+                          {second.title}
+                        </h3>
+                        <p className="relative mt-3.5 text-[13.5px] leading-[1.75] text-[color:var(--color-muted-light)] sm:text-[14px]">{second.body}</p>
+                      </motion.article>
+                    ) : null}
+                    {third ? (
+                      <motion.article
+                        variants={fadeUp}
+                        className="group relative overflow-hidden rounded-2xl border border-[color:var(--color-border-light)]/75 bg-white p-6 shadow-[0_2px_16px_rgba(2,6,23,0.06)] transition-all duration-300 hover:border-[color:var(--color-border-light)] hover:shadow-[0_8px_32px_rgba(2,6,23,0.1)] sm:p-7 lg:col-span-8"
+                        style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
+                      >
+                        <h3 className="relative text-[1.125rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
+                          {third.title}
+                        </h3>
+                        <p className="relative mt-3.5 text-[13.5px] leading-[1.75] text-[color:var(--color-muted-light)] sm:text-[14px]">{third.body}</p>
+                      </motion.article>
+                    ) : null}
+                  </>
+                )}
+              </>
+            ) : null}
           </motion.div>
 
           {whatMatters.interactiveWidget ? (
             <motion.div variants={fadeUp} className="mt-10 sm:mt-12">
               <div className="grid gap-6 lg:grid-cols-12 lg:items-stretch">
-                <div className="lg:col-span-6 h-full">
+                <div className={cn("h-full", industry === "industrial-energy" || industry === "steel-aluminum" ? "lg:col-span-7 lg:order-2" : "lg:col-span-6")}>
                   <IndustrySectionWidget widgetType={whatMatters.interactiveWidget} accentColor={accentColor} />
                 </div>
                 {(whatMatters.widgetSupportTitle != null || whatMatters.widgetSupportBody != null || (whatMatters.widgetSupportBullets?.length ?? 0) > 0) ? (
-                  <div className="lg:col-span-6 h-full flex flex-col">
+                  <div className={cn("h-full flex flex-col", industry === "industrial-energy" || industry === "steel-aluminum" ? "lg:col-span-5 lg:order-1" : "lg:col-span-6")}>
                     <div className="rounded-2xl border border-[color:var(--color-border-light)]/80 bg-white/95 flex h-full min-h-0 flex-col overflow-hidden shadow-[0_2px_12px_rgba(2,6,23,0.04)] sm:shadow-[0_4px_20px_rgba(2,6,23,0.06)]">
                       <div className="flex-1 min-h-0 p-6 sm:p-7 flex flex-col gap-4">
                         {whatMatters.widgetSupportTitle != null ? (

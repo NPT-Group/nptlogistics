@@ -35,6 +35,26 @@ export const THEME_LIGHT_BG: Record<IndustryHeroTheme, string> = {
   steel: "#f4f5f6",
 };
 
+/** Operational Proof background — slightly denser tint for evidence-focused section */
+export const THEME_PROOF_BG: Record<IndustryHeroTheme, string> = {
+  green: "#f4f8f6",
+  red: "#f8f5f5",
+  blue: "#f3f7fb",
+  slate: "#f3f5f7",
+  amber: "#f8f6f1",
+  steel: "#f2f5f8",
+};
+
+/** Mode Fit background — cleaner companion tint to separate from Operational Proof */
+export const THEME_MODEFIT_BG: Record<IndustryHeroTheme, string> = {
+  green: "#dde8e1",
+  red: "#e7dddd",
+  blue: "#dbe4ee",
+  slate: "#dde2e9",
+  amber: "#e5dece",
+  steel: "#d7dee8",
+};
+
 /** Radial gradient orbs for dark sections (e.g. How we support) — theme-tinted */
 export function getThemeOrbs(theme: IndustryHeroTheme): { main: string; secondary: string } {
   switch (theme) {

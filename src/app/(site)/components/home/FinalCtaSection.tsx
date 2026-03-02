@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
+import { HOME_CONTAINER_CLASS } from "./homeTokens";
 
 const focusRing =
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f8f4ef]";
@@ -32,7 +33,7 @@ export function FinalCtaSection() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,244,239,1))]" />
       </div>
 
-      <Container className="relative max-w-[1360px] px-4 py-16 sm:px-6 sm:py-20">
+      <Container className={cn("relative py-16 sm:py-20", HOME_CONTAINER_CLASS)}>
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 14 }}
           whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}

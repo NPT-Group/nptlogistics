@@ -135,6 +135,7 @@ function DesktopStage({
   index,
   reduceMotion,
   shellId,
+  activeTabId,
   onTouchStart,
   onTouchEnd,
 }: {
@@ -142,6 +143,7 @@ function DesktopStage({
   index: number;
   reduceMotion: boolean;
   shellId: string;
+  activeTabId: string;
   onTouchStart: (e: React.TouchEvent<HTMLDivElement>) => void;
   onTouchEnd: (e: React.TouchEvent<HTMLDivElement>) => void;
 }) {
@@ -152,17 +154,15 @@ function DesktopStage({
         <motion.div
           key={active.key}
           className="absolute inset-0"
-          id={`${shellId}-panel`}
+          id={`${shellId}-panel-desktop`}
           role="tabpanel"
-          aria-labelledby={`${shellId}-panel-heading-${active.key}`}
+          aria-labelledby={activeTabId}
           initial={reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 1.01 }}
           animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
           exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.99 }}
           transition={{ duration: reduceMotion ? 0 : 0.35, ease: "easeOut" }}
         >
-          <h3 id={`${shellId}-panel-heading-${active.key}`} className="sr-only">
-            {active.label}
-          </h3>
+          <h3 className="sr-only">{active.label}</h3>
           <Image
             src={active.image}
             alt=""
@@ -251,16 +251,14 @@ function MobileStage({
             key={active.key}
             className="absolute inset-0"
             id={`${shellId}-panel-mobile`}
-            role="tabpanel"
-            aria-labelledby={`${shellId}-panel-heading-${active.key}`}
+            role="region"
+            aria-label={`${active.label} mobile preview`}
             initial={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0 }}
             transition={{ duration: reduceMotion ? 0 : 0.3, ease: "easeOut" }}
           >
-            <h3 id={`${shellId}-panel-heading-${active.key}`} className="sr-only">
-              {active.label}
-            </h3>
+            <h3 className="sr-only">{active.label}</h3>
             <Image
               src={active.image}
               alt=""
@@ -334,6 +332,7 @@ export function IndustriesCarouselSection() {
   const goNext = React.useCallback(() => go(index + 1), [go, index]);
   const activeSlideAnnouncement = `${active.label}, slide ${index + 1} of ${total}`;
   const shellId = `${INDUSTRIES_SECTION.id}-carousel`;
+  const activeTabId = `${shellId}-tab-${active.key}`;
 
   const onKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
@@ -455,6 +454,7 @@ export function IndustriesCarouselSection() {
             index={index}
             reduceMotion={!!reduceMotion}
             shellId={shellId}
+            activeTabId={activeTabId}
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           />
@@ -472,9 +472,9 @@ export function IndustriesCarouselSection() {
                       onClick={() => setIndex(i)}
                       onKeyDown={onTabKeyDown}
                       role="tab"
-                      id={`industry-tab-${s.key}`}
+                      id={`${shellId}-tab-${s.key}`}
                       aria-selected={isActive}
-                      aria-controls={`${shellId}-panel`}
+                      aria-controls={`${shellId}-panel-desktop`}
                       tabIndex={isActive ? 0 : -1}
                       className={cn(
                         TOKENS.pillBtn,

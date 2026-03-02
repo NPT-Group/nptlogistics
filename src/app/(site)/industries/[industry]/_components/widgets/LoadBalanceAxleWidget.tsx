@@ -103,11 +103,11 @@ export function LoadBalanceAxleWidget({ accentColor }: { accentColor?: string })
       fillHeight
       className="h-full shadow-[0_4px_24px_rgba(15,23,42,0.06)]"
       icon={<IconWeight />}
-      title="Load Balance & Axle Stress Simulator"
+      title="Load Balance and Axle Stress Model"
       accentColor={accentColor}
-      howToUse="Adjust weight and center of gravity. Watch axle pressure and stability respond."
+      howToUse="Adjust weight and center of gravity to evaluate axle pressure distribution and stability."
       aria-labelledby="load-balance-axle-title"
-      didYouKnow="CoG shift moves pressure between axles; heavy loads raise all bars. Balance keeps stability high."
+      didYouKnow="Center-of-gravity shift redistributes axle load; balanced placement improves stability under heavy weight."
       visual={
         <div className="grid flex-1 min-h-0 gap-4 lg:grid-cols-[1fr,1.4fr]">
           {/* Left: controls */}

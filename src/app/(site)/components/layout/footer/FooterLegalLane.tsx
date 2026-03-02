@@ -14,6 +14,7 @@ export function FooterLegalLane({
 }) {
   const laneRef = React.useRef<HTMLDivElement | null>(null);
   const [laneWidth, setLaneWidth] = React.useState(1200);
+  const [isMotionPaused, setIsMotionPaused] = React.useState(false);
 
   React.useEffect(() => {
     const el = laneRef.current;
@@ -46,6 +47,7 @@ export function FooterLegalLane({
       {/* Trucks (explicitly aria-hidden) */}
       <div
         className="footer-legal-truck footer-legal-truck-right pointer-events-none absolute top-0 left-0 z-10 hidden sm:block"
+        style={{ animationPlayState: isMotionPaused ? "paused" : "running" }}
         aria-hidden="true"
       >
         <Image
@@ -59,6 +61,7 @@ export function FooterLegalLane({
 
       <div
         className="footer-legal-truck footer-legal-truck-left pointer-events-none absolute top-0 left-0 z-10 hidden sm:block"
+        style={{ animationPlayState: isMotionPaused ? "paused" : "running" }}
         aria-hidden="true"
       >
         <Image
@@ -69,6 +72,20 @@ export function FooterLegalLane({
           className="h-[30px] w-auto object-contain opacity-90 drop-shadow-[0_6px_10px_rgba(2,6,23,0.42)]"
         />
       </div>
+
+      <button
+        type="button"
+        onClick={() => setIsMotionPaused((prev) => !prev)}
+        className={cn(
+          "absolute top-0 right-0 z-20 hidden -translate-y-1/2 rounded-full border border-white/20 bg-[color:var(--color-footer-bg)] px-2.5 py-1 text-[10px] font-semibold text-[color:var(--color-footer-muted)] shadow-[0_6px_18px_rgba(2,6,23,0.35)] transition-colors",
+          "hover:text-[color:var(--color-footer-text)] sm:inline-flex",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-footer-bg)]",
+        )}
+        aria-pressed={isMotionPaused}
+        aria-label={isMotionPaused ? "Resume footer lane motion" : "Pause footer lane motion"}
+      >
+        {isMotionPaused ? "Play motion" : "Pause motion"}
+      </button>
 
       {children}
 

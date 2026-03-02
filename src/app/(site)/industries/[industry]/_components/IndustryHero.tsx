@@ -67,17 +67,22 @@ function themeGradientOverlay(theme: IndustryHeroTheme) {
 }
 
 /**
- * Industry-specific hero icons — each communicates intent for that vertical.
- * Used sparingly as subtle background decoration (aria-hidden).
+ * Industry-specific hero icons — each communicates operational context
+ * for that vertical. Rendered as subtle, premium badges in hero.
  */
 function HeroIcon({ name }: { name: string }) {
-  const className = "absolute w-8 h-8 sm:w-9 sm:h-9 opacity-[0.11] text-white";
+  const className = "h-7 w-7 text-white/20 sm:h-8 sm:w-8";
   switch (name) {
-    // Automotive: car, truck, gear, engine
     case "car":
       return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a2.25 2.25 0 002.25 2.25h3a2.25 2.25 0 002.25-2.25V14.25H8.25v4.5zM5.25 14.25h13.5L17.25 9H6.75L5.25 14.25zM3.75 15.75h16.5v2.25a.75.75 0 01-.75.75H4.5a.75.75 0 01-.75-.75V15.75z" />
+        </svg>
+      );
+    case "factory":
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 20.25h16.5M4.5 20.25V9.75l5.25 2.25V9.75L15 12V4.5h4.5v15.75M7.5 6V3.75M10.5 6V3.75" />
         </svg>
       );
     case "gear":
@@ -87,19 +92,12 @@ function HeroIcon({ name }: { name: string }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       );
-    case "engine":
-      return (
-        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 21V9.75m15 11.25V9.75M4.5 3h15a1.5 1.5 0 011.5 1.5v4.5a1.5 1.5 0 01-1.5 1.5H4.5A1.5 1.5 0 013 15V4.5A1.5 1.5 0 014.5 3zm0 6h15v6H4.5V9z" />
-        </svg>
-      );
     case "clock":
       return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       );
-    // Manufacturing: materials + production
     case "cube-stack":
       return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden>
@@ -112,7 +110,6 @@ function HeroIcon({ name }: { name: string }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L18.18 21.93M12 18.75c-3.97 0-7.2-2.239-8.88-5.5a9.07 9.07 0 011.56-2.5 9.07 9.07 0 012.5-1.56C9.76 8.94 12 5.75 12 1.75M12 18.75c3.97 0 7.2-2.239 8.88-5.5a9.07 9.07 0 00-1.56-2.5 9.07 9.07 0 00-2.5-1.56C14.24 8.94 12 5.75 12 1.75" />
         </svg>
       );
-    // Retail / Automotive: delivery truck
     case "truck":
       return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden>
@@ -125,11 +122,22 @@ function HeroIcon({ name }: { name: string }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 6.878V6a2.25 2.25 0 012.25-2.25h7.5A2.25 2.25 0 0118 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 004.5 9v.878m13.5-3A2.25 2.25 0 0119.5 9v.878m0 0a2.246 2.246 0 00-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0121 12v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6c0-.98.626-1.813 1.5-2.122" />
         </svg>
       );
-    // Food & Beverage: cold chain + compliance
+    case "store":
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.75h16.5M5.25 9.75V18a2.25 2.25 0 002.25 2.25h9A2.25 2.25 0 0018.75 18V9.75M8.25 20.25v-5.25a1.5 1.5 0 011.5-1.5h4.5a1.5 1.5 0 011.5 1.5v5.25M5.25 9.75l1.5-6h10.5l1.5 6" />
+        </svg>
+      );
     case "snowflake":
       return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v18m0-18l-3 3m3-3l3 3M3 12h18M3 12l3-3m0 6l-3 3M21 12l-3 3m0-6l3-3M12 21l-3-3m3 3l3-3" />
+        </svg>
+      );
+    case "thermometer":
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 14.5V5.625a2.25 2.25 0 10-4.5 0V14.5a4.5 4.5 0 104.5 0zM12 7.5v7.5" />
         </svg>
       );
     case "document-check":
@@ -138,11 +146,16 @@ function HeroIcon({ name }: { name: string }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5a7.5 7.5 0 000-15h-7.5a7.5 7.5 0 000 15zm3-8.25H12m0 0l2.25 2.25M12 12l2.25-2.25" />
         </svg>
       );
-    // Industrial & Energy: power + materials
     case "bolt":
       return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+        </svg>
+      );
+    case "route":
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 18.75h4.125a2.625 2.625 0 002.625-2.625V15a2.625 2.625 0 012.625-2.625h1.5A2.625 2.625 0 0018 9.75V9a2.625 2.625 0 00-2.625-2.625H12M6 6.75a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm15 12a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
         </svg>
       );
     case "cube":
@@ -151,7 +164,14 @@ function HeroIcon({ name }: { name: string }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
         </svg>
       );
-    // Steel & Aluminum: strength, compliance, fabrication
+    case "coil":
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+          <circle cx="12" cy="12" r="8.25" />
+          <circle cx="12" cy="12" r="5.25" />
+          <circle cx="12" cy="12" r="2.25" />
+        </svg>
+      );
     case "shield":
       return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden>
@@ -186,17 +206,24 @@ export function IndustryHero({ model }: { model: IndustryPageModel }) {
         {themeGradientOverlay(theme)}
       </div>
 
-      {/* Scattered industry icons — decorative only */}
+      {/* Industry icon badges — decorative only */}
       {hero.iconKeys?.length ? (
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-          <span className="absolute top-[12%] left-[8%]"><HeroIcon name={hero.iconKeys[0]} /></span>
-          {hero.iconKeys[1] && <span className="absolute top-[18%] right-[15%]"><HeroIcon name={hero.iconKeys[1]} /></span>}
-          {hero.iconKeys[2] && <span className="absolute bottom-[25%] left-[12%]"><HeroIcon name={hero.iconKeys[2]} /></span>}
-          {hero.iconKeys[3] ? (
-            <span className="absolute bottom-[20%] right-[10%]"><HeroIcon name={hero.iconKeys[3]} /></span>
-          ) : hero.iconKeys[1] ? (
-            <span className="absolute bottom-[20%] right-[10%]"><HeroIcon name={hero.iconKeys[1]} /></span>
-          ) : null}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden overflow-hidden sm:block">
+          {hero.iconKeys.slice(0, 4).map((key, idx) => {
+            const slotClass =
+              idx === 0
+                ? "top-[18%] left-[6%]"
+                : idx === 1
+                  ? "top-[22%] right-[10%]"
+                  : idx === 2
+                    ? "bottom-[22%] left-[10%]"
+                    : "bottom-[20%] right-[8%]";
+            return (
+              <span key={`${key}-${idx}`} className={cn("absolute", slotClass)}>
+                <HeroIcon name={key} />
+              </span>
+            );
+          })}
         </div>
       ) : null}
 
