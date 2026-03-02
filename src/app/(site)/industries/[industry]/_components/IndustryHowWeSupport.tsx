@@ -224,7 +224,7 @@ export function IndustryHowWeSupport({ model }: { model: IndustryPageModel }) {
                       width={2000}
                       height={614}
                       className="h-[250px] w-[102vw] max-w-none -translate-x-[1vw] object-contain object-bottom select-none sm:h-[305px] lg:h-[370px]"
-                      sizes="100vw"
+                      sizes="(min-width: 1536px) 1440px, (min-width: 1024px) calc(100vw - 3rem), calc(100vw - 2rem)"
                       priority={false}
                     />
                   </div>

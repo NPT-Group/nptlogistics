@@ -178,7 +178,7 @@ function VideoCard({
             title={item.title}
             loading="lazy"
             referrerPolicy="strict-origin-when-cross-origin"
-            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allow="autoplay; encrypted-media; picture-in-picture"
             allowFullScreen
           />
         ) : thumbnailSrc ? (
