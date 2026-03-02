@@ -13,7 +13,7 @@ import {
   publicFetchComments,
 } from "@/lib/utils/blog/publicBlogApi";
 
-const BlockNote = dynamic(() => import("@/components/BlockNote"), { ssr: false });
+const BlockNote = dynamic(() => import("@/components/blocknote/BlockNote"), { ssr: false });
 
 function fmtDate(d?: any) {
   if (!d) return "";

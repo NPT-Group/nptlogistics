@@ -8,10 +8,11 @@ import {
   MIME_TO_EXT_MAP,
   IMAGE_MIME_TYPES,
   VIDEO_MIME_TYPES,
+  SPREADSHEET_MIME_TYPES,
 } from "@/types/shared.types";
 import { successResponse, errorResponse } from "@/lib/utils/apiResponse";
 import { parseJsonBody } from "@/lib/utils/reqParser";
-import { getPresignedPutUrl } from "@/lib/utils/s3Helper";
+import { getPresignedPutUrl } from "@/lib/utils/s3Helper/server";
 import { APP_AWS_BUCKET_NAME, APP_AWS_REGION } from "@/config/env";
 import { DEFAULT_FILE_SIZE_LIMIT_MB, S3_TEMP_FOLDER } from "@/constants/aws";
 
@@ -24,6 +25,8 @@ const RESUME_MIME_TYPES: readonly EFileMimeType[] = [
   EFileMimeType.DOC,
   EFileMimeType.DOCX,
 ];
+
+const QUOTE_ALLOWED_MIME_TYPES: readonly EFileMimeType[] = Object.values(EFileMimeType);
 
 export async function POST(req: NextRequest) {
   try {
@@ -51,22 +54,33 @@ export async function POST(req: NextRequest) {
 
     const normalizedMime = (mimeType as string).toLowerCase() as EFileMimeType;
 
-    // Allowed mime types per folder
+    // Allowed mime types per folder (+ namespace override for quotes)
     let allowedMime: readonly EFileMimeType[] = [];
-    if (folder === ES3Folder.MEDIA_IMAGES) {
-      allowedMime = IMAGE_MIME_TYPES;
-    } else if (folder === ES3Folder.MEDIA_VIDEOS) {
-      allowedMime = VIDEO_MIME_TYPES;
-    } else if (folder === ES3Folder.JOB_APPLICATION_RESUMES) {
-      allowedMime = RESUME_MIME_TYPES;
-    } else if (folder === ES3Folder.JOB_APPLICATION_PHOTOS) {
-      allowedMime = IMAGE_MIME_TYPES;
+
+    // Quotes: accept ANY EFileMimeType (all known/whitelisted types) regardless of folder
+    if (namespace === ES3Namespace.QUOTES) {
+      allowedMime = QUOTE_ALLOWED_MIME_TYPES;
+    } else {
+      if (folder === ES3Folder.MEDIA_IMAGES) {
+        allowedMime = IMAGE_MIME_TYPES;
+      } else if (folder === ES3Folder.MEDIA_VIDEOS) {
+        allowedMime = VIDEO_MIME_TYPES;
+      } else if (folder === ES3Folder.JOB_APPLICATION_RESUMES) {
+        allowedMime = RESUME_MIME_TYPES;
+      } else if (folder === ES3Folder.JOB_APPLICATION_PHOTOS) {
+        allowedMime = IMAGE_MIME_TYPES;
+      } else if (folder === ES3Folder.ATTACHMENTS) {
+        // non-quotes attachments: allow docs + spreadsheets by default
+        allowedMime = [...RESUME_MIME_TYPES, ...SPREADSHEET_MIME_TYPES];
+      }
     }
 
     if (!allowedMime.length || !allowedMime.includes(normalizedMime)) {
       return errorResponse(
         400,
-        `Invalid file type for folder "${folder}". Allowed: ${allowedMime.join(", ")}`,
+        `Invalid file type for folder "${folder}" (namespace "${namespace}"). Allowed: ${allowedMime.join(
+          ", ",
+        )}`,
       );
     }
 

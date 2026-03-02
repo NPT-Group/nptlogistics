@@ -1,0 +1,125 @@
+/* src/components/blocknote/blocknote.css */
+
+/* =========================================================
+   BlockNote public (readonly) + admin (editable) styling
+   - Readonly: hide side UI + remove left gutter spacing
+   - Mobile editable: tighten paddings/gutter to maximize space
+   ========================================================= */
+
+/* ---------- Readonly (public) view ---------- */
+
+/* Hide side UI (six dots / plus / drag handle area) */
+.bn-scope .bn-readonly .bn-side-menu,
+.bn-scope .bn-readonly .bn-add-block-button,
+.bn-scope .bn-readonly .bn-block-side-menu {
+  display: none !important;
+}
+
+/* Remove the left “gutter” spacing reserved for the side UI */
+.bn-scope .bn-readonly .bn-editor,
+.bn-scope .bn-readonly .bn-content,
+.bn-scope .bn-readonly .bn-prosemirror {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Some themes apply padding per block/content wrapper */
+.bn-scope .bn-readonly .bn-block,
+.bn-scope .bn-readonly .bn-block-content,
+.bn-scope .bn-readonly [data-content-type] {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* If there’s extra horizontal padding overall */
+.bn-scope .bn-readonly .bn-editor {
+  padding-right: 0 !important;
+}
+
+/* ---------- Mobile typography tweaks (applies to both modes) ---------- */
+@media (max-width: 640px) {
+  .bn-scope .bn-prosemirror h1,
+  .bn-scope .bn-editor h1 {
+    font-size: 1.35rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .bn-scope .bn-prosemirror h2,
+  .bn-scope .bn-editor h2 {
+    font-size: 1.2rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .bn-scope .bn-prosemirror h3,
+  .bn-scope .bn-editor h3 {
+    font-size: 1.1rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .bn-scope .bn-prosemirror h4,
+  .bn-scope .bn-editor h4 {
+    font-size: 1.02rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .bn-scope .bn-prosemirror h5,
+  .bn-scope .bn-editor h5,
+  .bn-scope .bn-prosemirror h6,
+  .bn-scope .bn-editor h6 {
+    font-size: 0.98rem !important;
+    line-height: 1.35 !important;
+  }
+}
+
+/* ---------- Mobile editing (admin) view: reduce wasted space ---------- */
+@media (max-width: 640px) {
+  /* Add slight breathing room on the left so + / dots don’t clip */
+  .bn-scope .bn-editable .bn-editor,
+  .bn-scope .bn-editable .bn-content,
+  .bn-scope .bn-editable .bn-prosemirror {
+    padding-left: 14px !important; /* was 10px */
+    padding-right: 12px !important;
+  }
+
+  /* Keep block content tight */
+  .bn-scope .bn-editable .bn-block,
+  .bn-scope .bn-editable .bn-block-content,
+  .bn-scope .bn-editable [data-content-type] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Slightly smaller gutter width */
+  .bn-scope .bn-editable .bn-side-menu,
+  .bn-scope .bn-editable .bn-block-side-menu {
+    width: 30px !important;
+    min-width: 30px !important;
+  }
+
+  /* Nudge the + / dots outward (works even when position is static) */
+  .bn-scope .bn-editable .bn-side-menu,
+  .bn-scope .bn-editable .bn-block-side-menu {
+    transform: translateX(-2.5px) !important;
+  }
+
+  /* Make add-block button slightly smaller */
+  .bn-scope .bn-editable .bn-add-block-button {
+    transform: scale(0.9);
+    transform-origin: left center;
+  }
+
+  /* Tighten vertical spacing */
+  .bn-scope .bn-editable .bn-block {
+    margin-top: 6px !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* Ensure media fits properly */
+  .bn-scope .bn-editable img,
+  .bn-scope .bn-editable video {
+    max-width: 100%;
+    height: auto;
+  }
+}

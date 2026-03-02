@@ -10,7 +10,7 @@ import type { BlockNoteDocJSON, IFileAsset } from "@/types/shared.types";
 
 import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { IMAGE_MIME_TYPES, VIDEO_MIME_TYPES } from "@/types/shared.types";
-import { uploadToS3Presigned, type UploadResult } from "@/lib/utils/s3Helper";
+import { uploadToS3PresignedPublic } from "@/lib/utils/s3Helper/client";
 
 import BlogPostSidebar from "@/app/(admin)/components/blog/BlogPostSidebar";
 import { adminCreateCategory, adminFetchCategories } from "@/lib/utils/blog/adminBlogApi";
@@ -19,19 +19,21 @@ import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider
 
 import { ConfirmModal, type ConfirmTone } from "@/app/(admin)/components/ui/ConfirmModal";
 import { SoftButton } from "@/app/(admin)/components/ui/Buttons";
-import { ExternalLink, FileText, AlertTriangle } from "lucide-react";
+import { ExternalLink, FileText, AlertTriangle, CheckCircle2 } from "lucide-react";
+import BlockNoteSkeleton from "@/components/blocknote/BlockNoteSkeleton";
 
-const BlockNote = dynamic(() => import("@/components/BlockNote"), {
+const BlockNote = dynamic(() => import("@/components/blocknote/BlockNote"), {
   ssr: false,
   loading: () => (
-    <div
-      className={cn(
-        "rounded-3xl border p-5 text-sm shadow-[var(--dash-shadow)]",
-        "border-[var(--dash-border)] bg-[var(--dash-surface)] text-[var(--dash-muted)]",
-      )}
-    >
-      Loading editor…
-    </div>
+    <BlockNoteSkeleton
+      variant="admin"
+      paddingClassName="p-5"
+      heightClassName="min-h-[520px]"
+      lines={12}
+      showToolbar={true}
+      showTitleLine={false}
+      className="rounded-3xl"
+    />
   ),
 });
 
@@ -85,17 +87,7 @@ type Props = {
   previewUrl?: string | null;
 };
 
-function fileToAsset(r: UploadResult): IFileAsset {
-  return {
-    url: r.url,
-    s3Key: r.s3Key,
-    mimeType: r.mimeType,
-    sizeBytes: r.sizeBytes,
-    originalName: r.originalName,
-  };
-}
-
-async function uploadBlogMediaToTemp(file: File): Promise<UploadResult> {
+async function uploadBlogMediaToTemp(file: File): Promise<IFileAsset> {
   const mt = (file.type || "").toLowerCase();
   const folder = mt.startsWith("image/")
     ? ES3Folder.MEDIA_IMAGES
@@ -107,7 +99,7 @@ async function uploadBlogMediaToTemp(file: File): Promise<UploadResult> {
 
   const allowedMimeTypes = folder === ES3Folder.MEDIA_IMAGES ? IMAGE_MIME_TYPES : VIDEO_MIME_TYPES;
 
-  return uploadToS3Presigned({
+  return uploadToS3PresignedPublic({
     file,
     namespace: ES3Namespace.BLOG_POSTS,
     folder,
@@ -119,7 +111,7 @@ async function uploadBlogMediaToTemp(file: File): Promise<UploadResult> {
 async function uploadBannerToTemp(file: File): Promise<IFileAsset> {
   if (!file.type.toLowerCase().startsWith("image/")) throw new Error("Banner must be an image.");
 
-  const up = await uploadToS3Presigned({
+  const up = await uploadToS3PresignedPublic({
     file,
     namespace: ES3Namespace.BLOG_POSTS,
     folder: ES3Folder.MEDIA_IMAGES,
@@ -127,7 +119,7 @@ async function uploadBannerToTemp(file: File): Promise<IFileAsset> {
     maxSizeMB: 10,
   });
 
-  return fileToAsset(up);
+  return up;
 }
 
 function ChangePill({ saving, isDirty }: { saving: boolean; isDirty: boolean }) {
@@ -217,10 +209,15 @@ export default function BlogEditor(props: Props) {
   const [categorySearch, setCategorySearch] = React.useState("");
 
   const [saving, setSaving] = React.useState(false);
-  const [error, setError] = React.useState<{ message: string; nonce: number } | null>(null);
-  const errorRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Danger confirm modal
+  const [error, setError] = React.useState<{ message: string; nonce: number } | null>(null);
+  const [success, setSuccess] = React.useState<{ message: string; nonce: number } | null>(null);
+
+  const headerRef = React.useRef<HTMLDivElement | null>(null);
+  const errorRef = React.useRef<HTMLDivElement | null>(null);
+  const successRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Confirm modal (secondary + danger)
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmActionRef = React.useRef<null | (() => Promise<void>)>(null);
   const [confirmTone, setConfirmTone] = React.useState<ConfirmTone>("danger");
@@ -266,6 +263,29 @@ export default function BlogEditor(props: Props) {
     setIsDirty(false);
   }
 
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    requestAnimationFrame(() => headerRef.current?.focus?.());
+  }
+
+  React.useEffect(() => {
+    if (!error) return;
+    requestAnimationFrame(() => {
+      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      (errorRef.current as any)?.focus?.();
+    });
+  }, [error?.nonce]);
+
+  React.useEffect(() => {
+    if (!success) return;
+    scrollToTop();
+  }, [success?.nonce]);
+
+  React.useEffect(() => {
+    if (!success) return;
+    if (isDirty) setSuccess(null);
+  }, [isDirty]);
+
   async function refreshCategories() {
     const items = await adminFetchCategories();
     setCategories(items);
@@ -277,15 +297,9 @@ export default function BlogEditor(props: Props) {
     );
   }, []);
 
-  React.useEffect(() => {
-    if (!error) return;
-    requestAnimationFrame(() => {
-      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      errorRef.current?.focus?.();
-    });
-  }, [error?.nonce]);
-
   async function onCreateCategory(name: string) {
+    setError(null);
+    setSuccess(null);
     const created = await adminCreateCategory(name);
     await refreshCategories();
     setCategoryIds((prev) =>
@@ -295,11 +309,13 @@ export default function BlogEditor(props: Props) {
 
   async function onPickBanner(file: File) {
     setError(null);
+    setSuccess(null);
     const asset = await uploadBannerToTemp(file);
     setBannerImage(asset);
   }
 
   function onRemoveBanner() {
+    setSuccess(null);
     setBannerImage(undefined);
   }
 
@@ -329,18 +345,59 @@ export default function BlogEditor(props: Props) {
     };
   }
 
-  async function runAction(fn: (p: SubmitPayload) => Promise<void>) {
+  async function runAction(
+    fn: (p: SubmitPayload) => Promise<void>,
+    successMessage: string,
+  ): Promise<void> {
     setError(null);
+    setSuccess(null);
     setSaving(true);
     try {
       const payload = buildPayload();
       await fn(payload);
       markSavedNow();
+      setSuccess({ message: successMessage, nonce: Date.now() });
+      requestAnimationFrame(() => {
+        successRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
     } catch (e: any) {
       setError({ message: e?.message || "Failed to save.", nonce: Date.now() });
     } finally {
       setSaving(false);
     }
+  }
+
+  async function confirmSecondary(): Promise<void> {
+    if (props.secondaryDisabled) return;
+
+    const kind = props.secondaryActionKind;
+    const isPublish = kind === "PUBLISH";
+    const isUnpublish = kind === "UNPUBLISH";
+
+    const tone: ConfirmTone = isUnpublish ? "danger" : "neutral";
+
+    let title = "Confirm action";
+    let body: React.ReactNode = "Are you sure you want to continue?";
+    const label = props.secondaryLabel;
+    let successMsg = "Action completed.";
+
+    if (isPublish) {
+      title = "Publish this post?";
+      body = "This will publish the post and make it visible publicly.";
+      successMsg = "Post published.";
+    } else if (isUnpublish) {
+      title = "Unpublish this post?";
+      body = "This will unpublish the post and remove it from public listings.";
+      successMsg = "Post unpublished.";
+    }
+
+    confirmActionRef.current = async () => runAction(props.onSaveSecondary, successMsg);
+
+    setConfirmTone(tone);
+    setConfirmTitle(title);
+    setConfirmDesc(body);
+    setConfirmLabel(label);
+    setConfirmOpen(true);
   }
 
   function confirmDanger() {
@@ -351,9 +408,7 @@ export default function BlogEditor(props: Props) {
       props.dangerConfirmBody ??
       "This will archive the post and remove it from public listings. You can publish again later to restore it.";
 
-    confirmActionRef.current = async () => {
-      await runAction(props.onDanger!);
-    };
+    confirmActionRef.current = async () => runAction(props.onDanger!, "Post archived.");
 
     setConfirmTone("danger");
     setConfirmTitle(title);
@@ -398,6 +453,8 @@ export default function BlogEditor(props: Props) {
       <div className="mx-auto max-w-7xl px-6 py-6">
         {/* Header */}
         <div
+          ref={headerRef}
+          tabIndex={-1}
           className={cn(
             "mb-6 rounded-3xl border shadow-[var(--dash-shadow)]",
             "border-[var(--dash-border)] bg-[var(--dash-surface)]",
@@ -446,6 +503,21 @@ export default function BlogEditor(props: Props) {
               <ChangePill saving={saving} isDirty={isDirty} />
             </div>
 
+            {success ? (
+              <div
+                ref={successRef}
+                className={cn(
+                  "mt-4 flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm",
+                  isDark
+                    ? "border-emerald-400/25 bg-emerald-500/15 text-emerald-50"
+                    : "border-emerald-200 bg-emerald-50 text-emerald-900",
+                )}
+              >
+                <CheckCircle2 className="mt-0.5 h-4 w-4" />
+                <div className="flex-1">{success.message}</div>
+              </div>
+            ) : null}
+
             {error ? (
               <div
                 ref={errorRef}
@@ -488,25 +560,20 @@ export default function BlogEditor(props: Props) {
             </div>
 
             <div className="p-5">
-              <div
-                className={cn(
-                  "rounded-3xl border shadow-[var(--dash-shadow)]/12",
-                  "border-[var(--dash-border)] bg-[var(--dash-bg)]",
-                )}
-              >
-                <div className="p-4">
-                  <BlockNote
-                    onChange={setDoc}
-                    uploadFile={uploadBlogMediaToTemp}
-                    initialContent={doc ?? undefined}
-                    chrome={{
-                      borderColor: "var(--dash-border)",
-                      background: isDark ? "rgba(255,255,255,0.04)" : "white",
-                      className: "rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12",
-                    }}
-                  />
-                </div>
-              </div>
+              <BlockNote
+                onChange={(v: any) => {
+                  setSuccess(null);
+                  setError(null);
+                  setDoc(v);
+                }}
+                uploadFile={uploadBlogMediaToTemp}
+                initialContent={doc ?? undefined}
+                chrome={{
+                  borderColor: "var(--dash-border)",
+                  background: isDark ? "rgba(255,255,255,0.04)" : "white",
+                  className: "rounded-3xl border p-2 sm:p-4 shadow-[var(--dash-shadow)]/12",
+                }}
+              />
 
               <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-[var(--dash-muted)]">
                 <span className="rounded-full border border-[var(--dash-border)] bg-[var(--dash-bg)] px-2.5 py-1">
@@ -522,29 +589,53 @@ export default function BlogEditor(props: Props) {
           {/* Sidebar */}
           <BlogPostSidebar
             title={title}
-            setTitle={setTitle}
+            setTitle={(v) => {
+              setSuccess(null);
+              setError(null);
+              setTitle(v);
+            }}
             slug={slug}
-            setSlug={setSlug}
+            setSlug={(v) => {
+              setSuccess(null);
+              setError(null);
+              setSlug(v);
+            }}
             excerpt={excerpt}
-            setExcerpt={setExcerpt}
+            setExcerpt={(v) => {
+              setSuccess(null);
+              setError(null);
+              setExcerpt(v);
+            }}
             publishedAt={publishedAt}
-            setPublishedAt={setPublishedAt}
+            setPublishedAt={(v) => {
+              setSuccess(null);
+              setError(null);
+              setPublishedAt(v);
+            }}
             publishAtEnabled={publishAtEnabled}
             bannerImage={bannerImage}
             onPickBanner={onPickBanner}
             onRemoveBanner={onRemoveBanner}
             categories={categories}
             categoryIds={categoryIds}
-            setCategoryIds={setCategoryIds}
+            setCategoryIds={(ids) => {
+              setSuccess(null);
+              setError(null);
+              setCategoryIds(ids);
+            }}
             categorySearch={categorySearch}
-            setCategorySearch={setCategorySearch}
+            setCategorySearch={(v) => {
+              setSuccess(null);
+              setError(null);
+              setCategorySearch(v);
+            }}
             onCreateCategory={onCreateCategory}
             saving={saving}
             primaryLabel={props.primaryLabel}
             secondaryLabel={props.secondaryLabel}
             secondaryDisabled={props.secondaryDisabled}
-            onPrimary={() => runAction(props.onSavePrimary)}
-            onSecondary={() => runAction(props.onSaveSecondary)}
+            onPrimary={async () => runAction(props.onSavePrimary, "Changes saved.")}
+            onSecondary={confirmSecondary}
             dangerLabel={props.dangerLabel}
             dangerDisabled={props.dangerDisabled}
             onDanger={props.onDanger ? confirmDanger : undefined}

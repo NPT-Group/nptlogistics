@@ -97,3 +97,9 @@
   border: 3px solid transparent;
   background-clip: padding-box;
 }
+
+/* Make all interactive elements clearly clickable */
+.npt-chatbot button,
+.npt-chatbot [role="button"] {
+  cursor: pointer !important;
+}

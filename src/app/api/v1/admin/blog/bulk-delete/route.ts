@@ -8,7 +8,8 @@ import { parseJsonBody } from "@/lib/utils/reqParser";
 import { BlogPostModel } from "@/mongoose/models/BlogPost";
 import { BlogCommentModel } from "@/mongoose/models/BlogComment";
 
-import { collectS3KeysDeep, deleteS3Objects, isTempKey } from "@/lib/utils/s3Helper";
+import { isTempKey, collectS3KeysDeep } from "@/lib/utils/s3Helper";
+import { deleteS3Objects } from "@/lib/utils/s3Helper/server";
 
 type Body = {
   ids: string[];
@@ -32,7 +33,10 @@ export const POST = async (req: NextRequest) => {
     // Collect referenced S3 keys (final only)
     const keysToDelete = new Set<string>();
     for (const p of posts) {
-      for (const k of collectS3KeysDeep({ bannerImage: (p as any).bannerImage, body: (p as any).body })) {
+      for (const k of collectS3KeysDeep({
+        bannerImage: (p as any).bannerImage,
+        body: (p as any).body,
+      })) {
         if (!isTempKey(k)) keysToDelete.add(k);
       }
     }

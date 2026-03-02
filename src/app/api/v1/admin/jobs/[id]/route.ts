@@ -19,7 +19,8 @@ import {
   finalizeJobDocAssetsAllOrNothing,
   cleanupRemovedJobAssets,
 } from "@/lib/utils/jobs/jobPostingUtils";
-import { deleteS3Objects, collectS3KeysDeep } from "@/lib/utils/s3Helper";
+import { collectS3KeysDeep } from "@/lib/utils/s3Helper";
+import { deleteS3Objects } from "@/lib/utils/s3Helper/server";
 
 /* -------------------------------------------------------------------------- */
 /* GET /api/v1/admin/jobs/:id                                                 */

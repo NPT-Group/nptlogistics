@@ -1,15 +1,26 @@
 // src/lib/chatbot/knowledgeBase.ts
-
 export type BotIntentId =
   | "GET_QUOTE"
-  | "SERVICES_HELP"
   | "TRACKING"
-  | "CAREERS"
-  | "DRIVERS"
+  | "SOLUTIONS"
+  | "SERVICES_HELP"
   | "INDUSTRIES"
+  | "CAREERS"
   | "WHY_NPT"
+  | "COMPANY"
+  | "RESOURCES_GUIDES"
+  | "RESOURCES_FAQS"
   | "HUMAN_CONTACT"
-  | "GENERAL_FAQ";
+  | "GENERAL_FAQ"
+  // Specific solutions (new)
+  | "TL"
+  | "LTL"
+  | "INTERMODAL"
+  | "EXPEDITED"
+  | "HAZMAT"
+  | "TEMP_CONTROLLED"
+  | "CROSS_BORDER"
+  | "VALUE_ADDED";
 
 export type QuickReply = {
   label: string;
@@ -70,8 +81,22 @@ export const FAQ: FAQItem[] = [
 export const START_REPLIES: QuickReply[] = [
   { label: "Request a quote", intent: "GET_QUOTE" },
   { label: "Track a shipment", intent: "TRACKING" },
-  { label: "Explore services", intent: "SERVICES_HELP" },
+  { label: "Explore solutions", intent: "SOLUTIONS" },
   { label: "Industries we serve", intent: "INDUSTRIES" },
+  { label: "Shipping guides", intent: "RESOURCES_GUIDES" },
+  { label: "FAQs", intent: "RESOURCES_FAQS" },
+  { label: "Company info", intent: "COMPANY" },
   { label: "Careers at NPT", intent: "CAREERS" },
   { label: "Contact an agent", intent: "HUMAN_CONTACT" },
+];
+
+export const SOLUTIONS_REPLIES: QuickReply[] = [
+  { label: "Truckload (TL)", intent: "TL" },
+  { label: "Less-than-truckload (LTL)", intent: "LTL" },
+  { label: "Intermodal", intent: "INTERMODAL" },
+  { label: "Expedited & Specialized", intent: "EXPEDITED" },
+  { label: "Hazmat", intent: "HAZMAT" },
+  { label: "Temperature-controlled", intent: "TEMP_CONTROLLED" },
+  { label: "Cross-border & global", intent: "CROSS_BORDER" },
+  { label: "Value-added / warehousing", intent: "VALUE_ADDED" },
 ];

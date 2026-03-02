@@ -14,6 +14,9 @@ export default function StartWidget(props: any) {
       case "TRACKING":
         return actionProvider.startTracking();
 
+      case "SOLUTIONS":
+        return actionProvider.startSolutions();
+
       case "SERVICES_HELP":
         return actionProvider.startServicesHelp();
 
@@ -25,6 +28,15 @@ export default function StartWidget(props: any) {
 
       case "WHY_NPT":
         return actionProvider.showWhyNpt();
+
+      case "COMPANY":
+        return actionProvider.showCompany();
+
+      case "RESOURCES_GUIDES":
+        return actionProvider.goToFromNav("Shipping Guides", "/resources/guides");
+
+      case "RESOURCES_FAQS":
+        return actionProvider.goToFromNav("FAQs", "/resources/faqs");
 
       case "HUMAN_CONTACT":
         return actionProvider.showContact();

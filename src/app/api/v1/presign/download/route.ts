@@ -31,7 +31,7 @@
 import { NextRequest } from "next/server";
 import { successResponse, errorResponse } from "@/lib/utils/apiResponse";
 import { parseJsonBody } from "@/lib/utils/reqParser";
-import { getPresignedGetUrl, s3ObjectExists } from "@/lib/utils/s3Helper";
+import { getPresignedGetUrl, s3ObjectExists } from "@/lib/utils/s3Helper/server";
 
 type Body = {
   key?: string;

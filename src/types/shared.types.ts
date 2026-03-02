@@ -12,10 +12,16 @@ export enum EFileMimeType {
   WEBM = "video/webm",
   MOV = "video/quicktime",
 
-  // Documents (kept for reuse elsewhere)
+  // Documents
   PDF = "application/pdf",
   DOC = "application/msword",
   DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+  // Spreadsheets
+  XLS = "application/vnd.ms-excel",
+  XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  CSV = "text/csv",
+  ODS = "application/vnd.oasis.opendocument.spreadsheet",
 }
 
 /**
@@ -38,6 +44,12 @@ export const MIME_TO_EXT_MAP: Record<EFileMimeType, string> = {
   [EFileMimeType.PDF]: "pdf",
   [EFileMimeType.DOC]: "doc",
   [EFileMimeType.DOCX]: "docx",
+
+  // Spreadsheets
+  [EFileMimeType.XLS]: "xls",
+  [EFileMimeType.XLSX]: "xlsx",
+  [EFileMimeType.CSV]: "csv",
+  [EFileMimeType.ODS]: "ods",
 };
 
 /** Grouped helpers (reusable everywhere) */
@@ -54,12 +66,26 @@ export const VIDEO_MIME_TYPES: readonly EFileMimeType[] = [
   EFileMimeType.MOV,
 ];
 
+export const SPREADSHEET_MIME_TYPES: readonly EFileMimeType[] = [
+  EFileMimeType.XLS,
+  EFileMimeType.XLSX,
+  EFileMimeType.CSV,
+  EFileMimeType.ODS,
+];
+
 /** Runtime helpers */
 export const isImageMime = (mt?: string) =>
   typeof mt === "string" && mt.toLowerCase().startsWith("image/");
 
 export const isVideoMime = (mt?: string) =>
   typeof mt === "string" && mt.toLowerCase().startsWith("video/");
+
+export const isSpreadsheetMime = (mt?: string) =>
+  typeof mt === "string" &&
+  (mt === EFileMimeType.XLS ||
+    mt === EFileMimeType.XLSX ||
+    mt === EFileMimeType.CSV ||
+    mt === EFileMimeType.ODS);
 
 /**
  * Generic file asset stored in S3.

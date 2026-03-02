@@ -16,23 +16,26 @@ import { EWorkplaceType, EEmploymentType, EJobPostingStatus } from "@/types/jobP
 
 import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { IMAGE_MIME_TYPES, VIDEO_MIME_TYPES } from "@/types/shared.types";
-import { uploadToS3Presigned, type UploadResult } from "@/lib/utils/s3Helper";
+import { uploadToS3PresignedPublic } from "@/lib/utils/s3Helper/client";
 
 import JobPostingSidebar from "./JobPostingSidebar";
 import { AlertTriangle, Briefcase, CheckCircle2, ExternalLink } from "lucide-react";
 import { getAllowedJobActions } from "@/lib/utils/jobs/jobStatusTransitions";
+import BlockNoteSkeleton from "@/components/blocknote/BlockNoteSkeleton";
 
-const BlockNote = dynamic(() => import("@/components/BlockNote"), {
+const BlockNote = dynamic(() => import("@/components/blocknote/BlockNote"), {
   ssr: false,
   loading: () => (
-    <div
-      className={cn(
-        "rounded-3xl border p-5 text-sm shadow-[var(--dash-shadow)]",
-        "border-[var(--dash-border)] bg-[var(--dash-surface)] text-[var(--dash-muted)]",
-      )}
-    >
-      Loading editor…
-    </div>
+    <BlockNoteSkeleton
+      variant="admin"
+      paddingClassName="p-5"
+      heightClassName="min-h-[520px]"
+      lines={12}
+      showToolbar={true}
+      showTitleLine={false}
+      // optional: match your editor chrome spacing
+      className="rounded-3xl"
+    />
   ),
 });
 
@@ -70,17 +73,7 @@ type Props = {
   previewUrl?: string | null;
 };
 
-function fileToAsset(r: UploadResult): IFileAsset {
-  return {
-    url: r.url,
-    s3Key: r.s3Key,
-    mimeType: r.mimeType,
-    sizeBytes: r.sizeBytes,
-    originalName: r.originalName,
-  };
-}
-
-async function uploadJobsMediaToTemp(file: File): Promise<UploadResult> {
+async function uploadJobsMediaToTemp(file: File): Promise<IFileAsset> {
   const mt = (file.type || "").toLowerCase();
   const folder = mt.startsWith("image/")
     ? ES3Folder.MEDIA_IMAGES
@@ -92,7 +85,7 @@ async function uploadJobsMediaToTemp(file: File): Promise<UploadResult> {
 
   const allowedMimeTypes = folder === ES3Folder.MEDIA_IMAGES ? IMAGE_MIME_TYPES : VIDEO_MIME_TYPES;
 
-  return uploadToS3Presigned({
+  return uploadToS3PresignedPublic({
     file,
     namespace: ES3Namespace.JOBS,
     folder,
@@ -105,7 +98,7 @@ async function uploadCoverToTemp(file: File): Promise<IFileAsset> {
   if (!file.type.toLowerCase().startsWith("image/"))
     throw new Error("Cover image must be an image.");
 
-  const up = await uploadToS3Presigned({
+  const up = await uploadToS3PresignedPublic({
     file,
     namespace: ES3Namespace.JOBS,
     folder: ES3Folder.MEDIA_IMAGES,
@@ -113,7 +106,7 @@ async function uploadCoverToTemp(file: File): Promise<IFileAsset> {
     maxSizeMB: 10,
   });
 
-  return fileToAsset(up);
+  return up;
 }
 
 function ChangePill({ saving, isDirty }: { saving: boolean; isDirty: boolean }) {
@@ -662,29 +655,20 @@ export default function JobEditor(props: Props) {
             </div>
 
             <div className="p-5">
-              <div
-                className={cn(
-                  "rounded-3xl border shadow-[var(--dash-shadow)]/12",
-                  "border-[var(--dash-border)] bg-[var(--dash-bg)]",
-                )}
-              >
-                <div className="p-4">
-                  <BlockNote
-                    onChange={(v: any) => {
-                      setSuccess(null);
-                      setError(null);
-                      setDoc(v);
-                    }}
-                    uploadFile={uploadJobsMediaToTemp}
-                    initialContent={doc ?? undefined}
-                    chrome={{
-                      borderColor: "var(--dash-border)",
-                      background: isDark ? "rgba(255,255,255,0.04)" : "white",
-                      className: "rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12",
-                    }}
-                  />
-                </div>
-              </div>
+              <BlockNote
+                onChange={(v: any) => {
+                  setSuccess(null);
+                  setError(null);
+                  setDoc(v);
+                }}
+                uploadFile={uploadJobsMediaToTemp}
+                initialContent={doc ?? undefined}
+                chrome={{
+                  borderColor: "var(--dash-border)",
+                  background: isDark ? "rgba(255,255,255,0.04)" : "white",
+                  className: "rounded-3xl border p-4 shadow-[var(--dash-shadow)]/12",
+                }}
+              />
             </div>
           </section>
 

@@ -19,7 +19,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { EJobApplicationStatus } from "@/types/jobApplication.types";
-import { getDownloadUrlFromS3Key } from "@/lib/utils/s3Helper";
+import { getDownloadUrlFromS3Key } from "@/lib/utils/s3Helper/client";
 
 function usePortalReady() {
   const [ready, setReady] = React.useState(false);
