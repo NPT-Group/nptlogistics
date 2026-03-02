@@ -185,7 +185,7 @@ export function IndustryTrustProof({ model }: { model: IndustryPageModel }) {
           backgroundSize: "24px 24px",
         }}
       />
-      <Container className="relative max-w-[1440px] px-4 sm:px-6 lg:px-6">
+      <Container className="site-page-container relative">
         <motion.div
           initial="hidden"
           whileInView="show"

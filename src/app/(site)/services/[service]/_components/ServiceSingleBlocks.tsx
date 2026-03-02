@@ -4,9 +4,6 @@ import Link from "next/link";
 import { trackCtaClick, toCtaSlug } from "@/lib/analytics/cta";
 import { cn } from "@/lib/cn";
 
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-white";
-
 export function SinglePanel({
   title,
   intro,
@@ -138,7 +135,7 @@ export function ConversionRail({
           className={cn(
             "inline-flex h-12 items-center justify-center rounded-md px-5 text-sm font-semibold text-white md:h-11",
             "shadow-[0_8px_20px_rgba(2,6,23,0.16)]",
-            focusRing,
+            "focus-ring-light",
           )}
           style={{ backgroundColor: accent }}
         >
@@ -149,7 +146,7 @@ export function ConversionRail({
           onClick={onSecondaryClick}
           className={cn(
             "inline-flex h-12 items-center justify-center rounded-md border border-[color:var(--color-border-light)] bg-white px-5 text-sm font-semibold text-[color:var(--color-text-light)] hover:bg-[color:var(--color-surface-0-light)] md:h-11",
-            focusRing,
+            "focus-ring-light",
           )}
         >
           {secondary.label}
@@ -190,7 +187,7 @@ export function RelatedServicesList({
             className={cn(
               "rounded-xl border border-[color:var(--color-border-light)] bg-[color:var(--color-surface-0-light)] px-4 py-3 transition",
               "hover:border-[color:var(--color-brand-500)]/40 hover:bg-white",
-              focusRing,
+              "focus-ring-light",
             )}
           >
             <div className="text-[13.5px] font-semibold text-[color:var(--color-text-light)]">{item.label}</div>

@@ -9,9 +9,6 @@ import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import type { ServicePageModel } from "@/config/services";
 
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
-
 function overlayStyle(overlay?: ServicePageModel["hero"]["overlay"]) {
   switch (overlay) {
     case "red":
@@ -80,7 +77,7 @@ export function ServiceHero({ model }: { model: ServicePageModel }) {
         <div className="absolute inset-x-0 bottom-0 h-24 bg-[linear-gradient(180deg,transparent,rgba(7,10,18,0.55)_45%,rgba(7,10,18,0.9))]" />
       </div>
 
-      <Container className="relative max-w-[1440px] px-4 py-14 sm:px-6 sm:py-18 lg:px-6 lg:py-22">
+      <Container className="site-page-container relative py-14 sm:py-18 lg:py-22">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 14 }}
           whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
@@ -144,7 +141,7 @@ export function ServiceHero({ model }: { model: ServicePageModel }) {
                   : isTempControlled
                     ? "border border-cyan-300/52 bg-[linear-gradient(180deg,rgba(2,132,199,0.9),rgba(14,116,144,0.9))] text-white shadow-[0_14px_28px_rgba(14,116,144,0.34)] hover:bg-[linear-gradient(180deg,rgba(2,132,199,0.98),rgba(14,116,144,0.98))]"
                   : "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)] shadow-[0_12px_28px_rgba(220,38,38,0.28)]",
-                focusRing,
+                "focus-ring-surface",
               )}
             >
               {model.hero.primaryCta.label}
@@ -177,7 +174,7 @@ export function ServiceHero({ model }: { model: ServicePageModel }) {
                   : isTempControlled
                     ? "border border-cyan-300/40 bg-[rgba(2,6,23,0.2)] text-cyan-100 hover:bg-[rgba(2,132,199,0.16)]"
                   : "border border-white/22 bg-white/8 text-white hover:bg-white/12",
-                focusRing,
+                "focus-ring-surface",
               )}
             >
               {model.hero.secondaryCta.label}

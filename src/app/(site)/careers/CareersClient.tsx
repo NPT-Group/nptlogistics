@@ -353,9 +353,6 @@ export default function CareersClient({
     return () => window.clearTimeout(t);
   }, []);
 
-  const focusRing =
-    "focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-ring)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
-
   const canPrev = Boolean(meta?.hasPrev ?? (meta?.page ?? query.page) > 1);
   const canNext = Boolean(meta?.hasNext ?? (meta?.page ?? query.page) < (meta?.totalPages ?? 1));
 
@@ -411,7 +408,7 @@ export default function CareersClient({
         </div>
 
         <div className="relative">
-          <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+          <Container className="site-page-container">
             <motion.div
               initial="hidden"
               animate="show"
@@ -467,7 +464,7 @@ export default function CareersClient({
                   className={cn(
                     "inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold",
                     "cursor-pointer bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
-                    focusRing,
+                    "focus-ring-light",
                   )}
                 >
                   View Open Roles <ArrowRight className="h-4 w-4" />
@@ -487,7 +484,7 @@ export default function CareersClient({
                   className={cn(
                     "inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold",
                     "cursor-pointer border border-white/22 bg-white/10 text-white shadow-sm backdrop-blur transition hover:bg-white/15",
-                    focusRing,
+                    "focus-ring-light",
                   )}
                 >
                   Driver Opportunities <ArrowRight className="h-4 w-4" />
@@ -523,7 +520,7 @@ export default function CareersClient({
          ========================= */}
       <Section
         id="why"
-        className="relative py-12 sm:py-14"
+        className="relative py-14 sm:py-16"
         variant="light"
         style={{ scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
       >
@@ -536,7 +533,7 @@ export default function CareersClient({
           }}
         />
         <div className="relative">
-          <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+          <Container className="site-page-container">
             <motion.div
               initial="hidden"
               whileInView="show"
@@ -549,7 +546,7 @@ export default function CareersClient({
                     <Sparkles className="h-3.5 w-3.5 text-red-600" />
                     What you can count on
                   </div>
-                  <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+                  <h2 className="mt-3 text-[1.6rem] font-semibold tracking-tight text-slate-900 sm:text-[1.95rem] lg:text-[2.2rem]">
                     A place where standards are real — and support matches them.
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -563,7 +560,7 @@ export default function CareersClient({
                   onClick={() => scrollToId("jobs")}
                   className={cn(
                     "hidden cursor-pointer items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50 sm:inline-flex",
-                    focusRing,
+                    "focus-ring-light",
                   )}
                 >
                   See openings <ChevronRight className="h-4 w-4" />
@@ -594,7 +591,7 @@ export default function CareersClient({
                 ].map((c) => (
                   <div
                     key={c.title}
-                    className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+                    className="site-card-surface-subtle rounded-3xl p-5"
                   >
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
                       <CheckCircle2 className="h-4 w-4 text-red-600" />
@@ -614,11 +611,11 @@ export default function CareersClient({
          ========================= */}
       <Section
         id="drive"
-        className="border-t border-slate-200/70 bg-white py-12"
+        className="border-t border-slate-200/70 bg-white py-14 sm:py-16"
         variant="light"
         style={{ scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
       >
-        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+        <Container className="site-page-container">
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700">
@@ -626,7 +623,7 @@ export default function CareersClient({
                 For drivers
               </div>
 
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900">
+              <h2 className="mt-3 text-[1.6rem] font-semibold tracking-tight text-slate-900 sm:text-[1.95rem] lg:text-[2.2rem]">
                 Driver Opportunities
               </h2>
 
@@ -637,7 +634,7 @@ export default function CareersClient({
               </p>
 
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="site-card-surface-subtle rounded-2xl p-5">
                   <div className="text-sm font-semibold text-slate-900">
                     Equipment & maintenance
                   </div>
@@ -646,7 +643,7 @@ export default function CareersClient({
                   </p>
                 </div>
 
-                <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="site-card-surface-subtle rounded-2xl p-5">
                   <div className="text-sm font-semibold text-slate-900">Dispatch & planning</div>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
                     Clear communication, practical routing, and teams that help you keep moving.
@@ -655,7 +652,7 @@ export default function CareersClient({
               </div>
             </div>
 
-            <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="site-card-surface-subtle rounded-2xl p-5">
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
                 <ExternalLink className="h-4 w-4" />
                 Apply externally
@@ -680,7 +677,7 @@ export default function CareersClient({
                 className={cn(
                   "mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-semibold",
                   "bg-slate-900 text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
-                  focusRing,
+                  "focus-ring-light",
                 )}
               >
                 Apply via Drivedock <ExternalLink className="h-4 w-4" />
@@ -697,14 +694,16 @@ export default function CareersClient({
          ========================= */}
       <Section
         id="jobs"
-        className="border-t border-slate-200/70 bg-slate-50 py-12"
+        className="border-t border-slate-200/70 bg-slate-50 py-14 sm:py-16"
         variant="light"
         style={{ scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
       >
-        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+        <Container className="site-page-container">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Open Roles</h2>
+              <h2 className="text-[1.6rem] font-semibold tracking-tight text-slate-900 sm:text-[1.95rem] lg:text-[2.2rem]">
+                Open Roles
+              </h2>
               <p className="mt-1 text-sm text-slate-600">
                 Browse current openings, then filter by team, location, and work style to narrow
                 down fast.
@@ -721,7 +720,7 @@ export default function CareersClient({
           <div className="mt-6">
             <div
               className={cn(
-                "rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5",
+                "site-card-surface rounded-3xl p-4 sm:p-5",
                 "ring-1 ring-red-500/5",
               )}
             >
@@ -734,9 +733,7 @@ export default function CareersClient({
                     onChange={(e) => setQInput(e.target.value)}
                     placeholder="Search roles (e.g., dispatcher, safety, operations)…"
                     className={cn(
-                      "w-full rounded-2xl border px-10 py-3 text-sm",
-                      "bg-white text-slate-900 placeholder:text-slate-400",
-                      "border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-red-500/10 focus:outline-none",
+                      "site-input-light focus-ring-light w-full rounded-2xl px-10 py-3 text-sm",
                     )}
                   />
                   {qInput ? (
@@ -758,9 +755,7 @@ export default function CareersClient({
                     onChange={(e) => setDeptInput(e.target.value)}
                     placeholder="Department (optional)"
                     className={cn(
-                      "w-full rounded-2xl border px-10 py-3 text-sm",
-                      "bg-white text-slate-900 placeholder:text-slate-400",
-                      "border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-red-500/10 focus:outline-none",
+                      "site-input-light focus-ring-light w-full rounded-2xl px-10 py-3 text-sm",
                     )}
                   />
                   {deptInput ? (
@@ -782,9 +777,7 @@ export default function CareersClient({
                     onChange={(e) => setLocInput(e.target.value)}
                     placeholder="Location (optional)"
                     className={cn(
-                      "w-full rounded-2xl border px-10 py-3 text-sm",
-                      "bg-white text-slate-900 placeholder:text-slate-400",
-                      "border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-red-500/10 focus:outline-none",
+                      "site-input-light focus-ring-light w-full rounded-2xl px-10 py-3 text-sm",
                     )}
                   />
                   {locInput ? (
@@ -919,7 +912,7 @@ export default function CareersClient({
 
           {/* Listings */}
           <div className="mt-6" ref={resultsRef}>
-            <div className="rounded-3xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+            <div className="site-card-surface rounded-3xl p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-slate-900">Listings</h3>
                 <div className="text-xs text-slate-500">
@@ -942,7 +935,7 @@ export default function CareersClient({
                 </div>
               ) : null}
 
-              <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+              <div className="site-card-surface mt-4 overflow-hidden rounded-2xl">
                 <div className="grid grid-cols-1 divide-y divide-slate-200">
                   {loading ? (
                     <div className="p-10 text-center text-sm text-slate-500">
@@ -972,15 +965,15 @@ export default function CareersClient({
                           target="_blank"
                           onClick={() =>
                             trackCtaClick({
-                              ctaId: `careers_open_job_${slug || "unknown"}`,
+                              ctaId: "careers_open_job_listing",
                               location: "careers_jobs_list",
                               destination: jobHref,
-                              label: j.title ? `Open job: ${j.title}` : "Open job",
+                              label: "Open job listing",
                             })
                           }
                           className={cn(
                             "group block px-5 py-4 transition",
-                            "hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-ring)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                            "hover:bg-slate-50 focus-ring-light",
                           )}
                         >
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -1111,7 +1104,7 @@ export default function CareersClient({
                   }}
                   className={cn(
                     "cursor-pointer font-semibold text-slate-900 underline underline-offset-2",
-                    focusRing,
+                    "focus-ring-light",
                   )}
                 >
                   Driver Opportunities

@@ -98,7 +98,7 @@ async function fetchCategories(qs: URLSearchParams, signal?: AbortSignal) {
 
 function SkeletonCard() {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+    <div className="site-card-surface-subtle rounded-2xl p-3">
       <div className="aspect-[16/10] w-full rounded-xl bg-slate-100" />
       <div className="mt-3 h-4 w-3/4 rounded bg-slate-100" />
       <div className="mt-2 h-3 w-5/6 rounded bg-slate-100" />
@@ -340,7 +340,7 @@ export default function BlogIndexClient({
         </div>
 
         <div className="relative">
-          <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+          <Container className="site-page-container">
             {(() => {
               const reduceMotion = useReducedMotion();
 
@@ -415,9 +415,7 @@ export default function BlogIndexClient({
                             onChange={(e) => setQInput(e.target.value)}
                             placeholder="Search articles (e.g., cross-border, LTL, compliance)…"
                             className={cn(
-                              "w-full rounded-2xl border px-10 py-3 text-sm",
-                              "bg-black/20 text-white placeholder:text-white/60",
-                              "border-white/15 focus:border-white/25 focus:ring-2 focus:ring-white/20 focus:outline-none",
+                              "w-full rounded-2xl border border-white/15 bg-black/20 px-10 py-3 text-sm text-white placeholder:text-white/60 focus-ring-light",
                             )}
                           />
                           {qInput ? (
@@ -527,14 +525,14 @@ export default function BlogIndexClient({
       </section>
 
       {/* BODY */}
-      <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
-        <div className="mt-8 pb-12 sm:mt-10 sm:pb-16">
+      <Container className="site-page-container">
+        <div className="mt-10 pb-14 sm:mt-12 sm:pb-16">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             {/* RESULTS */}
             <div className="lg:col-span-9">
               <div
                 ref={resultsRef}
-                className="rounded-3xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4"
+                className="site-card-surface rounded-3xl p-3 sm:p-4"
               >
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-semibold text-slate-900">Articles</h2>
@@ -571,7 +569,7 @@ export default function BlogIndexClient({
                       <Link
                         key={p.id}
                         href={`/blog/${p.slug}`}
-                        className="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:-translate-y-[1px] hover:shadow-md"
+                        className="site-card-surface group cursor-pointer rounded-2xl p-3 transition hover:-translate-y-[1px] hover:shadow-md"
                       >
                         <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                           {p.coverImage?.url ? (
@@ -706,7 +704,7 @@ export default function BlogIndexClient({
             <div className="lg:col-span-3">
               <div className="sticky top-24 space-y-4">
                 {/* Categories pills */}
-                <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="site-card-surface rounded-3xl p-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-slate-900">Categories</h3>
                     <span className="text-[11px] text-slate-500">
@@ -751,14 +749,14 @@ export default function BlogIndexClient({
                 </div>
 
                 {/* Recent */}
-                <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="site-card-surface rounded-3xl p-4">
                   <h3 className="text-sm font-semibold text-slate-900">Recent</h3>
                   <div className="mt-3 space-y-3">
                     {recentItems?.map((p) => (
                       <Link
                         key={p.id}
                         href={`/blog/${p.slug}`}
-                        className="block cursor-pointer rounded-2xl border border-slate-200 bg-white p-3 hover:bg-slate-50"
+                        className="site-card-surface block cursor-pointer rounded-2xl p-3 hover:bg-slate-50"
                       >
                         <div className="line-clamp-2 text-xs font-semibold text-slate-900">
                           {p.title}
@@ -773,7 +771,7 @@ export default function BlogIndexClient({
                 </div>
 
                 {/* CTA */}
-                <div className="rounded-3xl border border-red-100 bg-gradient-to-br from-red-50 via-white to-white p-4 shadow-sm">
+                <div className="site-card-surface-subtle rounded-3xl p-4">
                   <h3 className="text-sm font-semibold text-slate-900">Need help shipping?</h3>
                   <p className="mt-2 text-xs text-slate-600">
                     Tell us what you’re moving and where—our team will suggest the right mode and

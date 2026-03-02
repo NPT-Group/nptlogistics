@@ -5,10 +5,6 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
-import { HOME_CONTAINER_CLASS } from "./homeTokens";
-
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f8f4ef]";
 
 const TRUST_SIGNALS = [
   "Fast, structured quote responses",
@@ -33,7 +29,7 @@ export function FinalCtaSection() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,244,239,1))]" />
       </div>
 
-      <Container className={cn("relative py-16 sm:py-20", HOME_CONTAINER_CLASS)}>
+      <Container className={cn("relative py-16 sm:py-20", "site-home-container")}>
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 14 }}
           whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
@@ -122,7 +118,7 @@ export function FinalCtaSection() {
                       "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold",
                       "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",
                       "shadow-[0_8px_22px_rgba(220,38,38,0.25)]",
-                      focusRing,
+                      "focus-ring-light",
                     )}
                   >
                     Request a Quote
@@ -144,7 +140,7 @@ export function FinalCtaSection() {
                     className={cn(
                       "inline-flex h-11 cursor-pointer items-center justify-center rounded-md px-5 text-sm font-semibold",
                       "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] hover:bg-[color:var(--color-surface-0-light)]",
-                      focusRing,
+                      "focus-ring-light",
                     )}
                   >
                     Speak with a live agent

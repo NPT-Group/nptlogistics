@@ -6,8 +6,6 @@ import { Container } from "@/app/(site)/components/layout/Container";
 import { Section } from "@/app/(site)/components/layout/Section";
 import { FAQ_CATEGORIES, type FaqCategory, type FaqItem } from "@/config/faqs";
 import { cn } from "@/lib/cn";
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0-light)]";
 
 function FaqAccordionItem({
   item,
@@ -53,7 +51,7 @@ function FaqAccordionItem({
           "flex w-full items-center gap-4 rounded-xl pl-5 pr-4 py-3 text-left sm:gap-5 sm:pl-6 sm:pr-5 sm:py-3.5",
           "text-sm font-semibold text-[color:var(--color-text-light)] sm:text-[15px]",
           "hover:bg-[color:var(--color-surface-0-light)]/60",
-          focusRing,
+          "focus-ring-light",
         )}
       >
         <span
@@ -186,7 +184,7 @@ export function FaqMain() {
         className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[rgba(11,17,32,0.12)] to-transparent"
       />
 
-      <Container className="relative max-w-[1440px] px-4 pt-3 pb-12 sm:px-6 sm:pt-4 sm:pb-14 lg:px-6 lg:pt-5 lg:pb-16">
+      <Container className="site-page-container relative pt-3 pb-12 sm:pt-4 sm:pb-14 lg:pt-5 lg:pb-16">
         <motion.div
           initial="hidden"
           whileInView="show"

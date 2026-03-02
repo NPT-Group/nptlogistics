@@ -11,10 +11,6 @@ import {
   TRUST_PROOF_SECTION,
   type TestimonialItem,
 } from "@/config/testimonials";
-import { HOME_CONTAINER_CLASS } from "./homeTokens";
-
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
 function getYouTubeId(url: string) {
   try {
@@ -233,7 +229,7 @@ function VideoCard({
             className={cn(
               "pointer-events-auto inline-flex items-center gap-2 truncate text-sm font-semibold",
               "cursor-pointer hover:text-white/90",
-              focusRing,
+              "focus-ring-light",
             )}
           >
             <Image
@@ -251,7 +247,7 @@ function VideoCard({
               onClick={openYoutube}
               className={cn(
                 "inline-flex h-8 cursor-pointer items-center justify-center rounded-lg border border-white/22 px-2.5 text-xs font-semibold hover:bg-white/12",
-                focusRing,
+                "focus-ring-light",
               )}
             >
               Open
@@ -261,7 +257,7 @@ function VideoCard({
               onClick={copyLink}
               className={cn(
                 "inline-flex h-8 cursor-pointer items-center justify-center rounded-lg border border-white/22 px-2.5 text-xs font-semibold hover:bg-white/12",
-                focusRing,
+                "focus-ring-light",
               )}
             >
               {copied ? "Copied" : "Copy link"}
@@ -417,7 +413,7 @@ export function TrustProofSection() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.2),rgba(255,255,255,0.92))]" />
       </div>
 
-      <Container className={cn("relative py-14 sm:py-16 lg:py-20", HOME_CONTAINER_CLASS)}>
+      <Container className={cn("relative py-14 sm:py-16 lg:py-20", "site-home-container")}>
         {/* Heading */}
         <div className="mx-auto max-w-3xl text-center">
           <div className="mx-auto mb-3 h-[2px] w-14 bg-[color:var(--color-brand-500)]" />
@@ -444,7 +440,7 @@ export function TrustProofSection() {
             {activeAnnouncement}
           </p>
           <div
-            className={cn("outline-none", focusRing)}
+            className={cn("outline-none", "focus-ring-light")}
             role="region"
             aria-roledescription="carousel"
             aria-label="Trust and proof carousel"
@@ -474,7 +470,7 @@ export function TrustProofSection() {
                     "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
                     "transition-all duration-200 hover:-translate-y-0.5 hover:border-[color:var(--color-brand-500)]/45 hover:text-[color:var(--color-brand-600)] hover:shadow-[0_12px_24px_rgba(2,6,23,0.12)]",
                     "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:border-[color:var(--color-border-light)] disabled:hover:text-[color:var(--color-text-light)] disabled:hover:shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
-                    focusRing,
+                    "focus-ring-light",
                   )}
                   aria-label="Previous slide"
                 >
@@ -489,7 +485,7 @@ export function TrustProofSection() {
                     "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
                     "transition-all duration-200 hover:-translate-y-0.5 hover:border-[color:var(--color-brand-500)]/45 hover:text-[color:var(--color-brand-600)] hover:shadow-[0_12px_24px_rgba(2,6,23,0.12)]",
                     "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:border-[color:var(--color-border-light)] disabled:hover:text-[color:var(--color-text-light)] disabled:hover:shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
-                    focusRing,
+                    "focus-ring-light",
                   )}
                   aria-label="Next slide"
                 >
@@ -594,7 +590,7 @@ export function TrustProofSection() {
                   onClick={() => setDirectIndex(i)}
                   disabled={!hasMultiple}
                   className={cn(
-                    focusRing,
+                    "focus-ring-light",
                     "h-2.5 rounded-full transition-all duration-200",
                     i === index
                       ? "w-6 bg-[color:var(--color-brand-500)]"
@@ -623,7 +619,7 @@ export function TrustProofSection() {
               className={cn(
                 "inline-flex h-8 items-center rounded-full border border-[color:var(--color-border-light)] bg-white px-3 text-xs font-semibold text-[color:var(--color-text-light)]",
                 "transition-colors hover:bg-[color:var(--color-surface-0-light)]",
-                focusRing,
+                "focus-ring-light",
               )}
               aria-pressed={isMarqueePaused}
               aria-label={isMarqueePaused ? "Resume partner logo motion" : "Pause partner logo motion"}

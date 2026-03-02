@@ -6,7 +6,6 @@ import { useInView } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
-import { HOME_CONTAINER_CLASS } from "./homeTokens";
 
 const glassCard = cn(
   "relative overflow-hidden rounded-2xl",
@@ -124,7 +123,7 @@ export function AudienceSection() {
         aria-hidden="true"
       />
 
-      <Container className={HOME_CONTAINER_CLASS}>
+      <Container className="site-home-container">
         <div className="relative mx-auto max-w-4xl text-center">
           <div className="mx-auto mb-3 h-[2px] w-14 bg-[color:var(--color-brand-600)]/90" />
 

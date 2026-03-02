@@ -222,7 +222,7 @@ export function LoadBalanceAxleWidget({ accentColor }: { accentColor?: string })
               className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg bg-white/70 px-2.5 py-2 shadow-sm backdrop-blur-sm"
               style={{ boxShadow: "0 1px 2px rgba(15,23,42,0.04)" }}
             >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
+              <div className="flex w-full min-w-0 flex-wrap items-center gap-1.5 sm:w-auto sm:flex-1 sm:flex-nowrap sm:gap-2">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--color-muted-light)] shrink-0">
                   Stability
                 </span>
@@ -244,7 +244,7 @@ export function LoadBalanceAxleWidget({ accentColor }: { accentColor?: string })
                   {stability}
                 </span>
               </div>
-              <span className="text-[9px] text-[color:var(--color-muted-light)] shrink-0">
+              <span className="w-full text-[9px] text-[color:var(--color-muted-light)] shrink-0 sm:w-auto">
                 L {leftPressure}% · C {centerPressure}% · R {rightPressure}%
               </span>
               <span

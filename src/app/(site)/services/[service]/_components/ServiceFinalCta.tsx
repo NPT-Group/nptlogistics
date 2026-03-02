@@ -8,9 +8,6 @@ import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import type { ServicePageModel } from "@/config/services";
 
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-white";
-
 function withServiceQuery(href: string, model: ServicePageModel) {
   // If the destination is /quote, enrich it with a service hint for preselection.
   // Keeps backwards compatibility if your quote form ignores these params today.
@@ -45,7 +42,7 @@ export function ServiceFinalCta({ model }: { model: ServicePageModel }) {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,250,252,0.9),rgba(241,245,249,0.96))]" />
       </div>
 
-      <Container className="relative max-w-[1360px] px-4 py-10 sm:px-6 sm:py-12 md:py-14">
+      <Container className="site-page-container-narrow relative py-10 sm:py-12 md:py-14">
         <div
           className={cn(
             "relative isolate mx-auto overflow-hidden rounded-[28px]",
@@ -135,7 +132,7 @@ export function ServiceFinalCta({ model }: { model: ServicePageModel }) {
                       "inline-flex h-12 items-center justify-center rounded-md px-5 text-sm font-semibold md:h-11",
                       "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",
                       "shadow-[0_8px_22px_rgba(220,38,38,0.25)]",
-                      focusRing,
+                      "focus-ring-light",
                     )}
                   >
                     {model.finalCta.primary.label}
@@ -155,7 +152,7 @@ export function ServiceFinalCta({ model }: { model: ServicePageModel }) {
                     className={cn(
                       "inline-flex h-12 cursor-pointer items-center justify-center rounded-md px-5 text-sm font-semibold md:h-11",
                       "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] hover:bg-[color:var(--color-surface-0-light)]",
-                      focusRing,
+                      "focus-ring-light",
                     )}
                   >
                     {model.finalCta.secondary.label}

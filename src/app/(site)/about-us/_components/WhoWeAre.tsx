@@ -16,9 +16,6 @@ type Data = Readonly<{
   cta: { label: string; href: string; ctaId: string };
 }>;
 
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0-light)]";
-
 // Hoisted: no deps on props/state, safe to define once at module level
 function formatStatLabel(label: string): string {
   const parts = label.trim().split(/\s+/);
@@ -48,7 +45,7 @@ export function WhoWeAre({ data }: { data: Data }) {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(720px_320px_at_20%_-8%,var(--color-section-glow-brand),transparent_55%)]"
       />
-      <Container className="relative max-w-[1440px] px-4 sm:px-6 lg:px-6">
+      <Container className="site-page-container relative">
         {/* Section heading */}
         <motion.div
           initial="hidden"
@@ -188,7 +185,7 @@ export function WhoWeAre({ data }: { data: Data }) {
                 }
                 className={cn(
                   "inline-flex h-10 items-center justify-center self-start rounded-md border border-[color:var(--color-brand-500)] bg-[linear-gradient(180deg,var(--color-brand-600),var(--color-brand-700))] px-5 text-sm font-semibold tracking-wide text-white shadow-[0_8px_20px_rgba(220,38,38,0.25)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_12px_28px_rgba(220,38,38,0.32)] sm:h-11 sm:px-7",
-                  focusRing,
+                  "focus-ring-light",
                 )}
               >
                 {data.cta.label}

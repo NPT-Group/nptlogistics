@@ -17,9 +17,6 @@ type HeroData = Readonly<{
   };
 }>;
 
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
-
 export function AboutHero({ data }: { data: HeroData }) {
   const reduceMotion = useReducedMotion();
 
@@ -39,7 +36,7 @@ export function AboutHero({ data }: { data: HeroData }) {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_900px_600px_at_78%_60%,rgba(220,38,38,0.18),transparent_62%)]" />
       </div>
 
-      <Container className="relative max-w-[1440px] px-4 sm:px-6 lg:px-6">
+      <Container className="site-page-container relative">
         <div className="grid items-center gap-6 sm:gap-8 lg:grid-cols-[0.93fr_1.07fr] lg:gap-8">
           {/* Left — text content */}
           <motion.div
@@ -86,7 +83,7 @@ export function AboutHero({ data }: { data: HeroData }) {
                   "inline-flex h-11 items-center justify-center rounded-md border border-[color:var(--color-brand-600)] bg-[linear-gradient(180deg,var(--color-brand-600),var(--color-brand-700))] px-5 text-sm font-semibold text-white transition-all duration-200",
                   "shadow-[0_8px_20px_rgba(220,38,38,0.25)] hover:-translate-y-[2px] hover:shadow-[0_12px_28px_rgba(220,38,38,0.32)]",
                   "sm:px-6",
-                  focusRing,
+                  "focus-ring-surface",
                 )}
               >
                 {data.ctas.primary.label}
@@ -109,7 +106,7 @@ export function AboutHero({ data }: { data: HeroData }) {
                   "inline-flex h-11 items-center justify-center rounded-md border border-[rgba(255,255,255,0.22)] bg-transparent px-5 text-sm font-semibold text-[color:var(--color-muted-strong)] transition-all duration-200",
                   "hover:-translate-y-[2px] hover:border-[rgba(255,255,255,0.38)] hover:text-white",
                   "sm:px-6",
-                  focusRing,
+                  "focus-ring-surface",
                 )}
               >
                 {data.ctas.secondary.label}

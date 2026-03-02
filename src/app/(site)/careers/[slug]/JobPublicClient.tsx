@@ -34,6 +34,7 @@ import { trackCtaClick } from "@/lib/analytics/cta";
 import { CheckBox } from "../../components/ui/CheckBox";
 import dynamic from "next/dynamic";
 import BlockNoteSkeleton from "@/components/blocknote/BlockNoteSkeleton";
+import { Container } from "@/app/(site)/components/layout/Container";
 
 const BlockNote = dynamic(() => import("@/components/blocknote/BlockNote"), {
   ssr: false,
@@ -192,7 +193,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
       setTurnstileToken(t);
 
       trackCtaClick({
-        ctaId: `job_apply_turnstile_verified_${slug}`,
+        ctaId: "job_apply_turnstile_verified",
         location: "job_apply_form",
         destination: `/careers/${encodeURIComponent(slug)}`,
         label: "Turnstile verified",
@@ -201,18 +202,14 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
     [slug],
   );
 
-  const focusRing =
-    "focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-ring)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
-
   /**
    * NOTE: In CSS Grid, children default to min-width:auto, which can cause overflow
    * when any descendant has an intrinsic width (iframes, file inputs, long strings).
    * We aggressively apply min-w-0/max-w-full and add overflow-x-hidden at key wrappers.
    */
   const fieldBase =
-    "min-w-0 w-full max-w-full rounded-2xl border border-slate-200/80 bg-white " +
-    "px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition " +
-    "focus:border-[color:var(--color-brand-600)]/35 " +
+    "site-input-light min-w-0 w-full max-w-full rounded-2xl " +
+    "px-3 py-2 text-sm shadow-sm outline-none transition " +
     "sm:px-4 sm:py-2.5";
 
   const fileBase =
@@ -286,7 +283,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
 
   async function submit() {
     trackCtaClick({
-      ctaId: `job_apply_submit_attempt_${slug}`,
+      ctaId: "job_apply_submit_attempt",
       location: "job_apply_form",
       destination: `/careers/${encodeURIComponent(slug)}`,
       label: "Submit application (attempt)",
@@ -300,7 +297,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
       scrollToNotice();
 
       trackCtaClick({
-        ctaId: `job_apply_submit_failed_turnstile_not_configured_${slug}`,
+        ctaId: "job_apply_submit_failed_turnstile_not_configured",
         location: "job_apply_form",
         destination: `/careers/${encodeURIComponent(slug)}`,
         label: "Submit failed: turnstile not configured",
@@ -314,7 +311,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
       scrollToNotice();
 
       trackCtaClick({
-        ctaId: `job_apply_submit_failed_missing_turnstile_${slug}`,
+        ctaId: "job_apply_submit_failed_missing_turnstile",
         location: "job_apply_form",
         destination: `/careers/${encodeURIComponent(slug)}`,
         label: "Submit failed: missing turnstile",
@@ -328,7 +325,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
       scrollToNotice();
 
       trackCtaClick({
-        ctaId: `job_apply_submit_failed_missing_required_${slug}`,
+        ctaId: "job_apply_submit_failed_missing_required",
         location: "job_apply_form",
         destination: `/careers/${encodeURIComponent(slug)}`,
         label: "Submit failed: missing required fields",
@@ -377,7 +374,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
       resetFormAfterSuccess();
 
       trackCtaClick({
-        ctaId: `job_apply_submit_success_${slug}`,
+        ctaId: "job_apply_submit_success",
         location: "job_apply_form",
         destination: `/careers/${encodeURIComponent(slug)}`,
         label: "Submit application (success)",
@@ -388,10 +385,10 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
       scrollToNotice();
 
       trackCtaClick({
-        ctaId: `job_apply_submit_failed_${slug}`,
+        ctaId: "job_apply_submit_failed",
         location: "job_apply_form",
         destination: `/careers/${encodeURIComponent(slug)}`,
-        label: `Submit application (failed): ${msg}`,
+        label: "Submit application (failed)",
       });
     } finally {
       setBusy(false);
@@ -400,12 +397,12 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-50 via-white to-white">
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <Container className="site-page-container py-6 sm:py-8">
         <button
           type="button"
           onClick={() => {
             trackCtaClick({
-              ctaId: `job_back_to_jobs_${slug}`,
+              ctaId: "job_back_to_jobs",
               location: "job_header",
               destination: "/careers#jobs",
               label: "Back to jobs",
@@ -414,7 +411,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
           }}
           className={[
             "inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50",
-            focusRing,
+            "focus-ring-light",
           ].join(" ")}
         >
           <ArrowLeft className="h-4 w-4" />
@@ -424,7 +421,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
         <div className="mt-5 grid min-w-0 gap-6 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)] lg:gap-8">
           {/* Left: Job details */}
           <section className="min-w-0">
-            <div className="overflow-hidden rounded-[28px] border border-slate-200/70 bg-white shadow-sm">
+            <div className="site-card-surface overflow-hidden rounded-[28px]">
               {/* Cover image */}
               <div className="relative h-44 w-full bg-slate-50 sm:h-52 lg:h-64">
                 {coverUrl ? (
@@ -534,7 +531,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
               </div>
             </div>
 
-            <div className="mt-5 rounded-[28px] border border-slate-200/70 bg-white p-4 shadow-sm sm:mt-6 sm:p-6">
+            <div className="site-card-surface mt-5 rounded-[28px] p-4 sm:mt-6 sm:p-6">
               <div className="text-sm font-semibold text-slate-900">Role description</div>{" "}
               <div className="mt-4">
                 <BlockNote initialContent={job.description as any} editable={false} />{" "}
@@ -542,7 +539,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
             </div>
 
             {Array.isArray(job.benefitsPreview) && job.benefitsPreview.length ? (
-              <div className="mt-5 rounded-[28px] border border-slate-200/70 bg-white p-4 shadow-sm sm:mt-6 sm:p-6">
+              <div className="site-card-surface mt-5 rounded-[28px] p-4 sm:mt-6 sm:p-6">
                 <div className="text-sm font-semibold text-slate-900">Benefits</div>
                 <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                   {job.benefitsPreview.map((b, idx) => (
@@ -560,7 +557,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
 
           {/* Right: Apply */}
           <aside className="w-full max-w-full min-w-0 lg:sticky lg:top-6">
-            <div className="max-w-full min-w-0 overflow-hidden rounded-[28px] border border-slate-200/70 bg-white p-4 shadow-sm sm:p-6">
+            <div className="site-card-surface max-w-full min-w-0 overflow-hidden rounded-[28px] p-4 sm:p-6">
               <div className="text-lg font-semibold tracking-tight text-slate-900">Apply</div>
               <div className="mt-1 text-sm text-slate-500">
                 Submit your details and upload your resume. We’ll review and follow up.
@@ -591,14 +588,14 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="First name *"
-                    className={[fieldBase, focusRing].join(" ")}
+                    className={[fieldBase, "focus-ring-light"].join(" ")}
                     disabled={busy}
                   />
                   <input
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Last name *"
-                    className={[fieldBase, focusRing].join(" ")}
+                    className={[fieldBase, "focus-ring-light"].join(" ")}
                     disabled={busy}
                   />
                 </div>
@@ -608,7 +605,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email *"
                   type="email"
-                  className={[fieldBase, focusRing].join(" ")}
+                  className={[fieldBase, "focus-ring-light"].join(" ")}
                   disabled={busy}
                 />
 
@@ -616,7 +613,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="Phone"
-                  className={[fieldBase, focusRing].join(" ")}
+                  className={[fieldBase, "focus-ring-light"].join(" ")}
                   disabled={busy}
                 />
 
@@ -625,14 +622,14 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                     value={currentLocation}
                     onChange={(e) => setCurrentLocation(e.target.value)}
                     placeholder="Current location"
-                    className={[fieldBase, focusRing].join(" ")}
+                    className={[fieldBase, "focus-ring-light"].join(" ")}
                     disabled={busy}
                   />
                   <input
                     value={addressLine}
                     onChange={(e) => setAddressLine(e.target.value)}
                     placeholder="Address (optional)"
-                    className={[fieldBase, focusRing].join(" ")}
+                    className={[fieldBase, "focus-ring-light"].join(" ")}
                     disabled={busy}
                   />
                 </div>
@@ -646,7 +643,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                     "w-full max-w-full min-w-0 rounded-2xl border border-slate-200/80 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition outline-none placeholder:text-slate-400",
                     "focus:border-[color:var(--color-brand-600)]/35",
                     "sm:px-4 sm:py-3",
-                    focusRing,
+                    "focus-ring-light",
                   ].join(" ")}
                   disabled={busy}
                 />
@@ -656,14 +653,14 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                     value={linkedInUrl}
                     onChange={(e) => setLinkedInUrl(e.target.value)}
                     placeholder="LinkedIn URL"
-                    className={[fieldBase, focusRing].join(" ")}
+                    className={[fieldBase, "focus-ring-light"].join(" ")}
                     disabled={busy}
                   />
                   <input
                     value={portfolioUrl}
                     onChange={(e) => setPortfolioUrl(e.target.value)}
                     placeholder="Portfolio URL"
-                    className={[fieldBase, focusRing].join(" ")}
+                    className={[fieldBase, "focus-ring-light"].join(" ")}
                     disabled={busy}
                   />
                 </div>
@@ -680,7 +677,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                         value={commuteMode}
                         onChange={(e) => setCommuteMode(e.target.value)}
                         placeholder="e.g. Car, Transit, Bike"
-                        className={[fieldBase, focusRing].join(" ")}
+                        className={[fieldBase, "focus-ring-light"].join(" ")}
                         disabled={busy}
                       />
                     </div>
@@ -729,7 +726,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
 
                           if (f) {
                             trackCtaClick({
-                              ctaId: `job_apply_resume_selected_${slug}`,
+                              ctaId: "job_apply_resume_selected",
                               location: "job_apply_form",
                               destination: `/careers/${encodeURIComponent(slug)}`,
                               label: "Resume selected",
@@ -737,7 +734,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                           }
                         }}
                         disabled={busy}
-                        className={[fileBase, focusRing].join(" ")}
+                        className={[fileBase, "focus-ring-light"].join(" ")}
                       />
                       {resumeFile ? (
                         <div className="mt-1 max-w-full min-w-0 truncate text-xs text-slate-500">
@@ -759,7 +756,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
 
                           if (f) {
                             trackCtaClick({
-                              ctaId: `job_apply_photo_selected_${slug}`,
+                              ctaId: "job_apply_photo_selected",
                               location: "job_apply_form",
                               destination: `/careers/${encodeURIComponent(slug)}`,
                               label: "Photo selected",
@@ -767,7 +764,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                           }
                         }}
                         disabled={busy}
-                        className={[fileBase, focusRing].join(" ")}
+                        className={[fileBase, "focus-ring-light"].join(" ")}
                       />
                       {photoFile ? (
                         <div className="mt-1 max-w-full min-w-0 truncate text-xs text-slate-500">
@@ -779,7 +776,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                 </div>
 
                 {/* Verification */}
-                <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
+                <div className="site-card-surface min-w-0 rounded-2xl p-3 sm:p-4">
                   <div className="min-w-0 text-sm font-semibold text-slate-900">Verification</div>
 
                   {/* This wrapper is the key: if Turnstile injects an iframe with a hard width, we prevent it from widening the grid item */}
@@ -803,7 +800,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                   onClick={submit}
                   className={[
                     "inline-flex w-full min-w-0 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60",
-                    focusRing,
+                    "focus-ring-light",
                   ].join(" ")}
                 >
                   Submit application
@@ -817,7 +814,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
               </div>
             </div>
 
-            <div className="mt-4 max-w-full min-w-0 overflow-hidden rounded-[28px] border border-slate-200/70 bg-white p-4 text-sm text-slate-600 shadow-sm sm:p-5">
+            <div className="site-card-surface mt-4 max-w-full min-w-0 overflow-hidden rounded-[28px] p-4 text-sm text-slate-600 sm:p-5">
               <div className="flex min-w-0 items-center gap-2 font-semibold text-slate-900">
                 <Mail className="h-4 w-4 shrink-0" />
                 Questions?
@@ -830,7 +827,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
                   )}`}
                   onClick={() =>
                     trackCtaClick({
-                      ctaId: `job_contact_hr_email_${slug}`,
+                      ctaId: "job_contact_hr_email",
                       location: "job_contact_card",
                       destination: `mailto:${NEXT_PUBLIC_NPT_HR_EMAIL}`,
                       label: "Email HR (mailto)",
@@ -849,7 +846,7 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
             </div>
           </aside>
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

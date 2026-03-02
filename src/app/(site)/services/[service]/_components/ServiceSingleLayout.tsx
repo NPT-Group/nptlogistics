@@ -63,7 +63,7 @@ export function ServiceSingleLayout({ model }: { model: ServicePageModel }) {
     <section className={cn("relative overflow-hidden", theme.bg)}>
       <div className={cn("pointer-events-none absolute inset-0", theme.veil)} aria-hidden="true" />
 
-      <Container className="relative z-10 max-w-[1440px] px-4 py-10 sm:px-6 sm:py-12 md:py-14 lg:px-6 lg:py-16">
+      <Container className="site-page-container relative z-10 py-10 sm:py-12 md:py-14 lg:py-16">
         <div className="grid gap-5 sm:gap-6 lg:grid-cols-12 lg:gap-7">
           <div className="order-1 space-y-5 sm:space-y-6 lg:order-1 lg:col-span-8">
             <section

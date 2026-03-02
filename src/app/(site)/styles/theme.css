@@ -145,3 +145,118 @@
   --color-footer-muted: rgba(255, 255, 255, 0.65);
   --color-footer-hover: rgba(255, 255, 255, 0.9);
 }
+
+/* Shared homepage layout container rhythm */
+.site-home-container {
+  max-width: 1440px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .site-home-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Shared site container rhythm (page sections) */
+.site-page-container {
+  max-width: 1440px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.site-page-container-narrow {
+  max-width: 1360px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.site-doc-container {
+  max-width: 56rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .site-page-container,
+  .site-page-container-narrow,
+  .site-doc-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-page-container,
+  .site-page-container-narrow,
+  .site-doc-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Shared focus rings for consistent keyboard UX */
+.focus-ring-light {
+  outline: none;
+}
+
+.focus-ring-light:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-brand-500),
+    0 0 0 4px #ffffff;
+}
+
+.focus-ring-dark {
+  outline: none;
+}
+
+.focus-ring-dark:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-brand-500),
+    0 0 0 4px var(--color-footer-bg);
+}
+
+.focus-ring-surface {
+  outline: none;
+}
+
+.focus-ring-surface:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-brand-500),
+    0 0 0 4px var(--color-surface-0);
+}
+
+/* Shared light-surface primitives for non-home pages */
+.site-card-surface {
+  border: 1px solid var(--color-border-light);
+  background: var(--color-surface-1-light);
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
+}
+
+.site-card-surface-subtle {
+  border: 1px solid var(--color-border-light);
+  background: var(--color-surface-1-light);
+  box-shadow: 0 4px 14px rgba(2, 6, 23, 0.04);
+}
+
+.site-input-light {
+  border: 1px solid var(--color-border-light);
+  background: var(--color-surface-1-light);
+  color: var(--color-text-light);
+}
+
+.site-input-light::placeholder {
+  color: var(--color-subtle-light);
+}
+
+@media (min-width: 1024px) {
+  .site-home-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}

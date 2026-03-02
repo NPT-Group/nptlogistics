@@ -8,9 +8,6 @@ import { cn } from "@/lib/cn";
 import { trackCtaClick, toCtaSlug } from "@/lib/analytics/cta";
 import type { ServiceKey, SubServiceSection } from "@/config/services";
 
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-white";
-
 function overlayClass(overlay?: SubServiceSection["overlay"]) {
   switch (overlay) {
     case "red":
@@ -932,7 +929,7 @@ export function ServiceSection({
         </svg>
       </div>
 
-      <Container className="relative z-10 max-w-[1440px] px-4 py-12 sm:px-6 sm:py-14 lg:px-6 lg:py-16">
+      <Container className="site-page-container relative z-10 py-12 sm:py-14 lg:py-16">
         <div className="relative">
           {/* Intro row */}
           <div
@@ -1137,7 +1134,7 @@ export function ServiceSection({
                         className={cn(
                           "inline-flex h-12 items-center justify-center rounded-md px-6 text-sm font-semibold text-white md:h-11",
                           "shadow-[0_8px_22px_rgba(2,6,23,0.18)]",
-                          focusRing,
+                          "focus-ring-light",
                         )}
                         style={{ backgroundColor: theme.accent }}
                       >
@@ -1158,7 +1155,7 @@ export function ServiceSection({
                           className={cn(
                             "inline-flex h-12 items-center justify-center rounded-md px-6 text-sm font-semibold md:h-11",
                             "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] hover:bg-[color:var(--color-surface-0-light)]",
-                            focusRing,
+                            "focus-ring-light",
                           )}
                         >
                           {section.ctas.secondary.label}
@@ -1372,7 +1369,7 @@ export function ServiceSection({
                           "bg-white px-4 py-3 transition-all",
                           "hover:border-[color:var(--color-brand-500)]/40 hover:bg-[color:var(--color-surface-0-light)]",
                           "hover:shadow-[0_4px_12px_rgba(2,6,23,0.06)]",
-                          focusRing,
+                          "focus-ring-light",
                         )}
                       >
                         <div

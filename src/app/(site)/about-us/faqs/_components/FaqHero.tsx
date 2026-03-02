@@ -22,7 +22,7 @@ export function FaqHero() {
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#070a12] to-transparent" />
       </div>
 
-      <Container className="relative max-w-[1440px] px-4 sm:px-6 lg:px-6">
+      <Container className="site-page-container relative">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 12 }}
           whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}

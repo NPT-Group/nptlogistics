@@ -9,9 +9,6 @@ import type { IndustryPageModel } from "@/config/industryPages";
 import { cn } from "@/lib/cn";
 import { getThemeOrbs, THEME_ACCENT, THEME_MODEFIT_BG } from "./industryTheme";
 
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0-light)]";
-
 export function IndustryRelatedServices({ model }: { model: IndustryPageModel }) {
   const reduceMotion = useReducedMotion();
   const { relatedServices, hero } = model;
@@ -49,7 +46,7 @@ export function IndustryRelatedServices({ model }: { model: IndustryPageModel })
           backgroundSize: "24px 24px",
         }}
       />
-      <Container className="relative max-w-[1440px] px-4 sm:px-6 lg:px-6">
+      <Container className="site-page-container relative">
         <motion.div
           initial="hidden"
           whileInView="show"
@@ -176,7 +173,7 @@ export function IndustryRelatedServices({ model }: { model: IndustryPageModel })
                     }
                     className={cn(
                       "group inline-flex w-full items-center justify-between rounded-xl border border-[color:var(--color-border-light)]/80 bg-[color:var(--color-surface-0-light)]/70 px-3.5 py-2.5 text-[13px] font-semibold text-[color:var(--color-text-light)] shadow-sm transition-all duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-brand-500)]/35 hover:bg-white hover:shadow-md",
-                      focusRing,
+                      "focus-ring-light",
                     )}
                   >
                     <span>{link.label}</span>

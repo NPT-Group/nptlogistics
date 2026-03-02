@@ -46,10 +46,10 @@ const ICONS = {
 const SOLUTIONS_OVERVIEW_TOKENS = {
   autoplayIntervalMs: 8000,
   autoplayDesktopMediaQuery: "(min-width: 1024px)",
-  tabProgressTransitionDuration: 0.45,
+  tabProgressTransitionDuration: 0.34,
   tabProgressTransitionEase: "easeInOut" as const,
-  panelTransitionDuration: 0.42,
-  panelTransitionEase: [0.22, 1, 0.36, 1] as const,
+  panelTransitionDuration: 0.52,
+  panelTransitionEase: [0.22, 0.61, 0.36, 1] as const,
   classes: {
     categoryHeaderContainer: "relative max-w-[1440px] px-4 py-7 sm:px-6 sm:py-9 lg:px-6 lg:py-10",
     categoryHeading: "text-3xl font-bold tracking-tight sm:text-[2.15rem] lg:text-[2.6rem]",
@@ -398,7 +398,7 @@ function CategorySection({
       </div>
 
       <div className={SOLUTIONS_OVERVIEW_TOKENS.classes.categoryCardsSection}>
-        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+        <Container className="site-page-container">
           <div
             className={cn(
               "grid justify-items-center gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-3",
@@ -684,33 +684,66 @@ export function SolutionsOverview() {
       </div>
 
       {/* Panel */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeCategory}
-          id="solutions-panel"
-          role="tabpanel"
-          aria-labelledby={`solutions-tab-${activeIndex}`}
-          onMouseEnter={pauseAutoRotation}
-          onMouseLeave={resumeAutoRotation}
-          onFocusCapture={pauseAutoRotation}
-          onBlurCapture={handleInteractiveAreaBlur}
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 22, filter: "blur(4px)" }}
-          animate={
-            prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, filter: "blur(0px)" }
-          }
-          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -12, filter: "blur(3px)" }}
-          transition={{
-            duration: SOLUTIONS_OVERVIEW_TOKENS.panelTransitionDuration,
-            ease: SOLUTIONS_OVERVIEW_TOKENS.panelTransitionEase,
-          }}
-        >
-          <CategorySection category={activeCategory} data={activeCategoryData} />
-        </motion.div>
-      </AnimatePresence>
+      <div className="relative">
+        <AnimatePresence initial={false} mode="sync">
+          <motion.div
+            key={activeCategory}
+            id="solutions-panel"
+            role="tabpanel"
+            aria-labelledby={`solutions-tab-${activeIndex}`}
+            onMouseEnter={pauseAutoRotation}
+            onMouseLeave={resumeAutoRotation}
+            onFocusCapture={pauseAutoRotation}
+            onBlurCapture={handleInteractiveAreaBlur}
+            className="relative"
+            initial={
+              prefersReducedMotion
+                ? false
+                : { opacity: 0, y: 12, scale: 0.995, filter: "blur(2.5px)" }
+            }
+            animate={
+              prefersReducedMotion
+                ? { opacity: 1 }
+                : {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    filter: "blur(0px)",
+                    transition: {
+                      duration: SOLUTIONS_OVERVIEW_TOKENS.panelTransitionDuration,
+                      ease: SOLUTIONS_OVERVIEW_TOKENS.panelTransitionEase,
+                    },
+                  }
+            }
+            exit={
+              prefersReducedMotion
+                ? { opacity: 0 }
+                : {
+                    opacity: 0,
+                    y: -8,
+                    scale: 1.005,
+                    filter: "blur(1.8px)",
+                    position: "absolute",
+                    inset: 0,
+                    transition: {
+                      duration: 0.34,
+                      ease: [0.4, 0, 1, 1],
+                    },
+                  }
+            }
+            style={{
+              transformOrigin: "50% 50%",
+              willChange: "opacity, transform, filter",
+            }}
+          >
+            <CategorySection category={activeCategory} data={activeCategoryData} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Guidance Strip */}
       <div className="relative border-t border-[color:var(--color-border-light)] bg-[color:var(--color-surface-0-light)] py-10 sm:py-12">
-        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+        <Container className="site-page-container">
           <div className="relative overflow-hidden rounded-2xl border border-white/65 bg-white/82 px-5 py-6 shadow-[0_14px_38px_rgba(2,6,23,0.08),inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl sm:px-7 sm:py-7">
             <div
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(700px_260px_at_96%_100%,rgba(220,38,38,0.09),transparent_55%)]"

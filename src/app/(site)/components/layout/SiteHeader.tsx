@@ -35,7 +35,7 @@ export function SiteHeader() {
         Skip to content
       </Link>
 
-      <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+      <Container className="site-page-container">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo (NO hover background) */}
           <Link

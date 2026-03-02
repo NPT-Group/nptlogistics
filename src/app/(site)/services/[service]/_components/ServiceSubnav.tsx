@@ -8,9 +8,6 @@ import { cn } from "@/lib/cn";
 import type { ServicePageModel } from "@/config/services";
 import { SERVICE_SUBNAV_TOP_PX } from "../../_constants";
 
-const focusRing =
-  "focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-footer-bg)] focus-visible:outline-none";
-
 const EQUIPMENT_META = {
   "dry-van": { code: "DV", hint: "Enclosed standard freight" },
   flatbed: { code: "FB", hint: "Open-deck securement freight" },
@@ -206,7 +203,7 @@ export function ServiceSubnav({ model }: { model: ServicePageModel }) {
     >
       <Container
         className={cn(
-          "max-w-[1440px] px-4 sm:px-6 lg:px-6",
+          "site-page-container",
           isPinned ? "py-2.5 sm:py-3" : "py-3 sm:py-4",
         )}
       >
@@ -245,7 +242,7 @@ export function ServiceSubnav({ model }: { model: ServicePageModel }) {
                     scrollTo(id);
                   }}
                   className={cn(
-                    focusRing,
+                    "focus-ring-dark",
                     "group relative rounded-xl border px-3.5 py-2.5 text-left transition-all duration-300",
                     isActive
                       ? "border-[color:var(--color-brand-500)]/60 bg-white/[0.14] shadow-[0_10px_28px_rgba(2,6,23,0.34)]"

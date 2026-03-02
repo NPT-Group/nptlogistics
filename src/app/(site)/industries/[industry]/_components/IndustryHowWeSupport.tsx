@@ -9,9 +9,6 @@ import type { IndustryPageModel } from "@/config/industryPages";
 import { cn } from "@/lib/cn";
 import { THEME_ACCENT, THEME_BG, getThemeBarGradient, getThemeOrbs } from "./industryTheme";
 
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
-
 // Desktop trailer-bed tuning controls (px). Keep X at 0 or negative to avoid cab overlap.
 const DESKTOP_CARD_OFFSET_X = 80;
 const DESKTOP_CARD_OFFSET_Y = 10;
@@ -60,7 +57,7 @@ export function IndustryHowWeSupport({ model }: { model: IndustryPageModel }) {
           style={{ backgroundColor: orbs.secondary }}
         />
       </div>
-      <Container className="relative max-w-[1440px] px-4 sm:px-6 lg:px-6">
+      <Container className="site-page-container relative">
         <motion.div
           initial="hidden"
           whileInView="show"
@@ -163,7 +160,7 @@ export function IndustryHowWeSupport({ model }: { model: IndustryPageModel }) {
                           className={cn(
                             "group relative h-[220px] w-auto shrink-0 overflow-hidden rounded-2xl border border-white/18 bg-white/[0.06] p-4 text-left shadow-[0_8px_22px_rgba(2,6,23,0.24)] backdrop-blur-sm transition-[flex-basis,border-color,transform,box-shadow,background-color] duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] xl:h-[226px] xl:p-5",
                             expanded && "border-white/30 bg-white/[0.09] shadow-[0_14px_30px_rgba(2,6,23,0.35)]",
-                            focusRing,
+                            "focus-ring-surface",
                           )}
                           style={{ flexBasis: `${expanded ? expandedBasis : collapsedBasis}%` }}
                           aria-expanded={expanded}

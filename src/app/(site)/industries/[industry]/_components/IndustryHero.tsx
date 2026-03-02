@@ -9,9 +9,6 @@ import { cn } from "@/lib/cn";
 import type { IndustryPageModel, IndustryHeroTheme } from "@/config/industryPages";
 import { THEME_ACCENT, THEME_BG } from "./industryTheme";
 
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
-
 function themeGradientOverlay(theme: IndustryHeroTheme) {
   switch (theme) {
     case "green":
@@ -227,7 +224,7 @@ export function IndustryHero({ model }: { model: IndustryPageModel }) {
         </div>
       ) : null}
 
-      <Container className="relative max-w-[1440px] px-4 sm:px-6 lg:px-6">
+      <Container className="site-page-container relative">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 12 }}
           animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
@@ -261,7 +258,7 @@ export function IndustryHero({ model }: { model: IndustryPageModel }) {
               }
               className={cn(
                 "inline-flex h-11 items-center justify-center rounded-md border px-5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-[2px] sm:px-6",
-                focusRing,
+                "focus-ring-surface",
               )}
               style={{
                 borderColor: accentColor,

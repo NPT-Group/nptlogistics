@@ -7,9 +7,6 @@ import { FAQ_CATEGORIES } from "@/config/faqs";
 import { cn } from "@/lib/cn";
 import { FAQ_SUBNAV_TOP_PX } from "../_constants";
 
-const focusRing =
-  "focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-footer-bg)] focus-visible:outline-none";
-
 const CATEGORY_META: Record<string, { code: string; hint: string }> = {
   services: { code: "SRV", hint: "Modes, quotes, coverage" },
   "safety-compliance": { code: "SFT", hint: "Carrier vetting, hazmat, docs" },
@@ -161,7 +158,7 @@ export function FaqSubnav() {
     >
       <Container
         className={cn(
-          "max-w-[1440px] px-4 sm:px-6 lg:px-6",
+          "site-page-container",
           isPinned ? "py-2.5 sm:py-3" : "py-3 sm:py-4",
         )}
       >
@@ -208,7 +205,7 @@ export function FaqSubnav() {
                     scrollTo(id);
                   }}
                   className={cn(
-                    focusRing,
+                    "focus-ring-dark",
                     "group relative rounded-xl border px-3.5 py-2.5 text-left transition-all duration-300",
                     isActive
                       ? "border-[color:var(--color-brand-500)]/60 bg-white/[0.14] shadow-[0_10px_28px_rgba(2,6,23,0.34)]"
@@ -299,7 +296,7 @@ export function FaqSubnav() {
                     scrollTo(id);
                   }}
                   className={cn(
-                    focusRing,
+                    "focus-ring-dark",
                     "group relative rounded-xl border px-3.5 py-2.5 text-left transition-all duration-300",
                     isActive
                       ? "border-[color:var(--color-brand-500)]/60 bg-white/[0.14] shadow-[0_10px_28px_rgba(2,6,23,0.34)]"

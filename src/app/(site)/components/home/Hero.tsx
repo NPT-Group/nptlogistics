@@ -6,13 +6,9 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
-import { HOME_CONTAINER_CLASS } from "./homeTokens";
 
 const VIDEO_DESKTOP = "/hero/hero-desktop.mp4";
 const POSTER = "/hero/hero-poster.png";
-
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
 
 export function Hero() {
   const reduceMotion = useReducedMotion();
@@ -93,7 +89,7 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative">
-        <Container className={HOME_CONTAINER_CLASS}>
+        <Container className="site-home-container">
           <motion.div
             className={cn(
               "relative z-10 flex flex-col justify-center",
@@ -170,7 +166,7 @@ export function Hero() {
                   "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold",
                   "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",
                   "shadow-sm shadow-black/25",
-                  focusRing,
+                  "focus-ring-surface",
                 )}
               >
                 Request a Quote
@@ -190,7 +186,7 @@ export function Hero() {
                   "inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold",
                   "border border-white/22 bg-white/10 text-white hover:bg-white/15",
                   "backdrop-blur",
-                  focusRing,
+                  "focus-ring-surface",
                 )}
               >
                 Explore Services

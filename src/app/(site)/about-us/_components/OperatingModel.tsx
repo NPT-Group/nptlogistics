@@ -3,7 +3,7 @@
 /**
  * Operating Model — LOCKED to about-page + homepage standards.
  * - Section: py-14 sm:py-16, scroll-mt-24 sm:scroll-mt-28, id="operating-model"
- * - Container: max-w-[1440px] px-4 sm:px-6 lg:px-6
+ * - Container: site-page-container
  * - Header: red bar + sectionLabel + h2 scale 1.6rem → 1.95rem → 2.2rem (WhoWeAre/AboutHero)
  * - Dark variant, useReducedMotion for all animations, viewport once: true
  * - Desktop: 6-col grid, alternating up/down cards, node row with thread line
@@ -74,7 +74,7 @@ export function OperatingModel({ data }: { data: Data }) {
         <div className="absolute -right-32 -bottom-32 h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle,rgba(185,28,28,0.05),transparent_65%)]" />
       </div>
 
-      <Container className="relative max-w-[1440px] px-4 sm:px-6 lg:px-6">
+      <Container className="site-page-container relative">
 
         {/* ── Section header ── */}
         <motion.div

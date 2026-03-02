@@ -9,9 +9,6 @@ import { cn } from "@/lib/cn";
 import { INDUSTRIES_SECTION, INDUSTRY_SLIDES, type IndustrySlide } from "@/config/industries";
 import { trackCtaClick } from "@/lib/analytics/cta";
 
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
-
 /* ------------------------------------------------------------------ */
 /*  Design tokens                                                      */
 /* ------------------------------------------------------------------ */
@@ -208,7 +205,7 @@ function DesktopStage({
                       label: `Explore ${active.label}`,
                     })
                   }
-                  className={cn(TOKENS.ctaPrimary, focusRing)}
+                  className={cn(TOKENS.ctaPrimary, "focus-ring-surface")}
                 >
                   Explore {active.label}
                 </Link>
@@ -296,7 +293,7 @@ function MobileStage({
                     label: `Explore ${active.label}`,
                   })
                 }
-                className={cn(TOKENS.ctaPrimary, focusRing)}
+                className={cn(TOKENS.ctaPrimary, "focus-ring-surface")}
               >
                 Explore {active.label}
               </Link>
@@ -426,7 +423,7 @@ export function IndustriesCarouselSection() {
 
         {/* Carousel shell */}
         <div
-          className={cn(TOKENS.shell, focusRing)}
+          className={cn(TOKENS.shell, "focus-ring-surface")}
           role="region"
           aria-roledescription="carousel"
           aria-label="Industries carousel"
@@ -478,7 +475,7 @@ export function IndustriesCarouselSection() {
                       tabIndex={isActive ? 0 : -1}
                       className={cn(
                         TOKENS.pillBtn,
-                        focusRing,
+                        "focus-ring-surface",
                         isActive
                           ? "border-white/24 bg-white/12 text-white"
                           : "border-white/10 bg-white/6 text-white/72 hover:bg-white/10 hover:text-white",
@@ -496,7 +493,7 @@ export function IndustriesCarouselSection() {
                   type="button"
                   onClick={goPrev}
                   disabled={!hasMultiple}
-                  className={cn(TOKENS.arrowBtn, focusRing)}
+                  className={cn(TOKENS.arrowBtn, "focus-ring-surface")}
                   aria-label="Previous industry"
                 >
                   ←
@@ -505,7 +502,7 @@ export function IndustriesCarouselSection() {
                   type="button"
                   onClick={goNext}
                   disabled={!hasMultiple}
-                  className={cn(TOKENS.arrowBtn, focusRing)}
+                  className={cn(TOKENS.arrowBtn, "focus-ring-surface")}
                   aria-label="Next industry"
                 >
                   →
