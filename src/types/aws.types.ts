@@ -5,6 +5,7 @@ import { EFileMimeType } from "./shared.types";
 export enum ES3Namespace {
   BLOG_POSTS = "blog-posts",
   JOBS = "jobs",
+  QUOTES = "quotes",
 }
 
 /**
@@ -18,6 +19,7 @@ export enum ES3Folder {
   // Shared
   MEDIA_IMAGES = "media/images",
   MEDIA_VIDEOS = "media/videos",
+  ATTACHMENTS = "attachments",
 
   // Jobs
   JOB_APPLICATION_RESUMES = "applications/resumes",

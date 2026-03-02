@@ -17,6 +17,7 @@
     "@blocknote/mantine": "^0.46.2",
     "@blocknote/react": "^0.46.2",
     "@emotion/react": "^11.14.0",
+    "@hookform/resolvers": "^5.2.2",
     "@mantine/core": "^8.3.14",
     "@mantine/hooks": "^8.3.14",
     "@radix-ui/react-accordion": "^1.2.12",
@@ -32,6 +33,7 @@
     "react": "19.2.3",
     "react-chatbot-kit": "^2.2.2",
     "react-dom": "19.2.3",
+    "react-hook-form": "^7.71.2",
     "tailwind-merge": "^3.4.0",
     "uuid": "^13.0.0",
     "zustand": "^5.0.11"
