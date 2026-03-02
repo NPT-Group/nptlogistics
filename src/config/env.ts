@@ -43,3 +43,6 @@ export const PORT = process.env.PORT! ?? 3000;
 // Public HR email
 export const NEXT_PUBLIC_NPT_HR_EMAIL =
   process.env.NEXT_PUBLIC_NPT_HR_EMAIL! || "hr@nptlogistics.com";
+
+// NPT quotes receiving email
+export const NPT_QUOTES_EMAIL = process.env.NPT_QUOTES_EMAIL! || "";

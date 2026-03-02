@@ -26,6 +26,7 @@
     "@radix-ui/react-visually-hidden": "^1.2.4",
     "clsx": "^2.1.1",
     "framer-motion": "^12.33.0",
+    "i18n-iso-countries": "^7.14.0",
     "lucide-react": "^0.563.0",
     "mongoose": "^9.1.6",
     "next": "16.1.6",

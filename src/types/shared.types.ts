@@ -115,3 +115,12 @@ export interface IGeoLocation {
  * Keep it flexible because BlockNote schema can evolve with plugins/blocks.
  */
 export type BlockNoteDocJSON = Record<string, any>;
+
+/**
+ * ISO-based country representation.
+ * Always store ISO-2 country code internally (CA, US, MX, etc.)
+ */
+export interface ICountry {
+  code: string; // ISO-2 (e.g., "CA", "US", "MX")
+  name: string; // Display name (e.g., "Canada")
+}
