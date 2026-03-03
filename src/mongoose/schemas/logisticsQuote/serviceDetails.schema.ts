@@ -21,15 +21,11 @@ import { NORTH_AMERICAN_COUNTRY_CODES } from "@/config/countries";
 import { logisticsAddressSchema } from "./address.schema";
 import { logisticsWeightSchema } from "./weight.schema";
 import { logisticsDimensionsSchema } from "./dimensions.schema";
-import {
-  warehousingVolumeBaseSchema,
-  warehousingVolumePalletCountSchema,
-  warehousingVolumeSquareFootageSchema,
-} from "./warehousingVolume.schema";
+import { warehousingVolumeSchema } from "./warehousingVolume.schema";
 
 function isNorthAmericanCountry(code?: string) {
   if (!code) return false;
-  return (NORTH_AMERICAN_COUNTRY_CODES as readonly string[]).includes(code.toUpperCase());
+  return (NORTH_AMERICAN_COUNTRY_CODES as readonly string[]).includes(String(code).toUpperCase());
 }
 
 function requireNorthAmericaAddresses(doc: {
@@ -62,16 +58,17 @@ export const quoteServiceDetailsBaseSchema = new Schema<QuoteServiceDetails>(
   {
     _id: false,
     discriminatorKey: "primaryService",
-    strict: "throw", // catch unknown fields in serviceDetails
   },
 );
 
 /* ------------------------------ FTL ------------------------------ */
-
-export const quoteFTLDetailsSchema = new Schema<QuoteFTLDetails>(
+/**
+ * NOTE:
+ * - Do NOT re-declare `primaryService` in discriminator schemas.
+ * - Discriminator key is owned by base schema.
+ */
+export const quoteFTLDetailsSchema = new Schema<Omit<QuoteFTLDetails, "primaryService">>(
   {
-    primaryService: { type: String, required: true, enum: [ELogisticsPrimaryService.FTL] },
-
     equipment: { type: String, required: true, enum: Object.values(EFTLEquipmentType) },
 
     origin: { type: logisticsAddressSchema, required: true },
@@ -89,12 +86,12 @@ export const quoteFTLDetailsSchema = new Schema<QuoteFTLDetails>(
 
     addons: { type: [String], required: false, default: [], enum: Object.values(EFTLAddon) },
   },
-  { _id: false, strict: "throw" },
+  { _id: false },
 );
 
-// FTL
 quoteFTLDetailsSchema.pre("validate", function () {
-  if (!requireNorthAmericaAddresses(this)) {
+  // At runtime, `primaryService` exists (from base discriminator), so this check works fine.
+  if (!requireNorthAmericaAddresses(this as any)) {
     throw new Error(
       "FTL origin/destination countryCode must be one of NORTH_AMERICAN_COUNTRY_CODES (CA/US/MX).",
     );
@@ -109,13 +106,11 @@ const quoteLTLPalletLineSchema = new Schema(
     dimensions: { type: logisticsDimensionsSchema, required: true },
     totalWeight: { type: logisticsWeightSchema, required: false },
   },
-  { _id: false, strict: "throw" },
+  { _id: false },
 );
 
-export const quoteLTLDetailsSchema = new Schema<QuoteLTLDetails>(
+export const quoteLTLDetailsSchema = new Schema<Omit<QuoteLTLDetails, "primaryService">>(
   {
-    primaryService: { type: String, required: true, enum: [ELogisticsPrimaryService.LTL] },
-
     origin: { type: logisticsAddressSchema, required: true },
     destination: { type: logisticsAddressSchema, required: true },
 
@@ -137,12 +132,11 @@ export const quoteLTLDetailsSchema = new Schema<QuoteLTLDetails>(
 
     addons: { type: [String], required: false, default: [], enum: Object.values(ELTLAddon) },
   },
-  { _id: false, strict: "throw" },
+  { _id: false },
 );
 
-// LTL
 quoteLTLDetailsSchema.pre("validate", function () {
-  if (!requireNorthAmericaAddresses(this)) {
+  if (!requireNorthAmericaAddresses(this as any)) {
     throw new Error(
       "LTL origin/destination countryCode must be one of NORTH_AMERICAN_COUNTRY_CODES (CA/US/MX).",
     );
@@ -151,14 +145,10 @@ quoteLTLDetailsSchema.pre("validate", function () {
 
 /* --------------------------- International --------------------------- */
 
-export const quoteInternationalDetailsSchema = new Schema<QuoteInternationalDetails>(
+export const quoteInternationalDetailsSchema = new Schema<
+  Omit<QuoteInternationalDetails, "primaryService">
+>(
   {
-    primaryService: {
-      type: String,
-      required: true,
-      enum: [ELogisticsPrimaryService.INTERNATIONAL],
-    },
-
     mode: { type: String, required: true, enum: Object.values(EInternationalMode) },
 
     origin: { type: logisticsAddressSchema, required: true },
@@ -175,44 +165,31 @@ export const quoteInternationalDetailsSchema = new Schema<QuoteInternationalDeta
       enum: Object.values(EInternationalShipmentSize),
     },
   },
-  { _id: false, strict: "throw" },
+  { _id: false },
 );
 
 /* --------------------------- Warehousing --------------------------- */
 
-export const quoteWarehousingDetailsSchema = new Schema<QuoteWarehousingDetails>(
+export const quoteWarehousingDetailsSchema = new Schema<
+  Omit<QuoteWarehousingDetails, "primaryService">
+>(
   {
-    primaryService: { type: String, required: true, enum: [ELogisticsPrimaryService.WAREHOUSING] },
-
     requiredLocation: { type: logisticsAddressSchema, required: true },
 
-    estimatedVolume: { type: warehousingVolumeBaseSchema, required: true },
+    estimatedVolume: { type: warehousingVolumeSchema, required: true },
 
     expectedDuration: { type: String, required: true, enum: Object.values(EWarehousingDuration) },
   },
-  { _id: false, strict: "throw" },
+  { _id: false },
 );
 
-// Warehousing
 quoteWarehousingDetailsSchema.pre("validate", function () {
-  if (!requireNorthAmericaAddresses(this)) {
+  if (!requireNorthAmericaAddresses(this as any)) {
     throw new Error(
       "Warehousing requiredLocation.countryCode must be one of NORTH_AMERICAN_COUNTRY_CODES (CA/US/MX).",
     );
   }
 });
-
-/* --------------------------- Attach volume discriminators --------------------------- */
-
-(quoteWarehousingDetailsSchema.path("estimatedVolume") as any).discriminator(
-  "PALLET_COUNT",
-  warehousingVolumePalletCountSchema,
-);
-
-(quoteWarehousingDetailsSchema.path("estimatedVolume") as any).discriminator(
-  "SQUARE_FOOTAGE",
-  warehousingVolumeSquareFootageSchema,
-);
 
 /* --------------------------- Register service discriminators --------------------------- */
 

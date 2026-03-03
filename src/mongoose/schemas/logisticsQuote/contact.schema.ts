@@ -21,5 +21,5 @@ export const quoteContactSchema = new Schema<QuoteContact>(
 
     companyAddress: { type: logisticsAddressSchema, required: false },
   },
-  { _id: false, strict: "throw" },
+  { _id: false },
 );

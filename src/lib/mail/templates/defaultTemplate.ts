@@ -69,7 +69,7 @@ export function buildDefaultEmailTemplate(options: DefaultTemplateOptions): stri
                 ${bodyHtml}
 
                 <p style="margin:0; font-size:12px; color:#9ca3af; border-top:1px solid #e5e7eb; padding-top:16px;">
-                  This message was sent automatically by the NPT Careers system.${footerNoteBlock}
+                  This message was sent automatically by the NPT Logistics system.${footerNoteBlock}
                   ${footerEmailBlock}
                 </p>
               </td>

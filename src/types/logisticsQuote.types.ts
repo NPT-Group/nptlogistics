@@ -224,15 +224,20 @@ export type QuoteInternationalDetails = {
 
 /* ───────────────────────────── Warehousing ───────────────────────────── */
 
-export type WarehousingVolume =
-  | {
-      type: "PALLET_COUNT";
-      palletCount: number;
-    }
-  | {
-      type: "SQUARE_FOOTAGE";
-      squareFeet: number;
-    };
+export enum EWarehousingVolumeType {
+  PALLET_COUNT = "PALLET_COUNT",
+  SQUARE_FOOTAGE = "SQUARE_FOOTAGE",
+}
+
+/**
+ * Warehousing volume (simple scalar).
+ * - PALLET_COUNT => value = pallets
+ * - SQUARE_FOOTAGE => value = square feet
+ */
+export type WarehousingVolume = {
+  volumeType: EWarehousingVolumeType;
+  value: number; // >= 1
+};
 
 export type QuoteWarehousingDetails = {
   primaryService: ELogisticsPrimaryService.WAREHOUSING;
@@ -282,7 +287,7 @@ export type QuoteContact = {
 /* ───────────────────────────── Root Model ───────────────────────────── */
 
 export interface ILogisticsQuote {
-  id: ObjectId | string;
+  _id: ObjectId | string;
 
   serviceDetails: QuoteServiceDetails;
 
@@ -305,4 +310,4 @@ export interface ILogisticsQuote {
 
 /* ───────────────────────────── Draft Helper ───────────────────────────── */
 
-export type LogisticsQuoteDraft = Partial<Omit<ILogisticsQuote, "id" | "createdAt" | "updatedAt">>;
+export type LogisticsQuoteDraft = Partial<Omit<ILogisticsQuote, "_id" | "createdAt" | "updatedAt">>;

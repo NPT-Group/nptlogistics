@@ -16,7 +16,7 @@ export const quoteIdentificationSchema = new Schema<QuoteIdentification>(
       enum: Object.values(EBrokerType),
     },
   },
-  { _id: false, strict: "throw" },
+  { _id: false },
 );
 
 quoteIdentificationSchema.pre("validate", function () {

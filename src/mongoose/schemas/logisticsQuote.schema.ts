@@ -30,7 +30,6 @@ export const logisticsQuoteSchema = new Schema<ILogisticsQuote>(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    strict: "throw",
   },
 );
 

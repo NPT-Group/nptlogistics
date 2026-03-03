@@ -1,4 +1,4 @@
-// src/lib/utils/mail/quotes/sendQuoteNotificationEmail.ts
+// src/lib/mail/quotes/sendQuoteNotificationEmail.ts
 import { sendMailAppOnly, type GraphAttachment } from "@/lib/mail/mailer";
 import { escapeHtml } from "@/lib/mail/utils";
 import { buildDefaultEmailTemplate } from "@/lib/mail/templates/defaultTemplate";
@@ -12,8 +12,23 @@ import {
   type LogisticsAddress,
   type LogisticsWeight,
   type LogisticsDimensions,
+  type WarehousingVolume,
 } from "@/types/logisticsQuote.types";
 import { filenameForAsset } from "@/lib/utils/files/mime";
+import {
+  BROKER_TYPE_LABEL,
+  EQUIPMENT_LABEL,
+  FTL_ADDON_LABEL,
+  IDENTITY_LABEL,
+  LTL_ADDON_LABEL,
+  PREF_CONTACT_LABEL,
+  INTL_MODE_LABEL,
+  INTL_SIZE_LABEL,
+  WAREHOUSING_DURATION_LABEL,
+  WAREHOUSING_VOLUME_TYPE_LABEL,
+  labelFromMap,
+  labelsFromMap,
+} from "@/lib/utils/enums/logisticsLabels";
 
 /* ───────────────────────── Small formatting helpers ───────────────────────── */
 
@@ -60,9 +75,12 @@ function fmtDims(d?: LogisticsDimensions) {
   return escapeHtml(safe);
 }
 
-function joinComma(list?: readonly string[]) {
-  if (!list?.length) return "—";
-  return escapeHtml(list.join(", "));
+function fmtWarehousingVolume(vol?: WarehousingVolume) {
+  if (!vol) return "—";
+  const label = labelFromMap(vol.volumeType, WAREHOUSING_VOLUME_TYPE_LABEL);
+  const value =
+    typeof vol.value === "number" ? String(vol.value) : escapeHtml(String((vol as any).value));
+  return `${escapeHtml(label)}: ${escapeHtml(value)}`;
 }
 
 /* ───────────────────────── Attachments helper (S3 -> Graph) ───────────────────────── */
@@ -106,7 +124,7 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
       return `
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (FTL)</p>
         <ul style="margin:0 0 16px 18px; padding:0;">
-          <li style="margin:0 0 8px 0;">Equipment: <strong>${escapeHtml(String(s.equipment || "—"))}</strong></li>
+          <li style="margin:0 0 8px 0;">Equipment: <strong>${escapeHtml(labelFromMap(s.equipment, EQUIPMENT_LABEL))}</strong></li>
           <li style="margin:0 0 8px 0;">Origin: ${fmtAddress(s.origin)}</li>
           <li style="margin:0 0 8px 0;">Destination: ${fmtAddress(s.destination)}</li>
           <li style="margin:0 0 8px 0;">Ready Date: ${fmtDate(s.readyDate)} (Flexible: ${yn(s.readyDateFlexible)})</li>
@@ -114,7 +132,12 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
           <li style="margin:0 0 8px 0;">Approx. Total Weight: ${fmtWeight(s.approximateTotalWeight)}</li>
           <li style="margin:0 0 8px 0;">Estimated Pallet Count: ${escapeHtml(String(s.estimatedPalletCount ?? "—"))}</li>
           <li style="margin:0 0 8px 0;">Dimensions (L×W×H): ${fmtDims(s.dimensions)}</li>
-          <li style="margin:0;">Add-ons: ${joinComma(s.addons)}</li>
+          <li style="margin:0;">
+            Add-ons: ${(() => {
+              const labels = labelsFromMap(s.addons, FTL_ADDON_LABEL);
+              return labels.length ? escapeHtml(labels.join(", ")) : "—";
+            })()}
+          </li>
         </ul>
       `;
     }
@@ -162,7 +185,12 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
           <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
           <li style="margin:0 0 8px 0;">Stackable: ${yn(s.stackable)}</li>
           <li style="margin:0 0 8px 0;">Approx. Total Weight: ${s.approximateTotalWeight ? fmtWeight(s.approximateTotalWeight) : "—"}</li>
-          <li style="margin:0;">Add-ons: ${joinComma(s.addons)}</li>
+          <li style="margin:0;">
+            Add-ons: ${(() => {
+              const labels = labelsFromMap(s.addons, LTL_ADDON_LABEL);
+              return labels.length ? escapeHtml(labels.join(", ")) : "—";
+            })()}
+          </li>
         </ul>
 
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Pallet Lines</p>
@@ -175,33 +203,31 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
       return `
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (International)</p>
         <ul style="margin:0 0 16px 18px; padding:0;">
-          <li style="margin:0 0 8px 0;">Mode: <strong>${escapeHtml(String(s.mode || "—"))}</strong></li>
+          <li style="margin:0 0 8px 0;">
+            Mode: <strong>${escapeHtml(labelFromMap(s.mode, INTL_MODE_LABEL))}</strong>
+          </li>
           <li style="margin:0 0 8px 0;">Origin: ${fmtAddress(s.origin)}</li>
           <li style="margin:0 0 8px 0;">Destination: ${fmtAddress(s.destination)}</li>
           <li style="margin:0 0 8px 0;">Ready Date: ${fmtDate(s.readyDate)}</li>
           <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
           <li style="margin:0 0 8px 0;">Estimated Weight: ${fmtWeight(s.estimatedWeight)}</li>
-          <li style="margin:0;">Shipment Size: ${escapeHtml(String(s.shipmentSize || "—"))}</li>
+          <li style="margin:0;">
+            Shipment Size: ${escapeHtml(labelFromMap(s.shipmentSize, INTL_SIZE_LABEL))}
+          </li>
         </ul>
       `;
     }
 
     case ELogisticsPrimaryService.WAREHOUSING: {
       const s: any = service;
-      const vol = s.estimatedVolume;
-      const volText =
-        vol?.type === "PALLET_COUNT"
-          ? `Pallet Count: ${escapeHtml(String(vol.palletCount ?? "—"))}`
-          : vol?.type === "SQUARE_FOOTAGE"
-            ? `Square Feet: ${escapeHtml(String(vol.squareFeet ?? "—"))}`
-            : "—";
-
       return `
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (Warehousing)</p>
         <ul style="margin:0 0 16px 18px; padding:0;">
           <li style="margin:0 0 8px 0;">Required Location: ${fmtAddress(s.requiredLocation)}</li>
-          <li style="margin:0 0 8px 0;">Estimated Volume: ${escapeHtml(volText)}</li>
-          <li style="margin:0;">Expected Duration: ${escapeHtml(String(s.expectedDuration || "—"))}</li>
+          <li style="margin:0 0 8px 0;">Estimated Volume: ${fmtWarehousingVolume(s.estimatedVolume)}</li>
+          <li style="margin:0;">
+            Expected Duration: ${escapeHtml(labelFromMap(s.expectedDuration, WAREHOUSING_DURATION_LABEL))}
+          </li>
         </ul>
       `;
     }
@@ -222,16 +248,20 @@ function renderContactAndIdentification(q: ILogisticsQuote): string {
   const safeEmail = c.email ? escapeHtml(String(c.email)) : "—";
   const safeCompany = c.company ? escapeHtml(String(c.company)) : "—";
   const safePhone = c.phone ? escapeHtml(String(c.phone)) : "";
-  const preferred = c.preferredContactMethod ? escapeHtml(String(c.preferredContactMethod)) : "—";
 
-  const identity = id.identity ? escapeHtml(String(id.identity)) : "—";
-  const brokerType = id.brokerType ? escapeHtml(String(id.brokerType)) : "—";
+  const identity = id.identity ? escapeHtml(labelFromMap(id.identity, IDENTITY_LABEL)) : "—";
+  const brokerType = id.brokerType
+    ? escapeHtml(labelFromMap(id.brokerType, BROKER_TYPE_LABEL))
+    : "";
+  const preferred = c.preferredContactMethod
+    ? escapeHtml(labelFromMap(c.preferredContactMethod, PREF_CONTACT_LABEL))
+    : "—";
 
   return `
     <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Identification</p>
     <ul style="margin:0 0 16px 18px; padding:0;">
       <li style="margin:0 0 8px 0;">Identity: <strong>${identity}</strong></li>
-      <li style="margin:0;">Broker Type: ${brokerType}</li>
+      ${brokerType ? `<li style="margin:0;">Broker Type: ${brokerType}</li>` : ""}
     </ul>
 
     <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Contact</p>
@@ -272,7 +302,7 @@ export type SendQuoteNotificationEmailParams = {
   sourceLabel?: string;
 };
 
-export async function sendQuoteNotificationEmail(
+export async function sendQuoteInternalNotificationEmail(
   params: SendQuoteNotificationEmailParams,
 ): Promise<void> {
   const toAddr = params.to || NPT_QUOTES_EMAIL;
@@ -280,7 +310,8 @@ export async function sendQuoteNotificationEmail(
   const q = params.quote;
   const service = q.serviceDetails;
 
-  const safeId = escapeHtml(String((q as any)?.id || "—"));
+  // Prefer Mongo id. Fall back safely if some upstream mapper adds `id`.
+  const safeId = escapeHtml(String((q as any)?._id || (q as any)?.id || "—"));
   const safePrimary = escapeHtml(String(service?.primaryService || "QUOTE"));
   const safeSource = params.sourceLabel ? escapeHtml(params.sourceLabel) : "";
 

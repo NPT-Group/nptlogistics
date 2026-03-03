@@ -35,6 +35,7 @@ export const NPT_HR_EMAIL = process.env.NPT_HR_EMAIL!;
 // Cloudflare
 export const NEXT_PUBLIC_TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!;
 export const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY!;
+export const TURNSTILE_DEV_BYPASS_TOKEN = process.env.TURNSTILE_DEV_BYPASS_TOKEN;
 
 // Application Environment
 export const isProd = process.env.NODE_ENV === "production";
