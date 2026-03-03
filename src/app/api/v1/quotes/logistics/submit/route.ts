@@ -1,19 +1,13 @@
 // src/app/api/v1/quotes/logistics/submit/route.ts
 import { NextRequest } from "next/server";
 import mongoose from "mongoose";
-
 import connectDB from "@/lib/utils/connectDB";
 import { successResponse, errorResponse } from "@/lib/utils/apiResponse";
 import { parseJsonBody } from "@/lib/utils/reqParser";
-
 import { verifyTurnstileToken, getRequestIp } from "@/lib/utils/turnstile";
-
 import type { ILogisticsQuote } from "@/types/logisticsQuote.types";
-
 import { sendQuoteInternalNotificationEmail } from "@/lib/mail/quotes/sendQuoteInternalNotificationEmail";
-
 import { validateLogisticsQuoteRequest } from "@/lib/utils/quotes/logisticsQuoteValidator";
-
 import { makeEntityFinalPrefix } from "@/lib/utils/s3Helper";
 import { finalizeAssetVectorAllOrNothing } from "@/lib/utils/s3Helper/server";
 import { ES3Namespace, ES3Folder } from "@/types/aws.types";
