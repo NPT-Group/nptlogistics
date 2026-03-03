@@ -8,7 +8,6 @@ import { parseJsonBody } from "@/lib/utils/reqParser";
 
 import { verifyTurnstileToken, getRequestIp } from "@/lib/utils/turnstile";
 
-import { LogisticsQuoteModel } from "@/mongoose/models/LogisticsQuote";
 import type { ILogisticsQuote } from "@/types/logisticsQuote.types";
 
 import { sendQuoteInternalNotificationEmail } from "@/lib/mail/quotes/sendQuoteInternalNotificationEmail";
@@ -20,6 +19,7 @@ import { finalizeAssetVectorAllOrNothing } from "@/lib/utils/s3Helper/server";
 import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { getSiteUrlFromRequest } from "@/lib/utils/urlHelper";
 import { sendQuoteCustomerConfirmationEmail } from "@/lib/mail/quotes/sendQuoteCustomerConfirmationEmail";
+import { LogisticsQuoteModel } from "@/mongoose/models/LogisticsQuote";
 
 type SubmitQuoteBody = {
   // Turnstile
