@@ -164,7 +164,7 @@ export const NAV = {
       {
         label: "Automotive",
         href: "/industries/automotive",
-        description: "Inbound components and vehicle-unit programs with sequence-sensitive control.",
+        description: "Exotic and specialty vehicle hauling, plus disciplined vehicle-unit and component-lane execution.",
         icon: "truck",
       },
       {

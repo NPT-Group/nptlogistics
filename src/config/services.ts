@@ -630,64 +630,64 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       {
         key: "specialized-vehicle-programs",
         label: "Specialized Vehicle Programs",
-        title: "Specialized Vehicle Programs | Dimension-Aware and Constraint-Controlled Moves",
+        title: "Exotic & Specialized Vehicle Hauling | Premium-Asset, Constraint-Controlled Transport",
         description:
-          "Specialized vehicle programs support freight that requires non-standard equipment, route feasibility validation, or strict loading and handling controls. This mode is built for complex cargo profiles where permit, clearance, and site access planning must be aligned before wheels move.",
-        image: "/_optimized/solutions/card-specialized-vehicle.webp",
-        imageAlt: "Specialized vehicle transport with route and handling controls",
+          "This program is purpose-built for exotic and specialty vehicle transport where condition integrity, enclosed handling, and route realism are non-negotiable. It also supports non-standard cargo profiles that require strict access, permit, or dimensional controls before dispatch.",
+        image: "/_optimized/services/specialized&time-sensitive/exoticCarhaulingImg2.webp",
+        imageAlt: "Exotic car hauling with enclosed, premium-asset transport controls",
         overlay: "blue",
         highlights: [
           {
-            title: "Equipment-fit engineering",
+            title: "Premium enclosed equipment-fit planning",
             description:
-              "Trailer and handling method are selected against actual cargo dimensions and load profile.",
+              "Trailer type, tie-down approach, and handling sequence are selected against verified vehicle profile and condition sensitivity.",
           },
           {
-            title: "Route and access feasibility",
+            title: "Route realism and delivery-site feasibility",
             description:
-              "Clearance and site constraints are validated early to prevent avoidable delays.",
+              "Clearance, grade, turning radius, and site-access constraints are validated early to prevent avoidable risk events.",
           },
           {
-            title: "Permit-aware execution rhythm",
+            title: "Condition-accountable handoff rhythm",
             description:
-              "Planning ties permit sequence, transit windows, and stakeholder timing into one workflow.",
+              "Pickup-to-delivery milestones include condition checks and accountable handoff communication at every critical transition.",
           },
         ],
         trustSnippet: {
-          title: "Designed for complex cargo and controlled risk",
-          body: "Specialized vehicle moves succeed when route reality, equipment fit, and communication ownership are set before dispatch. Our model is built around that discipline.",
+          title: "Built for exotic vehicles and controlled risk transfer",
+          body: "Exotic hauling succeeds when enclosed handling discipline, route reality, and communication ownership are confirmed before dispatch. Our model is built around that standard.",
         },
         whenToUse: {
           intro:
-            "Use specialized vehicle programs when cargo profile or lane constraints exceed standard equipment assumptions.",
+            "Use this program when exotic or specialty vehicles require enclosed, condition-accountable transport, or when lane constraints exceed standard equipment assumptions.",
           items: [
-            "Freight with dimensional, weight, or handling constraints beyond standard trailers",
-            "Moves requiring route planning around clearance or access limitations",
-            "Site conditions that require specific loading/unloading sequencing",
-            "High-value assets where reduced handling risk is a priority",
-            "Program freight requiring repeatable governance across recurring lanes",
+            "Exotic, collector, luxury, or high-value vehicles where condition integrity is mission-critical",
+            "Vehicle moves requiring enclosed transport and low-touch handling controls",
+            "Routes that demand feasibility checks for clearance, grade, or constrained access",
+            "Site conditions requiring controlled loading/unloading sequencing and documented handoffs",
+            "Recurring premium-asset lanes that need repeatable governance and accountability",
           ],
         },
         howToUse: {
           intro:
-            "Specialized program accuracy depends on complete cargo and site data before quote confirmation.",
+            "Program accuracy depends on complete vehicle profile, condition expectations, and site constraints before quote confirmation.",
           items: [
-            "Verified dimensions, center-of-gravity notes, and total load profile",
-            "Origin and destination site access, loading method, and equipment constraints",
-            "Permit, escort, and route restrictions known at planning stage",
-            "Target milestone plan, communication cadence, and exception contacts",
-            "Documentation package needed for secure release and handoff continuity",
+            "Verified vehicle dimensions, ride-height/special handling notes, and securement requirements",
+            "Origin/destination access details including ramp angle, loading method, and receiver constraints",
+            "Known route, permit, escort, or delivery-window restrictions before dispatch commitment",
+            "Target milestone plan with condition-confirmation checkpoints and escalation contacts",
+            "Documentation package required for secure release, transit accountability, and delivery closeout",
           ],
         },
         capabilities: {
           intro:
-            "Capabilities center on engineered planning, execution control, and reduced variance at critical handoffs.",
+            "Capabilities center on exotic-asset protection, engineered planning, and reduced variance at critical handoffs.",
           items: [
-            "Specialized equipment planning for non-standard freight profiles",
-            "Route and schedule design aligned to permit and access constraints",
-            "Operational control across pickup, transfer, and delivery milestones",
-            "Exception governance for weather, access, and timeline risk events",
-            "Program-level support for recurring specialized lane requirements",
+            "Enclosed specialized equipment planning for premium and non-standard vehicle profiles",
+            "Route and schedule design aligned to access constraints and timeline commitments",
+            "Condition-accountable control across pickup, transfer, and delivery milestones",
+            "Exception governance for weather, access, and timing risk events",
+            "Program-level support for recurring exotic and specialized lane requirements",
           ],
         },
         relatedServices: [

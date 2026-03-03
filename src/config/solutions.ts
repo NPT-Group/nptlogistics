@@ -114,7 +114,7 @@ export const SOLUTIONS_DATA = {
         description: "Expert handling for specialized vehicles and equipment.",
         icon: "truck",
         bestFor: "Oversized, delicate cargo",
-        image: "/_optimized/solutions/card-specialized-vehicle.webp",
+        image: "/_optimized/solutions/card-specialized-vehicleImg.webp",
       },
       {
         analyticsId: "hazmat",

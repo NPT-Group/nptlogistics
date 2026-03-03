@@ -34,9 +34,9 @@ export const INDUSTRY_SLIDES: IndustrySlide[] = [
     label: "Automotive",
     title: "Automotive freight that stays on schedule.",
     subtitle:
-      "Inbound parts, finished vehicles, and time-sensitive lanes — executed with disciplined handoffs and proactive updates.",
-    mobileTitle: "Automotive freight that stays on schedule.",
-    mobileSubtitle: "Inbound parts and finished vehicles moved with disciplined handoffs.",
+      "Specialized exotic hauling leads our automotive model, backed by reliable vehicle-unit delivery and component-lane continuity.",
+    mobileTitle: "Exotic-first automotive transport.",
+    mobileSubtitle: "Specialized exotic hauling, plus dependable vehicle and parts flows.",
     href: "/industries/automotive",
     image: "/_optimized/industries/Automotives.webp",
     accent: "red",

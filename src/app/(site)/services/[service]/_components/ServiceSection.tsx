@@ -117,19 +117,19 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
   ],
   "specialized-vehicle-programs": [
     {
-      label: "RGN / Oversize",
-      href: "/services/truckload#section-rgn-oversize",
-      reason: "For heavy-haul and permit-sensitive loads requiring specialized deck configuration.",
+      label: "Expedited",
+      href: "/services/expedited-specialized#section-expedited",
+      reason: "For exotic and specialty vehicle moves tied to hard delivery windows, event timing, or urgent recovery timelines.",
     },
     {
-      label: "Project-Specific / Oversize",
-      href: "/services/value-added#section-project-oversize-programs",
-      reason: "For multi-shipment complex programs requiring centralized project governance.",
+      label: "Dry Van",
+      href: "/services/truckload#section-dry-van",
+      reason: "For automotive parts and unfinished manufacturing components that need enclosed, schedule-disciplined lane execution.",
     },
     {
-      label: "Cross-Border & Global",
-      href: "/services/cross-border",
-      reason: "For specialized freight programs involving customs and international handoff complexity.",
+      label: "Truckload (TL)",
+      href: "/services/truckload",
+      reason: "For general vehicle-unit program support where lane consistency, appointment control, and scalable capacity matter.",
     },
   ],
   "canada-us": [

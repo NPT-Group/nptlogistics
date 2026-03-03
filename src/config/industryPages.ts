@@ -139,14 +139,15 @@ const INDUSTRY_PAGE_DATA: Record<IndustryKey, IndustryPageModel> = {
     meta: {
       title: "Automotive Logistics | Inbound & Outbound Freight | NPT Logistics",
       description:
-        "Inbound parts, vehicle-unit programs, and time-sensitive automotive freight. Disciplined handoffs, proactive updates, and lane-level control across North America.",
+        "Exotic and specialty vehicle transport supported by disciplined car-hauler execution, plus vehicle-unit and inbound component freight across North America.",
+      ogImage: "/_optimized/services/specialized&time-sensitive/exoticCarhauling2.webp",
     },
     hero: {
       kicker: "Industry Logistics Programs",
       valueHeadline: "Production continuity.",
       title: "Automotive Logistics",
       description:
-        "Inbound components, vehicle-unit programs, and sequence-sensitive freight managed through disciplined control, accountable ownership, and decision-ready visibility designed to protect plant schedules.",
+        "Our automotive operation is led by specialized and exotic vehicle hauling, backed by disciplined vehicle-unit moves and inbound component freight for unfinished manufacturing. Every lane is managed with accountable ownership, controlled handoffs, and decision-ready visibility.",
       cta: { label: "Contact us", href: "/contact", ctaId: "industry_automotive_hero_contact" },
       theme: "red",
       iconKeys: ["car", "truck", "gear", "factory"],
@@ -155,20 +156,20 @@ const INDUSTRY_PAGE_DATA: Record<IndustryKey, IndustryPageModel> = {
       variant: "timeline",
       sectionTitle: "Operational Priorities for Automotive Freight",
       intro:
-        "Automotive networks run on sequence windows, appointment precision, and disruption containment. When one handoff slips, plant schedules and dealer commitments absorb the impact. This operation is built around disciplined control, documented accountability, and recovery readiness that protects production continuity.",
+        "Automotive execution requires different controls across three realities: high-value exotic/specialty units, finished-vehicle flows, and inbound parts feeding production. Our operating model is intentionally weighted toward premium-asset risk control while preserving appointment precision for unit distribution and sequence reliability for manufacturing support.",
 
       items: [
         {
-          title: "Sequence and Appointment Discipline",
-          body: "Pickup appointments, delivery windows, and handoff timing are confirmed before dispatch and managed against milestone checkpoints through completion.",
+          title: "Exotic and Specialty Asset Protection",
+          body: "High-value vehicles are planned with route-aware, enclosed transport controls, low-touch handling discipline, and delivery-condition accountability from origin through final handoff.",
         },
         {
-          title: "Risk-Matched Transport Controls",
-          body: "Equipment, routing, and handling protocols are aligned to cargo sensitivity, environmental exposure, and schedule tolerance before the load moves.",
+          title: "Vehicle Program Timing Discipline",
+          body: "Pickup appointments, delivery windows, and handoff timing are confirmed before dispatch and actively managed against milestone checkpoints through completion.",
         },
         {
-          title: "Documented Chain of Accountability",
-          body: "One operating owner manages the shipment end to end, with structured status communication, exception tracking, and audit-ready shipment records.",
+          title: "Parts Flow Continuity for Manufacturing",
+          body: "Inbound component lanes are managed with sequence-sensitive controls, structured exception response, and audit-ready shipment records to protect production cadence.",
         },
       ],
 
@@ -177,12 +178,12 @@ const INDUSTRY_PAGE_DATA: Record<IndustryKey, IndustryPageModel> = {
       widgetSupportTitle: "Production-Risk Controls in Motion",
 
       widgetSupportBody:
-        "Automotive freight exposure is driven by environmental conditions, handling intensity, and sequence sensitivity. This model shows how protection choices change control posture before execution begins.",
+        "Automotive risk profile changes by shipment type. Exotic units demand premium exposure control, vehicle programs demand timing precision, and parts lanes demand sequence continuity. This model shows how protection choices shift control posture before dispatch.",
 
       widgetSupportBullets: [
-        "Vehicle units: enclosed or covered options reduce environmental and debris exposure.",
-        "Components: handling controls and mode selection align to shock and moisture tolerance.",
-        "Sequence-sensitive lanes: milestone governance and single-owner escalation protect schedule continuity.",
+        "Exotic units: enclosed, low-touch handling and condition-verification workflows reduce exposure risk.",
+        "Vehicle programs: timing checkpoints and appointment governance protect dealer and destination commitments.",
+        "Component freight: handling controls and escalation ownership preserve unfinished manufacturing flow.",
       ],
 
       widgetSupportFooter: "Control design before dispatch. Visibility through delivery.",
@@ -190,39 +191,39 @@ const INDUSTRY_PAGE_DATA: Record<IndustryKey, IndustryPageModel> = {
     howWeSupport: {
       sectionTitle: "How NPT Supports Automotive Programs",
       intro:
-        "Building on those operating priorities, we translate automotive pressure into a controlled execution model: clear lane planning, disciplined handoffs, real-time governance, and documented recovery when risk appears.",
+        "We structure automotive support around a clear concentration: specialized/exotic vehicle hauling first, then finished-vehicle program execution, then inbound parts continuity. The result is a controlled model that protects premium assets and keeps production and distribution lanes stable.",
       cards: [
         {
           eyebrow: "Plan with us",
-          title: "Program design by lane and sequence",
-          summary: "Each lane is set up with appointment discipline, sequencing assumptions, and checkpoint ownership before first movement.",
+          title: "Exotic-focused transport design",
+          summary: "Specialized lanes are engineered for enclosed transport, route-fit feasibility, and low-touch handoffs before first movement.",
           details:
-            "Your network receives a documented operating blueprint that aligns planning, dispatch, and receiving teams around one execution standard.",
-          metric: "Lane governance",
+            "Your team receives a documented operating blueprint for condition-sensitive vehicles, with checkpoint ownership aligned across planning, dispatch, and receiving.",
+          metric: "Exotic-control model",
         },
         {
           eyebrow: "Execute it",
-          title: "Production-safe execution control",
-          summary: "Dispatch, handoff control, and exception escalation are managed under a single accountable operations lead.",
+          title: "Vehicle-unit execution reliability",
+          summary: "Finished-vehicle dispatch, handoff control, and exception escalation are managed under a single accountable operations lead.",
           details:
-            "When a lane moves off plan, corrective pathing is activated immediately with revised execution steps and clear ownership through closeout.",
-          metric: "Execution command",
+            "When a vehicle lane moves off plan, corrective pathing is activated immediately with revised milestones and clear ownership through delivery closeout.",
+          metric: "Unit-flow control",
         },
         {
           eyebrow: "Monitor in real time",
-          title: "Decision-ready operational visibility",
-          summary: "Milestone reporting is structured for planners, plant operations, and leadership decision cycles.",
+          title: "Decision-ready lane visibility",
+          summary: "Milestone reporting is structured for premium-asset moves, distribution lanes, and production-facing teams.",
           details:
-            "Status, exception context, and completion confirmation are shared in a consistent format so teams can act without ambiguity.",
+            "Status, exception context, and completion confirmation are shared in one consistent format so teams can act early and without ambiguity.",
           metric: "Reporting cadence",
         },
         {
           eyebrow: "Strengthen resilience",
-          title: "Recovery paths for schedule protection",
-          summary: "Contingency routing and alternate capacity are prepared in advance for disruption scenarios.",
+          title: "Parts continuity and recovery paths",
+          summary: "Contingency routing and alternate capacity are prepared in advance for component-lane and sequence disruptions.",
           details:
-            "The objective is continuity: contain disruption quickly, restore plan integrity, and protect production commitments downstream.",
-          metric: "Continuity planning",
+            "The objective is continuity: contain disruption quickly, restore sequence integrity, and protect unfinished manufacturing commitments downstream.",
+          metric: "Production continuity",
         },
       ],
       cta: { label: "Plan your automotive lanes", href: "/contact", ctaId: "industry_automotive_support_contact" },
@@ -275,9 +276,9 @@ const INDUSTRY_PAGE_DATA: Record<IndustryKey, IndustryPageModel> = {
           rationale: "Protects appointment reliability while preserving a rapid recovery path when exceptions emerge.",
         },
         {
-          scenario: "Vehicle-unit distribution",
+          scenario: "Exotic and specialty vehicle moves",
           recommendation: "Specialized protected transport",
-          rationale: "Aligns equipment and exposure controls to cargo sensitivity and delivery commitments.",
+          rationale: "Aligns enclosed equipment, route feasibility, and low-touch handling controls to premium-asset sensitivity.",
         },
         {
           scenario: "Cross-border automotive flows",
@@ -286,8 +287,8 @@ const INDUSTRY_PAGE_DATA: Record<IndustryKey, IndustryPageModel> = {
         },
       ],
       links: [
-        { label: "Truckload", href: "/services/truckload" },
         { label: "Expedited & Specialized", href: "/services/expedited-specialized" },
+        { label: "Truckload", href: "/services/truckload" },
         { label: "Cross-Border", href: "/services/cross-border" },
       ],
     },

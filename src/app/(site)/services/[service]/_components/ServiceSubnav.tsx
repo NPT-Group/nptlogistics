@@ -36,8 +36,14 @@ function findServiceShell(el: HTMLElement | null) {
   return (el?.closest?.("[data-service-shell]") as HTMLElement | null) ?? null;
 }
 
-export function ServiceSubnav({ model }: { model: ServicePageModel }) {
-  const sections = model.sections ?? [];
+export function ServiceSubnav({
+  model,
+  sections: sectionOverrides,
+}: {
+  model: ServicePageModel;
+  sections?: NonNullable<ServicePageModel["sections"]>;
+}) {
+  const sections = sectionOverrides ?? model.sections ?? [];
   const ids = React.useMemo(() => sections.map((s) => `section-${s.key}`), [sections]);
   const [activeId, setActiveId] = React.useState(ids[0] ?? "");
   const [isPinned, setIsPinned] = React.useState(false);
