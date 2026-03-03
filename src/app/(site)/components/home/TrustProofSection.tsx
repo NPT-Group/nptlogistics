@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { LogoImage } from "@/components/media/LogoImage";
 import { cn } from "@/lib/cn";
 import {
   TRUST_PROOF_ITEMS,
@@ -232,7 +232,7 @@ function VideoCard({
               "focus-ring-light",
             )}
           >
-            <Image
+            <LogoImage
               src="/brand/NPTlogo2.png"
               alt="NPT logo"
               width={16}
@@ -683,7 +683,7 @@ function MarqueeLogos({ paused }: { paused: boolean }) {
                 "opacity-85 transition-opacity hover:opacity-100",
               )}
             >
-              <Image
+              <LogoImage
                 src={logo.src}
                 alt={logo.alt}
                 width={220}

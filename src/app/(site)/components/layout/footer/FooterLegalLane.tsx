@@ -2,8 +2,8 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { cn } from "@/lib/cn";
+import { CardImage } from "@/components/media/CardImage";
 
 export function FooterLegalLane({
   children,
@@ -50,9 +50,9 @@ export function FooterLegalLane({
         style={{ animationPlayState: isMotionPaused ? "paused" : "running" }}
         aria-hidden="true"
       >
-        <Image
+        <CardImage
           src="/brand/footerTruckMovingRight.png"
-          alt=""
+          alt="Moving truck animation"
           width={140}
           height={50}
           className="h-[30px] w-auto object-contain opacity-95 drop-shadow-[0_6px_12px_rgba(2,6,23,0.45)]"
@@ -64,9 +64,9 @@ export function FooterLegalLane({
         style={{ animationPlayState: isMotionPaused ? "paused" : "running" }}
         aria-hidden="true"
       >
-        <Image
+        <CardImage
           src="/brand/footerTruckMovingLeft.png"
-          alt=""
+          alt="Moving truck animation"
           width={140}
           height={50}
           className="h-[30px] w-auto object-contain opacity-90 drop-shadow-[0_6px_10px_rgba(2,6,23,0.42)]"

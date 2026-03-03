@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { Section } from "@/app/(site)/components/layout/Section";
+import { HeroImage } from "@/components/media/HeroImage";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import { cn } from "@/lib/cn";
 
@@ -127,7 +127,7 @@ export function AboutHero({ data }: { data: HeroData }) {
                             sm:aspect-[16/10] sm:max-w-[680px]
                             lg:mx-0 lg:ml-auto lg:aspect-[16/10] lg:max-w-[1100px] lg:translate-x-10"
             >
-              <Image
+              <HeroImage
                 src="/company/about-hero.png"
                 alt="NPT branded truck representing disciplined freight execution"
                 fill

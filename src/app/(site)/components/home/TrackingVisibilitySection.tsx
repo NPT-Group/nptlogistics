@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { SectionImage } from "@/components/media/SectionImage";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 
@@ -121,7 +121,7 @@ export function TrackingVisibilitySection() {
           >
             {/* The map image */}
             <div ref={mapRef} className={TRACKING_VISIBILITY_TOKENS.mapWrapperClass}>
-              <Image
+              <SectionImage
                 src="/tracking/Tracking-map2.png"
                 alt="North America shipment tracking coverage map"
                 fill

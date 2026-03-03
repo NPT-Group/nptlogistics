@@ -3,9 +3,9 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { CardImage } from "@/components/media/CardImage";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import {
@@ -185,7 +185,7 @@ function ServiceCard({
       )}
     >
       <div className="absolute top-0 left-0 h-[70%] w-full">
-        <Image
+        <CardImage
           src={card.image || categoryImage || "/hero/hero-poster.png"}
           alt={card.label}
           fill

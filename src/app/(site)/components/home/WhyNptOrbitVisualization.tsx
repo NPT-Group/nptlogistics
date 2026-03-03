@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import {
   motion,
   useAnimationFrame,
@@ -18,6 +17,7 @@ import {
   WHY_NPT_TOKENS,
   type WhyNptCard,
 } from "@/config/whyNpt";
+import { CardImage } from "@/components/media/CardImage";
 
 const DESKTOP_ORBIT_CARDS = WHY_NPT_CARDS.filter((card) =>
   WHY_NPT_DESKTOP_CARD_IDS.includes(card.id),
@@ -402,7 +402,7 @@ export function WhyNPTOrbitVisualization() {
                     "inset 0 0 26px rgba(255,255,255,0.1), 0 0 40px rgba(255,74,24,0.24), 0 18px 54px rgba(2,6,23,0.42)",
                 }}
               >
-                <Image
+                <CardImage
                   src={WHY_NPT_TOKENS.solar.coreImageSrc}
                   alt="NPT"
                   fill

@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { LogoImage } from "@/components/media/LogoImage";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import { DesktopNav } from "./header/DesktopNav";
@@ -51,13 +51,12 @@ export function SiteHeader() {
             className={cn("flex cursor-pointer items-center rounded-md px-2 py-1.5", focusRing)}
             aria-label="NPT Logistics home"
           >
-            <Image
+            <LogoImage
               src="/brand/NPTlogo2.png"
               alt="NPT Logistics"
               width={220}
               height={80}
               className="h-auto w-[50px] object-contain sm:w-[50px] md:w-[50px]"
-              priority
             />
           </Link>
 

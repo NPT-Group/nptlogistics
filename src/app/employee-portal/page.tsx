@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
+import { HeroImage } from "@/components/media/HeroImage";
+import { LogoImage } from "@/components/media/LogoImage";
 
 export default function EmployeePortalLoginPage() {
   const [email, setEmail] = React.useState("");
@@ -22,12 +23,12 @@ export default function EmployeePortalLoginPage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#061127]">
-      <Image
+      <HeroImage
         src="/brand/loginPgBg.png"
         alt="Employee portal background"
         fill
         priority
-        sizes="100vw"
+        wrapperClassName="absolute inset-0"
         className="object-cover"
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,8,23,0.58),rgba(2,8,23,0.82))]" />
@@ -35,7 +36,7 @@ export default function EmployeePortalLoginPage() {
       <section className="relative z-10 flex min-h-screen items-center justify-center px-4 pb-20">
         <div className="w-full max-w-[390px] rounded-2xl border border-white/15 bg-[rgba(7,20,46,0.65)] p-6 shadow-[0_18px_48px_rgba(2,8,23,0.45)] backdrop-blur-md sm:p-7">
           <div className="mb-5 flex items-center justify-center">
-            <Image
+            <LogoImage
               src="/brand/NPTlogo2.png"
               alt="NPT Logistics"
               width={120}

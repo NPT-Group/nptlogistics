@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { Section } from "@/app/(site)/components/layout/Section";
+import { SectionImage } from "@/components/media/SectionImage";
 import type { IndustryPageModel } from "@/config/industryPages";
 import { cn } from "@/lib/cn";
 import { THEME_ACCENT, THEME_BG, getThemeBarGradient, getThemeOrbs } from "./industryTheme";
@@ -218,14 +218,13 @@ export function IndustryHowWeSupport({ model }: { model: IndustryPageModel }) {
                     })}
                   </div>
                   <div className={cn("relative", !reduceMotion && "animate-industry-truck-move")}>
-                    <Image
+                    <SectionImage
                       src="/industries/movingTruck_Img.png"
-                      alt=""
+                      alt="NPT truck illustration"
                       width={2000}
                       height={614}
                       className="h-[250px] w-[102vw] max-w-none -translate-x-[1vw] object-contain object-bottom select-none sm:h-[305px] lg:h-[370px]"
                       sizes="(min-width: 1536px) 1440px, (min-width: 1024px) calc(100vw - 3rem), calc(100vw - 2rem)"
-                      priority={false}
                     />
                   </div>
                 </div>

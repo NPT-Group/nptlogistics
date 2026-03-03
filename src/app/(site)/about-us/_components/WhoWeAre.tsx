@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { Section } from "@/app/(site)/components/layout/Section";
+import { SectionImage } from "@/components/media/SectionImage";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import { cn } from "@/lib/cn";
 
@@ -99,11 +99,10 @@ export function WhoWeAre({ data }: { data: Data }) {
                 aria-hidden="true"
                 className="absolute right-[2%] bottom-[5%] z-[1] hidden h-7 w-20 rounded-full border border-[rgba(180,170,158,0.45)] bg-[color:var(--color-about-safety-bg)] shadow-[0_4px_14px_rgba(15,23,42,0.07)] lg:block"
               />
-              <Image
+              <SectionImage
                 src="/company/groupPhoto.png"
                 alt="NPT Logistics team members"
                 fill
-                priority
                 sizes="(min-width: 1280px) 560px, (min-width: 1024px) 45vw, (min-width: 640px) 600px, 100vw"
                 className="relative z-10 object-contain object-bottom"
               />

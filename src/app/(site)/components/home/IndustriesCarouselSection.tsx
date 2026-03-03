@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { SectionImage } from "@/components/media/SectionImage";
 import { cn } from "@/lib/cn";
 import { INDUSTRIES_SECTION, INDUSTRY_SLIDES, type IndustrySlide } from "@/config/industries";
 import { trackCtaClick } from "@/lib/analytics/cta";
@@ -129,7 +129,6 @@ function IndustryBadge({ label }: { label: string }) {
 
 function DesktopStage({
   active,
-  index,
   reduceMotion,
   shellId,
   activeTabId,
@@ -137,7 +136,6 @@ function DesktopStage({
   onTouchEnd,
 }: {
   active: IndustrySlide;
-  index: number;
   reduceMotion: boolean;
   shellId: string;
   activeTabId: string;
@@ -160,11 +158,10 @@ function DesktopStage({
           transition={{ duration: reduceMotion ? 0 : 0.35, ease: "easeOut" }}
         >
           <h3 className="sr-only">{active.label}</h3>
-          <Image
+          <SectionImage
             src={active.image}
-            alt=""
+            alt={`${active.label} background image`}
             fill
-            priority={index === 0}
             className="object-cover"
             sizes="(min-width: 1440px) 1440px, 100vw"
           />
@@ -226,14 +223,12 @@ function DesktopStage({
 
 function MobileStage({
   active,
-  index,
   reduceMotion,
   shellId,
   onTouchStart,
   onTouchEnd,
 }: {
   active: IndustrySlide;
-  index: number;
   reduceMotion: boolean;
   shellId: string;
   onTouchStart: (e: React.TouchEvent<HTMLDivElement>) => void;
@@ -256,11 +251,10 @@ function MobileStage({
             transition={{ duration: reduceMotion ? 0 : 0.3, ease: "easeOut" }}
           >
             <h3 className="sr-only">{active.label}</h3>
-            <Image
+            <SectionImage
               src={active.image}
-              alt=""
+              alt={`${active.label} background image`}
               fill
-              priority={index === 0}
               className="object-cover"
               sizes="100vw"
             />
@@ -438,7 +432,6 @@ export function IndustriesCarouselSection() {
           {/* Mobile: stacked layout (image + content in flow) */}
           <MobileStage
             active={active}
-            index={index}
             reduceMotion={!!reduceMotion}
             shellId={shellId}
             onTouchStart={onTouchStart}
@@ -448,7 +441,6 @@ export function IndustriesCarouselSection() {
           {/* Desktop / tablet: absolute overlay on fixed-aspect image */}
           <DesktopStage
             active={active}
-            index={index}
             reduceMotion={!!reduceMotion}
             shellId={shellId}
             activeTabId={activeTabId}

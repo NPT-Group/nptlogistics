@@ -1,9 +1,9 @@
 "use client";
 
 // src/app/(site)/services/[service]/_components/ServiceSection.tsx
-import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { SectionImage } from "@/components/media/SectionImage";
 import { cn } from "@/lib/cn";
 import { trackCtaClick, toCtaSlug } from "@/lib/analytics/cta";
 import type { ServiceKey, SubServiceSection } from "@/config/services";
@@ -1018,7 +1018,7 @@ export function ServiceSection({
                   isCrossBorderMode ? "lg:h-[380px]" : "lg:h-full",
                 )}
               >
-                <Image
+                <SectionImage
                   src={section.image}
                   alt={section.imageAlt}
                   fill

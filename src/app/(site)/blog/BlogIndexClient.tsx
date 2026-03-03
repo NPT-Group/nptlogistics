@@ -3,10 +3,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Calendar, Clock, Search, ArrowRight, X, Loader2 } from "lucide-react";
 import { Select } from "@/app/(site)/components/ui/Select";
+import { CardImage } from "@/components/media/CardImage";
 import { cn } from "@/lib/utils/cn";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
@@ -573,7 +573,7 @@ export default function BlogIndexClient({
                       >
                         <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                           {p.coverImage?.url ? (
-                            <Image
+                            <CardImage
                               src={p.coverImage.url}
                               alt={p.coverImage.alt || p.title}
                               fill

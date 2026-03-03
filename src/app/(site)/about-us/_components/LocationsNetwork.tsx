@@ -10,11 +10,11 @@
  * - Map: always contained, never overlaps, and is right-justified.
  */
 
-import Image from "next/image";
 import * as React from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { Section } from "@/app/(site)/components/layout/Section";
+import { SectionImage } from "@/components/media/SectionImage";
 import { cn } from "@/lib/cn";
 
 type Metric = Readonly<{ value: string; label: string }>;
@@ -257,13 +257,12 @@ export function LocationsNetwork({ data }: Readonly<{ data: Data }>) {
           >
             <div className="absolute inset-0 overflow-hidden">
               {data.mapImage ? (
-                <Image
+                <SectionImage
                   src={data.mapImage}
                   alt="NPT Logistics offices across North America"
                   fill
                   className="object-contain object-center"
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority={false}
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-sm text-[color:var(--color-muted)]">

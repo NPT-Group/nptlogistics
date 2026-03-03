@@ -3,7 +3,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowRight,
@@ -27,6 +26,7 @@ import { trackCtaClick } from "@/lib/analytics/cta";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { Section } from "@/app/(site)/components/layout/Section";
 import { Select } from "@/app/(site)/components/ui/Select";
+import { HeroImage } from "@/components/media/HeroImage";
 import { cn } from "@/lib/cn";
 
 type SortBy = "publishedAt" | "title" | "createdAt";
@@ -379,7 +379,7 @@ export default function CareersClient({
       >
         <div className="absolute inset-0">
           <div className="absolute inset-0">
-            <Image
+            <HeroImage
               src="/careers/careers-banner.jpg"
               alt="Careers banner"
               fill

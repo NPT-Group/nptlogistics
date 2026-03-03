@@ -1,9 +1,9 @@
 "use client";
 
 // src/app/(site)/services/[service]/_components/ServiceFinalCta.tsx
-import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { CardImage } from "@/components/media/CardImage";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import type { ServicePageModel } from "@/config/services";
@@ -66,7 +66,7 @@ export function ServiceFinalCta({ model }: { model: ServicePageModel }) {
             <div className="lg:col-span-6">
               <div className="grid min-h-[220px] grid-cols-1 items-center gap-3 sm:min-h-[248px] sm:grid-cols-[210px_1fr] sm:items-end sm:gap-2.5 md:grid-cols-[226px_1fr]">
                 <div className="relative mx-auto hidden h-[214px] w-[170px] sm:-mb-6 sm:-ml-6 sm:mx-0 sm:block sm:h-[250px] sm:w-[190px] md:-mb-7 md:-ml-8 md:h-[286px] md:w-[226px] lg:-ml-10">
-                  <Image
+                  <CardImage
                     src="/services/Curtis.png"
                     alt="Curtis from NPT Logistics"
                     fill

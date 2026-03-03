@@ -3,7 +3,6 @@
 
 import * as React from "react";
 // import dynamic from "next/dynamic";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -35,6 +34,7 @@ import { CheckBox } from "../../components/ui/CheckBox";
 import dynamic from "next/dynamic";
 import BlockNoteSkeleton from "@/components/blocknote/BlockNoteSkeleton";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { CardImage } from "@/components/media/CardImage";
 
 const BlockNote = dynamic(() => import("@/components/blocknote/BlockNote"), {
   ssr: false,
@@ -425,13 +425,12 @@ export default function JobPublicClient({ job }: { job: IJobPosting }) {
               {/* Cover image */}
               <div className="relative h-44 w-full bg-slate-50 sm:h-52 lg:h-64">
                 {coverUrl ? (
-                  <Image
+                  <CardImage
                     src={coverUrl}
                     alt={job.title ? `${job.title} cover` : "Job cover"}
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 60vw"
-                    priority={false}
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-slate-400">

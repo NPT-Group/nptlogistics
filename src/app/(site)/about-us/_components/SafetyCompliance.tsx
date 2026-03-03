@@ -1,9 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { Section } from "@/app/(site)/components/layout/Section";
+import { LogoImage } from "@/components/media/LogoImage";
+import { SectionImage } from "@/components/media/SectionImage";
 import { TRUST_PARTNER_LOGOS } from "@/config/testimonials";
 import { cn } from "@/lib/cn";
 
@@ -141,13 +142,12 @@ export function SafetyCompliance({ data }: { data: Data }) {
             className="relative flex items-center justify-center lg:justify-end"
           >
             <div className="relative w-full aspect-[4/3] sm:aspect-[6/5] lg:aspect-[8/5] lg:min-h-[340px]">
-              <Image
+              <SectionImage
                 src={data.heroImage}
                 alt="Safety and compliance at NPT Logistics: disciplined standards, documented accountability, and verified execution."
                 fill
                 className="object-contain object-center"
                 sizes="(max-width: 1023px) 100vw, 55vw"
-                priority={false}
               />
             </div>
           </motion.div>
@@ -200,7 +200,7 @@ function CertificationsMarquee() {
               key={`${logo.src}-${idx}`}
               className="flex h-8 w-[100px] flex-shrink-0 items-center justify-center opacity-90 transition-opacity hover:opacity-100 sm:h-9 sm:w-[120px]"
             >
-              <Image
+              <LogoImage
                 src={logo.src}
                 alt={logo.alt}
                 width={140}

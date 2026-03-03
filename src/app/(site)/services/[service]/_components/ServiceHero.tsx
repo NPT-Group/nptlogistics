@@ -1,10 +1,10 @@
 "use client";
 
 // src/app/(site)/services/[service]/_components/ServiceHero.tsx
-import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { HeroImage } from "@/components/media/HeroImage";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import type { ServicePageModel } from "@/config/services";
@@ -48,13 +48,13 @@ export function ServiceHero({ model }: { model: ServicePageModel }) {
     <section className="relative overflow-hidden bg-[color:var(--color-surface-0)]">
       {/* Background */}
       <div className="absolute inset-0" aria-hidden="true">
-        <Image
+        <HeroImage
           src={model.hero.image}
           alt={model.hero.imageAlt}
           fill
           className="object-cover"
           priority
-          sizes="100vw"
+          wrapperClassName="absolute inset-0"
         />
 
         {/* Strong baseline overlay to ensure text contrast across all images */}

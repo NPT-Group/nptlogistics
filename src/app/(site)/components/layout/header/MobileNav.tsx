@@ -5,9 +5,9 @@ import * as Dialog from "@radix-ui/react-dialog";
 import * as Accordion from "@radix-ui/react-accordion";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import { LogoImage } from "@/components/media/LogoImage";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import { cn } from "@/lib/cn";
 import { NAV, type NavLink } from "@/config/navigation";
@@ -263,13 +263,12 @@ export function MobileNav() {
                     aria-label="Home"
                     onClick={closeAll}
                   >
-                    <Image
+                    <LogoImage
                       src="/brand/NPTlogo2.png"
                       alt="NPT Logistics"
                       width={220}
                       height={80}
                       className="h-auto w-[50px] object-contain sm:w-[50px] md:w-[50px]"
-                      priority
                     />
                   </Link>
 

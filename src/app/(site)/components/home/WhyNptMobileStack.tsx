@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { cn } from "@/lib/cn";
+import { LogoImage } from "@/components/media/LogoImage";
 import { WHY_NPT_CARDS, WHY_NPT_MOBILE_CARD_IDS, WHY_NPT_TOKENS } from "@/config/whyNpt";
 
 const MOBILE_STACK_CARDS = WHY_NPT_CARDS.filter((card) => WHY_NPT_MOBILE_CARD_IDS.includes(card.id));
@@ -8,7 +8,7 @@ export function WhyNptMobileStack() {
   return (
     <div className="mx-auto grid max-w-3xl gap-4">
       <div className="mx-auto mb-2">
-        <Image
+        <LogoImage
           src={WHY_NPT_TOKENS.solar.coreImageSrc}
           alt="NPT"
           width={1024}
