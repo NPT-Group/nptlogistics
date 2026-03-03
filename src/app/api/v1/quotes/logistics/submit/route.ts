@@ -19,7 +19,7 @@ import { finalizeAssetVectorAllOrNothing } from "@/lib/utils/s3Helper/server";
 import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { getSiteUrlFromRequest } from "@/lib/utils/urlHelper";
 import { sendQuoteCustomerConfirmationEmail } from "@/lib/mail/quotes/sendQuoteCustomerConfirmationEmail";
-import { LogisticsQuoteModel } from "@/mongoose/models/LogisticsQuote";
+import { LogisticsQuoteModel } from "@/mongoose/models/Something";
 
 type SubmitQuoteBody = {
   // Turnstile
