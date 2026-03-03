@@ -265,11 +265,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             {/* Logo */}
             <Link href="/admin" className="flex items-center gap-3">
               <Image
-                src="/brand/NPTlogo.png"
+                src="/brand/NPTlogo2.png"
                 alt="NPT Logistics"
-                width={120}
-                height={32}
-                className="h-auto w-[110px] object-contain"
+                width={220}
+                height={80}
+                className="h-auto w-[50px] object-contain sm:w-[50px] md:w-[50px]"
                 priority
               />
               <span className="hidden text-xs font-semibold tracking-[0.22em] text-[var(--dash-muted)] sm:block">
