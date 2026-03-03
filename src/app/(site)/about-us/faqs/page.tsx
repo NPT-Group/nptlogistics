@@ -17,14 +17,14 @@ export const metadata: Metadata = {
       "Common questions about NPT Logistics services, compliance, and operations. Enterprise shipping guides and best practices.",
     type: "website",
     url: "/about-us/faqs",
-    images: ["/brand/nptLogo-glow.png"],
+    images: ["/_optimized/brand/nptLogo-glow.webp"],
   },
   twitter: {
     card: "summary_large_image",
     title: "FAQs & Shipping Guides | NPT Logistics",
     description:
       "Common questions about NPT Logistics services, compliance, and operations. Enterprise shipping guides and best practices.",
-    images: ["/brand/nptLogo-glow.png"],
+    images: ["/_optimized/brand/nptLogo-glow.webp"],
   },
 };
 

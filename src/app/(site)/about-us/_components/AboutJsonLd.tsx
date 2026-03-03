@@ -4,7 +4,7 @@ const jsonLd = [
     "@type": "Organization",
     name: "NPT Logistics",
     url: "https://nptlogistics.com",
-    logo: "https://nptlogistics.com/brand/NPTlogo2.png",
+    logo: "https://nptlogistics.com/_optimized/brand/NPTlogo2.webp",
     areaServed: ["Canada", "United States"],
     description:
       "NPT Logistics provides disciplined freight execution across Canada and the United States with a compliance-first operating model.",

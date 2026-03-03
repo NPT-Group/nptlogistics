@@ -219,7 +219,7 @@ export function IndustryHowWeSupport({ model }: { model: IndustryPageModel }) {
                   </div>
                   <div className={cn("relative", !reduceMotion && "animate-industry-truck-move")}>
                     <SectionImage
-                      src="/industries/movingTruck_Img.png"
+                      src="/_optimized/industries/movingTruck_Img.webp"
                       alt="NPT truck illustration"
                       width={2000}
                       height={614}

@@ -186,7 +186,7 @@ function ServiceCard({
     >
       <div className="absolute top-0 left-0 h-[70%] w-full">
         <CardImage
-          src={card.image || categoryImage || "/hero/hero-poster.png"}
+          src={card.image || categoryImage || "/_optimized/hero/hero-poster.webp"}
           alt={card.label}
           fill
           className="object-cover transition-transform duration-700 ease-out md:group-hover:scale-105"

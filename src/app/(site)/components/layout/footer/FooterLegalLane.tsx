@@ -51,7 +51,7 @@ export function FooterLegalLane({
         aria-hidden="true"
       >
         <CardImage
-          src="/brand/footerTruckMovingRight.png"
+          src="/_optimized/brand/footerTruckMovingRight.webp"
           alt="Moving truck animation"
           width={140}
           height={50}
@@ -65,7 +65,7 @@ export function FooterLegalLane({
         aria-hidden="true"
       >
         <CardImage
-          src="/brand/footerTruckMovingLeft.png"
+          src="/_optimized/brand/footerTruckMovingLeft.webp"
           alt="Moving truck animation"
           width={140}
           height={50}

@@ -233,7 +233,7 @@ function VideoCard({
             )}
           >
             <LogoImage
-              src="/brand/NPTlogo2.png"
+              src="/_optimized/brand/NPTlogo2.webp"
               alt="NPT logo"
               width={16}
               height={16}

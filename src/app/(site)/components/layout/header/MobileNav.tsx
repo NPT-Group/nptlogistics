@@ -264,7 +264,7 @@ export function MobileNav() {
                     onClick={closeAll}
                   >
                     <LogoImage
-                      src="/brand/NPTlogo2.png"
+                      src="/_optimized/brand/NPTlogo2.webp"
                       alt="NPT Logistics"
                       width={220}
                       height={80}

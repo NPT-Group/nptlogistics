@@ -265,7 +265,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             {/* Logo */}
             <Link href="/admin" className="flex items-center gap-3">
               <AdminImage
-                src="/brand/NPTlogo2.png"
+                src="/_optimized/brand/NPTlogo2.webp"
                 alt="NPT Logistics"
                 width={220}
                 height={80}

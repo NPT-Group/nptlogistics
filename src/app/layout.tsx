@@ -20,11 +20,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/brand/NPTlogo2.png", type: "image/png" },
-      { url: "/brand/nptLogo-glow.png", type: "image/png" },
+      { url: "/_optimized/brand/NPTlogo2.webp", type: "image/png" },
+      { url: "/_optimized/brand/nptLogo-glow.webp", type: "image/png" },
     ],
-    shortcut: ["/brand/NPTlogo2.png"],
-    apple: [{ url: "/brand/NPTlogo2.png", type: "image/png" }],
+    shortcut: ["/_optimized/brand/NPTlogo2.webp"],
+    apple: [{ url: "/_optimized/brand/NPTlogo2.webp", type: "image/png" }],
   },
   manifest: "/manifest.webmanifest",
   category: "business",
@@ -74,14 +74,14 @@ export const metadata: Metadata = {
       "Reliable freight solutions across North America. Truckload, LTL, intermodal, and cross-border shipping built on compliance and execution.",
     url: "https://nptlogistics.com",
     locale: "en_US",
-    images: [{ url: "/brand/nptLogo-glow.png", width: 1200, height: 630, alt: "NPT Logistics" }],
+    images: [{ url: "/_optimized/brand/nptLogo-glow.webp", width: 1200, height: 630, alt: "NPT Logistics" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "NPT Logistics",
     description:
       "Reliable freight solutions across North America. Built on compliance, visibility, and execution.",
-    images: ["/brand/nptLogo-glow.png"],
+    images: ["/_optimized/brand/nptLogo-glow.webp"],
   },
 };
 

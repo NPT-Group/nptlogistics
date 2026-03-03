@@ -325,7 +325,7 @@ export default function BlogIndexClient({
         <div className="absolute inset-0">
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: "url(/blog/blog-banner.jpg)" }}
+            style={{ backgroundImage: "url(/_optimized/blog/blog-banner.webp)" }}
             aria-hidden="true"
           />
           <div className="absolute inset-0 bg-black/35" aria-hidden="true" />

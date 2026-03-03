@@ -100,7 +100,7 @@ export function WhoWeAre({ data }: { data: Data }) {
                 className="absolute right-[2%] bottom-[5%] z-[1] hidden h-7 w-20 rounded-full border border-[rgba(180,170,158,0.45)] bg-[color:var(--color-about-safety-bg)] shadow-[0_4px_14px_rgba(15,23,42,0.07)] lg:block"
               />
               <SectionImage
-                src="/company/groupPhoto.png"
+                src="/_optimized/company/groupPhoto.webp"
                 alt="NPT Logistics team members"
                 fill
                 sizes="(min-width: 1280px) 560px, (min-width: 1024px) 45vw, (min-width: 640px) 600px, 100vw"

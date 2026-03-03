@@ -26,13 +26,13 @@ export async function generateMetadata({
       description: model.meta.description,
       type: "website",
       url: `https://nptlogistics.com/industries/${model.slug}`,
-      images: model.meta.ogImage ? [model.meta.ogImage] : ["/brand/nptLogo-glow.png"],
+      images: model.meta.ogImage ? [model.meta.ogImage] : ["/_optimized/brand/nptLogo-glow.webp"],
     },
     twitter: {
       card: "summary_large_image",
       title: model.meta.title,
       description: model.meta.description,
-      images: model.meta.ogImage ? [model.meta.ogImage] : ["/brand/nptLogo-glow.png"],
+      images: model.meta.ogImage ? [model.meta.ogImage] : ["/_optimized/brand/nptLogo-glow.webp"],
     },
   };
 }

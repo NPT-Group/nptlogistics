@@ -122,7 +122,7 @@ export function TrackingVisibilitySection() {
             {/* The map image */}
             <div ref={mapRef} className={TRACKING_VISIBILITY_TOKENS.mapWrapperClass}>
               <SectionImage
-                src="/tracking/Tracking-map2.png"
+                src="/_optimized/tracking/Tracking-map2.webp"
                 alt="North America shipment tracking coverage map"
                 fill
                 className={TRACKING_VISIBILITY_TOKENS.mapImageClass}

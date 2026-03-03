@@ -380,7 +380,7 @@ export default function CareersClient({
         <div className="absolute inset-0">
           <div className="absolute inset-0">
             <HeroImage
-              src="/careers/careers-banner.jpg"
+              src="/_optimized/careers/careers-banner.webp"
               alt="Careers banner"
               fill
               priority

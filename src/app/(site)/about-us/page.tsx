@@ -23,14 +23,14 @@ export const metadata: Metadata = {
       "Learn how NPT Logistics delivers disciplined freight execution across Canada and the U.S. through compliance-first operations and accountable communication.",
     type: "website",
     url: "/about-us",
-    images: ["/brand/nptLogo-glow.png"],
+    images: ["/_optimized/brand/nptLogo-glow.webp"],
   },
   twitter: {
     card: "summary_large_image",
     title: "About NPT Logistics",
     description:
       "Learn how NPT Logistics delivers disciplined freight execution across Canada and the U.S. through compliance-first operations and accountable communication.",
-    images: ["/brand/nptLogo-glow.png"],
+    images: ["/_optimized/brand/nptLogo-glow.webp"],
   },
 };
 

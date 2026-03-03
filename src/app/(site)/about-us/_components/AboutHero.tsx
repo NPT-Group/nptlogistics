@@ -128,7 +128,7 @@ export function AboutHero({ data }: { data: HeroData }) {
                             lg:mx-0 lg:ml-auto lg:aspect-[16/10] lg:max-w-[1100px] lg:translate-x-10"
             >
               <HeroImage
-                src="/company/about-hero.png"
+                src="/_optimized/company/about-hero.webp"
                 alt="NPT branded truck representing disciplined freight execution"
                 fill
                 sizes="(min-width: 1280px) 1100px, (min-width: 1024px) 72vw, (min-width: 640px) 680px, 100vw"

@@ -24,7 +24,7 @@ export default function EmployeePortalLoginPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#061127]">
       <HeroImage
-        src="/brand/loginPgBg.png"
+        src="/_optimized/brand/loginPgBg.webp"
         alt="Employee portal background"
         fill
         priority
@@ -37,7 +37,7 @@ export default function EmployeePortalLoginPage() {
         <div className="w-full max-w-[390px] rounded-2xl border border-white/15 bg-[rgba(7,20,46,0.65)] p-6 shadow-[0_18px_48px_rgba(2,8,23,0.45)] backdrop-blur-md sm:p-7">
           <div className="mb-5 flex items-center justify-center">
             <LogoImage
-              src="/brand/NPTlogo2.png"
+              src="/_optimized/brand/NPTlogo2.webp"
               alt="NPT Logistics"
               width={120}
               height={44}

@@ -52,7 +52,7 @@ export function SiteHeader() {
             aria-label="NPT Logistics home"
           >
             <LogoImage
-              src="/brand/NPTlogo2.png"
+              src="/_optimized/brand/NPTlogo2.webp"
               alt="NPT Logistics"
               width={220}
               height={80}

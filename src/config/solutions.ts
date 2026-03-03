@@ -56,7 +56,7 @@ export type SolutionsCategory = {
 export const SOLUTIONS_DATA = {
   "Core Freight Modes": {
     description: "Standard shipping methods for everyday freight needs.",
-    image: "/solutions/npt-core-freight-hero.png",
+    image: "/_optimized/solutions/npt-core-freight-hero.webp",
     layout: "three",
     theme: "default",
     cards: [
@@ -67,7 +67,7 @@ export const SOLUTIONS_DATA = {
         description: "Dedicated capacity for your entire shipment with faster transit times.",
         icon: "truck",
         bestFor: "Full loads, expedited delivery",
-        image: "/solutions/card-truckload-tl.jpg",
+        image: "/_optimized/solutions/card-truckload-tl.webp",
         cardTheme: "red",
       },
       {
@@ -77,7 +77,7 @@ export const SOLUTIONS_DATA = {
         description: "Cost-efficient shipping by consolidating smaller shipments.",
         icon: "package",
         bestFor: "Smaller shipments, cost savings",
-        image: "/solutions/card-ltl.jpg",
+        image: "/_optimized/solutions/card-ltl.webp",
         cardTheme: "ltl",
       },
       {
@@ -87,14 +87,14 @@ export const SOLUTIONS_DATA = {
         description: "Rail efficiency for long distances with truck flexibility for delivery.",
         icon: "train",
         bestFor: "Long distances, cost optimization",
-        image: "/solutions/card-intermodal.jpg",
+        image: "/_optimized/solutions/card-intermodal.webp",
         cardTheme: "navy",
       },
     ],
   },
   "Specialized & Time-Sensitive": {
     description: "Expert handling for urgent and specialized freight requirements.",
-    image: "/solutions/solutions-specialized.jpg",
+    image: "/_optimized/solutions/solutions-specialized.webp",
     layout: "four",
     theme: "dark",
     cards: [
@@ -105,7 +105,7 @@ export const SOLUTIONS_DATA = {
         description: "Fast-track delivery for urgent shipments.",
         icon: "zap",
         bestFor: "Time-sensitive freight",
-        image: "/solutions/card-expedited.jpg",
+        image: "/_optimized/solutions/card-expedited.webp",
       },
       {
         analyticsId: "specialized_vehicle_transport",
@@ -114,7 +114,7 @@ export const SOLUTIONS_DATA = {
         description: "Expert handling for specialized vehicles and equipment.",
         icon: "truck",
         bestFor: "Oversized, delicate cargo",
-        image: "/solutions/card-specialized-vehicle.jpg",
+        image: "/_optimized/solutions/card-specialized-vehicle.webp",
       },
       {
         analyticsId: "hazmat",
@@ -123,7 +123,7 @@ export const SOLUTIONS_DATA = {
         description: "Compliant hazmat movement and documentation.",
         icon: "shield",
         bestFor: "Regulated materials",
-        image: "/solutions/card-hazmat.jpg",
+        image: "/_optimized/solutions/card-hazmat.webp",
       },
       {
         analyticsId: "temperature_controlled",
@@ -132,13 +132,13 @@ export const SOLUTIONS_DATA = {
         description: "Refrigerated and controlled-temperature freight.",
         icon: "snowflake",
         bestFor: "Perishables, pharmaceuticals",
-        image: "/solutions/card-refrigerated.png",
+        image: "/_optimized/solutions/card-refrigerated.webp",
       },
     ],
   },
   "Cross-Border & Global": {
     description: "Seamless international shipping across borders and oceans.",
-    image: "/hero/hero-poster.png",
+    image: "/_optimized/hero/hero-poster.webp",
     layout: "four",
     theme: "default",
     cards: [
@@ -149,7 +149,7 @@ export const SOLUTIONS_DATA = {
         description: "Seamless cross-border shipping between Canada and USA.",
         icon: "globe",
         bestFor: "North American trade",
-        image: "/solutions/card-cross-border-canada-us.jpg",
+        image: "/_optimized/solutions/card-cross-border-canada-us.webp",
       },
       {
         analyticsId: "cross_border_mexico",
@@ -158,7 +158,7 @@ export const SOLUTIONS_DATA = {
         description: "Reliable Mexico cross-border logistics.",
         icon: "globe",
         bestFor: "Mexico trade lanes",
-        image: "/solutions/card-cross-border-mexico.jpg",
+        image: "/_optimized/solutions/card-cross-border-mexico.webp",
       },
       {
         analyticsId: "ocean_freight",
@@ -167,7 +167,7 @@ export const SOLUTIONS_DATA = {
         description: "International ocean shipping solutions.",
         icon: "ship",
         bestFor: "International bulk shipping",
-        image: "/solutions/card-ocean-freight.jpg",
+        image: "/_optimized/solutions/card-ocean-freight.webp",
       },
       {
         analyticsId: "air_freight",
@@ -176,13 +176,13 @@ export const SOLUTIONS_DATA = {
         description: "Fast international air cargo services.",
         icon: "plane",
         bestFor: "Urgent international delivery",
-        image: "/solutions/card-air-freight.jpg",
+        image: "/_optimized/solutions/card-air-freight.webp",
       },
     ],
   },
   "Logistics & Value-Added": {
     description: "Comprehensive logistics solutions beyond transportation.",
-    image: "/solutions/solutions-logistics.jpg",
+    image: "/_optimized/solutions/solutions-logistics.webp",
     layout: "four",
     theme: "dark",
     cards: [
@@ -193,7 +193,7 @@ export const SOLUTIONS_DATA = {
         description: "Strategic warehousing and distribution networks.",
         icon: "warehouse",
         bestFor: "Inventory management",
-        image: "/solutions/card-warehousing-distribution.jpg",
+        image: "/_optimized/solutions/card-warehousing-distribution.webp",
       },
       {
         analyticsId: "managed_capacity",
@@ -202,7 +202,7 @@ export const SOLUTIONS_DATA = {
         description: "Dedicated capacity solutions for consistent volume.",
         icon: "briefcase",
         bestFor: "High-volume shippers",
-        image: "/solutions/card-managed-capacity.jpg",
+        image: "/_optimized/solutions/card-managed-capacity.webp",
       },
       {
         analyticsId: "dedicated_contract_logistics",
@@ -211,7 +211,7 @@ export const SOLUTIONS_DATA = {
         description: "Custom logistics programs tailored to your needs.",
         icon: "briefcase",
         bestFor: "Long-term partnerships",
-        image: "/solutions/card-dedicated-contract.jpg",
+        image: "/_optimized/solutions/card-dedicated-contract.webp",
       },
       {
         analyticsId: "project_oversize_programs",
@@ -220,7 +220,7 @@ export const SOLUTIONS_DATA = {
         description: "Specialized handling for large-scale and oversize projects.",
         icon: "truck",
         bestFor: "Complex, oversized cargo",
-        image: "/solutions/card-project-oversize.jpg",
+        image: "/_optimized/solutions/card-project-oversize.webp",
       },
     ],
   },

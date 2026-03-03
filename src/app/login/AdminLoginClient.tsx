@@ -29,7 +29,7 @@ export default function AdminLoginClient({
       <div className="w-full max-w-md">
         <div className="mb-6 flex flex-col items-center">
           <LogoImage
-            src="/brand/NPTlogo2.png"
+            src="/_optimized/brand/NPTlogo2.webp"
             alt="NPT Logistics"
             width={220}
             height={80}

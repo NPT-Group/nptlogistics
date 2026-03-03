@@ -15,13 +15,13 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["business", "logistics", "transportation"],
     icons: [
       {
-        src: "/brand/NPTlogo2.png",
+        src: "/_optimized/brand/NPTlogo2.webp",
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/brand/nptLogo-glow.png",
+        src: "/_optimized/brand/nptLogo-glow.webp",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",

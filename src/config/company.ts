@@ -146,7 +146,7 @@ export const companyAbout = {
     title: "Non-negotiable. Every load.",
     subtitle: "Disciplined standards. Documented accountability.",
     body: "We meet the rules, every time. From carrier vetting to documentation, we build trust through consistent compliance so you have one accountable partner.",
-    heroImage: "/company/safety_compliance2.png",
+    heroImage: "/_optimized/company/safety_compliance2.webp",
     snapshot: {
       value: "Every load.",
       label: "Meets the standard.",
@@ -196,7 +196,7 @@ export const companyAbout = {
       "Audit-ready documentation",
       "Single invoice, single accountability",
     ],
-    mapImage: "/company/locationMaps.png",
+    mapImage: "/_optimized/company/locationMaps.webp",
     countries: [
       { name: "Canada", yards: ["Milton, ON", "Montreal, QC"] },
       { name: "United States", yards: ["Laredo, TX", "Houston, TX", "Livermore, CA", "Miami, FL"] },
