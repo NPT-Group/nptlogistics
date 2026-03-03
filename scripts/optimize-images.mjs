@@ -6,7 +6,7 @@ const ROOT = process.cwd();
 const PUBLIC_DIR = path.join(ROOT, "public");
 const OUT_DIR = path.join(PUBLIC_DIR, "_optimized");
 
-const INPUT_EXTS = new Set([".jpg", ".jpeg", ".png"]);
+const INPUT_EXTS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 const SKIP_DIRS = new Set(["_optimized", ".git", "node_modules"]);
 
 // Safe default for a marketing site
