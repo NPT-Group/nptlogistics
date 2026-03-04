@@ -15,7 +15,8 @@ import { uploadToS3PresignedPublic, deleteTempFile } from "@/lib/utils/s3Helper/
 
 export type FileUploadFieldProps<TFieldValues extends FieldValues> = {
   control: Control<TFieldValues>;
-  name: Path<TFieldValues>; // recommended: IFileAsset | undefined
+  /** Recommended: field is `IFileAsset | undefined` */
+  name: Path<TFieldValues>;
 
   label?: React.ReactNode;
   hint?: React.ReactNode;
@@ -39,6 +40,13 @@ export type FileUploadFieldProps<TFieldValues extends FieldValues> = {
   uploadLabel?: string;
   replaceLabel?: string;
   removeLabel?: string;
+
+  /**
+   * For enterprise error UX:
+   * - defaults to `name`
+   * - can be overridden if you want the wrapper to map to a higher-level path
+   */
+  fieldPathAttr?: string;
 };
 
 function mimeToAccept(mt: EFileMimeType) {
@@ -64,6 +72,7 @@ export function FileUploadField<TFieldValues extends FieldValues>({
   uploadLabel = "Upload file",
   replaceLabel = "Replace",
   removeLabel = "Remove",
+  fieldPathAttr,
 }: FileUploadFieldProps<TFieldValues>) {
   const { field, fieldState } = useController({ control, name });
   const current = (field.value ?? undefined) as IFileAsset | undefined;
@@ -72,7 +81,6 @@ export function FileUploadField<TFieldValues extends FieldValues>({
   const [localError, setLocalError] = React.useState<string | null>(null);
 
   const error = fieldState.error?.message || localError;
-
   const acceptValue = accept ?? allowedMimeTypes.map(mimeToAccept).join(",");
 
   async function handlePickFile(file: File) {
@@ -80,6 +88,7 @@ export function FileUploadField<TFieldValues extends FieldValues>({
     setIsUploading(true);
 
     try {
+      // If replacing: cleanup old temp asset (if applicable)
       if (current) {
         if (cleanupTempOnRemove) await deleteTempFile(current);
         await onRemoved?.(current);
@@ -117,7 +126,7 @@ export function FileUploadField<TFieldValues extends FieldValues>({
   }
 
   return (
-    <div className={ui.container}>
+    <div className={ui.container} data-field-path={fieldPathAttr ?? String(name)}>
       {label ? (
         <label className={ui.label}>
           {label}
@@ -140,6 +149,7 @@ export function FileUploadField<TFieldValues extends FieldValues>({
             onBlur={field.onBlur}
             onChange={(e) => {
               const f = e.target.files?.[0];
+              // allow re-selecting the same file
               e.currentTarget.value = "";
               if (f) void handlePickFile(f);
             }}

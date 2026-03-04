@@ -151,9 +151,8 @@ export default function BlogPostClient({
 
       const qs = new URLSearchParams({
         page: "1",
-        pageSize: "6",
-        sortBy: "publishedAt",
-        sortDir: "desc",
+        limit: "6",
+        sortBy: "newest",
         categoryId: String(catId),
       });
 

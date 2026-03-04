@@ -16,6 +16,9 @@ export type DigitsFieldProps<TFieldValues extends FieldValues> = {
 
   ui: FieldUi;
 
+  /** For enterprise scroll-to-error targeting. Defaults to `name`. */
+  fieldPathAttr?: string;
+
   /**
    * If true, strips all non-digits. Defaults true.
    * Useful for postal/zip fragments, unit counts, etc.
@@ -34,6 +37,7 @@ export function DigitsField<TFieldValues extends FieldValues>({
   hint,
   required,
   ui,
+  fieldPathAttr,
   digitsOnly = true,
   inputProps,
   invalidClassName = "border-red-500 focus:ring-red-500/20",
@@ -45,7 +49,7 @@ export function DigitsField<TFieldValues extends FieldValues>({
   const value = (field.value ?? "") as string;
 
   return (
-    <div className={ui.container}>
+    <div className={ui.container} data-field-path={fieldPathAttr ?? String(name)}>
       {label ? (
         <label className={ui.label}>
           {label}

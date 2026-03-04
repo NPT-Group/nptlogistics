@@ -26,6 +26,9 @@ export type RadioGroupFieldProps<
 
   ui: FieldUi;
 
+  /** For enterprise scroll-to-error targeting. Defaults to `name`. */
+  fieldPathAttr?: string;
+
   options: ReadonlyArray<RadioOption<TValue>>;
 
   /** Optional: render radios in columns */
@@ -44,6 +47,7 @@ export function RadioGroupField<TFieldValues extends FieldValues, TValue extends
   hint,
   required,
   ui,
+  fieldPathAttr,
   options,
   columnsClassName = "space-y-2",
   radioProps,
@@ -53,7 +57,7 @@ export function RadioGroupField<TFieldValues extends FieldValues, TValue extends
   const current = (field.value ?? "") as string;
 
   return (
-    <fieldset className={ui.container}>
+    <fieldset className={ui.container} data-field-path={fieldPathAttr ?? String(name)}>
       {legend ? (
         <legend className={ui.label}>
           {legend}
@@ -62,7 +66,7 @@ export function RadioGroupField<TFieldValues extends FieldValues, TValue extends
       ) : null}
 
       <div className={columnsClassName}>
-        {options.map((opt) => {
+        {options.map((opt, idx) => {
           const checked = current === opt.value;
 
           return (
@@ -80,6 +84,7 @@ export function RadioGroupField<TFieldValues extends FieldValues, TValue extends
                 onBlur={field.onBlur}
                 onChange={() => field.onChange(opt.value)}
                 className={cn(ui.controlBox)}
+                ref={idx === 0 ? field.ref : undefined}
               />
               <div className="min-w-0">
                 <div className={ui.label}>{opt.label}</div>

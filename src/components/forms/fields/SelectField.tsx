@@ -22,6 +22,9 @@ export type SelectFieldProps<TFieldValues extends FieldValues, TValue extends st
 
   ui: FieldUi;
 
+  /** For enterprise scroll-to-error targeting. Defaults to `name`. */
+  fieldPathAttr?: string;
+
   options: ReadonlyArray<SelectOption<TValue>>;
 
   placeholder?: string; // if provided, adds a disabled placeholder option
@@ -40,6 +43,7 @@ export function SelectField<TFieldValues extends FieldValues, TValue extends str
   hint,
   required,
   ui,
+  fieldPathAttr,
   options,
   placeholder = "Select...",
   selectProps,
@@ -52,7 +56,7 @@ export function SelectField<TFieldValues extends FieldValues, TValue extends str
   const value = (field.value ?? "") as string;
 
   return (
-    <div className={ui.container}>
+    <div className={ui.container} data-field-path={fieldPathAttr ?? String(name)}>
       {label ? (
         <label className={ui.label}>
           {label}

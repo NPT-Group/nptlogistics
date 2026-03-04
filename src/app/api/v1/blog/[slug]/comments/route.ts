@@ -17,7 +17,9 @@ type CreateCommentBody = {
 };
 
 async function getPublishedPostIdBySlug(slug: string): Promise<string | null> {
-  const post = await BlogPostModel.findOne({ slug, status: EBlogStatus.PUBLISHED }).select({ _id: 1 }).lean();
+  const post = await BlogPostModel.findOne({ slug, status: EBlogStatus.PUBLISHED })
+    .select({ _id: 1 })
+    .lean();
 
   return post?._id?.toString?.() ?? null;
 }
@@ -36,7 +38,12 @@ export const GET = async (req: NextRequest, ctx: { params: Promise<{ slug: strin
 
     const { page, limit, skip } = parsePagination(sp.get("page"), sp.get("pageSize"), 200);
     const allowedSortKeys = ["createdAt"] as const;
-    const { sortBy, sortDir } = parseSort(sp.get("sortBy"), sp.get("sortDir"), allowedSortKeys, "createdAt");
+    const { sortBy, sortDir } = parseSort(
+      sp.get("sortBy"),
+      sp.get("sortDir"),
+      allowedSortKeys,
+      "createdAt",
+    );
 
     const filter = { blogPostId: postId };
     const total = await BlogCommentModel.countDocuments(filter);

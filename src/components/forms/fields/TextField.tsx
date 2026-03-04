@@ -15,6 +15,10 @@ export type TextFieldProps<TFieldValues extends FieldValues> = {
   required?: boolean;
 
   ui: FieldUi;
+
+  /** For enterprise scroll-to-error targeting. Defaults to `name`. */
+  fieldPathAttr?: string;
+
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 
   invalidClassName?: string;
@@ -27,6 +31,7 @@ export function TextField<TFieldValues extends FieldValues>({
   hint,
   required,
   ui,
+  fieldPathAttr,
   inputProps,
   invalidClassName = "border-red-500 focus:ring-red-500/20",
 }: TextFieldProps<TFieldValues>) {
@@ -36,7 +41,7 @@ export function TextField<TFieldValues extends FieldValues>({
   const invalid = !!error;
 
   return (
-    <div className={ui.container}>
+    <div className={ui.container} data-field-path={fieldPathAttr ?? String(name)}>
       {label ? (
         <label className={ui.label}>
           {label}
