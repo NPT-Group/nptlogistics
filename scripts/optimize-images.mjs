@@ -101,7 +101,9 @@ async function main() {
   const results = [];
   console.log(`Scanning: ${PUBLIC_DIR}`);
   console.log(`Output:   ${OUT_DIR}`);
-  console.log(`MaxWidth: ${MAX_WIDTH}px | WebP q=${WEBP_QUALITY} | AVIF: ${ENABLE_AVIF ? `on (q=${AVIF_QUALITY})` : "off"}`);
+  console.log(
+    `MaxWidth: ${MAX_WIDTH}px | WebP q=${WEBP_QUALITY} | AVIF: ${ENABLE_AVIF ? `on (q=${AVIF_QUALITY})` : "off"}`,
+  );
   console.log("");
 
   for await (const abs of walk(PUBLIC_DIR)) {
@@ -114,26 +116,33 @@ async function main() {
     return;
   }
 
-  let totalIn = 0, totalWebp = 0, totalAvif = 0;
+  let totalIn = 0,
+    totalWebp = 0,
+    totalAvif = 0;
   for (const r of results) {
     totalIn += r.inputBytes;
     totalWebp += r.webpBytes;
     if (r.avifBytes != null) totalAvif += r.avifBytes;
   }
 
-  results.sort((a, b) => (b.inputBytes - b.webpBytes) - (a.inputBytes - a.webpBytes));
+  results.sort((a, b) => b.inputBytes - b.webpBytes - (a.inputBytes - a.webpBytes));
 
   console.log("Top 25 savings (original -> webp):");
   for (const r of results.slice(0, 25)) {
     const saved = r.inputBytes - r.webpBytes;
-    console.log(`- ${r.rel} | ${formatBytes(r.inputBytes)} -> ${formatBytes(r.webpBytes)} (saved ${formatBytes(saved)})`);
+    console.log(
+      `- ${r.rel} | ${formatBytes(r.inputBytes)} -> ${formatBytes(r.webpBytes)} (saved ${formatBytes(saved)})`,
+    );
   }
 
   console.log("");
   console.log("Totals:");
   console.log(`- Original: ${formatBytes(totalIn)}`);
   console.log(`- WebP:     ${formatBytes(totalWebp)} (saved ${formatBytes(totalIn - totalWebp)})`);
-  if (ENABLE_AVIF) console.log(`- AVIF:     ${formatBytes(totalAvif)} (saved ${formatBytes(totalIn - totalAvif)})`);
+  if (ENABLE_AVIF)
+    console.log(
+      `- AVIF:     ${formatBytes(totalAvif)} (saved ${formatBytes(totalIn - totalAvif)})`,
+    );
 
   console.log("");
   console.log("Done. Optimized images are in public/_optimized/ (originals not overwritten).");
