@@ -4,6 +4,7 @@ import { escapeHtml } from "@/lib/mail/utils";
 import { buildDefaultEmailTemplate } from "@/lib/mail/templates/defaultTemplate";
 import { NPT_HR_EMAIL } from "@/config/env";
 import type { IFileAsset } from "@/types/shared.types";
+import { filenameForAsset } from "@/lib/utils/files/mime";
 
 export type SendJobApplicantHrNotificationEmailParams = {
   /** HR mailbox recipient (often same as NPT_HR_EMAIL) */
@@ -50,28 +51,6 @@ function joinUrl(base: string, path: string) {
   const b = (base || "").replace(/\/+$/, "");
   const p = (path || "").replace(/^\/+/, "");
   return `${b}/${p}`;
-}
-
-function inferExtFromMime(mime?: string) {
-  const m = (mime || "").toLowerCase();
-  if (m.includes("pdf")) return "pdf";
-  if (m.includes("msword")) return "doc";
-  if (m.includes("officedocument.wordprocessingml")) return "docx";
-  if (m.includes("png")) return "png";
-  if (m.includes("jpeg") || m.includes("jpg")) return "jpg";
-  if (m.includes("webp")) return "webp";
-  if (m.includes("gif")) return "gif";
-  return "";
-}
-
-function filenameForAsset(asset: any, fallbackBase: string, fallbackMime?: string) {
-  const raw =
-    asset?.filename || asset?.originalName || asset?.originalFilename || asset?.name || "";
-
-  if (raw && typeof raw === "string") return raw;
-
-  const ext = inferExtFromMime(fallbackMime || asset?.mimeType);
-  return ext ? `${fallbackBase}.${ext}` : fallbackBase;
 }
 
 async function assetToAttachment(

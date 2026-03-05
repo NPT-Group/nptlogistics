@@ -268,6 +268,99 @@ export async function finalizeVectorWithCache(
   return out;
 }
 
+/* ───────────────────────── All-or-nothing move helpers (server) ───────────────────────── */
+
+export type S3MovePair = { fromKey: string; toKey: string };
+
+/**
+ * Roll back a set of S3 moves (copy+delete) in reverse order (best-effort).
+ * Useful when you need all-or-nothing temp -> final moves.
+ */
+export async function rollbackS3Moves(moves: S3MovePair[]): Promise<void> {
+  for (let i = moves.length - 1; i >= 0; i--) {
+    const m = moves[i];
+    try {
+      await moveS3Object({ fromKey: m.toKey, toKey: m.fromKey });
+    } catch (e) {
+      console.warn("Rollback move failed:", m, e);
+    }
+  }
+}
+
+/**
+ * Finalize a vector of assets in an all-or-nothing way:
+ * - Moves only temp keys
+ * - Dedupes repeated temp keys (cache)
+ * - If ANY move fails, rolls back all moves
+ *
+ * Returns updated assets + a rollback() you can call if later steps fail (DB validate/save).
+ */
+export async function finalizeAssetVectorAllOrNothing(args: {
+  assets?: IFileAsset[];
+  finalFolder: string; // full prefix
+}): Promise<{
+  assets: IFileAsset[];
+  movedCount: number;
+  rollback: () => Promise<void>;
+}> {
+  const moves: S3MovePair[] = [];
+  const cache = new Map<string, IFileAsset>(); // tempKey -> finalized asset
+
+  try {
+    const input = Array.isArray(args.assets) ? args.assets : [];
+    if (!input.length) {
+      return { assets: [], movedCount: 0, rollback: async () => {} };
+    }
+
+    const out: IFileAsset[] = [];
+
+    for (const asset of input) {
+      const tempKey = asset?.s3Key ? String(asset.s3Key) : "";
+
+      // Not a real asset or already final => keep as-is
+      if (!tempKey || !isTempKey(tempKey)) {
+        out.push(asset);
+        continue;
+      }
+
+      // Cache to avoid moving same temp key twice
+      const cached = cache.get(tempKey);
+      if (cached) {
+        out.push(cached);
+        continue;
+      }
+
+      // Build final key (keep same filename)
+      const filename = tempKey.split("/").pop() || "file";
+      const finalKey = keyJoin(args.finalFolder, filename);
+
+      // Move
+      const moved = await moveS3Object({ fromKey: tempKey, toKey: finalKey });
+
+      // Track move for rollback
+      moves.push({ fromKey: tempKey, toKey: moved.key });
+
+      const finalized: IFileAsset = {
+        ...asset,
+        s3Key: moved.key,
+        url: moved.url,
+      };
+
+      cache.set(tempKey, finalized);
+      out.push(finalized);
+    }
+
+    return {
+      assets: out,
+      movedCount: moves.length,
+      rollback: async () => rollbackS3Moves(moves),
+    };
+  } catch (e) {
+    if (moves.length) await rollbackS3Moves(moves);
+    throw e;
+  }
+}
+
 /* ───────────────────────── Presigned GET download (server) ───────────────────────── */
 
 function sanitizeDownloadName(name: string): string {

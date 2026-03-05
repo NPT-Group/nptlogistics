@@ -1,96 +1,276 @@
-// src/types/quoteRequest.types.ts
-import type { ObjectId } from "mongoose";
-import type { IFileAsset } from "@/types/shared.types";
+// src/types/logisticsQuote.types.ts
 
-/** Primary service buttons (single-select) */
-export enum EQuotePrimaryService {
+import type { ObjectId } from "mongoose";
+import type { IFileAsset, ICountry } from "@/types/shared.types";
+
+/* ──────────────────────────────────────────────────────────────────────────────
+BUSINESS RULE SUMMARY
+
+1. Primary service is SINGLE-SELECT (strict discriminator model).
+2. Country storage:
+   - Always store ISO-2 country code (CA, US, MX, etc.).
+   - FTL, LTL, Warehousing → ONLY NORTH_AMERICAN_COUNTRY_CODES.
+   - International → ANY ISO country code allowed.
+3. Weight:
+   - ALWAYS requires unit (KG or LB).
+4. Dimensions:
+   - Stored as numeric L/W/H only.
+   - NO dimension unit stored (internal normalization).
+5. Cross-border:
+   - Derived in backend:
+     crossBorder = origin.countryCode !== destination.countryCode
+6. Equipment-addon compatibility:
+   - Must be validated in service layer / schema validation.
+────────────────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────── Enums ───────────────────────────── */
+
+export enum ELogisticsPrimaryService {
   FTL = "FTL",
   LTL = "LTL",
   INTERNATIONAL = "INTERNATIONAL",
   WAREHOUSING = "WAREHOUSING",
 }
 
-/** Contact / identification */
-export enum EQuotePartyRole {
+export enum EWeightUnit {
+  KG = "KG",
+  LB = "LB",
+}
+
+export enum ECustomerIdentity {
   SHIPPER = "SHIPPER",
   BROKER = "BROKER",
 }
 
-export enum EQuoteBrokerType {
-  FREIGHT = "FREIGHT",
-  CUSTOMS = "CUSTOMS",
+export enum EBrokerType {
+  FREIGHT_BROKER = "FREIGHT_BROKER",
+  CUSTOMS_BROKER = "CUSTOMS_BROKER",
   BOTH = "BOTH",
 }
 
-export enum EPreferredContactMethod {
-  EMAIL = "EMAIL",
-  PHONE = "PHONE",
-  TEXT = "TEXT",
-}
-
-/** FTL */
 export enum EFTLEquipmentType {
   DRY_VAN = "DRY_VAN",
   REEFER = "REEFER",
   FLATBED = "FLATBED",
   RGN_LOWBOY = "RGN_LOWBOY",
   CONESTOGA = "CONESTOGA",
-  INTERMODAL_CHASSIS = "INTERMODAL_CHASSIS",
 }
 
-export enum EFTLAddOn {
+export enum EFTLAddon {
   EXPEDITED = "EXPEDITED",
   TEAM_DRIVERS = "TEAM_DRIVERS",
   HAZARDOUS_MATERIALS = "HAZARDOUS_MATERIALS",
-
-  OVERSIZED_OVERWEIGHT = "OVERSIZED_OVERWEIGHT", // flatbed / rgn
-  PERMITS_REQUIRED = "PERMITS_REQUIRED", // rgn
-  ESCORT_VEHICLES_REQUIRED = "ESCORT_VEHICLES_REQUIRED", // rgn
-  OVERWEIGHT_CONTAINER = "OVERWEIGHT_CONTAINER", // intermodal
+  OVERSIZED_OVERWEIGHT = "OVERSIZED_OVERWEIGHT",
+  ESCORT_VEHICLES_REQUIRED = "ESCORT_VEHICLES_REQUIRED",
 }
 
-/** LTL */
-export enum ELTLAddOn {
+export enum ELTLAddon {
   LIFTGATE_REQUIRED = "LIFTGATE_REQUIRED",
   RESIDENTIAL_DELIVERY = "RESIDENTIAL_DELIVERY",
   APPOINTMENT_REQUIRED = "APPOINTMENT_REQUIRED",
   HAZARDOUS_MATERIALS = "HAZARDOUS_MATERIALS",
-  CROSS_BORDER = "CROSS_BORDER",
   EXPEDITED_HANDLING = "EXPEDITED_HANDLING",
 }
 
-export type Dimensions = {
-  length: number;
-  width: number;
-  height: number;
-  unit: "IN" | "CM";
-};
-
-/** International */
 export enum EInternationalMode {
   AIR = "AIR",
   OCEAN = "OCEAN",
 }
 
-export enum EInternationalShipmentSizeBand {
+export enum EInternationalShipmentSize {
   SMALL = "SMALL",
   MEDIUM = "MEDIUM",
   LARGE = "LARGE",
 }
 
-/** Warehousing */
 export enum EWarehousingDuration {
   SHORT_TERM = "SHORT_TERM",
   LONG_TERM_ONGOING = "LONG_TERM_ONGOING",
 }
 
-/** Common helpers */
-export type CityCountryLocation = {
+export enum EPreferredContactMethod {
+  EMAIL = "EMAIL",
+  PHONE = "PHONE",
+}
+
+/* ───────────────────────────── Shared Types ───────────────────────────── */
+
+/**
+ * Standardized logistics address.
+ *
+ * IMPORTANT:
+ * - countryCode stores ISO-2 code (e.g., CA, US, MX).
+ * - Validation rules by service:
+ *
+ *   FTL, LTL, Warehousing:
+ *     countryCode MUST be one of NORTH_AMERICAN_COUNTRY_CODES
+ *
+ *   International:
+ *     countryCode can be any ISO-2 code from ALL_COUNTRIES
+ */
+export type LogisticsAddress = {
+  street1: string;
+  street2?: string;
   city: string;
-  country: string;
-  region?: string;
-  postalCode?: string;
+  region: string; // State / Province
+  postalCode: string;
+  countryCode: ICountry["code"]; // ISO-2
 };
+
+/**
+ * Dimensions WITHOUT unit.
+ * Internal team determines measurement unit.
+ */
+export type LogisticsDimensions = {
+  length: number;
+  width: number;
+  height: number;
+};
+
+/**
+ * Weight ALWAYS requires unit.
+ */
+export type LogisticsWeight = {
+  value: number;
+  unit: EWeightUnit;
+};
+
+/* ───────────────────────────── FTL ───────────────────────────── */
+
+export type QuoteFTLDetails = {
+  primaryService: ELogisticsPrimaryService.FTL;
+
+  equipment: EFTLEquipmentType;
+
+  /**
+   * Business rule:
+   * origin.countryCode and destination.countryCode
+   * MUST be CA, US, or MX (North America only).
+   */
+  origin: LogisticsAddress;
+  destination: LogisticsAddress;
+
+  readyDate: Date | string;
+  commodityDescription: string;
+
+  approximateTotalWeight: LogisticsWeight;
+
+  estimatedPalletCount?: number;
+  dimensions?: LogisticsDimensions;
+
+  readyDateFlexible?: boolean;
+
+  /**
+   * Equipment compatibility must be validated:
+   *
+   * DRY_VAN → EXPEDITED, TEAM_DRIVERS, HAZMAT
+   * REEFER → EXPEDITED, TEAM_DRIVERS, HAZMAT
+   * FLATBED → OVERSIZED, ESCORT, EXPEDITED, TEAM_DRIVERS, HAZMAT
+   * RGN → OVERSIZED, ESCORT, EXPEDITED
+   * CONESTOGA → EXPEDITED, TEAM_DRIVERS, HAZMAT
+   */
+  addons?: EFTLAddon[];
+};
+
+/* ───────────────────────────── LTL ───────────────────────────── */
+
+export type QuoteLTLPalletLine = {
+  quantity: number; // >= 1
+  dimensions: LogisticsDimensions;
+  totalWeight?: LogisticsWeight;
+};
+
+export type QuoteLTLDetails = {
+  primaryService: ELogisticsPrimaryService.LTL;
+
+  /**
+   * MUST be North American countries only.
+   */
+  origin: LogisticsAddress;
+  destination: LogisticsAddress;
+
+  readyDate: Date | string;
+  commodityDescription: string;
+
+  stackable: boolean;
+
+  palletLines: QuoteLTLPalletLine[];
+
+  approximateTotalWeight?: LogisticsWeight;
+
+  addons?: ELTLAddon[];
+};
+
+/* ───────────────────────────── International ───────────────────────────── */
+
+export type QuoteInternationalDetails = {
+  primaryService: ELogisticsPrimaryService.INTERNATIONAL;
+
+  mode: EInternationalMode;
+
+  /**
+   * Any ISO country allowed.
+   */
+  origin: LogisticsAddress;
+  destination: LogisticsAddress;
+
+  readyDate: Date | string;
+  commodityDescription: string;
+
+  estimatedWeight: LogisticsWeight;
+
+  shipmentSize?: EInternationalShipmentSize;
+};
+
+/* ───────────────────────────── Warehousing ───────────────────────────── */
+
+export enum EWarehousingVolumeType {
+  PALLET_COUNT = "PALLET_COUNT",
+  SQUARE_FOOTAGE = "SQUARE_FOOTAGE",
+}
+
+/**
+ * Warehousing volume (simple scalar).
+ * - PALLET_COUNT => value = pallets
+ * - SQUARE_FOOTAGE => value = square feet
+ */
+export type WarehousingVolume = {
+  volumeType: EWarehousingVolumeType;
+  value: number; // >= 1
+};
+
+export type QuoteWarehousingDetails = {
+  primaryService: ELogisticsPrimaryService.WAREHOUSING;
+
+  /**
+   * Location MUST be CA, US, or MX.
+   */
+  requiredLocation: LogisticsAddress;
+
+  estimatedVolume: WarehousingVolume;
+
+  expectedDuration: EWarehousingDuration;
+};
+
+/* ───────────────────────────── Union Type ───────────────────────────── */
+
+export type QuoteServiceDetails =
+  | QuoteFTLDetails
+  | QuoteLTLDetails
+  | QuoteInternationalDetails
+  | QuoteWarehousingDetails;
+
+/* ───────────────────────────── Contact & Identification ───────────────────────────── */
+
+export type QuoteIdentification =
+  | {
+      identity: ECustomerIdentity.SHIPPER;
+      brokerType?: never;
+    }
+  | {
+      identity: ECustomerIdentity.BROKER;
+      brokerType: EBrokerType;
+    };
 
 export type QuoteContact = {
   firstName: string;
@@ -101,138 +281,35 @@ export type QuoteContact = {
   phone?: string;
   preferredContactMethod?: EPreferredContactMethod;
 
-  attachments?: IFileAsset[];
+  companyAddress?: string;
 };
 
-export type QuoteIdentification = {
-  role: EQuotePartyRole;
-  brokerType?: EQuoteBrokerType; // required iff role === BROKER
-};
+/* ───────────────────────────── Root Model ───────────────────────────── */
 
-/** Per-path basics (kept explicit + clean) */
-export type QuoteFTLBasics = {
-  readyDate: Date | string;
-  commodity: string;
+export interface ILogisticsQuote {
+  _id: ObjectId | string;
 
-  approximateTotalWeight: number;
-  weightUnit?: "LB" | "KG";
+  serviceDetails: QuoteServiceDetails;
 
-  estimatedPalletCount?: number;
-  isReadyDateFlexible?: boolean;
-};
-
-export type QuoteLTLBasics = {
-  readyDate: Date | string;
-  commodity: string;
-
-  approximateTotalWeight: number;
-  weightUnit?: "LB" | "KG";
-
-  dimensions: Dimensions;
-  palletCount: number;
-  isStackable: boolean;
-};
-
-export type QuoteInternationalBasics = {
-  readyDate: Date | string;
-  commodity: string;
-
-  estimatedWeight: number;
-  weightUnit?: "LB" | "KG";
-
-  shipmentSizeBand?: EInternationalShipmentSizeBand;
-};
-
-/** FTL path */
-export type QuoteFTL = {
-  service: EQuotePrimaryService.FTL;
-
-  equipment: EFTLEquipmentType;
-
-  pickup: CityCountryLocation;
-  delivery: CityCountryLocation;
-
-  basics: QuoteFTLBasics;
-
-  addOns?: EFTLAddOn[];
-};
-
-/** LTL path */
-export type QuoteLTL = {
-  service: EQuotePrimaryService.LTL;
-
-  pickup: CityCountryLocation;
-  delivery: CityCountryLocation;
-
-  basics: QuoteLTLBasics;
-
-  addOns?: ELTLAddOn[];
-};
-
-/** International path */
-export type QuoteInternational = {
-  service: EQuotePrimaryService.INTERNATIONAL;
-
-  mode: EInternationalMode;
-
-  originCountry: string;
-  destinationCountry: string;
-
-  basics: QuoteInternationalBasics;
-};
-
-/** Warehousing path */
-export type QuoteWarehousing = {
-  service: EQuotePrimaryService.WAREHOUSING;
-
-  requiredLocation: CityCountryLocation;
-
-  estimatedVolume: {
-    value: number;
-    unit: "PALLETS" | "SQFT";
-  };
-
-  duration?: EWarehousingDuration;
-};
-
-/** Discriminated union for service-specific data */
-export type QuoteServiceDetails = QuoteFTL | QuoteLTL | QuoteInternational | QuoteWarehousing;
-
-/** Lifecycle / routing */
-export enum EQuoteRequestStatus {
-  NEW = "NEW",
-  IN_REVIEW = "IN_REVIEW",
-  QUALIFIED = "QUALIFIED",
-  CLOSED = "CLOSED",
-  SPAM = "SPAM",
-}
-
-export type QuoteInternalRouting = {
-  lane?: "DOMESTIC" | "CROSS_BORDER" | "INTERNATIONAL";
-  priority?: "LOW" | "NORMAL" | "HIGH";
-  tags?: string[];
-  notes?: string;
-};
-
-export interface IQuoteRequest {
-  id: ObjectId | string;
-
-  /** Step 1 */
-  primaryService: EQuotePrimaryService;
-
-  /** Step 5 */
-  details: QuoteServiceDetails;
-
-  /** Step 6 */
   identification: QuoteIdentification;
   contact: QuoteContact;
 
-  /** Step 7 */
   finalNotes?: string;
 
-  status: EQuoteRequestStatus;
-  routing?: QuoteInternalRouting;
+  attachments?: IFileAsset[];
+
+  marketingEmailConsent?: boolean;
+
+  /**
+   * Derived in backend.
+   * Not user-editable.
+   */
+  crossBorder?: boolean;
 
   createdAt: Date | string;
   updatedAt: Date | string;
 }
+
+/* ───────────────────────────── Draft Helper ───────────────────────────── */
+
+export type LogisticsQuoteDraft = Partial<Omit<ILogisticsQuote, "_id" | "createdAt" | "updatedAt">>;

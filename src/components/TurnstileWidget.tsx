@@ -1,4 +1,4 @@
-// src/components/shared/TurnstileWidget.tsx
+// src/components/TurnstileWidget.tsx
 "use client";
 
 import * as React from "react";
@@ -18,12 +18,31 @@ declare global {
 type Props = {
   /** Turnstile "action" (optional, but nice for analytics / rules) */
   action?: string;
-  /** Called when token is issued */
+  /** Called when token is issued (empty string means cleared/expired) */
   onToken: (token: string) => void;
   /** Optional class wrapper */
   className?: string;
   /** Optional: called when widget fails */
   onError?: (message: string) => void;
+
+  /** Form-driven invalid state (so it can highlight like other inputs) */
+  invalid?: boolean;
+  /** Form-driven error message (typically RHF field error) */
+  errorMessage?: string;
+
+  /** Optional: enterprise scroll-to-error targeting (works with or without RHF) */
+  fieldPathAttr?: string;
+
+  /** Optional label/hint (useful outside RHF too) */
+  label?: React.ReactNode;
+  hint?: React.ReactNode;
+
+  /**
+   * Visual chrome control:
+   * - "default": bordered/padded card (existing behavior)
+   * - "bare": no border/padding card; just the widget + messages (for compact layouts)
+   */
+  variant?: "default" | "bare";
 };
 
 const TURNSTILE_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
@@ -67,13 +86,23 @@ function loadTurnstileScript(): Promise<void> {
   return window.__turnstileScriptLoadPromise;
 }
 
-export default function TurnstileWidget({ action, onToken, className, onError }: Props) {
+export default function TurnstileWidget({
+  action,
+  onToken,
+  className,
+  onError,
+  invalid,
+  errorMessage,
+  fieldPathAttr,
+  label,
+  hint,
+  variant = "default",
+}: Props) {
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const widgetIdRef = React.useRef<string | null>(null);
 
-  // Keep latest callbacks in refs so parent re-renders don't re-init widget
   const onTokenRef = React.useRef(onToken);
   const onErrorRef = React.useRef(onError);
 
@@ -90,7 +119,6 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
   );
   const [msg, setMsg] = React.useState<string>("");
 
-  // Helpful: if the site key is missing, surface immediately.
   React.useEffect(() => {
     if (!siteKey) {
       setStatus("error");
@@ -120,7 +148,6 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
           return;
         }
 
-        // Cleanup any previous widget
         if (widgetIdRef.current) {
           try {
             window.turnstile.remove(widgetIdRef.current);
@@ -130,14 +157,12 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
           widgetIdRef.current = null;
         }
 
-        // Clear container so re-render is clean
         containerRef.current.innerHTML = "";
 
         const widgetId = window.turnstile.render(containerRef.current, {
           sitekey: siteKey,
           action: action || undefined,
 
-          // Receive the token
           callback: (token: string) => {
             if (cancelled) return;
             setStatus("verified");
@@ -145,12 +170,11 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
             onTokenRef.current(token);
           },
 
-          // If token expires, reset and clear token upstream
           "expired-callback": () => {
             if (cancelled) return;
             setStatus("ready");
             setMsg("Verification expired. Please try again.");
-            onTokenRef.current(""); // clear token
+            onTokenRef.current("");
             try {
               window.turnstile?.reset(widgetIdRef.current || undefined);
             } catch {
@@ -158,18 +182,16 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
             }
           },
 
-          // If something goes wrong, show a meaningful state
           "error-callback": () => {
             if (cancelled) return;
             setStatus("error");
             setMsg(
               "Verification failed to load. If you’re on localhost, ensure the site key allows this domain.",
             );
-            onTokenRef.current(""); // clear token
+            onTokenRef.current("");
             onErrorRef.current?.("Turnstile error-callback fired");
           },
 
-          // Optional: visuals
           theme: "light",
           size: "normal",
         });
@@ -197,30 +219,52 @@ export default function TurnstileWidget({ action, onToken, className, onError }:
         widgetIdRef.current = null;
       }
     };
-  }, [siteKey, action]); // NOTE: callbacks intentionally excluded
+  }, [siteKey, action]);
+
+  const showError = Boolean(errorMessage) || status === "error";
+
+  // Default (existing) chrome
+  const borderClass =
+    invalid || showError ? "border-red-300 bg-red-50" : "border-neutral-200 bg-white";
+
+  const content = (
+    <>
+      <div ref={containerRef} />
+
+      {status === "loading" ? (
+        <div className="mt-2 text-xs text-slate-500">Loading verification…</div>
+      ) : null}
+
+      {msg ? (
+        <div
+          className={["mt-2 text-xs", status === "error" ? "text-red-700" : "text-slate-500"].join(
+            " ",
+          )}
+        >
+          {msg}
+        </div>
+      ) : null}
+
+      {errorMessage ? <div className="mt-2 text-xs text-red-700">{errorMessage}</div> : null}
+    </>
+  );
 
   return (
-    <div className={className}>
-      <div className={[status === "error" ? "border-red-200 bg-red-50" : ""].join(" ")}>
-        {/* Turnstile mounts here */}
-        <div ref={containerRef} />
+    <div className={className} data-field-path={fieldPathAttr}>
+      {variant === "default" && label ? (
+        <div className="mb-1 text-sm font-medium text-neutral-900">{label}</div>
+      ) : null}
 
-        {/* Small status line */}
-        {status === "loading" ? (
-          <div className="mt-2 text-xs text-slate-500">Loading verification…</div>
-        ) : null}
+      {variant === "default" ? (
+        <div className={["rounded-xl border p-3", borderClass].join(" ")}>{content}</div>
+      ) : (
+        // bare: no padding/border wrapper
+        <div>{content}</div>
+      )}
 
-        {msg ? (
-          <div
-            className={[
-              "mt-2 text-xs",
-              status === "error" ? "text-red-700" : "text-slate-500",
-            ].join(" ")}
-          >
-            {msg}
-          </div>
-        ) : null}
-      </div>
+      {variant === "default" && hint ? (
+        <div className="mt-1 text-xs text-neutral-500">{hint}</div>
+      ) : null}
     </div>
   );
 }

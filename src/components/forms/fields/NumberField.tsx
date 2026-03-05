@@ -18,6 +18,9 @@ export type NumberFieldProps<TFieldValues extends FieldValues> = {
 
   ui: FieldUi;
 
+  /** For enterprise scroll-to-error targeting. Defaults to `name`. */
+  fieldPathAttr?: string;
+
   /**
    * By default, stores a number in RHF.
    * If false, stores raw string (rare).
@@ -36,6 +39,7 @@ export function NumberField<TFieldValues extends FieldValues>({
   hint,
   required,
   ui,
+  fieldPathAttr,
   parseAsNumber = true,
   inputProps,
   invalidClassName = "border-red-500 focus:ring-red-500/20",
@@ -47,7 +51,7 @@ export function NumberField<TFieldValues extends FieldValues>({
   const value: NumberLike = field.value as any;
 
   return (
-    <div className={ui.container}>
+    <div className={ui.container} data-field-path={fieldPathAttr ?? String(name)}>
       {label ? (
         <label className={ui.label}>
           {label}

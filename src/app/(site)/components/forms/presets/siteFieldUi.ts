@@ -1,29 +1,38 @@
 // src/app/(site)/components/forms/presets/siteFieldUi.ts
 import type { FieldUi } from "@/components/forms";
 
-/** Text input / select base */
+/**
+ * NOTE:
+ * Our site theme can set global text color to white (dark theme).
+ * Inputs/buttons must explicitly set text color to avoid white-on-white inputs.
+ */
+
+const CONTROL_BASE =
+  "w-full rounded-xl border shadow-sm transition focus:outline-none focus:ring-2";
+
+const CONTROL_TEXT = "text-neutral-900 placeholder:text-neutral-400 caret-neutral-900";
+
+const CONTROL_BG = "bg-white border-neutral-300 focus:border-black focus:ring-black/10";
+
 export const siteTextUi: FieldUi = {
   container: "space-y-1",
   label: "text-sm font-medium text-neutral-900",
-  control:
-    "h-12 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm shadow-sm transition focus:border-black focus:ring-2 focus:ring-black/10 focus:outline-none",
+  control: ["h-12 px-4 text-sm", CONTROL_BASE, CONTROL_BG, CONTROL_TEXT].join(" "),
   hint: "text-xs text-neutral-500",
   error: "text-xs text-red-500",
 };
 
-/** Textarea base */
 export const siteTextareaUi: FieldUi = {
   ...siteTextUi,
-  control:
-    "min-h-[140px] w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm shadow-sm transition focus:border-black focus:ring-2 focus:ring-black/10 focus:outline-none",
+  control: ["min-h-[140px] px-4 py-3 text-sm", CONTROL_BASE, CONTROL_BG, CONTROL_TEXT].join(" "),
 };
 
-/** Checkbox / radio rows */
 export const siteCheckUi: FieldUi = {
   container: "space-y-1",
   label: "text-sm font-medium text-neutral-900",
   controlRow: "rounded-xl p-2 hover:bg-neutral-50",
-  controlBox: "mt-1 h-4 w-4 rounded border border-neutral-300",
+  // checkbox itself should not inherit white text issues, but keep it explicit anyway
+  controlBox: "mt-1 h-4 w-4 rounded border border-neutral-300 bg-white",
   hint: "text-xs text-neutral-500",
   error: "text-xs text-red-500",
 };
