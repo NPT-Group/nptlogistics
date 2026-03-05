@@ -1,79 +1,113 @@
 // src/app/(site)/components/LogisticsQuoteForm/sections/SubmitSection.tsx
 "use client";
 
+import Link from "next/link";
 import { useFormContext } from "react-hook-form";
-import { ShieldCheck, Send } from "lucide-react";
+import { Send, AlertCircle } from "lucide-react";
 
 import type { LogisticsQuoteSubmitValues } from "../schema";
 import TurnstileWidget from "@/components/TurnstileWidget";
+import { CheckboxField } from "@/components/forms/fields/CheckboxField";
+import { siteCheckUi } from "@/app/(site)/components/forms/presets/siteFieldUi";
 
 export function SubmitSection() {
   const {
+    control,
     setValue,
     trigger,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting },
   } = useFormContext<LogisticsQuoteSubmitValues>();
 
   const turnstileError = errors.turnstileToken?.message;
   const turnstileInvalid = Boolean(turnstileError);
 
   return (
-    <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-      <div className="mb-4">
-        <h3 className="flex items-center gap-2 text-base font-semibold text-neutral-900">
-          <ShieldCheck className="h-4 w-4" />
-          Submit request
-        </h3>
-        <p className="mt-1 text-sm text-neutral-600">
-          Complete verification, then submit your quote request.
-        </p>
+    <section className="space-y-5">
+      {/* Consent (full width, left aligned by default) */}
+      <CheckboxField<LogisticsQuoteSubmitValues>
+        control={control}
+        name="marketingEmailConsent"
+        ui={siteCheckUi}
+        fieldPathAttr="marketingEmailConsent"
+        label={
+          <span className="text-sm font-medium text-[color:var(--color-text-light)]">
+            I agree to receive marketing communications from NPT Logistics
+          </span>
+        }
+        hint="Optional. You can unsubscribe anytime using the link in our emails."
+      />
+
+      {/* Privacy Block (full width, left aligned) */}
+      <div
+        className={[
+          "w-full rounded-2xl border p-4 sm:p-5",
+          "border-[color:var(--color-border-light)]",
+          "bg-[linear-gradient(180deg,rgba(15,23,42,0.02),transparent_55%)]",
+        ].join(" ")}
+      >
+        <div className="flex items-start gap-3">
+          <span
+            className={[
+              "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
+              "bg-[color:var(--color-brand-50)] text-[color:var(--color-brand-700)]",
+            ].join(" ")}
+          >
+            <AlertCircle className="h-4 w-4" />
+          </span>
+
+          <div className="min-w-0">
+            <div className="text-sm font-semibold text-[color:var(--color-text-light)]">
+              Your privacy is protected
+            </div>
+
+            <p className="mt-1 text-sm leading-relaxed text-[color:var(--color-muted-light)]">
+              We use your information to prepare your quote and support your request. We don’t sell
+              your personal data or share it with third parties for their marketing purposes.
+            </p>
+
+            <Link
+              href="/privacy"
+              className="mt-2 inline-block text-sm font-medium text-[color:var(--color-brand-700)] underline underline-offset-4 hover:text-[color:var(--color-brand-600)]"
+            >
+              Read our Privacy Policy
+            </Link>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-4">
+      {/* Turnstile verification (minimal, centered, no wrapper chrome) */}
+      <div className="flex justify-center">
         <TurnstileWidget
+          variant="bare"
           action="logistics-quote-submit"
           fieldPathAttr="turnstileToken"
-          label="Verification"
-          hint="This helps us prevent spam submissions."
           invalid={turnstileInvalid}
           errorMessage={turnstileError}
           onToken={(token) => {
-            // Keep RHF as the single source of truth
             setValue("turnstileToken", token, { shouldDirty: true, shouldTouch: true });
-            // If user completes captcha, re-validate just this field so error clears immediately
             void trigger("turnstileToken");
           }}
           onError={() => {
-            // Ensure RHF sees it as empty/invalid if widget errors
             setValue("turnstileToken", "", { shouldDirty: true, shouldTouch: true });
           }}
         />
+      </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="text-xs text-neutral-500">
-            By submitting, you agree we may contact you about this request.
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={[
-              "inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-black px-5 text-sm font-medium text-white",
-              "transition hover:opacity-90 focus:ring-2 focus:ring-black/20 focus:outline-none",
-              isSubmitting ? "opacity-70" : "",
-            ].join(" ")}
-          >
-            <Send className="h-4 w-4" />
-            {isSubmitting ? "Submitting…" : "Submit quote request"}
-          </button>
-        </div>
-
-        {/* Optional: a subtle helper if the form isn't valid yet (no blocking, just guidance). */}
-        {!isSubmitting && !isValid ? (
-          <div className="text-xs text-neutral-500">
-            Please review required fields above before submitting.
-          </div>
-        ) : null}
+      {/* Submit (red primary) */}
+      <div className="pt-1">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={[
+            "inline-flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-white",
+            "bg-[color:var(--color-brand-600)] hover:bg-[color:var(--color-brand-700)]",
+            "transition focus:ring-2 focus:ring-[color:var(--color-brand-600)]/25 focus:outline-none",
+            isSubmitting ? "opacity-70" : "",
+          ].join(" ")}
+        >
+          <Send className="h-4 w-4" />
+          {isSubmitting ? "Submitting…" : "Submit quote request"}
+        </button>
       </div>
     </section>
   );

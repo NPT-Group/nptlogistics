@@ -27,6 +27,8 @@ type SubmitQuoteBody = {
   finalNotes?: any;
   attachments?: any;
 
+  marketingEmailConsent?: any;
+
   /** Optional: affects email subject (e.g. "Website", "LP-A", etc.) */
   sourceLabel?: string;
 };
@@ -62,6 +64,7 @@ export const POST = async (req: NextRequest) => {
       contact: body?.contact,
       finalNotes: body?.finalNotes,
       attachments: body?.attachments,
+      marketingEmailConsent: body?.marketingEmailConsent,
     });
 
     // 4) Connect DB only after request is valid
@@ -79,6 +82,7 @@ export const POST = async (req: NextRequest) => {
 
       finalNotes: validated.finalNotes,
       attachments: validated.attachments,
+      marketingEmailConsent: validated.marketingEmailConsent,
 
       crossBorder: deriveCrossBorder(validated.serviceDetails),
     });

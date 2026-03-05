@@ -23,6 +23,8 @@ export const logisticsQuoteSchema = new Schema<ILogisticsQuote>(
 
     attachments: { type: [fileAssetSchema], required: false, default: [] },
 
+    marketingEmailConsent: { type: Boolean, required: false, default: false },
+
     // Derived in backend.
     crossBorder: { type: Boolean, required: false, index: true },
   },

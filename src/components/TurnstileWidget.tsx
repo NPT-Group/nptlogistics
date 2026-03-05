@@ -36,6 +36,13 @@ type Props = {
   /** Optional label/hint (useful outside RHF too) */
   label?: React.ReactNode;
   hint?: React.ReactNode;
+
+  /**
+   * Visual chrome control:
+   * - "default": bordered/padded card (existing behavior)
+   * - "bare": no border/padding card; just the widget + messages (for compact layouts)
+   */
+  variant?: "default" | "bare";
 };
 
 const TURNSTILE_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
@@ -89,6 +96,7 @@ export default function TurnstileWidget({
   fieldPathAttr,
   label,
   hint,
+  variant = "default",
 }: Props) {
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
@@ -214,37 +222,49 @@ export default function TurnstileWidget({
   }, [siteKey, action]);
 
   const showError = Boolean(errorMessage) || status === "error";
+
+  // Default (existing) chrome
   const borderClass =
     invalid || showError ? "border-red-300 bg-red-50" : "border-neutral-200 bg-white";
 
+  const content = (
+    <>
+      <div ref={containerRef} />
+
+      {status === "loading" ? (
+        <div className="mt-2 text-xs text-slate-500">Loading verification…</div>
+      ) : null}
+
+      {msg ? (
+        <div
+          className={["mt-2 text-xs", status === "error" ? "text-red-700" : "text-slate-500"].join(
+            " ",
+          )}
+        >
+          {msg}
+        </div>
+      ) : null}
+
+      {errorMessage ? <div className="mt-2 text-xs text-red-700">{errorMessage}</div> : null}
+    </>
+  );
+
   return (
     <div className={className} data-field-path={fieldPathAttr}>
-      {label ? <div className="mb-1 text-sm font-medium text-neutral-900">{label}</div> : null}
+      {variant === "default" && label ? (
+        <div className="mb-1 text-sm font-medium text-neutral-900">{label}</div>
+      ) : null}
 
-      <div className={["rounded-xl border p-3", borderClass].join(" ")}>
-        <div ref={containerRef} />
+      {variant === "default" ? (
+        <div className={["rounded-xl border p-3", borderClass].join(" ")}>{content}</div>
+      ) : (
+        // bare: no padding/border wrapper
+        <div>{content}</div>
+      )}
 
-        {status === "loading" ? (
-          <div className="mt-2 text-xs text-slate-500">Loading verification…</div>
-        ) : null}
-
-        {/* Widget internal status message */}
-        {msg ? (
-          <div
-            className={[
-              "mt-2 text-xs",
-              status === "error" ? "text-red-700" : "text-slate-500",
-            ].join(" ")}
-          >
-            {msg}
-          </div>
-        ) : null}
-
-        {/* Form-driven error message (RHF/Zod) */}
-        {errorMessage ? <div className="mt-2 text-xs text-red-700">{errorMessage}</div> : null}
-      </div>
-
-      {hint ? <div className="mt-1 text-xs text-neutral-500">{hint}</div> : null}
+      {variant === "default" && hint ? (
+        <div className="mt-1 text-xs text-neutral-500">{hint}</div>
+      ) : null}
     </div>
   );
 }

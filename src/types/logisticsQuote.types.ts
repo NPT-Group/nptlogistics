@@ -281,7 +281,7 @@ export type QuoteContact = {
   phone?: string;
   preferredContactMethod?: EPreferredContactMethod;
 
-  companyAddress?: LogisticsAddress;
+  companyAddress?: string;
 };
 
 /* ───────────────────────────── Root Model ───────────────────────────── */
@@ -297,6 +297,8 @@ export interface ILogisticsQuote {
   finalNotes?: string;
 
   attachments?: IFileAsset[];
+
+  marketingEmailConsent?: boolean;
 
   /**
    * Derived in backend.

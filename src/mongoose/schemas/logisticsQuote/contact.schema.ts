@@ -2,7 +2,6 @@
 import { Schema } from "mongoose";
 import type { QuoteContact } from "@/types/logisticsQuote.types";
 import { EPreferredContactMethod } from "@/types/logisticsQuote.types";
-import { logisticsAddressSchema } from "./address.schema";
 
 export const quoteContactSchema = new Schema<QuoteContact>(
   {
@@ -19,7 +18,7 @@ export const quoteContactSchema = new Schema<QuoteContact>(
       enum: Object.values(EPreferredContactMethod),
     },
 
-    companyAddress: { type: logisticsAddressSchema, required: false },
+    companyAddress: { type: String, required: false, trim: true, maxlength: 400 },
   },
   { _id: false },
 );

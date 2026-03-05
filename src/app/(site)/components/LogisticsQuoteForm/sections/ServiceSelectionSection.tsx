@@ -5,7 +5,7 @@ import * as React from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { Truck, Boxes, Globe2, Warehouse, AlertTriangle } from "lucide-react";
 
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 
 import {
   ELogisticsPrimaryService,
@@ -26,7 +26,7 @@ const SERVICES: readonly ServiceCard[] = [
   {
     value: ELogisticsPrimaryService.FTL,
     label: "Full Truckload (FTL)",
-    description: "Dedicated truck, best for larger shipments and time-sensitive loads.",
+    description: "Dedicated truck for larger, time-sensitive shipments.",
     icon: Truck,
   },
   {
@@ -44,7 +44,7 @@ const SERVICES: readonly ServiceCard[] = [
   {
     value: ELogisticsPrimaryService.WAREHOUSING,
     label: "Warehousing",
-    description: "Storage and fulfillment support with flexible durations and volume.",
+    description: "Storage and fulfillment support with flexible durations.",
     icon: Warehouse,
   },
 ];
@@ -69,7 +69,6 @@ export function ServiceSelectionSection() {
 
   function selectService(next: PrimaryService) {
     const prev = getValues("serviceDetails.primaryService");
-
     if (prev === next) return;
 
     const nextDefaults = buildServiceDetailsOnPrimaryServiceChange(next);
@@ -84,14 +83,14 @@ export function ServiceSelectionSection() {
   }
 
   return (
-    <section
-      className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm"
-      data-field-path="serviceDetails.primaryService"
-    >
-      <div className="mb-4">
-        <h2 className="text-base font-semibold text-neutral-900">Select a service</h2>
-        <p className="mt-1 text-sm text-neutral-600">
-          Choose the primary service first. We’ll show only the fields that apply.
+    <section data-field-path="serviceDetails.primaryService">
+      <div className="mb-3">
+        <h2 className="text-sm font-semibold text-[color:var(--color-text-light)]">
+          Select a service
+        </h2>
+
+        <p className="mt-1 text-sm text-[color:var(--color-muted-light)]">
+          Pick the primary service. We’ll show only the fields that apply.
         </p>
 
         {serviceError ? (
@@ -112,20 +111,51 @@ export function ServiceSelectionSection() {
               key={svc.value}
               type="button"
               onClick={() => selectService(svc.value)}
-              className={cn(
-                "group relative rounded-2xl border p-4 text-left transition",
-                "hover:border-neutral-300 hover:bg-neutral-50",
-                active
-                  ? "border-black bg-neutral-50 ring-1 ring-black/10"
-                  : "border-neutral-200 bg-white",
-              )}
               aria-pressed={active}
+              className={cn(
+                "group relative overflow-hidden rounded-2xl border text-left",
+                "p-3 sm:p-4",
+                "transition-all duration-200 ease-out",
+                // base surface
+                "border-[color:var(--color-border-light)] bg-white",
+                // hover polish
+                "hover:-translate-y-[1px] hover:border-neutral-300 hover:shadow-md",
+                // active depth (this is the big change)
+                active && [
+                  "border-black/80",
+                  "shadow-[0_10px_30px_-18px_rgba(0,0,0,0.45)]",
+                  "ring-1 ring-black/10",
+                ],
+              )}
             >
-              <div className="flex items-start gap-3">
+              {/* Subtle surface sheen (makes it feel expensive) */}
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200",
+                  // tiny black wash + top highlight
+                  "bg-[linear-gradient(180deg,rgba(0,0,0,0.04),rgba(0,0,0,0.00)_60%)]",
+                  active && "opacity-100",
+                )}
+              />
+
+              {/* Inner stroke (inset border look) */}
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-200",
+                  "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.55)]",
+                  active && "opacity-100",
+                )}
+              />
+
+              <div className="relative flex items-start gap-3">
                 <div
                   className={cn(
-                    "mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-xl border",
-                    active ? "border-black bg-black text-white" : "border-neutral-200 bg-white",
+                    "mt-0.5 inline-flex size-10 shrink-0 items-center justify-center rounded-full border transition",
+                    active
+                      ? "border-black bg-black text-white shadow-sm"
+                      : "border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)]",
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -133,23 +163,22 @@ export function ServiceSelectionSection() {
 
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <div className="text-sm font-semibold text-neutral-900">{svc.label}</div>
-                    {active ? (
-                      <span className="rounded-full bg-black px-2 py-0.5 text-xs font-medium text-white">
+                    <div className="text-sm font-semibold text-[color:var(--color-text-light)]">
+                      {svc.label}
+                    </div>
+
+                    {active && (
+                      <span className="rounded-full bg-black px-2 py-0.5 text-xs font-medium text-white shadow-sm">
                         Selected
                       </span>
-                    ) : null}
+                    )}
                   </div>
-                  <p className="mt-1 text-sm text-neutral-600">{svc.description}</p>
+
+                  <p className="mt-1 text-sm text-[color:var(--color-muted-light)]">
+                    {svc.description}
+                  </p>
                 </div>
               </div>
-
-              <span
-                className={cn(
-                  "pointer-events-none absolute inset-0 rounded-2xl",
-                  active ? "shadow-[0_0_0_2px_rgba(0,0,0,0.08)]" : "",
-                )}
-              />
             </button>
           );
         })}

@@ -14,6 +14,7 @@ import { FTLFields } from "./FTLFields";
 import { LTLFields } from "./LTLFields";
 import { InternationalFields } from "./InternationalFields";
 import { WarehousingFields } from "./WarehousingFields";
+import { InternationalModeSelector } from "./InternationalModeSelector";
 
 export function ServiceConfigurationSection() {
   const { control } = useFormContext<LogisticsQuoteSubmitValues>();
@@ -81,6 +82,8 @@ export function ServiceConfigurationSection() {
             transition={{ duration: 0.2 }}
             className="space-y-8"
           >
+            <InternationalModeSelector />
+
             <ShipmentDetailsSection>
               <InternationalFields />
             </ShipmentDetailsSection>

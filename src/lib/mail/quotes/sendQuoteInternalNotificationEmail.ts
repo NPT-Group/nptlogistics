@@ -57,6 +57,12 @@ function fmtAddress(a?: LogisticsAddress) {
   return escapeHtml(parts.join(" • "));
 }
 
+function fmtCompanyAddress(v?: unknown) {
+  if (v === null || v === undefined) return "—";
+  const s = String(v).trim();
+  return s ? escapeHtml(s) : "—";
+}
+
 function fmtWeight(w?: LogisticsWeight) {
   if (!w) return "—";
   const value = typeof w.value === "number" ? w.value : Number(w.value);
@@ -285,7 +291,7 @@ function renderContactAndIdentification(q: ILogisticsQuote): string {
     </ul>
 
     <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Company Address</p>
-    <p style="margin:0 0 16px 0; color:#374151;">${fmtAddress((q as any)?.contact?.companyAddress)}</p>
+    <p style="margin:0 0 16px 0; color:#374151;">${fmtCompanyAddress(c.companyAddress)}</p>
   `;
 }
 

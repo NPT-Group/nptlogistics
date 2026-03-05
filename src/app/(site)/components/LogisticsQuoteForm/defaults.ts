@@ -110,7 +110,7 @@ export function makeServiceDetailsDefaults(
  */
 export const LOGISTICS_QUOTE_SUBMIT_DEFAULTS: LogisticsQuoteSubmitValues = {
   turnstileToken: "",
-  sourceLabel: undefined,
+  sourceLabel: "NPT Logistics Quote Form",
 
   // no primary service selected on load
   serviceDetails: undefined,
@@ -126,9 +126,10 @@ export const LOGISTICS_QUOTE_SUBMIT_DEFAULTS: LogisticsQuoteSubmitValues = {
     company: "",
     phone: "",
     preferredContactMethod: undefined,
-    companyAddress: undefined,
+    companyAddress: "",
   },
 
   finalNotes: "",
   attachments: [],
+  marketingEmailConsent: false,
 };

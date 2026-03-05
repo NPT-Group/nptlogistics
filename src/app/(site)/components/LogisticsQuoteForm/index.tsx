@@ -2,7 +2,15 @@
 "use client";
 
 import * as React from "react";
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import {
+  FormProvider,
+  useForm,
+  useWatch,
+  type Control,
+  type UseFormSetValue,
+  type SubmitHandler,
+  type Resolver,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -12,7 +20,6 @@ import {
 } from "@/types/logisticsQuote.types";
 
 import { logisticsQuoteSubmitSchema, type LogisticsQuoteSubmitValues } from "./schema";
-
 import { LOGISTICS_QUOTE_SUBMIT_DEFAULTS } from "./defaults";
 import { focusFirstError, toApiSubmitBody, resetFtlAddonsOnEquipmentChange } from "./helpers";
 
@@ -24,16 +31,13 @@ import { AttachmentsSection } from "./sections/AttachmentsSection";
 import { FinalNotesSection } from "./sections/FinalNotesSection";
 import { SubmitSection } from "./sections/SubmitSection";
 
-/**
- * Reset logic effects (must obey the guidelines strictly):
- * - When Primary Service changes:
- *   ServiceSelectionSection replaces entire serviceDetails subtree.
- * - When Equipment changes (FTL only):
- *   Reset ONLY serviceDetails.addons
- *   Do NOT reset shipment inputs.
- */
-function ServiceResetEffects({ control, setValue }: { control: any; setValue: any }) {
-  // serviceDetails is optional now
+function ServiceResetEffects({
+  control,
+  setValue,
+}: {
+  control: Control<LogisticsQuoteSubmitValues>;
+  setValue: UseFormSetValue<LogisticsQuoteSubmitValues>;
+}) {
   const primaryService = useWatch({
     control,
     name: "serviceDetails.primaryService",
@@ -47,12 +51,10 @@ function ServiceResetEffects({ control, setValue }: { control: any; setValue: an
   const prevEquipmentRef = React.useRef<EFTLEquipmentType | undefined>(undefined);
 
   React.useEffect(() => {
-    // Only applies to FTL with equipment selected
     if (primaryService !== ELogisticsPrimaryService.FTL) {
       prevEquipmentRef.current = undefined;
       return;
     }
-
     if (!equipment) {
       prevEquipmentRef.current = undefined;
       return;
@@ -60,7 +62,6 @@ function ServiceResetEffects({ control, setValue }: { control: any; setValue: an
 
     const prev = prevEquipmentRef.current;
 
-    // first time selecting equipment should NOT force reset (addons already default [])
     if (!prev) {
       prevEquipmentRef.current = equipment;
       return;
@@ -68,7 +69,6 @@ function ServiceResetEffects({ control, setValue }: { control: any; setValue: an
 
     if (equipment !== prev) {
       const nextAddons = resetFtlAddonsOnEquipmentChange() as EFTLAddon[];
-
       setValue("serviceDetails.addons", nextAddons as any, {
         shouldDirty: true,
         shouldTouch: true,
@@ -82,9 +82,28 @@ function ServiceResetEffects({ control, setValue }: { control: any; setValue: an
   return null;
 }
 
+function SectionDivider() {
+  return (
+    <div className="py-2">
+      <div
+        className={[
+          "mx-auto h-px w-[88%]",
+          // thin edges, clearer in the center
+          "bg-[linear-gradient(90deg,transparent,rgba(15,23,42,0.16),rgba(15,23,42,0.22),rgba(15,23,42,0.16),transparent)]",
+        ].join(" ")}
+        aria-hidden="true"
+      />
+    </div>
+  );
+}
+
 export default function LogisticsQuoteForm() {
+  const resolver = zodResolver(
+    logisticsQuoteSubmitSchema,
+  ) as unknown as Resolver<LogisticsQuoteSubmitValues>;
+
   const methods = useForm<LogisticsQuoteSubmitValues>({
-    resolver: zodResolver(logisticsQuoteSubmitSchema),
+    resolver,
     defaultValues: LOGISTICS_QUOTE_SUBMIT_DEFAULTS,
     shouldUnregister: true,
     mode: "onSubmit",
@@ -99,7 +118,7 @@ export default function LogisticsQuoteForm() {
     formState: { errors },
   } = methods;
 
-  async function onSubmit(values: LogisticsQuoteSubmitValues) {
+  const onSubmit: SubmitHandler<LogisticsQuoteSubmitValues> = async (values) => {
     const body = toApiSubmitBody(values);
 
     const res = await fetch("/api/v1/quotes/logistics/submit", {
@@ -115,39 +134,55 @@ export default function LogisticsQuoteForm() {
       throw new Error(msg);
     }
 
-    // success: reset entire form to initial blank (no service selected)
     reset(LOGISTICS_QUOTE_SUBMIT_DEFAULTS);
-  }
+  };
 
-  function onInvalid() {
+  const onInvalid = () => {
     focusFirstError(errors);
-  }
+  };
 
   return (
     <FormProvider {...methods}>
-      {/* Ensure turnstileToken is registered in RHF even though TurnstileWidget writes via setValue */}
       <input type="hidden" {...register("turnstileToken")} />
 
-      {/* Reset effects (equipment => reset only addons) */}
       <ServiceResetEffects control={methods.control} setValue={setValue} />
 
-      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
-        {/* Always visible */}
-        <ServiceSelectionSection />
+      {/* White form card */}
+      <div
+        className={[
+          "rounded-3xl bg-white shadow-sm",
+          "border border-[color:var(--color-border-light)]",
+        ].join(" ")}
+      >
+        <form
+          onSubmit={handleSubmit(onSubmit, onInvalid)}
+          className="space-y-6 px-5 py-6 sm:px-7 sm:py-7"
+        >
+          <ServiceSelectionSection />
 
-        {/* Dynamic (animated) */}
-        <ServiceConfigurationSection />
+          <SectionDivider />
 
-        <div className="border-t border-neutral-200" />
+          <ServiceConfigurationSection />
 
-        {/* Stable sections */}
-        <IdentificationSection />
-        <ContactSection />
-        <AttachmentsSection />
-        <FinalNotesSection />
+          <SectionDivider />
 
-        <SubmitSection />
-      </form>
+          <IdentificationSection />
+
+          <SectionDivider />
+
+          <ContactSection />
+
+          <SectionDivider />
+
+          <FinalNotesSection />
+
+          <AttachmentsSection />
+
+          <SectionDivider />
+
+          <SubmitSection />
+        </form>
+      </div>
     </FormProvider>
   );
 }

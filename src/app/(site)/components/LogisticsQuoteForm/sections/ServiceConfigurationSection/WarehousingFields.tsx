@@ -14,7 +14,7 @@ export function WarehousingFields() {
   const { control } = useFormContext<LogisticsQuoteSubmitValues>();
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-3 md:grid-cols-2 md:gap-4">
       <SelectField<LogisticsQuoteSubmitValues, EWarehousingVolumeType>
         control={control}
         name={"serviceDetails.estimatedVolume.volumeType" as any}

@@ -40,21 +40,38 @@ export function AddonsSection() {
   const addons = useWatch({
     control,
     name: "serviceDetails.addons",
-  }) as any[] | undefined;
+  }) as string[] | undefined;
+
+  // Hooks MUST be unconditional
+  const ftlAllowed = React.useMemo<readonly EFTLAddon[]>(() => {
+    if (primaryService !== ELogisticsPrimaryService.FTL) return [];
+    if (!equipment) return [];
+    return getAllowedFtlAddons(equipment) as readonly EFTLAddon[];
+  }, [primaryService, equipment]);
+
+  const ftlAllowedSet = React.useMemo(() => new Set<string>(ftlAllowed), [ftlAllowed]);
+
+  // Filter out incompatible FTL addons whenever equipment/allowed/addons changes
+  React.useEffect(() => {
+    if (primaryService !== ELogisticsPrimaryService.FTL) return;
+    if (!equipment) return;
+
+    const cur = Array.isArray(addons) ? addons : [];
+    const filtered = cur.filter((a) => ftlAllowedSet.has(a));
+
+    if (filtered.length !== cur.length) {
+      setValue("serviceDetails.addons" as any, filtered as any, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+    }
+  }, [primaryService, equipment, addons, ftlAllowedSet, setValue]);
+
+  // ---- Render branches (branching here is fine) ----
 
   if (primaryService === ELogisticsPrimaryService.FTL) {
     if (!equipment) return null;
-
-    const allowed = getAllowedFtlAddons(equipment) as readonly EFTLAddon[];
-    const allowedSet = React.useMemo(() => new Set<string>(allowed), [allowed]);
-
-    React.useEffect(() => {
-      const cur = (addons ?? []) as string[];
-      const filtered = cur.filter((a) => allowedSet.has(a));
-      if (filtered.length !== cur.length) {
-        setValue("serviceDetails.addons" as any, filtered as any, { shouldDirty: true });
-      }
-    }, [equipment, allowedSet, setValue]);
 
     return (
       <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
@@ -66,7 +83,7 @@ export function AddonsSection() {
         </div>
 
         <div className="space-y-2" data-field-path="serviceDetails.addons">
-          {allowed.map((addon) => {
+          {ftlAllowed.map((addon) => {
             const checked = Array.isArray(addons) ? addons.includes(addon) : false;
 
             return (
@@ -79,6 +96,7 @@ export function AddonsSection() {
                   const nextArr = toggleInArray(addons as EFTLAddon[] | undefined, addon, next);
                   setValue("serviceDetails.addons" as any, nextArr as any, {
                     shouldDirty: true,
+                    shouldTouch: true,
                     shouldValidate: true,
                   });
                 }}
@@ -117,6 +135,7 @@ export function AddonsSection() {
                   const nextArr = toggleInArray(addons as ELTLAddon[] | undefined, addon, next);
                   setValue("serviceDetails.addons" as any, nextArr as any, {
                     shouldDirty: true,
+                    shouldTouch: true,
                     shouldValidate: true,
                   });
                 }}

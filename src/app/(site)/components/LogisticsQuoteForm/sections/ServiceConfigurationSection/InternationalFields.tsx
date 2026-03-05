@@ -4,11 +4,7 @@
 import { useFormContext } from "react-hook-form";
 
 import type { LogisticsQuoteSubmitValues } from "../../schema";
-import {
-  EInternationalMode,
-  EInternationalShipmentSize,
-  EWeightUnit,
-} from "@/types/logisticsQuote.types";
+import { EInternationalShipmentSize, EWeightUnit } from "@/types/logisticsQuote.types";
 
 import { SelectField } from "@/components/forms/fields/SelectField";
 import { TextField } from "@/components/forms/fields/TextField";
@@ -21,20 +17,6 @@ export function InternationalFields() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <SelectField<LogisticsQuoteSubmitValues, EInternationalMode>
-        control={control}
-        name={"serviceDetails.mode" as any}
-        fieldPathAttr="serviceDetails.mode"
-        label="Mode"
-        required
-        ui={siteTextUi}
-        placeholder="Select mode..."
-        options={[
-          { label: "Air", value: EInternationalMode.AIR },
-          { label: "Ocean", value: EInternationalMode.OCEAN },
-        ]}
-      />
-
       <SelectField<LogisticsQuoteSubmitValues, EInternationalShipmentSize>
         control={control}
         name={"serviceDetails.shipmentSize" as any}

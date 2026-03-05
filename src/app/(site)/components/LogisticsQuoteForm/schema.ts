@@ -26,10 +26,9 @@ import type { IFileAsset } from "@/types/shared.types";
 ────────────────────────────────────────────────────────────────────────────── */
 
 const trimStr = z.string().trim().min(1, "Required");
-const optTrimStr = z.preprocess(
-  (v) => (typeof v === "string" ? v.trim() : v),
-  z.string().optional(),
-);
+const optTrimStr = z
+  .preprocess((v) => (typeof v === "string" ? v.trim() : v), z.string())
+  .optional();
 
 const upper2 = z
   .string()
@@ -283,7 +282,7 @@ export const contactSchema = z.object({
   phone: optTrimStr,
   preferredContactMethod: z.nativeEnum(EPreferredContactMethod).optional(),
 
-  companyAddress: logisticsAddressSchema.optional(),
+  companyAddress: optTrimStr.refine((s) => s == null || s.length <= 400, "Max 400 characters"),
 });
 
 /* ───────────────────────────── SUBMIT BODY ───────────────────────────── */
@@ -305,6 +304,8 @@ export const logisticsQuoteSubmitSchema = z
       .refine((s) => s == null || s.length <= 6000, "finalNotes exceeds maximum length (6000)"),
 
     attachments: z.array(fileAssetSchema).optional(),
+
+    marketingEmailConsent: z.coerce.boolean().optional(),
 
     sourceLabel: z.string().optional(),
   })

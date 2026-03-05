@@ -17,19 +17,24 @@ export function FinalNotesSection() {
   const len = typeof notes === "string" ? notes.length : 0;
 
   return (
-    <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-start justify-between gap-4">
+    <section>
+      <div className="mb-3 flex items-start justify-between gap-4">
         <div>
-          <h3 className="flex items-center gap-2 text-base font-semibold text-neutral-900">
-            <MessageSquareText className="h-4 w-4" />
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-[color:var(--color-text-light)]">
+            <MessageSquareText className="h-4 w-4 text-[color:var(--color-brand-700)]" />
             Final notes
           </h3>
-          <p className="mt-1 text-sm text-neutral-600">
-            Optional. Add any constraints, special handling instructions, or timing details.
+          <p className="mt-1 text-sm text-[color:var(--color-muted-light)]">
+            Optional. Add constraints, special handling, or timing details.
           </p>
         </div>
 
-        <div className="text-xs text-neutral-500 tabular-nums">
+        <div
+          className={[
+            "mt-0.5 rounded-full px-2 py-1 text-xs tabular-nums",
+            "bg-[color:var(--color-brand-50)] text-[color:var(--color-brand-700)]",
+          ].join(" ")}
+        >
           {len}/{MAX_NOTES}
         </div>
       </div>
@@ -41,8 +46,7 @@ export function FinalNotesSection() {
         ui={siteTextareaUi}
         hint={`Max ${MAX_NOTES} characters.`}
         textareaProps={{
-          placeholder:
-            "e.g., loading dock hours, pickup contact, access restrictions, handling notes…",
+          placeholder: "e.g., dock hours, pickup contact, access restrictions, handling notes…",
           maxLength: MAX_NOTES,
         }}
       />

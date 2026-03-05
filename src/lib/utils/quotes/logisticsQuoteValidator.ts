@@ -147,7 +147,12 @@ function validateContact(c: any) {
   }
 
   if (c.companyAddress != null) {
-    validateAddress(c.companyAddress, "contact.companyAddress");
+    const ca = trim(String(c.companyAddress));
+    c.companyAddress = ca || undefined;
+
+    if (c.companyAddress && c.companyAddress.length > 400) {
+      throw new Error("contact.companyAddress exceeds maximum length (400)");
+    }
   }
 }
 
@@ -212,12 +217,14 @@ export function validateLogisticsQuoteRequest(input: {
   contact: any;
   finalNotes?: any;
   attachments?: any;
+  marketingEmailConsent?: any;
 }): {
   serviceDetails: QuoteServiceDetails;
   identification: any;
   contact: any;
   finalNotes?: string;
   attachments: IFileAsset[];
+  marketingEmailConsent?: boolean;
 } {
   assert(isObj(input), "Invalid body");
 
@@ -405,11 +412,17 @@ export function validateLogisticsQuoteRequest(input: {
 
   const attachments = validateAttachments(input.attachments);
 
+  let marketingEmailConsent: boolean | undefined = undefined;
+  if (input.marketingEmailConsent != null) {
+    marketingEmailConsent = Boolean(input.marketingEmailConsent);
+  }
+
   return {
     serviceDetails: service as QuoteServiceDetails,
     identification: input.identification,
     contact: input.contact,
     finalNotes,
     attachments,
+    marketingEmailConsent,
   };
 }
