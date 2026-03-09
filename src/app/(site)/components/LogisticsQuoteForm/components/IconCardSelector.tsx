@@ -63,12 +63,14 @@ export function IconCardSelector<T extends string>({
         aria-pressed={active}
         aria-describedby={errorId}
         className={cn(
-          "group relative w-full border text-left transition",
-          "hover:cursor-pointer hover:border-neutral-300 hover:bg-neutral-50",
+          "group relative w-full overflow-hidden border text-left transition",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10",
+          "hover:cursor-pointer",
+
           active
-            ? "border-black bg-neutral-50 ring-1 ring-black/10"
-            : "border-neutral-200 bg-white",
+            ? "border-neutral-900 bg-neutral-50/80"
+            : "border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/70",
+
           invalid && !active && "border-red-300",
 
           isPrimary &&
@@ -81,22 +83,21 @@ export function IconCardSelector<T extends string>({
 
           variant === "secondary" &&
             cn(
-              "rounded-lg px-3 py-3",
+              "rounded-xl px-3.5 py-3.5",
               isCenter
                 ? "flex flex-col items-center justify-center text-center"
                 : "flex items-start gap-3",
             ),
 
-          isDetailed && cn("rounded-2xl px-4", (opt.description ?? opt.hint) ? "py-3" : "py-2.5"),
+          isDetailed && cn("rounded-2xl px-4", (opt.description ?? opt.hint) ? "py-3.5" : "py-3"),
         )}
       >
         <span
           aria-hidden="true"
           className={cn(
-            "pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200",
-            isDetailed ? "rounded-2xl" : isPrimary ? "rounded-xl" : "rounded-lg",
-            "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.6)]",
-            active && "opacity-100",
+            "pointer-events-none absolute inset-0 opacity-0 transition-opacity",
+            isDetailed ? "rounded-2xl" : "rounded-xl",
+            active && "opacity-100 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)]",
           )}
         />
 
@@ -115,10 +116,10 @@ export function IconCardSelector<T extends string>({
                 <div
                   className={cn(
                     "inline-flex shrink-0 items-center justify-center border transition",
-                    hasSupportingText ? "mt-0.5 h-9 w-9 rounded-xl" : "h-8 w-8 rounded-lg",
+                    hasSupportingText ? "mt-0.5 h-10 w-10 rounded-xl" : "h-9 w-9 rounded-xl",
                     active
-                      ? "border-black bg-black text-white shadow-sm"
-                      : "border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)]",
+                      ? "border-neutral-900 bg-neutral-900 text-white"
+                      : "border-neutral-200 bg-white text-[color:var(--color-text-light)] group-hover:border-neutral-300",
                   )}
                 >
                   <Icon className={cn(hasSupportingText ? "h-4.5 w-4.5" : "h-4 w-4")} />
@@ -126,19 +127,19 @@ export function IconCardSelector<T extends string>({
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <div className="text-sm font-semibold text-[color:var(--color-text-light)]">
+                    <div className="text-sm font-semibold tracking-[-0.01em] text-[color:var(--color-text-light)]">
                       {opt.label}
                     </div>
 
                     {active ? (
-                      <span className="rounded-full bg-black px-2 py-0.5 text-[11px] font-medium text-white shadow-sm">
+                      <span className="rounded-full border border-neutral-200 bg-white px-2 py-0.5 text-[10px] font-medium tracking-[0.12em] text-neutral-600 uppercase">
                         {selectedLabel}
                       </span>
                     ) : null}
                   </div>
 
                   {hasSupportingText ? (
-                    <p className="mt-0.5 text-[11px] leading-4 text-[color:var(--color-muted-light)]">
+                    <p className="mt-1 text-[11px] leading-4 text-[color:var(--color-muted-light)]">
                       {supportingText}
                     </p>
                   ) : null}
@@ -150,11 +151,11 @@ export function IconCardSelector<T extends string>({
           <>
             <div
               className={cn(
-                "relative flex items-center justify-center border transition",
-                isPrimary ? "mb-2 size-10 rounded-full" : "mb-2 size-8 rounded-full",
+                "relative mb-2 flex items-center justify-center border transition",
+                isPrimary ? "size-10 rounded-full" : "size-9 rounded-full",
                 active
-                  ? "border-black bg-black text-white"
-                  : "border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)]",
+                  ? "border-neutral-900 bg-neutral-900 text-white"
+                  : "border-neutral-200 bg-white text-[color:var(--color-text-light)] group-hover:border-neutral-300",
               )}
             >
               <Icon className={cn(isPrimary ? "h-5 w-5" : "h-4 w-4")} />
@@ -163,21 +164,30 @@ export function IconCardSelector<T extends string>({
             <div className={cn("relative min-w-0", isCenter ? "text-center" : "text-left")}>
               <div
                 className={cn(
-                  "font-semibold text-[color:var(--color-text-light)]",
-                  isPrimary ? "text-sm" : "text-xs sm:text-sm",
+                  "font-semibold tracking-[-0.01em] text-[color:var(--color-text-light)]",
+                  isPrimary ? "text-sm" : "text-[13px] sm:text-sm",
                 )}
               >
                 {opt.label}
               </div>
 
               {(opt.description || opt.hint) && !isCenter ? (
-                <p className="mt-0.5 text-[11px] leading-4 text-[color:var(--color-muted-light)]">
+                <p className="mt-1 text-[11px] leading-4 text-[color:var(--color-muted-light)]">
                   {opt.description ?? opt.hint}
                 </p>
               ) : null}
             </div>
           </>
         )}
+
+        {active && !isDetailed ? (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute top-3 right-3 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-neutral-900 bg-white"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-neutral-900" />
+          </span>
+        ) : null}
 
         {name ? (
           <input

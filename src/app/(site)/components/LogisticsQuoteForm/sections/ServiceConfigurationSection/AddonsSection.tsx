@@ -71,25 +71,29 @@ function PillCheckbox({
       className={cn(
         "group relative inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm transition",
         "hover:cursor-pointer hover:border-neutral-300 hover:bg-neutral-50",
-        checked ? "border-black bg-neutral-50 ring-1 ring-black/10" : "border-neutral-200 bg-white",
-        invalid && "border-red-300",
+
+        checked ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 bg-white",
+
+        invalid && !checked && "border-red-300",
       )}
     >
+      {/* subtle inset polish like icon cards */}
       <span
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-200",
-          "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.65)]",
+          "pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity",
+          "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.6)]",
           checked && "opacity-100",
         )}
       />
 
+      {/* check indicator */}
       <span
         aria-hidden="true"
         className={cn(
           "relative inline-flex h-5 w-5 items-center justify-center rounded-md border transition",
           checked
-            ? "border-black bg-black text-white shadow-sm"
+            ? "border-neutral-900 bg-neutral-900 text-white"
             : "border-[color:var(--color-border-light)] bg-white text-transparent",
         )}
       >

@@ -110,35 +110,17 @@ export function ContactSection() {
           </div>
         </div>
 
-        {/* Divider */}
-        <div
-          className="h-px bg-[linear-gradient(90deg,transparent,rgba(15,23,42,0.10),rgba(15,23,42,0.16),rgba(15,23,42,0.10),transparent)]"
-          aria-hidden="true"
+        <TextField
+          control={control}
+          name="contact.companyAddress"
+          fieldPathAttr="contact.companyAddress"
+          label="Business address"
+          ui={siteTextUi}
+          inputProps={{
+            placeholder: "Street, City, Region, Postal, Country (optional)",
+            autoComplete: "street-address",
+          }}
         />
-
-        {/* Address */}
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <h4 className="text-sm font-semibold text-[color:var(--color-text-light)]">
-              Business address
-            </h4>
-            <p className="text-sm text-[color:var(--color-muted-light)]">
-              Optional business address for coordination and record keeping.
-            </p>
-          </div>
-
-          <TextField
-            control={control}
-            name="contact.companyAddress"
-            fieldPathAttr="contact.companyAddress"
-            label="Business address"
-            ui={siteTextUi}
-            inputProps={{
-              placeholder: "Street, City, Region, Postal, Country (optional)",
-              autoComplete: "street-address",
-            }}
-          />
-        </div>
       </div>
     </section>
   );

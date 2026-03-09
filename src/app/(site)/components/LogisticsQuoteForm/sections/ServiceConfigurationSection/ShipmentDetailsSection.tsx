@@ -4,14 +4,20 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-export function ShipmentDetailsSection({ children }: { children: ReactNode }) {
+export function ShipmentDetailsSection({
+  children,
+  title = "Shipment details",
+  description = "Provide the basic details for your shipment.",
+}: {
+  children: ReactNode;
+  title?: string;
+  description?: string;
+}) {
   return (
     <section className="space-y-5">
       <div>
-        <h3 className="text-base font-semibold text-neutral-900">Shipment details</h3>
-        <p className="mt-1 text-sm text-neutral-600">
-          Provide the basic details for your shipment.
-        </p>
+        <h3 className="text-base font-semibold text-neutral-900">{title}</h3>
+        <p className="mt-1 text-sm text-neutral-600">{description}</p>
       </div>
 
       <div className="space-y-4">{children}</div>

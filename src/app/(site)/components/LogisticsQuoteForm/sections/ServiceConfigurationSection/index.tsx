@@ -107,7 +107,10 @@ export function ServiceConfigurationSection() {
           transition={{ duration: 0.2 }}
           className="space-y-6"
         >
-          <ShipmentDetailsSection>
+          <ShipmentDetailsSection
+            title="Warehousing details"
+            description="Tell us where storage is needed and the basic requirements."
+          >
             <WarehousingFields />
           </ShipmentDetailsSection>
         </motion.div>

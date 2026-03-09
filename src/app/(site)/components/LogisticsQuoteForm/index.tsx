@@ -251,7 +251,7 @@ export default function LogisticsQuoteForm() {
         ref={cardRef}
         tabIndex={-1}
         className={[
-          "mx-auto w-full max-w-[960px] xl:max-w-[1100px]",
+          "mx-auto w-full",
           "rounded-3xl bg-white shadow-sm",
           "border border-[color:var(--color-border-light)]",
         ].join(" ")}
