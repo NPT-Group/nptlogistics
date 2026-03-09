@@ -10,15 +10,24 @@ import { ServiceSingleLayout } from "./ServiceSingleLayout";
 
 export function ServicePage({ model }: { model: ServicePageModel }) {
   const hasSections = Boolean(model.sections && model.sections.length > 0);
+  const orderedSections = hasSections
+    ? model.key === "expedited-specialized"
+      ? [...model.sections!].sort((a, b) => {
+          if (a.key === "specialized-vehicle-programs") return -1;
+          if (b.key === "specialized-vehicle-programs") return 1;
+          return 0;
+        })
+      : model.sections!
+    : undefined;
 
   return (
     <ServicePageShell>
       <ServiceJsonLd model={model} />
       <ServiceHero model={model} />
-      {hasSections ? <ServiceSubnav model={model} /> : null}
+      {hasSections ? <ServiceSubnav model={model} sections={orderedSections} /> : null}
 
       {hasSections
-        ? model.sections!.map((section, index) => (
+        ? orderedSections!.map((section, index) => (
             <ServiceSection key={section.key} section={section} serviceKey={model.key} index={index} />
           ))
         : <ServiceSingleLayout model={model} />}

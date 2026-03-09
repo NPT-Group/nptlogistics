@@ -149,7 +149,7 @@ export const WHY_NPT_TOKENS = {
     descriptionClass: "mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-white/72 sm:text-base",
   },
   solar: {
-    coreImageSrc: "/brand/nptLogo-glow.png",
+    coreImageSrc: "/_optimized/brand/nptLogo-glow.webp",
     desktopStageHeight: 560,
     mobileLogoWidth: 190,
     centerLogoWidth: 300,

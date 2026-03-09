@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { ArrowRight, ShieldCheck } from "lucide-react";
+import { LogoImage } from "@/components/media/LogoImage";
 
 export default function AdminLoginClient({
   errorMsg,
@@ -28,7 +28,13 @@ export default function AdminLoginClient({
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4">
       <div className="w-full max-w-md">
         <div className="mb-6 flex flex-col items-center">
-          <Image src="/brand/NPTlogo.png" alt="NPT Logistics" width={180} height={140} priority />
+          <LogoImage
+            src="/_optimized/brand/NPTlogo2.webp"
+            alt="NPT Logistics"
+            width={220}
+            height={80}
+            className="h-auto w-[50px] object-contain sm:w-[50px] md:w-[50px]"
+          />
           <h1 className="mt-4 text-center text-2xl font-bold text-gray-900">Admin Portal</h1>
           <p className="mt-1 text-center text-sm text-gray-600">
             Sign in with your company account

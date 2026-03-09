@@ -123,7 +123,7 @@ export function AudienceSection() {
         aria-hidden="true"
       />
 
-      <Container>
+      <Container className="site-home-container">
         <div className="relative mx-auto max-w-4xl text-center">
           <div className="mx-auto mb-3 h-[2px] w-14 bg-[color:var(--color-brand-600)]/90" />
 

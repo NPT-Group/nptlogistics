@@ -87,13 +87,13 @@ export const TRUST_PROOF_ITEMS: TestimonialItem[] = [
 ];
 
 export const TRUST_PARTNER_LOGOS: PartnerLogo[] = [
-  { src: "/partners/CTPAT-icon.png", alt: "CTPAT" },
-  { src: "/partners/smartWay-icon.png", alt: "SmartWay" },
-  { src: "/partners/ACI-icon.png", alt: "ACI" },
-  { src: "/partners/CSA-icon.png", alt: "CSA" },
-  { src: "/partners/pip-icon.png", alt: "PIP" },
-  { src: "/partners/Haccp-icon.png", alt: "HACCP" },
-  { src: "/partners/ccc-icon.png", alt: "CCC" },
-  { src: "/partners/Fast-free-secure-icon.png", alt: "FAST" },
-  { src: "/partners/Ace-icon.png", alt: "ACE" },
+  { src: "/_optimized/partners/CTPAT-icon.webp", alt: "CTPAT" },
+  { src: "/_optimized/partners/smartWay-icon.webp", alt: "SmartWay" },
+  { src: "/_optimized/partners/ACI-icon.webp", alt: "ACI" },
+  { src: "/_optimized/partners/CSA-icon.webp", alt: "CSA" },
+  { src: "/_optimized/partners/pip-icon.webp", alt: "PIP" },
+  { src: "/_optimized/partners/Haccp-icon.webp", alt: "HACCP" },
+  { src: "/_optimized/partners/ccc-icon.webp", alt: "CCC" },
+  { src: "/_optimized/partners/Fast-free-secure-icon.webp", alt: "FAST" },
+  { src: "/_optimized/partners/Ace-icon.webp", alt: "ACE" },
 ];

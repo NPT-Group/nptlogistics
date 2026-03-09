@@ -8,9 +8,6 @@ import { cn } from "@/lib/cn";
 import type { ServicePageModel } from "@/config/services";
 import { SERVICE_SUBNAV_TOP_PX } from "../../_constants";
 
-const focusRing =
-  "focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-footer-bg)] focus-visible:outline-none";
-
 const EQUIPMENT_META = {
   "dry-van": { code: "DV", hint: "Enclosed standard freight" },
   flatbed: { code: "FB", hint: "Open-deck securement freight" },
@@ -39,8 +36,14 @@ function findServiceShell(el: HTMLElement | null) {
   return (el?.closest?.("[data-service-shell]") as HTMLElement | null) ?? null;
 }
 
-export function ServiceSubnav({ model }: { model: ServicePageModel }) {
-  const sections = model.sections ?? [];
+export function ServiceSubnav({
+  model,
+  sections: sectionOverrides,
+}: {
+  model: ServicePageModel;
+  sections?: NonNullable<ServicePageModel["sections"]>;
+}) {
+  const sections = sectionOverrides ?? model.sections ?? [];
   const ids = React.useMemo(() => sections.map((s) => `section-${s.key}`), [sections]);
   const [activeId, setActiveId] = React.useState(ids[0] ?? "");
   const [isPinned, setIsPinned] = React.useState(false);
@@ -55,7 +58,8 @@ export function ServiceSubnav({ model }: { model: ServicePageModel }) {
     const style = getComputedStyle(source);
     const headerH = parseFloat(style.getPropertyValue("--service-header-h")) || 0;
     const subnavH = parseFloat(style.getPropertyValue("--service-subnav-h")) || 0;
-    return headerH + subnavH;
+    const isDesktopSticky = window.matchMedia("(min-width: 768px)").matches;
+    return headerH + (isDesktopSticky ? subnavH : 0);
   }, []);
 
   // Measure subnav height and set CSS var on the service shell.
@@ -198,14 +202,14 @@ export function ServiceSubnav({ model }: { model: ServicePageModel }) {
       id="service-subnav"
       ref={barRef}
       className={cn(
-        "sticky z-30 border-y border-white/10 bg-[color:var(--color-footer-bg)]/95 backdrop-blur transition-all duration-300",
+        "z-30 border-y border-white/10 bg-[color:var(--color-footer-bg)]/95 backdrop-blur transition-all duration-300 md:sticky",
         isPinned && "bg-[color:var(--color-footer-bg)]/98 backdrop-blur-md",
       )}
       style={{ top: SERVICE_SUBNAV_TOP_PX }}
     >
       <Container
         className={cn(
-          "max-w-[1440px] px-4 sm:px-6 lg:px-6",
+          "site-page-container",
           isPinned ? "py-2.5 sm:py-3" : "py-3 sm:py-4",
         )}
       >
@@ -244,7 +248,7 @@ export function ServiceSubnav({ model }: { model: ServicePageModel }) {
                     scrollTo(id);
                   }}
                   className={cn(
-                    focusRing,
+                    "focus-ring-dark",
                     "group relative rounded-xl border px-3.5 py-2.5 text-left transition-all duration-300",
                     isActive
                       ? "border-[color:var(--color-brand-500)]/60 bg-white/[0.14] shadow-[0_10px_28px_rgba(2,6,23,0.34)]"

@@ -112,7 +112,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       title: "North American Truckload Capacity | Asset-Backed & Managed | NPT Logistics",
       description:
         "Asset-backed and broker-integrated truckload solutions across CA–US–MX. 500+ fleet scale, secure trade compliance, and lane-level control from pickup through POD.",
-      ogImage: "/og/services-truckload.png",
+      ogImage: "/_optimized/brand/nptLogo-glow.webp",
     },
 
     hero: {
@@ -121,7 +121,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       description:
         "NPT moves truckload freight across Canada, the United States, and Mexico through a hybrid asset + brokerage model built for scale. Dry van, flatbed, RGN heavy haul, and Conestoga capacity delivered with appointment precision, secure trade compliance, and milestone-level visibility from dispatch through POD.",
       microNote: "Built for lane consistency, clean handoffs, and faster exception recovery.",
-      image: "/services/truckload/hero.png",
+      image: "/_optimized/services/truckload/hero.webp",
       imageAlt: "NPT truckload equipment moving freight on a North American highway",
       overlay: "red",
       primaryCta: {
@@ -146,7 +146,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           "Dry Van Truckload | Enclosed Capacity for Retail, Automotive & Industrial Supply Chains",
         description:
           "Dry Van is the industry-standard enclosed truckload solution for freight that does not require temperature control. It delivers full protection from weather, road exposure, and in-transit risk while supporting strict appointment compliance and OTIF performance. Designed for high-volume distribution and plant-to-plant lanes, dry van capacity is ideal for retail and CPG shipments, automotive parts, packaged goods, paper products, and general industrial freight moving across North America.",
-        image: "/services/truckload/dry-van.png",
+        image: "/_optimized/services/truckload/dry-van.webp",
         imageAlt: "Dry van trailer in transit on a major North American corridor",
         overlay: "slate",
 
@@ -239,7 +239,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         description:
           "Flatbed is a specialized open-deck truckload solution built for freight that exceeds standard trailer dimensions or requires crane, side-load, or top-load access. It supports industrial and project-driven shipments where securement standards, route planning, and jobsite coordination directly impact schedule integrity. Common commodities include structural steel, lumber, construction materials, heavy equipment, machinery, and oversized industrial components moving across North America.",
 
-        image: "/services/truckload/flatbed.png",
+        image: "/_optimized/services/truckload/flatbed.webp",
         imageAlt: "Flatbed trailer hauling industrial freight with securement in place",
         overlay: "blue",
 
@@ -325,7 +325,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         description:
           "RGN and Heavy Haul services are engineered for freight that exceeds standard legal dimensions or axle weight limits and requires permit-governed execution. Designed for project-critical and high-value cargo, this mode integrates specialized trailer configurations, route feasibility analysis, axle distribution planning, and multi-jurisdiction compliance management. Typical shipments include construction and mining equipment, power generation components, transformers, and oversized industrial machinery moving across North America.",
 
-        image: "/services/truckload/oversize.png",
+        image: "/_optimized/services/truckload/oversize.webp",
         imageAlt: "Oversize load on specialized trailer with escort and route-control context",
         overlay: "red",
 
@@ -411,7 +411,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         description:
           "Conestoga is a covered-deck truckload solution that combines full weather protection with the loading flexibility of an open trailer. It is purpose-built for freight that cannot be exposed to the elements yet requires side or overhead access for safe handling. Ideal for high-value industrial cargo and specialized equipment, Conestoga capacity supports crated machinery, aluminum products, engineered materials, and finished industrial goods moving across North America.",
 
-        image: "/services/truckload/conestoga.png",
+        image: "/_optimized/services/truckload/conestoga.webp",
         imageAlt: "Conestoga trailer transporting protected industrial freight",
         overlay: "dark",
 
@@ -505,7 +505,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_truckload_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_truckload_final_speak_expert_chat",
       },
@@ -527,7 +527,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         "NPT combines expedited execution and specialized vehicle programs under one operating model. We align urgency, handling constraints, and risk controls so critical shipments move with clear accountability from pickup through delivery.",
       microNote:
         "Deadline-critical coverage, specialized equipment fit, and milestone control for high-consequence moves.",
-      image: "/services/specialized&time-sensitive/hero.png",
+      image: "/_optimized/services/specialized&time-sensitive/hero.webp",
       imageAlt: "Specialized and time-sensitive freight operations planning board",
       overlay: "slate",
       primaryCta: {
@@ -549,7 +549,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         title: "Expedited Freight | Priority Capacity for Time-Critical Recovery and Continuity",
         description:
           "Expedited freight is designed for shipments where delivery timing directly affects production, customer commitments, or service recovery. Execution depends on priority dispatch, direct routing, and disciplined communication so teams can act quickly when conditions change.",
-        image: "/solutions/card-expedited.jpg",
+        image: "/_optimized/solutions/card-expedited.webp",
         imageAlt: "Expedited shipment moving on a time-critical lane",
         overlay: "red",
         highlights: [
@@ -630,64 +630,64 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       {
         key: "specialized-vehicle-programs",
         label: "Specialized Vehicle Programs",
-        title: "Specialized Vehicle Programs | Dimension-Aware and Constraint-Controlled Moves",
+        title: "Exotic & Specialized Vehicle Hauling | Premium-Asset, Constraint-Controlled Transport",
         description:
-          "Specialized vehicle programs support freight that requires non-standard equipment, route feasibility validation, or strict loading and handling controls. This mode is built for complex cargo profiles where permit, clearance, and site access planning must be aligned before wheels move.",
-        image: "/solutions/card-specialized-vehicle.jpg",
-        imageAlt: "Specialized vehicle transport with route and handling controls",
+          "This program is purpose-built for exotic and specialty vehicle transport where condition integrity, enclosed handling, and route realism are non-negotiable. It also supports non-standard cargo profiles that require strict access, permit, or dimensional controls before dispatch.",
+        image: "/_optimized/services/specialized&time-sensitive/exoticCarhaulingImg2.webp",
+        imageAlt: "Exotic car hauling with enclosed, premium-asset transport controls",
         overlay: "blue",
         highlights: [
           {
-            title: "Equipment-fit engineering",
+            title: "Premium enclosed equipment-fit planning",
             description:
-              "Trailer and handling method are selected against actual cargo dimensions and load profile.",
+              "Trailer type, tie-down approach, and handling sequence are selected against verified vehicle profile and condition sensitivity.",
           },
           {
-            title: "Route and access feasibility",
+            title: "Route realism and delivery-site feasibility",
             description:
-              "Clearance and site constraints are validated early to prevent avoidable delays.",
+              "Clearance, grade, turning radius, and site-access constraints are validated early to prevent avoidable risk events.",
           },
           {
-            title: "Permit-aware execution rhythm",
+            title: "Condition-accountable handoff rhythm",
             description:
-              "Planning ties permit sequence, transit windows, and stakeholder timing into one workflow.",
+              "Pickup-to-delivery milestones include condition checks and accountable handoff communication at every critical transition.",
           },
         ],
         trustSnippet: {
-          title: "Designed for complex cargo and controlled risk",
-          body: "Specialized vehicle moves succeed when route reality, equipment fit, and communication ownership are set before dispatch. Our model is built around that discipline.",
+          title: "Built for exotic vehicles and controlled risk transfer",
+          body: "Exotic hauling succeeds when enclosed handling discipline, route reality, and communication ownership are confirmed before dispatch. Our model is built around that standard.",
         },
         whenToUse: {
           intro:
-            "Use specialized vehicle programs when cargo profile or lane constraints exceed standard equipment assumptions.",
+            "Use this program when exotic or specialty vehicles require enclosed, condition-accountable transport, or when lane constraints exceed standard equipment assumptions.",
           items: [
-            "Freight with dimensional, weight, or handling constraints beyond standard trailers",
-            "Moves requiring route planning around clearance or access limitations",
-            "Site conditions that require specific loading/unloading sequencing",
-            "High-value assets where reduced handling risk is a priority",
-            "Program freight requiring repeatable governance across recurring lanes",
+            "Exotic, collector, luxury, or high-value vehicles where condition integrity is mission-critical",
+            "Vehicle moves requiring enclosed transport and low-touch handling controls",
+            "Routes that demand feasibility checks for clearance, grade, or constrained access",
+            "Site conditions requiring controlled loading/unloading sequencing and documented handoffs",
+            "Recurring premium-asset lanes that need repeatable governance and accountability",
           ],
         },
         howToUse: {
           intro:
-            "Specialized program accuracy depends on complete cargo and site data before quote confirmation.",
+            "Program accuracy depends on complete vehicle profile, condition expectations, and site constraints before quote confirmation.",
           items: [
-            "Verified dimensions, center-of-gravity notes, and total load profile",
-            "Origin and destination site access, loading method, and equipment constraints",
-            "Permit, escort, and route restrictions known at planning stage",
-            "Target milestone plan, communication cadence, and exception contacts",
-            "Documentation package needed for secure release and handoff continuity",
+            "Verified vehicle dimensions, ride-height/special handling notes, and securement requirements",
+            "Origin/destination access details including ramp angle, loading method, and receiver constraints",
+            "Known route, permit, escort, or delivery-window restrictions before dispatch commitment",
+            "Target milestone plan with condition-confirmation checkpoints and escalation contacts",
+            "Documentation package required for secure release, transit accountability, and delivery closeout",
           ],
         },
         capabilities: {
           intro:
-            "Capabilities center on engineered planning, execution control, and reduced variance at critical handoffs.",
+            "Capabilities center on exotic-asset protection, engineered planning, and reduced variance at critical handoffs.",
           items: [
-            "Specialized equipment planning for non-standard freight profiles",
-            "Route and schedule design aligned to permit and access constraints",
-            "Operational control across pickup, transfer, and delivery milestones",
-            "Exception governance for weather, access, and timeline risk events",
-            "Program-level support for recurring specialized lane requirements",
+            "Enclosed specialized equipment planning for premium and non-standard vehicle profiles",
+            "Route and schedule design aligned to access constraints and timeline commitments",
+            "Condition-accountable control across pickup, transfer, and delivery milestones",
+            "Exception governance for weather, access, and timing risk events",
+            "Program-level support for recurring exotic and specialized lane requirements",
           ],
         },
         relatedServices: [
@@ -728,7 +728,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_es_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_es_final_speak_expert_chat",
       },
@@ -750,7 +750,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         "NPT coordinates Canada-USA, Mexico cross-border, ocean, and air freight under one operating rhythm. From customs documentation to final delivery milestones, we keep teams aligned across every handoff.",
       microNote:
         "Customs-ready handoffs, proactive milestones, and mode guidance matched to urgency and cost.",
-      image: "/services/cross-border&global/hero.png",
+      image: "/_optimized/services/cross-border&global/hero.webp",
       imageAlt: "International freight movement with cross-border and global transport context",
       overlay: "blue",
       primaryCta: {
@@ -774,7 +774,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         title: "Canada ↔ USA Cross-Border | Customs-Aligned Freight Across Major Trade Lanes",
         description:
           "Canada-USA freight requires disciplined documentation, broker coordination, and timing control at both origin and destination. Our cross-border process is built to reduce border friction while protecting delivery commitments across recurring and spot lanes.",
-        image: "/solutions/card-cross-border-canada-us.jpg",
+        image: "/_optimized/solutions/card-cross-border-canada-us.webp",
         imageAlt: "Cross-border freight corridor between Canada and the United States",
         overlay: "blue",
         highlights: [
@@ -845,7 +845,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         title: "Mexico Cross-Border Logistics | Coordinated Northbound and Southbound Freight",
         description:
           "Mexico cross-border freight depends on strong handoff design between drayage, transload, customs, and linehaul stakeholders. We engineer the workflow to protect cargo integrity, timing, and communication across each border transition.",
-        image: "/solutions/card-cross-border-mexico.jpg",
+        image: "/_optimized/solutions/card-cross-border-mexico.webp",
         imageAlt: "Cross-border freight operations between Mexico and the United States",
         overlay: "red",
         highlights: [
@@ -916,7 +916,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         title: "Ocean Freight | FCL and LCL Planning for Global Inbound and Outbound Programs",
         description:
           "Ocean freight supports cost-effective international movement when planning discipline and schedule management are in place. We coordinate origin, booking, and destination milestones so shipments remain visible and controllable from vessel booking through inland delivery.",
-        image: "/solutions/card-ocean-freight.jpg",
+        image: "/_optimized/solutions/card-ocean-freight.webp",
         imageAlt: "Ocean container freight operations for international supply chains",
         overlay: "slate",
         highlights: [
@@ -988,7 +988,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         title: "Air Freight | Priority International Cargo for Time-Critical Shipments",
         description:
           "Air freight is designed for urgent replenishment, launch-critical freight, and high-value cargo where transit speed and schedule confidence are essential. We coordinate booking, documentation, and destination handoff to keep urgent supply chain decisions informed in real time.",
-        image: "/solutions/card-air-freight.jpg",
+        image: "/_optimized/solutions/card-air-freight.webp",
         imageAlt: "Air cargo logistics for time-critical international shipments",
         overlay: "dark",
         highlights: [
@@ -1070,7 +1070,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_crossborder_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_crossborder_final_speak_expert_chat",
       },
@@ -1092,7 +1092,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         "NPT combines warehousing, managed capacity, dedicated contract operations, and project-specific execution into one coordinated operating model. The result is better service continuity, tighter cost governance, and cleaner handoffs from planning through delivery.",
       microNote:
         "Inventory flow stability, capacity assurance, and execution governance aligned to your network goals.",
-      image: "/services/logistics&value-added-services/hero.png",
+      image: "/_optimized/services/logistics&value-added-services/hero.webp",
       imageAlt: "Warehouse and logistics operations control environment",
       overlay: "dark",
       primaryCta: {
@@ -1115,7 +1115,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           "Warehousing & Distribution | Inventory Positioning, Fulfillment, and Controlled Outbound Execution",
         description:
           "Warehousing and distribution programs are designed to convert inventory into reliable outbound performance. We align receiving, storage, order processing, and shipping workflows to support accuracy, cycle-time consistency, and customer service-level commitments.",
-        image: "/solutions/card-warehousing-distribution.jpg",
+        image: "/_optimized/solutions/card-warehousing-distribution.webp",
         imageAlt: "Warehouse distribution operations and inventory handling",
         overlay: "slate",
         highlights: [
@@ -1188,7 +1188,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           "Managed Capacity | Procurement, Planning, and Continuous Transportation Optimization",
         description:
           "Managed capacity programs centralize transportation planning, procurement, execution oversight, and performance management. We align carrier strategy, routing decisions, and exception workflows to improve service reliability while controlling total transportation cost.",
-        image: "/solutions/card-managed-capacity.jpg",
+        image: "/_optimized/solutions/card-managed-capacity.webp",
         imageAlt: "Transportation control tower and managed capacity planning",
         overlay: "blue",
         highlights: [
@@ -1259,7 +1259,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         title: "Dedicated / Contract Programs | Embedded Capacity and Service-Level Accountability",
         description:
           "Dedicated and contract logistics programs provide predictable capacity and operating discipline for recurring freight demand. We structure staffing, equipment, and workflow governance around committed service outcomes and lane-level consistency.",
-        image: "/solutions/card-dedicated-contract.jpg",
+        image: "/_optimized/solutions/card-dedicated-contract.webp",
         imageAlt: "Dedicated logistics operations with consistent fleet and service planning",
         overlay: "dark",
         highlights: [
@@ -1332,7 +1332,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           "Project-Specific / Oversize Programs | Route, Permit, and Multi-Party Execution Control",
         description:
           "Project and oversize programs require engineering-grade planning, permit governance, route validation, and synchronized stakeholder execution. We coordinate each handoff from pre-move analysis through final delivery to reduce schedule and compliance risk.",
-        image: "/solutions/card-project-oversize.jpg",
+        image: "/_optimized/solutions/card-project-oversize.webp",
         imageAlt: "Project cargo and oversize logistics planning execution",
         overlay: "red",
         highlights: [
@@ -1414,7 +1414,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_valueadded_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_valueadded_final_speak_expert_chat",
       },
@@ -1435,7 +1435,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         "NPT designs LTL execution around consolidation efficiency, shipment handling discipline, and delivery-window reliability. We help shippers balance cost and service through lane-fit planning, class-ready quoting, and proactive exception management.",
       microNote:
         "Consolidation efficiency, handling control, and delivery visibility for recurring shipment programs.",
-      image: "/solutions/npt-ltl.jpg",
+      image: "/_optimized/solutions/npt-ltl.webp",
       imageAlt: "LTL freight moving through a distribution lane",
       overlay: "slate",
       primaryCta: {
@@ -1561,7 +1561,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_ltl_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_ltl_final_speak_expert_chat",
       },
@@ -1582,7 +1582,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         "NPT aligns rail and truck handoffs to deliver intermodal programs that improve cost control without sacrificing operational clarity. We focus on lane fit, transit consistency, and exception governance for high-volume corridors.",
       microNote:
         "Lane-fit conversion, rail-truck coordination, and transit governance designed for consistency.",
-      image: "/solutions/npt-intermodal.jpg",
+      image: "/_optimized/solutions/npt-intermodal.webp",
       imageAlt: "Intermodal rail and truck freight operations",
       overlay: "blue",
       primaryCta: {
@@ -1706,7 +1706,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_intermodal_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_intermodal_final_speak_expert_chat",
       },
@@ -1728,7 +1728,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         "NPT coordinates hazardous materials freight with process discipline across documentation, handling controls, and execution governance. We align operational workflows to regulatory requirements and shipper-specific risk protocols.",
       microNote:
         "Compliance-first planning, documentation discipline, and controlled escalation for regulated freight.",
-      image: "/solutions/card-hazmat.jpg",
+      image: "/_optimized/solutions/card-hazmat.webp",
       imageAlt: "Hazmat freight transportation with compliance and safety context",
       overlay: "red",
       primaryCta: {
@@ -1852,7 +1852,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_hazmat_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_hazmat_final_speak_expert_chat",
       },
@@ -1874,7 +1874,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         "NPT runs temperature-controlled shipments with operational discipline across equipment readiness, transit monitoring, and exception response. We help shippers protect product integrity across heat- and cold-sensitive lanes while meeting strict delivery commitments.",
       microNote:
         "Setpoint governance, monitoring visibility, and proactive response for temperature-sensitive freight.",
-      image: "/solutions/card-refrigerated.png",
+      image: "/_optimized/solutions/card-refrigerated.webp",
       imageAlt: "Temperature-controlled freight operations for heat- and cold-sensitive cargo",
       overlay: "blue",
       primaryCta: {
@@ -1999,7 +1999,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ctaId: "service_tempcontrolled_final_call_us",
       },
       secondary: {
-        label: "Speak to an Expert",
+        label: "Speak with a live agent",
         href: "#live-chat",
         ctaId: "service_tempcontrolled_final_speak_expert_chat",
       },

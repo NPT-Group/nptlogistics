@@ -21,6 +21,59 @@
   --color-text: rgba(255, 255, 255, 0.92);
   --color-muted: rgba(255, 255, 255, 0.72);
   --color-subtle: rgba(255, 255, 255, 0.56);
+  --color-text-strong: #ffffff;
+  --color-muted-strong: rgba(255, 255, 255, 0.8);
+
+  /* =========================
+     Shared dark hero ornaments + actions
+     ========================= */
+  --color-ornament-accent-border: rgba(252, 165, 165, 0.34);
+  --color-ornament-accent-bg: rgba(239, 68, 68, 0.14);
+  --color-ornament-accent-bg-soft: rgba(239, 68, 68, 0.11);
+  --color-ornament-neutral-border: rgba(226, 232, 240, 0.24);
+  --color-ornament-neutral-bg: rgba(226, 232, 240, 0.1);
+
+  --color-action-secondary-border: rgba(255, 255, 255, 0.34);
+  --color-action-secondary-bg: rgba(2, 6, 23, 0.32);
+  --color-action-secondary-hover: rgba(255, 255, 255, 0.16);
+
+  --shadow-action-primary: 0 14px 28px rgba(185, 28, 28, 0.34);
+  --shadow-action-secondary: 0 8px 22px rgba(2, 6, 23, 0.2);
+  --shadow-action-accent: 0 12px 24px rgba(234, 88, 12, 0.28);
+
+  --color-action-accent-500: #f97316;
+  --color-action-accent-600: #ea580c;
+  --color-action-accent-text: #ffffff;
+
+  --color-decorative-shape-1: #f7d7d8;
+  --color-decorative-shape-2: #b8ded5;
+
+  /* Light section decorative pills (Who We Are, etc.) */
+  --color-ornament-light-pill-border: rgba(148, 163, 184, 0.28);
+  --color-ornament-light-pill-bg: rgba(226, 232, 240, 0.52);
+  --shadow-ornament-light-pill: 0 4px 14px rgba(15, 23, 42, 0.05);
+
+  /* Light section border with built-in opacity (avoids /60 modifier on CSS vars) */
+  --color-border-light-soft: rgba(15, 23, 42, 0.06);
+
+  /* Section ambient glow — brand red at ultra-low opacity */
+  --color-section-glow-brand: rgba(220, 38, 38, 0.04);
+
+  /* =========================
+     Dark glass cards (Mission / Vision section)
+     ========================= */
+  --color-glass-bg: rgba(255, 255, 255, 0.045);
+  --color-glass-bg-hover: rgba(255, 255, 255, 0.075);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --color-glass-border-hover: rgba(255, 255, 255, 0.18);
+  --shadow-glass-card: 0 8px 32px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-glass-card-hover: 0 20px 48px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  /* =========================
+     Shared premium background textures
+     ========================= */
+  --texture-grid-line: rgba(255, 255, 255, 0.055);
+  --texture-grid-fade: rgba(7, 10, 18, 0.9);
 
   /* =========================
      Light section surfaces
@@ -69,6 +122,14 @@
   --color-menu-icon-bg: rgba(185, 28, 28, 0.08); /* faint red tint */
 
   /* =========================
+     About page — Operating Model section (locked)
+     ========================= */
+  --color-about-operating-bg: #0b1120; /* dark navy, distinct from hero surface-0 */
+
+  /* About page — Safety & Compliance (champagne white beige) */
+  --color-about-safety-bg: #f0eeeb;
+
+  /* =========================
      Audience section (elegant light)
      ========================= */
   --audience-bg: #f5f4f2; /* warm off-white, not pure white */
@@ -83,4 +144,119 @@
   --color-footer-text: rgba(255, 255, 255, 0.92);
   --color-footer-muted: rgba(255, 255, 255, 0.65);
   --color-footer-hover: rgba(255, 255, 255, 0.9);
+}
+
+/* Shared homepage layout container rhythm */
+.site-home-container {
+  max-width: 1440px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .site-home-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Shared site container rhythm (page sections) */
+.site-page-container {
+  max-width: 1440px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.site-page-container-narrow {
+  max-width: 1360px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.site-doc-container {
+  max-width: 56rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .site-page-container,
+  .site-page-container-narrow,
+  .site-doc-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-page-container,
+  .site-page-container-narrow,
+  .site-doc-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Shared focus rings for consistent keyboard UX */
+.focus-ring-light {
+  outline: none;
+}
+
+.focus-ring-light:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-brand-500),
+    0 0 0 4px #ffffff;
+}
+
+.focus-ring-dark {
+  outline: none;
+}
+
+.focus-ring-dark:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-brand-500),
+    0 0 0 4px var(--color-footer-bg);
+}
+
+.focus-ring-surface {
+  outline: none;
+}
+
+.focus-ring-surface:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-brand-500),
+    0 0 0 4px var(--color-surface-0);
+}
+
+/* Shared light-surface primitives for non-home pages */
+.site-card-surface {
+  border: 1px solid var(--color-border-light);
+  background: var(--color-surface-1-light);
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
+}
+
+.site-card-surface-subtle {
+  border: 1px solid var(--color-border-light);
+  background: var(--color-surface-1-light);
+  box-shadow: 0 4px 14px rgba(2, 6, 23, 0.04);
+}
+
+.site-input-light {
+  border: 1px solid var(--color-border-light);
+  background: var(--color-surface-1-light);
+  color: var(--color-text-light);
+}
+
+.site-input-light::placeholder {
+  color: var(--color-subtle-light);
+}
+
+@media (min-width: 1024px) {
+  .site-home-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }

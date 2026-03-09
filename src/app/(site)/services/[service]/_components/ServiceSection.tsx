@@ -1,15 +1,12 @@
 "use client";
 
 // src/app/(site)/services/[service]/_components/ServiceSection.tsx
-import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { SectionImage } from "@/components/media/SectionImage";
 import { cn } from "@/lib/cn";
-import { trackCtaClick } from "@/lib/analytics/cta";
+import { trackCtaClick, toCtaSlug } from "@/lib/analytics/cta";
 import type { ServiceKey, SubServiceSection } from "@/config/services";
-
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
 function overlayClass(overlay?: SubServiceSection["overlay"]) {
   switch (overlay) {
@@ -120,19 +117,19 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
   ],
   "specialized-vehicle-programs": [
     {
-      label: "RGN / Oversize",
-      href: "/services/truckload#section-rgn-oversize",
-      reason: "For heavy-haul and permit-sensitive loads requiring specialized deck configuration.",
+      label: "Expedited",
+      href: "/services/expedited-specialized#section-expedited",
+      reason: "For exotic and specialty vehicle moves tied to hard delivery windows, event timing, or urgent recovery timelines.",
     },
     {
-      label: "Project-Specific / Oversize",
-      href: "/services/value-added#section-project-oversize-programs",
-      reason: "For multi-shipment complex programs requiring centralized project governance.",
+      label: "Dry Van",
+      href: "/services/truckload#section-dry-van",
+      reason: "For automotive parts and unfinished manufacturing components that need enclosed, schedule-disciplined lane execution.",
     },
     {
-      label: "Cross-Border & Global",
-      href: "/services/cross-border",
-      reason: "For specialized freight programs involving customs and international handoff complexity.",
+      label: "Truckload (TL)",
+      href: "/services/truckload",
+      reason: "For general vehicle-unit program support where lane consistency, appointment control, and scalable capacity matter.",
     },
   ],
   "canada-us": [
@@ -932,7 +929,7 @@ export function ServiceSection({
         </svg>
       </div>
 
-      <Container className="relative z-10 max-w-[1440px] px-4 py-12 sm:px-6 sm:py-14 lg:px-6 lg:py-16">
+      <Container className="site-page-container relative z-10 py-12 sm:py-14 lg:py-16">
         <div className="relative">
           {/* Intro row */}
           <div
@@ -1021,7 +1018,7 @@ export function ServiceSection({
                   isCrossBorderMode ? "lg:h-[380px]" : "lg:h-full",
                 )}
               >
-                <Image
+                <SectionImage
                   src={section.image}
                   alt={section.imageAlt}
                   fill
@@ -1048,7 +1045,7 @@ export function ServiceSection({
                 "bg-[linear-gradient(90deg,rgba(244,114,182,0.03),rgba(255,255,255,0.0)_35%,rgba(99,102,241,0.03))]",
             )}
           >
-            <div className="bg-white/64 px-6 py-7 sm:px-8 sm:py-8 lg:col-span-7 lg:px-9 lg:py-10">
+            <div className="order-1 bg-white/64 px-5 py-6 sm:px-8 sm:py-8 md:px-9 md:py-9 lg:order-1 lg:col-span-7 lg:px-9 lg:py-10">
               {section.whenToUse && (
                 <ContentSection
                   title="When to use this Service"
@@ -1079,7 +1076,7 @@ export function ServiceSection({
 
             <div
               className={cn(
-                "border-t border-[color:var(--color-border-light)]/65 px-6 py-7 sm:px-8 sm:py-8 lg:col-span-5 lg:border-t-0 lg:border-l lg:px-9 lg:py-10",
+                "order-2 border-b border-[color:var(--color-border-light)]/65 px-5 py-6 sm:px-8 sm:py-8 md:px-9 md:py-9 lg:order-2 lg:col-span-5 lg:border-t-0 lg:border-b-0 lg:border-l lg:px-9 lg:py-10",
                 isCrossBorderMode
                   ? "bg-[linear-gradient(180deg,rgba(248,252,255,0.78),rgba(240,249,255,0.62))]"
                   : isValueAddedMode
@@ -1102,7 +1099,7 @@ export function ServiceSection({
                       : isSpecializedMode
                         ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.93),rgba(250,245,255,0.74))]"
                         : "bg-white/82",
-                    "p-5 sm:p-6",
+                    "p-4 sm:p-5 md:p-6",
                   )}
                 >
                   <div className="relative">
@@ -1135,9 +1132,9 @@ export function ServiceSection({
                           })
                         }
                         className={cn(
-                          "inline-flex h-11 items-center justify-center rounded-md px-6 text-sm font-semibold text-white",
+                          "inline-flex h-12 items-center justify-center rounded-md px-6 text-sm font-semibold text-white md:h-11",
                           "shadow-[0_8px_22px_rgba(2,6,23,0.18)]",
-                          focusRing,
+                          "focus-ring-light",
                         )}
                         style={{ backgroundColor: theme.accent }}
                       >
@@ -1156,9 +1153,9 @@ export function ServiceSection({
                             })
                           }
                           className={cn(
-                            "inline-flex h-11 items-center justify-center rounded-md px-6 text-sm font-semibold",
+                            "inline-flex h-12 items-center justify-center rounded-md px-6 text-sm font-semibold md:h-11",
                             "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] hover:bg-[color:var(--color-surface-0-light)]",
-                            focusRing,
+                            "focus-ring-light",
                           )}
                         >
                           {section.ctas.secondary.label}
@@ -1180,7 +1177,7 @@ export function ServiceSection({
                       : isSpecializedMode
                         ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(248,244,255,0.72))]"
                         : "bg-white/78",
-                    "p-5 sm:p-6",
+                    "p-4 sm:p-5 md:p-6",
                   )}
                 >
                   <div className="relative">
@@ -1206,7 +1203,7 @@ export function ServiceSection({
                         : isSpecializedMode
                           ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(248,244,255,0.72))]"
                           : "bg-white/78",
-                      "p-5 sm:p-6",
+                      "p-4 sm:p-5 md:p-6",
                     )}
                   >
                     <h3 className="text-[1.14rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
@@ -1236,7 +1233,7 @@ export function ServiceSection({
                       "relative overflow-hidden rounded-lg flex-1",
                       "border border-[color:var(--color-border-light)]",
                       "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(239,246,255,0.72))]",
-                      "p-5 sm:p-6",
+                      "p-4 sm:p-5 md:p-6",
                     )}
                   >
                     <h3 className="text-[1.14rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
@@ -1359,12 +1356,20 @@ export function ServiceSection({
                       <Link
                         key={service.href}
                         href={service.href}
+                        onClick={() =>
+                          trackCtaClick({
+                            ctaId: `service_section_related_${serviceKey}_${section.key}_${toCtaSlug(service.label)}`,
+                            location: `service_section_related:${serviceKey}:${section.key}`,
+                            destination: service.href,
+                            label: service.label,
+                          })
+                        }
                         className={cn(
                           "group flex items-center gap-3 rounded-xl border border-[color:var(--color-border-light)]",
                           "bg-white px-4 py-3 transition-all",
                           "hover:border-[color:var(--color-brand-500)]/40 hover:bg-[color:var(--color-surface-0-light)]",
                           "hover:shadow-[0_4px_12px_rgba(2,6,23,0.06)]",
-                          focusRing,
+                          "focus-ring-light",
                         )}
                       >
                         <div

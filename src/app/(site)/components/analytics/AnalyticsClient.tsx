@@ -20,6 +20,7 @@ declare global {
 }
 
 type BannerMode = "compact" | "preferences";
+const ANALYTICS_EXCLUDED_PREFIXES = ["/admin"];
 
 function CookieConsentBanner({
   initialized,
@@ -141,8 +142,10 @@ export function AnalyticsClient() {
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const routeExcluded = ANALYTICS_EXCLUDED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
   const [consent, setConsent] = React.useState<ConsentPreferences | null>(null);
   const [initialized, setInitialized] = React.useState(false);
+  const trackedPathRef = React.useRef<string>("");
 
   React.useEffect(() => {
     const stored = readConsentPreferences();
@@ -154,16 +157,27 @@ export function AnalyticsClient() {
   }, []);
 
   React.useEffect(() => {
-    if (!initialized || !gaId || !consent?.analytics || typeof window.gtag !== "function") return;
+    if (
+      routeExcluded ||
+      !initialized ||
+      !gaId ||
+      !consent?.analytics ||
+      typeof window.gtag !== "function"
+    ) {
+      return;
+    }
 
-    const query = searchParams.toString();
-    const pagePath = query ? `${pathname}?${query}` : pathname;
+    const pagePath = pathname;
+    if (trackedPathRef.current === pagePath) return;
+
+    trackedPathRef.current = pagePath;
     window.gtag("event", "page_view", {
       page_path: pagePath,
       page_location: window.location.href,
       page_title: document.title,
+      transport_type: "beacon",
     });
-  }, [consent?.analytics, gaId, initialized, pathname, searchParams]);
+  }, [consent?.analytics, gaId, initialized, pathname, routeExcluded, searchParams]);
 
   const saveConsent = React.useCallback((analytics: boolean) => {
     const next = createConsentPreferences(analytics);
@@ -173,7 +187,7 @@ export function AnalyticsClient() {
     window.dispatchEvent(new CustomEvent("npt:cookie_consent_updated", { detail: next }));
   }, []);
 
-  if (!gaId) return null;
+  if (!gaId || routeExcluded) return null;
 
   return (
     <>
@@ -201,7 +215,12 @@ export function AnalyticsClient() {
                   security_storage: 'granted',
                   wait_for_update: 500
                 });
-                gtag('config', '${gaId}', { send_page_view: false });
+                gtag('config', '${gaId}', {
+                  send_page_view: false,
+                  anonymize_ip: true,
+                  allow_google_signals: false,
+                  allow_ad_personalization_signals: false
+                });
               `,
           }}
         />

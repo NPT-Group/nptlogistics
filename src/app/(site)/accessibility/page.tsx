@@ -6,7 +6,7 @@ const LAST_UPDATED = "February 17, 2026";
 export default function AccessibilityPage() {
   return (
     <main className="bg-[color:var(--color-surface-0-light)] py-14 sm:py-16">
-      <Container className="max-w-4xl px-4 sm:px-6">
+      <Container className="site-doc-container">
         <div className="rounded-2xl border border-[color:var(--color-border-light)] bg-white p-6 shadow-[0_12px_32px_rgba(2,6,23,0.08)] sm:p-8">
           <h1 className="text-3xl font-semibold text-[color:var(--color-text-light)]">
             Accessibility Statement

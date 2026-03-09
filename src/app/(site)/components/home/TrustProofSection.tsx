@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { LogoImage } from "@/components/media/LogoImage";
 import { cn } from "@/lib/cn";
 import {
   TRUST_PROOF_ITEMS,
@@ -11,9 +11,6 @@ import {
   TRUST_PROOF_SECTION,
   type TestimonialItem,
 } from "@/config/testimonials";
-
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
 function getYouTubeId(url: string) {
   try {
@@ -83,37 +80,48 @@ function TestimonialCard({ item }: { item: Extract<TestimonialItem, { type: "tes
 function VideoCard({
   item,
   isActive,
-  reduceMotion,
 }: {
   item: Extract<TestimonialItem, { type: "video" }>;
   isActive: boolean;
-  reduceMotion: boolean;
 }) {
   const ytId = React.useMemo(() => getYouTubeId(item.youtubeUrl), [item.youtubeUrl]);
   const channelHref = item.channelUrl ?? item.youtubeUrl;
+  const [forceControls, setForceControls] = React.useState(false);
 
-  // Autoplay requires mute. Loop requires playlist=ID.
+  // Keep embeds user-friendly for keyboard/touch users:
+  // - no forced autoplay
+  // - native controls visible
   const embedSrc = React.useMemo(() => {
     if (!ytId || !isActive) return "";
-    const autoplay = reduceMotion ? "0" : "1";
-    const loop = reduceMotion ? "0" : "1";
     const params = new URLSearchParams({
-      autoplay,
+      autoplay: "0",
       mute: "1",
-      loop,
-      playlist: ytId,
-      controls: "0",
+      loop: "0",
+      controls: "1",
       modestbranding: "1",
       rel: "0",
       playsinline: "1",
     });
     return `https://www.youtube.com/embed/${ytId}?${params.toString()}`;
-  }, [isActive, ytId, reduceMotion]);
+  }, [isActive, ytId]);
   const thumbnailSrc = ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : "";
 
   const [hovered, setHovered] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
   const copyResetTimeoutRef = React.useRef<number | null>(null);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia("(hover: none), (pointer: coarse)");
+    const sync = () => setForceControls(mediaQuery.matches);
+    sync();
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", sync);
+      return () => mediaQuery.removeEventListener("change", sync);
+    }
+    mediaQuery.addListener(sync);
+    return () => mediaQuery.removeListener(sync);
+  }, []);
 
   const openYoutube = React.useCallback(() => {
     if (typeof window === "undefined") return;
@@ -154,6 +162,13 @@ function VideoCard({
       onDoubleClick={openYoutube}
       role="group"
       aria-label="Featured video"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openYoutube();
+        }
+      }}
     >
       <div className="relative aspect-video w-full">
         {isActive && embedSrc ? (
@@ -163,7 +178,7 @@ function VideoCard({
             title={item.title}
             loading="lazy"
             referrerPolicy="strict-origin-when-cross-origin"
-            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allow="autoplay; encrypted-media; picture-in-picture"
             allowFullScreen
           />
         ) : thumbnailSrc ? (
@@ -203,7 +218,7 @@ function VideoCard({
         <div
           className={cn(
             "absolute inset-x-0 top-0 flex items-center justify-between bg-black/78 px-4 py-2.5 text-white transition-opacity duration-200",
-            hovered ? "opacity-100" : "opacity-0",
+            forceControls || hovered ? "opacity-100" : "opacity-0",
             "group-focus-within:opacity-100",
           )}
         >
@@ -214,11 +229,11 @@ function VideoCard({
             className={cn(
               "pointer-events-auto inline-flex items-center gap-2 truncate text-sm font-semibold",
               "cursor-pointer hover:text-white/90",
-              focusRing,
+              "focus-ring-light",
             )}
           >
-            <Image
-              src="/brand/NPTlogo2.png"
+            <LogoImage
+              src="/_optimized/brand/NPTlogo2.webp"
               alt="NPT logo"
               width={16}
               height={16}
@@ -229,10 +244,20 @@ function VideoCard({
           <div className="flex items-center gap-2">
             <button
               type="button"
+              onClick={openYoutube}
+              className={cn(
+                "inline-flex h-8 cursor-pointer items-center justify-center rounded-lg border border-white/22 px-2.5 text-xs font-semibold hover:bg-white/12",
+                "focus-ring-light",
+              )}
+            >
+              Open
+            </button>
+            <button
+              type="button"
               onClick={copyLink}
               className={cn(
                 "inline-flex h-8 cursor-pointer items-center justify-center rounded-lg border border-white/22 px-2.5 text-xs font-semibold hover:bg-white/12",
-                focusRing,
+                "focus-ring-light",
               )}
             >
               {copied ? "Copied" : "Copy link"}
@@ -246,6 +271,7 @@ function VideoCard({
 
 export function TrustProofSection() {
   const reduceMotion = useReducedMotion();
+  const [isMarqueePaused, setIsMarqueePaused] = React.useState(false);
   const pointerStartRef = React.useRef<{ x: number; y: number; pointerType: string } | null>(null);
   const orderedItems = React.useMemo(
     () =>
@@ -387,7 +413,7 @@ export function TrustProofSection() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.2),rgba(255,255,255,0.92))]" />
       </div>
 
-      <Container className="relative max-w-[1440px] px-4 py-14 sm:px-6 sm:py-16 lg:px-6 lg:py-20">
+      <Container className={cn("relative py-14 sm:py-16 lg:py-20", "site-home-container")}>
         {/* Heading */}
         <div className="mx-auto max-w-3xl text-center">
           <div className="mx-auto mb-3 h-[2px] w-14 bg-[color:var(--color-brand-500)]" />
@@ -414,7 +440,7 @@ export function TrustProofSection() {
             {activeAnnouncement}
           </p>
           <div
-            className={cn("outline-none", focusRing)}
+            className={cn("outline-none", "focus-ring-light")}
             role="region"
             aria-roledescription="carousel"
             aria-label="Trust and proof carousel"
@@ -444,7 +470,7 @@ export function TrustProofSection() {
                     "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
                     "transition-all duration-200 hover:-translate-y-0.5 hover:border-[color:var(--color-brand-500)]/45 hover:text-[color:var(--color-brand-600)] hover:shadow-[0_12px_24px_rgba(2,6,23,0.12)]",
                     "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:border-[color:var(--color-border-light)] disabled:hover:text-[color:var(--color-text-light)] disabled:hover:shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
-                    focusRing,
+                    "focus-ring-light",
                   )}
                   aria-label="Previous slide"
                 >
@@ -459,7 +485,7 @@ export function TrustProofSection() {
                     "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
                     "transition-all duration-200 hover:-translate-y-0.5 hover:border-[color:var(--color-brand-500)]/45 hover:text-[color:var(--color-brand-600)] hover:shadow-[0_12px_24px_rgba(2,6,23,0.12)]",
                     "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:border-[color:var(--color-border-light)] disabled:hover:text-[color:var(--color-text-light)] disabled:hover:shadow-[0_8px_20px_rgba(2,6,23,0.08)]",
-                    focusRing,
+                    "focus-ring-light",
                   )}
                   aria-label="Next slide"
                 >
@@ -486,7 +512,6 @@ export function TrustProofSection() {
                         <VideoCard
                           item={orderedItems[leftIndex]}
                           isActive={false}
-                          reduceMotion={!!reduceMotion}
                         />
                       ) : (
                         <TestimonialCard item={orderedItems[leftIndex]} />
@@ -505,7 +530,7 @@ export function TrustProofSection() {
                     transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
                   >
                     {activeItem?.type === "video" ? (
-                      <VideoCard item={activeItem} isActive={true} reduceMotion={!!reduceMotion} />
+                      <VideoCard item={activeItem} isActive={true} />
                     ) : activeItem ? (
                       <TestimonialCard item={activeItem} />
                     ) : null}
@@ -527,7 +552,6 @@ export function TrustProofSection() {
                         <VideoCard
                           item={orderedItems[rightIndex]}
                           isActive={false}
-                          reduceMotion={!!reduceMotion}
                         />
                       ) : (
                         <TestimonialCard item={orderedItems[rightIndex]} />
@@ -548,7 +572,7 @@ export function TrustProofSection() {
                     transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                   >
                     {activeItem?.type === "video" ? (
-                      <VideoCard item={activeItem} isActive={true} reduceMotion={!!reduceMotion} />
+                      <VideoCard item={activeItem} isActive={true} />
                     ) : activeItem ? (
                       <TestimonialCard item={activeItem} />
                     ) : null}
@@ -566,7 +590,7 @@ export function TrustProofSection() {
                   onClick={() => setDirectIndex(i)}
                   disabled={!hasMultiple}
                   className={cn(
-                    focusRing,
+                    "focus-ring-light",
                     "h-2.5 rounded-full transition-all duration-200",
                     i === index
                       ? "w-6 bg-[color:var(--color-brand-500)]"
@@ -582,23 +606,36 @@ export function TrustProofSection() {
 
         {/* Partner / certification marquee */}
         <div className="mt-12 border-t border-[color:var(--color-border-light)]/70 pt-10">
-          <div className="mx-auto mb-5 max-w-3xl text-center">
+          <div className="mx-auto mb-5 flex max-w-4xl flex-wrap items-center justify-center gap-3 text-center">
             <div className="text-xs font-semibold tracking-wide text-[color:var(--color-muted-light)]">
               Certifications & Partners
             </div>
             <div className="mt-2 text-sm leading-relaxed text-[color:var(--color-muted-light)]">
               Verified credentials and partner programs that reinforce secure, compliant execution.
             </div>
+            <button
+              type="button"
+              onClick={() => setIsMarqueePaused((prev) => !prev)}
+              className={cn(
+                "inline-flex h-8 items-center rounded-full border border-[color:var(--color-border-light)] bg-white px-3 text-xs font-semibold text-[color:var(--color-text-light)]",
+                "transition-colors hover:bg-[color:var(--color-surface-0-light)]",
+                "focus-ring-light",
+              )}
+              aria-pressed={isMarqueePaused}
+              aria-label={isMarqueePaused ? "Resume partner logo motion" : "Pause partner logo motion"}
+            >
+              {isMarqueePaused ? "Play motion" : "Pause motion"}
+            </button>
           </div>
 
-          <MarqueeLogos />
+          <MarqueeLogos paused={isMarqueePaused} />
         </div>
       </Container>
     </section>
   );
 }
 
-function MarqueeLogos() {
+function MarqueeLogos({ paused }: { paused: boolean }) {
   // Duplicate list for seamless loop
   const items = [...TRUST_PARTNER_LOGOS, ...TRUST_PARTNER_LOGOS];
 
@@ -633,7 +670,10 @@ function MarqueeLogos() {
       />
 
       <div className="relative">
-        <div className="marquee-track flex items-center gap-10 px-8 py-7 sm:gap-12 sm:py-8">
+        <div
+          className="marquee-track flex items-center gap-10 px-8 py-7 sm:gap-12 sm:py-8"
+          style={{ animationPlayState: paused ? "paused" : "running" }}
+        >
           {items.map((logo, idx) => (
             <div
               key={`${logo.src}-${idx}`}
@@ -643,7 +683,7 @@ function MarqueeLogos() {
                 "opacity-85 transition-opacity hover:opacity-100",
               )}
             >
-              <Image
+              <LogoImage
                 src={logo.src}
                 alt={logo.alt}
                 width={220}
@@ -663,6 +703,10 @@ function MarqueeLogos() {
         .marquee-track {
           width: max-content;
           animation: marquee 28s linear infinite;
+        }
+        .marquee-track:hover,
+        .marquee-track:focus-within {
+          animation-play-state: paused;
         }
         @keyframes marquee {
           0% {

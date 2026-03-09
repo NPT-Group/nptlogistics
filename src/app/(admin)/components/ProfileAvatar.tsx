@@ -1,8 +1,8 @@
 // src/app/(admin)/components/shared/ProfileAvatar.tsx
 "use client";
 
-import Image from "next/image";
 import { UserCircle2 } from "lucide-react";
+import { AdminImage } from "@/components/media/AdminImage";
 import type { IUser } from "@/types/user.types";
 
 interface ProfileAvatarProps {
@@ -15,7 +15,7 @@ export default function ProfileAvatar({ user, size = 32 }: ProfileAvatarProps) {
 
   if (userImage) {
     return (
-      <Image
+      <AdminImage
         src={userImage}
         alt={user?.name || "User Profile"}
         width={size}

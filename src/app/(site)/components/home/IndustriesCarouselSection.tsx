@@ -1,16 +1,13 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { SectionImage } from "@/components/media/SectionImage";
 import { cn } from "@/lib/cn";
 import { INDUSTRIES_SECTION, INDUSTRY_SLIDES, type IndustrySlide } from "@/config/industries";
 import { trackCtaClick } from "@/lib/analytics/cta";
-
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
 
 /* ------------------------------------------------------------------ */
 /*  Design tokens                                                      */
@@ -132,16 +129,16 @@ function IndustryBadge({ label }: { label: string }) {
 
 function DesktopStage({
   active,
-  index,
   reduceMotion,
   shellId,
+  activeTabId,
   onTouchStart,
   onTouchEnd,
 }: {
   active: IndustrySlide;
-  index: number;
   reduceMotion: boolean;
   shellId: string;
+  activeTabId: string;
   onTouchStart: (e: React.TouchEvent<HTMLDivElement>) => void;
   onTouchEnd: (e: React.TouchEvent<HTMLDivElement>) => void;
 }) {
@@ -152,22 +149,19 @@ function DesktopStage({
         <motion.div
           key={active.key}
           className="absolute inset-0"
-          id={`${shellId}-panel`}
+          id={`${shellId}-panel-desktop`}
           role="tabpanel"
-          aria-labelledby={`${shellId}-panel-heading-${active.key}`}
+          aria-labelledby={activeTabId}
           initial={reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 1.01 }}
           animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
           exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.99 }}
           transition={{ duration: reduceMotion ? 0 : 0.35, ease: "easeOut" }}
         >
-          <h3 id={`${shellId}-panel-heading-${active.key}`} className="sr-only">
-            {active.label}
-          </h3>
-          <Image
+          <h3 className="sr-only">{active.label}</h3>
+          <SectionImage
             src={active.image}
-            alt=""
+            alt={`${active.label} background image`}
             fill
-            priority={index === 0}
             className="object-cover"
             sizes="(min-width: 1440px) 1440px, 100vw"
           />
@@ -208,7 +202,7 @@ function DesktopStage({
                       label: `Explore ${active.label}`,
                     })
                   }
-                  className={cn(TOKENS.ctaPrimary, focusRing)}
+                  className={cn(TOKENS.ctaPrimary, "focus-ring-surface")}
                 >
                   Explore {active.label}
                 </Link>
@@ -229,14 +223,12 @@ function DesktopStage({
 
 function MobileStage({
   active,
-  index,
   reduceMotion,
   shellId,
   onTouchStart,
   onTouchEnd,
 }: {
   active: IndustrySlide;
-  index: number;
   reduceMotion: boolean;
   shellId: string;
   onTouchStart: (e: React.TouchEvent<HTMLDivElement>) => void;
@@ -251,21 +243,18 @@ function MobileStage({
             key={active.key}
             className="absolute inset-0"
             id={`${shellId}-panel-mobile`}
-            role="tabpanel"
-            aria-labelledby={`${shellId}-panel-heading-${active.key}`}
+            role="region"
+            aria-label={`${active.label} mobile preview`}
             initial={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0 }}
             transition={{ duration: reduceMotion ? 0 : 0.3, ease: "easeOut" }}
           >
-            <h3 id={`${shellId}-panel-heading-${active.key}`} className="sr-only">
-              {active.label}
-            </h3>
-            <Image
+            <h3 className="sr-only">{active.label}</h3>
+            <SectionImage
               src={active.image}
-              alt=""
+              alt={`${active.label} background image`}
               fill
-              priority={index === 0}
               className="object-cover"
               sizes="100vw"
             />
@@ -298,7 +287,7 @@ function MobileStage({
                     label: `Explore ${active.label}`,
                   })
                 }
-                className={cn(TOKENS.ctaPrimary, focusRing)}
+                className={cn(TOKENS.ctaPrimary, "focus-ring-surface")}
               >
                 Explore {active.label}
               </Link>
@@ -334,6 +323,7 @@ export function IndustriesCarouselSection() {
   const goNext = React.useCallback(() => go(index + 1), [go, index]);
   const activeSlideAnnouncement = `${active.label}, slide ${index + 1} of ${total}`;
   const shellId = `${INDUSTRIES_SECTION.id}-carousel`;
+  const activeTabId = `${shellId}-tab-${active.key}`;
 
   const onKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
@@ -427,7 +417,7 @@ export function IndustriesCarouselSection() {
 
         {/* Carousel shell */}
         <div
-          className={cn(TOKENS.shell, focusRing)}
+          className={cn(TOKENS.shell, "focus-ring-surface")}
           role="region"
           aria-roledescription="carousel"
           aria-label="Industries carousel"
@@ -442,7 +432,6 @@ export function IndustriesCarouselSection() {
           {/* Mobile: stacked layout (image + content in flow) */}
           <MobileStage
             active={active}
-            index={index}
             reduceMotion={!!reduceMotion}
             shellId={shellId}
             onTouchStart={onTouchStart}
@@ -452,9 +441,9 @@ export function IndustriesCarouselSection() {
           {/* Desktop / tablet: absolute overlay on fixed-aspect image */}
           <DesktopStage
             active={active}
-            index={index}
             reduceMotion={!!reduceMotion}
             shellId={shellId}
+            activeTabId={activeTabId}
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           />
@@ -472,13 +461,13 @@ export function IndustriesCarouselSection() {
                       onClick={() => setIndex(i)}
                       onKeyDown={onTabKeyDown}
                       role="tab"
-                      id={`industry-tab-${s.key}`}
+                      id={`${shellId}-tab-${s.key}`}
                       aria-selected={isActive}
-                      aria-controls={`${shellId}-panel`}
+                      aria-controls={`${shellId}-panel-desktop`}
                       tabIndex={isActive ? 0 : -1}
                       className={cn(
                         TOKENS.pillBtn,
-                        focusRing,
+                        "focus-ring-surface",
                         isActive
                           ? "border-white/24 bg-white/12 text-white"
                           : "border-white/10 bg-white/6 text-white/72 hover:bg-white/10 hover:text-white",
@@ -496,7 +485,7 @@ export function IndustriesCarouselSection() {
                   type="button"
                   onClick={goPrev}
                   disabled={!hasMultiple}
-                  className={cn(TOKENS.arrowBtn, focusRing)}
+                  className={cn(TOKENS.arrowBtn, "focus-ring-surface")}
                   aria-label="Previous industry"
                 >
                   ←
@@ -505,7 +494,7 @@ export function IndustriesCarouselSection() {
                   type="button"
                   onClick={goNext}
                   disabled={!hasMultiple}
-                  className={cn(TOKENS.arrowBtn, focusRing)}
+                  className={cn(TOKENS.arrowBtn, "focus-ring-surface")}
                   aria-label="Next industry"
                 >
                   →

@@ -3,9 +3,9 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { CardImage } from "@/components/media/CardImage";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import {
@@ -46,10 +46,10 @@ const ICONS = {
 const SOLUTIONS_OVERVIEW_TOKENS = {
   autoplayIntervalMs: 8000,
   autoplayDesktopMediaQuery: "(min-width: 1024px)",
-  tabProgressTransitionDuration: 0.45,
+  tabProgressTransitionDuration: 0.34,
   tabProgressTransitionEase: "easeInOut" as const,
-  panelTransitionDuration: 0.42,
-  panelTransitionEase: [0.22, 1, 0.36, 1] as const,
+  panelTransitionDuration: 0.52,
+  panelTransitionEase: [0.22, 0.61, 0.36, 1] as const,
   classes: {
     categoryHeaderContainer: "relative max-w-[1440px] px-4 py-7 sm:px-6 sm:py-9 lg:px-6 lg:py-10",
     categoryHeading: "text-3xl font-bold tracking-tight sm:text-[2.15rem] lg:text-[2.6rem]",
@@ -185,8 +185,8 @@ function ServiceCard({
       )}
     >
       <div className="absolute top-0 left-0 h-[70%] w-full">
-        <Image
-          src={card.image || categoryImage || "/hero/hero-poster.png"}
+        <CardImage
+          src={card.image || categoryImage || "/_optimized/hero/hero-poster.webp"}
           alt={card.label}
           fill
           className="object-cover transition-transform duration-700 ease-out md:group-hover:scale-105"
@@ -217,7 +217,7 @@ function ServiceCard({
 
       <div
         className={cn(
-          "absolute top-[56%] right-5 bottom-[12%] left-5 grid grid-rows-[auto_1fr_auto] gap-y-2 text-white min-[680px]:top-[58%] min-[680px]:right-4 min-[680px]:bottom-[8%] min-[680px]:left-4 min-[680px]:gap-y-2 sm:top-[58%] sm:right-[30px] sm:bottom-[10%] sm:left-[30px] sm:gap-y-2.5 md:top-[58%] md:right-4 md:bottom-[8%] md:left-4 md:gap-y-2",
+          "absolute top-[56%] right-5 bottom-[14%] left-5 grid grid-rows-[auto_1fr_auto] gap-y-2 text-white min-[680px]:top-[58%] min-[680px]:right-4 min-[680px]:bottom-[9%] min-[680px]:left-4 min-[680px]:gap-y-2 sm:top-[58%] sm:right-[30px] sm:bottom-[10%] sm:left-[30px] sm:gap-y-2.5 md:top-[58%] md:right-4 md:bottom-[8%] md:left-4 md:gap-y-2",
           isFourGridCategory && "lg:top-[58%] lg:right-4 lg:bottom-[8%] lg:left-4 lg:gap-y-2",
         )}
       >
@@ -245,7 +245,7 @@ function ServiceCard({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 items-end gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-x-6 sm:gap-y-0">
+        <div className="-translate-y-3 grid grid-cols-1 items-end gap-y-2 pb-4 sm:translate-y-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-x-6 sm:gap-y-0 sm:pb-0">
           {card.bestFor && (
             <p
               className={cn(
@@ -258,7 +258,7 @@ function ServiceCard({
           )}
           <span
             className={cn(
-              "inline-flex h-10 w-fit min-w-[112px] shrink-0 items-center justify-center gap-2 border border-white px-4 text-[13px] font-semibold text-white min-[680px]:h-9 min-[680px]:w-[84px] min-[680px]:px-2.5 min-[680px]:text-[12px] sm:ml-2 sm:h-11 sm:w-[106px] sm:min-w-0 sm:px-4 sm:text-[14px] md:h-9 md:w-[84px] md:px-2.5 md:text-[12px]",
+              "mb-2 inline-flex h-10 w-fit min-w-[112px] shrink-0 items-center justify-center gap-2 rounded-md border border-white px-4 text-[13px] font-semibold text-white min-[680px]:mb-1 min-[680px]:h-9 min-[680px]:w-[84px] min-[680px]:px-2.5 min-[680px]:text-[12px] sm:mb-0 sm:ml-2 sm:h-11 sm:w-[106px] sm:min-w-0 sm:px-4 sm:text-[14px] md:h-9 md:w-[84px] md:px-2.5 md:text-[12px]",
               isFourGridCategory && "lg:h-9 lg:w-[84px] lg:px-2.5 lg:text-[12px]",
               "transition-all duration-300 group-hover:gap-2.5 hover:bg-white/10",
               "[&>.arrow]:inline-block [&>.arrow]:transition-all [&>.arrow]:duration-300 [&>.arrow]:ease-[cubic-bezier(0.34,1.56,0.64,1)]",
@@ -398,7 +398,7 @@ function CategorySection({
       </div>
 
       <div className={SOLUTIONS_OVERVIEW_TOKENS.classes.categoryCardsSection}>
-        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+        <Container className="site-page-container">
           <div
             className={cn(
               "grid justify-items-center gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-3",
@@ -684,33 +684,66 @@ export function SolutionsOverview() {
       </div>
 
       {/* Panel */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeCategory}
-          id="solutions-panel"
-          role="tabpanel"
-          aria-labelledby={`solutions-tab-${activeIndex}`}
-          onMouseEnter={pauseAutoRotation}
-          onMouseLeave={resumeAutoRotation}
-          onFocusCapture={pauseAutoRotation}
-          onBlurCapture={handleInteractiveAreaBlur}
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 22, filter: "blur(4px)" }}
-          animate={
-            prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, filter: "blur(0px)" }
-          }
-          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -12, filter: "blur(3px)" }}
-          transition={{
-            duration: SOLUTIONS_OVERVIEW_TOKENS.panelTransitionDuration,
-            ease: SOLUTIONS_OVERVIEW_TOKENS.panelTransitionEase,
-          }}
-        >
-          <CategorySection category={activeCategory} data={activeCategoryData} />
-        </motion.div>
-      </AnimatePresence>
+      <div className="relative">
+        <AnimatePresence initial={false} mode="sync">
+          <motion.div
+            key={activeCategory}
+            id="solutions-panel"
+            role="tabpanel"
+            aria-labelledby={`solutions-tab-${activeIndex}`}
+            onMouseEnter={pauseAutoRotation}
+            onMouseLeave={resumeAutoRotation}
+            onFocusCapture={pauseAutoRotation}
+            onBlurCapture={handleInteractiveAreaBlur}
+            className="relative"
+            initial={
+              prefersReducedMotion
+                ? false
+                : { opacity: 0, y: 12, scale: 0.995, filter: "blur(2.5px)" }
+            }
+            animate={
+              prefersReducedMotion
+                ? { opacity: 1 }
+                : {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    filter: "blur(0px)",
+                    transition: {
+                      duration: SOLUTIONS_OVERVIEW_TOKENS.panelTransitionDuration,
+                      ease: SOLUTIONS_OVERVIEW_TOKENS.panelTransitionEase,
+                    },
+                  }
+            }
+            exit={
+              prefersReducedMotion
+                ? { opacity: 0 }
+                : {
+                    opacity: 0,
+                    y: -8,
+                    scale: 1.005,
+                    filter: "blur(1.8px)",
+                    position: "absolute",
+                    inset: 0,
+                    transition: {
+                      duration: 0.34,
+                      ease: [0.4, 0, 1, 1],
+                    },
+                  }
+            }
+            style={{
+              transformOrigin: "50% 50%",
+              willChange: "opacity, transform, filter",
+            }}
+          >
+            <CategorySection category={activeCategory} data={activeCategoryData} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Guidance Strip */}
       <div className="relative border-t border-[color:var(--color-border-light)] bg-[color:var(--color-surface-0-light)] py-10 sm:py-12">
-        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+        <Container className="site-page-container">
           <div className="relative overflow-hidden rounded-2xl border border-white/65 bg-white/82 px-5 py-6 shadow-[0_14px_38px_rgba(2,6,23,0.08),inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl sm:px-7 sm:py-7">
             <div
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(700px_260px_at_96%_100%,rgba(220,38,38,0.09),transparent_55%)]"
@@ -766,25 +799,28 @@ export function SolutionsOverview() {
                 >
                   Request a Quote
                 </Link>
-                <Link
-                  href="/contact"
-                  onClick={() =>
+                <button
+                  type="button"
+                  onClick={() => {
                     trackCtaClick({
-                      ctaId: "solutions_guidance_secondary_contact_operations",
+                      ctaId: "solutions_guidance_secondary_speak_live_agent",
                       location: "solutions_guidance_strip",
-                      destination: "/contact",
-                      label: "Contact Operations",
-                    })
-                  }
+                      destination: "#live-chat",
+                      label: "Speak with a live agent",
+                    });
+                    if (typeof window !== "undefined") {
+                      window.dispatchEvent(new CustomEvent("npt:open-live-chat"));
+                    }
+                  }}
                   className={cn(
-                    "inline-flex h-11 w-full items-center justify-center rounded-md px-5 text-sm font-semibold sm:w-auto",
+                    "inline-flex h-11 w-full cursor-pointer items-center justify-center rounded-md px-5 text-sm font-semibold sm:w-auto",
                     "border border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)]",
                     "hover:bg-[color:var(--color-surface-0-light)]",
                     "focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-600)] focus-visible:ring-offset-2 focus-visible:outline-none",
                   )}
                 >
-                  Contact Operations
-                </Link>
+                  Speak with a live agent
+                </button>
               </div>
             </div>
           </div>

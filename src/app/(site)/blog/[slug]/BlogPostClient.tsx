@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import type { PartialBlock } from "@blocknote/core";
 import { ArrowLeft, Calendar, Clock, User2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Container } from "@/app/(site)/components/layout/Container";
 import {
   publicCountView,
   publicCreateComment,
@@ -203,11 +204,11 @@ export default function BlogPostClient({
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/65 to-slate-950/25" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-6 py-10">
+        <Container className="site-page-container relative py-10">
           <div className="flex items-center gap-3">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15"
+              className="focus-ring-light inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Blog
@@ -233,15 +234,15 @@ export default function BlogPostClient({
               </span>
             ) : null}
           </div>
-        </div>
+        </Container>
       </div>
 
       {/* BODY */}
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <Container className="site-page-container py-10">
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           {/* LEFT */}
           <div>
-            <div className="rounded-[28px] border border-slate-200/70 bg-white p-7 shadow-sm">
+            <div className="site-card-surface rounded-[28px] p-7">
               {initialPost?.excerpt ? (
                 <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
                   {initialPost.excerpt}
@@ -257,7 +258,7 @@ export default function BlogPostClient({
             </div>
 
             {/* COMMENTS */}
-            <div className="mt-8 rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm">
+            <div className="site-card-surface mt-8 rounded-[28px] p-6">
               <div className="flex items-center justify-between">
                 <div className="text-lg font-semibold text-slate-900">Comments</div>
 
@@ -286,7 +287,7 @@ export default function BlogPostClient({
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Your name"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 transition outline-none placeholder:text-slate-400 focus:ring-4 focus:ring-slate-900/5"
+                      className="site-input-light focus-ring-light w-full rounded-xl px-3 py-2 text-sm transition outline-none"
                     />
                   </div>
 
@@ -298,7 +299,7 @@ export default function BlogPostClient({
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@company.com"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 transition outline-none placeholder:text-slate-400 focus:ring-4 focus:ring-slate-900/5"
+                      className="site-input-light focus-ring-light w-full rounded-xl px-3 py-2 text-sm transition outline-none"
                     />
                   </div>
                 </div>
@@ -310,7 +311,7 @@ export default function BlogPostClient({
                     onChange={(e) => setComment(e.target.value)}
                     placeholder="Write a comment…"
                     rows={3}
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 transition outline-none placeholder:text-slate-400 focus:ring-4 focus:ring-slate-900/5"
+                    className="site-input-light focus-ring-light w-full rounded-xl px-3 py-2 text-sm transition outline-none"
                   />
                 </div>
 
@@ -322,7 +323,7 @@ export default function BlogPostClient({
                   <button
                     disabled={busy || !name.trim() || !comment.trim()}
                     onClick={submit}
-                    className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50"
+                    className="focus-ring-light inline-flex items-center justify-center rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50"
                   >
                     {busy ? "Posting…" : "Post"}
                   </button>
@@ -371,7 +372,7 @@ export default function BlogPostClient({
                           type="button"
                           disabled={commentsBusy || !hasPrev}
                           onClick={() => fetchComments(Math.max(1, commentsPage - 1))}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 disabled:opacity-40"
+                          className="focus-ring-light inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 disabled:opacity-40"
                           aria-label="Previous page"
                         >
                           <ChevronLeft className="h-4 w-4" />
@@ -386,7 +387,7 @@ export default function BlogPostClient({
                           type="button"
                           disabled={commentsBusy || !hasNext}
                           onClick={() => fetchComments(commentsPage + 1)}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 disabled:opacity-40"
+                          className="focus-ring-light inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 disabled:opacity-40"
                           aria-label="Next page"
                         >
                           <ChevronRight className="h-4 w-4" />
@@ -407,7 +408,7 @@ export default function BlogPostClient({
           <aside className="hidden lg:block">
             <div className="sticky top-6 space-y-5">
               {/* About author */}
-              <div className="rounded-[28px] border border-slate-200/70 bg-white p-5 shadow-sm">
+              <div className="site-card-surface rounded-[28px] p-5">
                 <div className="text-sm font-semibold text-slate-900">About the Author</div>
 
                 <div className="mt-4 flex items-start gap-3">
@@ -430,7 +431,7 @@ export default function BlogPostClient({
               </div>
 
               {/* Related */}
-              <div className="rounded-[28px] border border-slate-200/70 bg-white p-5 shadow-sm">
+              <div className="site-card-surface rounded-[28px] p-5">
                 <div className="text-sm font-semibold text-slate-900">Related Articles</div>
 
                 <div className="mt-3 divide-y divide-slate-200">
@@ -454,7 +455,7 @@ export default function BlogPostClient({
             </div>
           </aside>
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

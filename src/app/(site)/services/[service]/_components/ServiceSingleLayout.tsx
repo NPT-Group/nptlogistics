@@ -63,9 +63,9 @@ export function ServiceSingleLayout({ model }: { model: ServicePageModel }) {
     <section className={cn("relative overflow-hidden", theme.bg)}>
       <div className={cn("pointer-events-none absolute inset-0", theme.veil)} aria-hidden="true" />
 
-      <Container className="relative z-10 max-w-[1440px] px-4 py-12 sm:px-6 sm:py-14 lg:px-6 lg:py-16">
-        <div className="grid gap-6 lg:grid-cols-12 lg:gap-7">
-          <div className="space-y-6 lg:col-span-8">
+      <Container className="site-page-container relative z-10 py-10 sm:py-12 md:py-14 lg:py-16">
+        <div className="grid gap-5 sm:gap-6 lg:grid-cols-12 lg:gap-7">
+          <div className="order-1 space-y-5 sm:space-y-6 lg:order-1 lg:col-span-8">
             <section
               className={cn(
                 "rounded-2xl border border-[color:var(--color-border-light)] p-6 sm:p-7",
@@ -92,6 +92,40 @@ export function ServiceSingleLayout({ model }: { model: ServicePageModel }) {
               <BulletList items={model.singleLayout.whenToUse.items} accent={theme.accent} />
             </SinglePanel>
 
+            {/* Mobile-only placement: CTA after definition + when-to-use */}
+            <div className="lg:hidden">
+              <ConversionRail
+                title={model.singleLayout.conversion.title}
+                body={model.singleLayout.conversion.body}
+                signals={model.singleLayout.conversion.signals}
+                primary={{
+                  label: model.hero.primaryCta.label,
+                  href: model.hero.primaryCta.href,
+                }}
+                secondary={{
+                  label: model.hero.secondaryCta.label,
+                  href: model.hero.secondaryCta.href,
+                }}
+                accent={theme.accent}
+                onPrimaryClick={() =>
+                  trackCtaClick({
+                    ctaId: model.hero.primaryCta.ctaId,
+                    location: `service_single_layout:${model.key}`,
+                    destination: model.hero.primaryCta.href,
+                    label: model.hero.primaryCta.label,
+                  })
+                }
+                onSecondaryClick={() =>
+                  trackCtaClick({
+                    ctaId: model.hero.secondaryCta.ctaId,
+                    location: `service_single_layout:${model.key}`,
+                    destination: model.hero.secondaryCta.href,
+                    label: model.hero.secondaryCta.label,
+                  })
+                }
+              />
+            </div>
+
             <SinglePanel
               title={model.singleLayout.howItWorks.title}
               intro={model.singleLayout.howItWorks.intro}
@@ -115,9 +149,21 @@ export function ServiceSingleLayout({ model }: { model: ServicePageModel }) {
             >
               <BulletList items={model.singleLayout.riskAndCompliance.items} accent={theme.accent} />
             </SinglePanel>
+
+            {/* Mobile-only placement: related services at the end */}
+            <div className="lg:hidden">
+              <RelatedServicesList
+                title={`Related services for ${model.hero.kicker}`}
+                items={model.singleLayout.relatedServices}
+                trackingContext={{
+                  serviceKey: model.key,
+                  location: `service_single_related:${model.key}`,
+                }}
+              />
+            </div>
           </div>
 
-          <div className="space-y-6 lg:col-span-4">
+          <div className="order-2 hidden space-y-5 sm:space-y-6 lg:block lg:col-span-4">
             <ConversionRail
               title={model.singleLayout.conversion.title}
               body={model.singleLayout.conversion.body}
@@ -152,6 +198,10 @@ export function ServiceSingleLayout({ model }: { model: ServicePageModel }) {
             <RelatedServicesList
               title={`Related services for ${model.hero.kicker}`}
               items={model.singleLayout.relatedServices}
+              trackingContext={{
+                serviceKey: model.key,
+                location: `service_single_related:${model.key}`,
+              }}
             />
           </div>
         </div>

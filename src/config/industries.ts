@@ -34,11 +34,11 @@ export const INDUSTRY_SLIDES: IndustrySlide[] = [
     label: "Automotive",
     title: "Automotive freight that stays on schedule.",
     subtitle:
-      "Inbound parts, finished vehicles, and time-sensitive lanes — executed with disciplined handoffs and proactive updates.",
-    mobileTitle: "Automotive freight that stays on schedule.",
-    mobileSubtitle: "Inbound parts and finished vehicles moved with disciplined handoffs.",
+      "Specialized exotic hauling leads our automotive model, backed by reliable vehicle-unit delivery and component-lane continuity.",
+    mobileTitle: "Exotic-first automotive transport.",
+    mobileSubtitle: "Specialized exotic hauling, plus dependable vehicle and parts flows.",
     href: "/industries/automotive",
-    image: "/industries/Automotives.png",
+    image: "/_optimized/industries/Automotives.webp",
     accent: "red",
   },
   {
@@ -51,7 +51,7 @@ export const INDUSTRY_SLIDES: IndustrySlide[] = [
     mobileSubtitle:
       "Raw materials and production-critical freight moved with consistency and visibility.",
     href: "/industries/manufacturing-materials",
-    image: "/industries/Manufacturing.png",
+    image: "/_optimized/industries/Manufacturing.webp",
     accent: "slate",
   },
   {
@@ -63,7 +63,7 @@ export const INDUSTRY_SLIDES: IndustrySlide[] = [
     mobileTitle: "Retail freight delivered with zero drama.",
     mobileSubtitle: "Store and DC lanes delivered with predictable execution and clear updates.",
     href: "/industries/retail-consumer-goods",
-    image: "/industries/Retail.png",
+    image: "/_optimized/industries/Retail.webp",
     accent: "blue",
   },
   {
@@ -76,7 +76,7 @@ export const INDUSTRY_SLIDES: IndustrySlide[] = [
     mobileSubtitle:
       "Temperature-aware handling and on-time execution to protect shelf life and trust.",
     href: "/industries/food-beverage",
-    image: "/industries/food.png",
+    image: "/_optimized/industries/food.webp",
     accent: "red",
   },
   {
@@ -89,7 +89,7 @@ export const INDUSTRY_SLIDES: IndustrySlide[] = [
     mobileSubtitle:
       "Equipment and site-critical freight moved with safety-first execution and clear ownership.",
     href: "/industries/industrial-energy",
-    image: "/industries/Industry&Energy.png",
+    image: "/_optimized/industries/Industry&Energy.webp",
     accent: "slate",
   },
   {
@@ -102,7 +102,7 @@ export const INDUSTRY_SLIDES: IndustrySlide[] = [
     mobileSubtitle:
       "Metal coils and plate moved with proper equipment, securement, and accountable execution.",
     href: "/industries/steel-aluminum",
-    image: "/industries/Steel.png",
+    image: "/_optimized/industries/Steel.webp",
     accent: "blue",
   },
 ];

@@ -2,7 +2,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -20,6 +19,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils/cn";
+import { AdminImage } from "@/components/media/AdminImage";
 import ProfileDropdown from "@/app/(admin)/components/ProfileDropdown";
 import { ThemeModeSwitcher } from "../theme/ThemeModeSwitcher";
 
@@ -264,13 +264,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
             {/* Logo */}
             <Link href="/admin" className="flex items-center gap-3">
-              <Image
-                src="/brand/NPTlogo.png"
+              <AdminImage
+                src="/_optimized/brand/NPTlogo2.webp"
                 alt="NPT Logistics"
-                width={120}
-                height={32}
-                className="h-auto w-[110px] object-contain"
-                priority
+                width={220}
+                height={80}
+                className="h-auto w-[50px] object-contain sm:w-[50px] md:w-[50px]"
               />
               <span className="hidden text-xs font-semibold tracking-[0.22em] text-[var(--dash-muted)] sm:block">
                 ADMIN

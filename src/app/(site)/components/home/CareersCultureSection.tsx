@@ -6,9 +6,6 @@ import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 
-const focusRing =
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-brand-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-surface-0)]";
-
 const CULTURE_PILLARS = [
   {
     title: "Safety Before Speed",
@@ -47,7 +44,7 @@ export function CareersCultureSection() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,10,18,0.08),rgba(7,10,18,0.9))]" />
       </div>
 
-      <Container className="relative max-w-[1440px] px-4 py-16 sm:px-6 sm:py-20 lg:px-6 lg:py-24">
+      <Container className={cn("relative py-16 sm:py-20 lg:py-24", "site-home-container")}>
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
@@ -183,7 +180,7 @@ export function CareersCultureSection() {
                     "inline-flex h-11 items-center justify-center rounded-md px-6 text-sm font-semibold",
                     "bg-[color:var(--color-brand-600)] text-white hover:bg-[color:var(--color-brand-700)]",
                     "shadow-[0_10px_24px_rgba(220,38,38,0.26)]",
-                    focusRing,
+                    "focus-ring-surface",
                   )}
                 >
                   View Open Roles
@@ -201,7 +198,7 @@ export function CareersCultureSection() {
                   className={cn(
                     "inline-flex h-11 items-center justify-center rounded-md px-6 text-sm font-semibold",
                     "border border-white/20 bg-white/6 text-white hover:bg-white/10",
-                    focusRing,
+                    "focus-ring-surface",
                   )}
                 >
                   Driver Opportunities

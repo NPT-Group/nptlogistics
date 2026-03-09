@@ -3,7 +3,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowRight,
@@ -12,11 +11,11 @@ import {
   Calendar,
   CheckCircle2,
   ChevronRight,
-  ExternalLink,
+  ArrowUpRight,
+  Home,
   Loader2,
   MapPin,
   Search,
-  Sparkles,
   X,
 } from "lucide-react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
@@ -27,6 +26,7 @@ import { trackCtaClick } from "@/lib/analytics/cta";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { Section } from "@/app/(site)/components/layout/Section";
 import { Select } from "@/app/(site)/components/ui/Select";
+import { HeroImage } from "@/components/media/HeroImage";
 import { cn } from "@/lib/cn";
 
 type SortBy = "publishedAt" | "title" | "createdAt";
@@ -353,9 +353,6 @@ export default function CareersClient({
     return () => window.clearTimeout(t);
   }, []);
 
-  const focusRing =
-    "focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-ring)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
-
   const canPrev = Boolean(meta?.hasPrev ?? (meta?.page ?? query.page) > 1);
   const canNext = Boolean(meta?.hasNext ?? (meta?.page ?? query.page) < (meta?.totalPages ?? 1));
 
@@ -370,20 +367,20 @@ export default function CareersClient({
     : { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <>
       {/* =========================
           HERO (no filters here)
          ========================= */}
       <Section
         id="overview"
-        className="relative overflow-hidden"
-        variant="light"
+        className="relative overflow-hidden bg-[color:var(--color-surface-0)]"
+        variant="dark"
         style={{ scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
       >
         <div className="absolute inset-0">
           <div className="absolute inset-0">
-            <Image
-              src="/careers/careers-banner.jpg"
+            <HeroImage
+              src="/_optimized/careers/careers-banner.webp"
               alt="Careers banner"
               fill
               priority
@@ -405,13 +402,14 @@ export default function CareersClient({
             }}
           />
           <div
-            className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-black/80"
+            className="absolute inset-x-0 bottom-0 h-20"
+            style={{ background: "linear-gradient(to bottom, transparent, #070a12)" }}
             aria-hidden="true"
           />
         </div>
 
         <div className="relative">
-          <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+          <Container className="site-page-container">
             <motion.div
               initial="hidden"
               animate="show"
@@ -435,16 +433,15 @@ export default function CareersClient({
                   "text-3xl sm:text-4xl lg:text-5xl",
                 )}
               >
-                Join the team behind dependable freight execution.
+                Drive Impact. Deliver Excellence.
               </motion.h1>
 
               <motion.p
                 variants={fadeUp}
                 transition={{ duration: reduceMotion ? 0 : 0.45, ease: "easeOut" }}
-                className="mt-3 max-w-2xl text-sm text-white/85 sm:text-base"
+                className="mt-3 max-w-2xl text-sm text-[rgba(255,255,255,0.85)] sm:text-base leading-relaxed"
               >
-                We run on clear standards, reliable communication, and doing things right — every
-                day. Explore openings across terminals, dispatch, safety, and operations.
+                Join a high-performance team where precision meets opportunity. Whether you're navigating the road or optimizing global supply chains, NPT provides the stability, scale, and strategic vision to accelerate your career.
               </motion.p>
 
               {/* CTAs */}
@@ -465,9 +462,9 @@ export default function CareersClient({
                     scrollToId("jobs");
                   }}
                   className={cn(
-                    "inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold",
-                    "cursor-pointer bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
-                    focusRing,
+                    "inline-flex h-11 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold",
+                    "cursor-pointer border border-[color:var(--color-brand-600)] bg-[linear-gradient(180deg,var(--color-brand-600),var(--color-brand-700))] text-white shadow-[0_8px_20px_rgba(220,38,38,0.25)] transition hover:-translate-y-[2px] hover:shadow-[0_12px_28px_rgba(220,38,38,0.32)]",
+                    "focus-ring-surface",
                   )}
                 >
                   View Open Roles <ArrowRight className="h-4 w-4" />
@@ -485,9 +482,9 @@ export default function CareersClient({
                     scrollToId("drive");
                   }}
                   className={cn(
-                    "inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold",
-                    "cursor-pointer border border-white/22 bg-white/10 text-white shadow-sm backdrop-blur transition hover:bg-white/15",
-                    focusRing,
+                    "inline-flex h-11 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold",
+                    "cursor-pointer border border-[rgba(255,255,255,0.22)] bg-[rgba(255,255,255,0.10)] text-[color:var(--color-muted-strong)] shadow-sm backdrop-blur transition hover:-translate-y-[2px] hover:border-[rgba(255,255,255,0.38)] hover:text-white",
+                    "focus-ring-surface",
                   )}
                 >
                   Driver Opportunities <ArrowRight className="h-4 w-4" />
@@ -519,14 +516,15 @@ export default function CareersClient({
       </Section>
 
       {/* =========================
-          WHY JOIN NPT (separate background)
+          WHY JOIN NPT (dark section)
          ========================= */}
       <Section
         id="why"
-        className="relative py-12 sm:py-14"
+        className="relative py-14 sm:py-16"
         variant="light"
         style={{ scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
       >
+        {/* Subtle radial depth */}
         <div
           aria-hidden
           className="absolute inset-0"
@@ -536,7 +534,7 @@ export default function CareersClient({
           }}
         />
         <div className="relative">
-          <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+          <Container className="site-page-container">
             <motion.div
               initial="hidden"
               whileInView="show"
@@ -545,16 +543,18 @@ export default function CareersClient({
             >
               <motion.div variants={fadeUp} className="flex items-end justify-between gap-4">
                 <div className="max-w-2xl">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-3 py-1 text-xs text-slate-700">
-                    <Sparkles className="h-3.5 w-3.5 text-red-600" />
-                    What you can count on
+                  {/* Accent bar heading */}
+                  <div className="mb-3 flex items-center gap-2.5">
+                    <div className="h-[2px] w-10 bg-[color:var(--color-brand-500)] sm:w-14" />
+                    <span className="text-[10.5px] font-bold tracking-[0.15em] uppercase text-[color:var(--color-brand-500)]">
+                      The NPT Advantage
+                    </span>
                   </div>
-                  <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-                    A place where standards are real — and support matches them.
+                  <h2 className="text-[1.6rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.95rem] lg:text-[2.2rem]">
+                    Uncompromising Standards. Unwavering Support.
                   </h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    The work is fast-paced, but not chaotic. We keep processes clean, communication
-                    direct, and decisions grounded in safety and service.
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--color-muted-light)]">
+                    We operate at the intersection of speed and reliability. Our culture is built on operational clarity, direct communication, and an absolute commitment to safety—so you can focus on execution.
                   </p>
                 </div>
 
@@ -562,8 +562,8 @@ export default function CareersClient({
                   type="button"
                   onClick={() => scrollToId("jobs")}
                   className={cn(
-                    "hidden cursor-pointer items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50 sm:inline-flex",
-                    focusRing,
+                    "hidden cursor-pointer items-center gap-2 rounded-md border border-[color:var(--color-border-light)] bg-white px-4 py-2 text-sm font-semibold text-[color:var(--color-text-light)] shadow-sm transition hover:bg-[color:var(--color-surface-0-light)] sm:inline-flex",
+                    "focus-ring-light",
                   )}
                 >
                   See openings <ChevronRight className="h-4 w-4" />
@@ -576,31 +576,31 @@ export default function CareersClient({
               >
                 {[
                   {
-                    title: "Safety is non-negotiable",
-                    desc: "Training, maintained equipment, and decisions that protect the team and the public.",
+                    title: "Safety as a Core Value",
+                    desc: "Rigorous training, state-of-the-art equipment, and protocols designed to protect our people and the public.",
                   },
                   {
-                    title: "Straightforward operations",
-                    desc: "Clear handoffs, practical tools, and fewer surprises because expectations are set early.",
+                    title: "Operational Clarity",
+                    desc: "Streamlined workflows, intelligent technology, and zero ambiguity. We set clear expectations and provide the tools to meet them.",
                   },
                   {
-                    title: "Support you can reach",
-                    desc: "Dispatch and ops teams that communicate clearly and resolve issues without finger-pointing.",
+                    title: "Dedicated Support Infrastructure",
+                    desc: "Dispatch and operations teams that operate as true partners, resolving complex challenges with speed and precision.",
                   },
                   {
-                    title: "Room to grow responsibly",
-                    desc: "Ownership is encouraged — when you’re ready, we help you build your lane with structure.",
+                    title: "Accelerated Career Trajectory",
+                    desc: "We reward ownership and results. As we scale, we provide the framework for you to expand your scope and lead with impact.",
                   },
                 ].map((c) => (
                   <div
                     key={c.title}
-                    className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+                    className="site-card-surface-subtle overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:-translate-y-[2px]"
                   >
-                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                      <CheckCircle2 className="h-4 w-4 text-red-600" />
+                    <div className="flex items-center gap-2 text-sm font-semibold text-[color:var(--color-text-light)]">
+                      <CheckCircle2 className="h-4 w-4 text-[color:var(--color-brand-600)]" />
                       {c.title}
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">{c.desc}</p>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--color-muted-light)]">{c.desc}</p>
                   </div>
                 ))}
               </motion.div>
@@ -610,197 +610,261 @@ export default function CareersClient({
       </Section>
 
       {/* =========================
-          DRIVE FOR NPT (separate background)
+          DRIVE FOR NPT
          ========================= */}
       <Section
         id="drive"
-        className="border-t border-slate-200/70 bg-white py-12"
-        variant="light"
-        style={{ scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
+        className="relative overflow-hidden"
+        variant="dark"
+        style={{ backgroundColor: "var(--color-about-operating-bg)", scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
       >
-        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+        {/* Radial gradient depth */}
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle,rgba(220,38,38,0.06),transparent_60%)]" />
+          <div className="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle,rgba(15,23,42,0.6),transparent_70%)]" />
+        </div>
+        <Container className="site-page-container relative">
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700">
-                <Briefcase className="h-3.5 w-3.5 text-slate-900" />
-                For drivers
+              {/* Accent bar heading */}
+              <div className="mb-3 flex items-center gap-2.5">
+                <div className="h-[2px] w-10 bg-[color:var(--color-brand-500)] sm:w-14" />
+                <span className="text-[10.5px] font-bold tracking-[0.15em] uppercase text-[color:var(--color-brand-500)]">
+                  Fleet Operations
+                </span>
               </div>
 
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900">
-                Driver Opportunities
+              <h2 className="text-[1.6rem] font-semibold tracking-tight text-white sm:text-[1.95rem] lg:text-[2.2rem]">
+                Elite Driver Opportunities
               </h2>
 
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                We run a safety-led fleet with dispatch support you can rely on. If you value clear
-                expectations, well-maintained equipment, and consistent planning, you’ll feel at
-                home here.
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[rgba(255,255,255,0.7)]">
+                We deploy a safety-first fleet backed by world-class dispatch intelligence. If you demand premium equipment, strategic routing, and a culture of respect, your future is behind the wheel at NPT.
               </p>
 
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
-                  <div className="text-sm font-semibold text-slate-900">
-                    Equipment & maintenance
+                <div
+                  className="rounded-2xl p-5"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.11)",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.30)",
+                  }}
+                >
+                  <div className="text-sm font-semibold text-white">
+                    Premium Equipment &amp; Maintenance
                   </div>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Modern fleet with preventative maintenance and compliance baked into daily ops.
+                  <p className="mt-2 text-sm leading-6 text-[rgba(255,255,255,0.6)]">
+                    A modernized fleet with proactive, scheduled maintenance to keep you moving safely and efficiently.
                   </p>
                 </div>
 
-                <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
-                  <div className="text-sm font-semibold text-slate-900">Dispatch & planning</div>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Clear communication, practical routing, and teams that help you keep moving.
+                <div
+                  className="rounded-2xl p-5"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.11)",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.30)",
+                  }}
+                >
+                  <div className="text-sm font-semibold text-white">Strategic Dispatch &amp; Planning</div>
+                  <p className="mt-2 text-sm leading-6 text-[rgba(255,255,255,0.6)]">
+                    Intelligent routing and 24/7 cross-functional support designed to maximize your time, earnings, and work-life balance.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                <ExternalLink className="h-4 w-4" />
-                Apply externally
+            {/* Premium Drivedock Application Card */}
+            <div className="group relative overflow-hidden rounded-[2rem] p-[1px] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+              {/* Animated gradient border effect */}
+              <div 
+                className="absolute inset-0 bg-gradient-to-br from-[color:var(--color-brand-500)] via-transparent to-white/10 opacity-40 transition-opacity duration-500 group-hover:opacity-70" 
+                aria-hidden="true" 
+              />
+              
+              <div className="relative h-full rounded-[calc(2rem-1px)] bg-[#0d111a]/95 p-6 backdrop-blur-2xl sm:p-8">
+                {/* Subtle internal glow */}
+                <div 
+                  className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[color:var(--color-brand-600)] opacity-20 blur-3xl mix-blend-screen transition-all duration-700 group-hover:scale-110 group-hover:opacity-30" 
+                  aria-hidden="true" 
+                />
+
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-[rgba(220,38,38,0.25)] bg-[rgba(220,38,38,0.1)] shadow-[0_0_15px_rgba(220,38,38,0.15)]">
+                  <ArrowUpRight className="h-5 w-5 text-[color:var(--color-brand-400)] transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
+                </div>
+                
+                <h3 className="mb-2 text-xl font-bold tracking-tight text-white">Drivedock Portal</h3>
+                <p className="mb-8 text-sm leading-relaxed text-[rgba(255,255,255,0.65)]">
+                  Driver opportunities are managed through our exclusive external platform, engineered for a transparent, fast-tracked application process.
+                </p>
+
+                <a
+                  href="https://drivedock.ssp4you.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() =>
+                    trackCtaClick({
+                      ctaId: "careers_apply_drivedock",
+                      location: "careers_drive_card",
+                      destination: "https://drivedock.ssp4you.com",
+                      label: "Apply via Drivedock",
+                    })
+                  }
+                  className={cn(
+                    "group/btn relative flex w-full items-center justify-between rounded-xl px-5 py-4 transition-all duration-300",
+                    "border border-[rgba(220,38,38,0.5)] bg-gradient-to-r from-[color:var(--color-brand-700)] via-[color:var(--color-brand-600)] to-[color:var(--color-brand-500)]",
+                    "shadow-[0_8px_25px_rgba(220,38,38,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(220,38,38,0.5)]",
+                    "focus-ring-light",
+                  )}
+                >
+                  <span className="font-semibold tracking-wide text-white">Start your application</span>
+                  {/* Premium glass-effect icon container */}
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 transition-all duration-300 group-hover/btn:bg-white group-hover/btn:text-[color:var(--color-brand-700)]">
+                    <ArrowRight className="h-4 w-4 text-white transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:text-[color:var(--color-brand-700)]" />
+                  </div>
+                </a>
+
+                <div className="mt-5 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs font-medium text-[rgba(255,255,255,0.5)]">
+                    <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                    Accepting applications
+                  </div>
+                  <div className="text-[10px] uppercase tracking-wider text-[rgba(255,255,255,0.3)]">Secure link</div>
+                </div>
               </div>
-
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Driver applications are handled through our external portal.
-              </p>
-
-              <a
-                href="https://drivedock.ssp4you.com"
-                target="_blank"
-                rel="noreferrer"
-                onClick={() =>
-                  trackCtaClick({
-                    ctaId: "careers_apply_drivedock",
-                    location: "careers_drive_card",
-                    destination: "https://drivedock.ssp4you.com",
-                    label: "Apply via Drivedock",
-                  })
-                }
-                className={cn(
-                  "mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-semibold",
-                  "bg-slate-900 text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md",
-                  focusRing,
-                )}
-              >
-                Apply via Drivedock <ExternalLink className="h-4 w-4" />
-              </a>
-
-              <div className="mt-3 text-xs text-slate-500">Opens in a new tab.</div>
             </div>
           </div>
         </Container>
       </Section>
 
       {/* =========================
-          JOB LISTINGS (filters moved here)
+          JOB LISTINGS
          ========================= */}
       <Section
         id="jobs"
-        className="border-t border-slate-200/70 bg-slate-50 py-12"
+        className="relative overflow-hidden"
         variant="light"
-        style={{ scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
+        style={{ backgroundColor: "var(--audience-bg)", scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
       >
-        <Container className="max-w-[1440px] px-4 sm:px-6 lg:px-6">
+        {/* Subtle radial depth */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(900px 420px at 80% 0%, rgba(220,38,38,0.04), transparent 55%), radial-gradient(900px 420px at 10% 10%, rgba(15,23,42,0.03), transparent 55%)",
+          }}
+        />
+        <Container className="site-page-container relative">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Open Roles</h2>
-              <p className="mt-1 text-sm text-slate-600">
-                Browse current openings, then filter by team, location, and work style to narrow
-                down fast.
+              {/* Accent bar heading */}
+              <div className="mb-3 flex items-center gap-2.5">
+                <div className="h-[2px] w-10 bg-[color:var(--color-brand-500)] sm:w-14" />
+                <span className="text-[10.5px] font-bold tracking-[0.15em] uppercase text-[color:var(--color-brand-600)]">
+                  Current Openings
+                </span>
+              </div>
+              <h2 className="text-[1.6rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.95rem] lg:text-[2.2rem]">
+                Shape the Future of Logistics
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm text-[color:var(--color-muted-light)]">
+                Explore strategic opportunities across fleet operations, supply chain management, and corporate leadership. We seek high-caliber professionals dedicated to driving operational excellence.
               </p>
             </div>
 
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-[color:var(--color-subtle-light)]">
               Total:{" "}
-              <span className="font-semibold text-slate-900">{meta?.total ?? items.length}</span>
+              <span className="font-semibold text-[color:var(--color-text-light)]">{meta?.total ?? items.length}</span>
             </div>
           </div>
 
-          {/* Filters Card (inside jobs) */}
+          {/* Filters Card */}
           <div className="mt-6">
             <div
               className={cn(
-                "rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5",
-                "ring-1 ring-red-500/5",
+                "relative flex flex-col gap-4 rounded-2xl p-4 sm:p-5",
+                "site-card-surface",
               )}
             >
+              {/* Row 1: Search, Dept, Location */}
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
                 {/* Search */}
                 <div className="relative flex-1">
-                  <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[color:var(--color-subtle-light)] transition-colors duration-300 peer-focus:text-[color:var(--color-brand-600)]" />
                   <input
                     value={qInput}
                     onChange={(e) => setQInput(e.target.value)}
                     placeholder="Search roles (e.g., dispatcher, safety, operations)…"
                     className={cn(
-                      "w-full rounded-2xl border px-10 py-3 text-sm",
-                      "bg-white text-slate-900 placeholder:text-slate-400",
-                      "border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-red-500/10 focus:outline-none",
+                      "peer w-full rounded-xl border border-[color:var(--color-border-light)] bg-white py-2.5 pl-10 pr-10 text-sm shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-all duration-300",
+                      "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+                      "focus:border-[color:var(--color-brand-400)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
                     )}
                   />
                   {qInput ? (
                     <button
                       onClick={() => setQInput("")}
-                      className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                      className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-900"
                       aria-label="Clear search"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-3.5 w-3.5" />
                     </button>
                   ) : null}
                 </div>
 
                 {/* Department */}
                 <div className="relative lg:w-56">
-                  <Building2 className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Building2 className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[color:var(--color-subtle-light)] transition-colors duration-300 peer-focus:text-[color:var(--color-brand-600)]" />
                   <input
                     value={deptInput}
                     onChange={(e) => setDeptInput(e.target.value)}
                     placeholder="Department (optional)"
                     className={cn(
-                      "w-full rounded-2xl border px-10 py-3 text-sm",
-                      "bg-white text-slate-900 placeholder:text-slate-400",
-                      "border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-red-500/10 focus:outline-none",
+                      "peer w-full rounded-xl border border-[color:var(--color-border-light)] bg-white py-2.5 pl-10 pr-10 text-sm shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-all duration-300",
+                      "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+                      "focus:border-[color:var(--color-brand-400)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
                     )}
                   />
                   {deptInput ? (
                     <button
                       onClick={() => setDeptInput("")}
-                      className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                      className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-900"
                       aria-label="Clear department"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-3.5 w-3.5" />
                     </button>
                   ) : null}
                 </div>
 
                 {/* Location */}
                 <div className="relative lg:w-56">
-                  <MapPin className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <MapPin className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[color:var(--color-subtle-light)] transition-colors duration-300 peer-focus:text-[color:var(--color-brand-600)]" />
                   <input
                     value={locInput}
                     onChange={(e) => setLocInput(e.target.value)}
                     placeholder="Location (optional)"
                     className={cn(
-                      "w-full rounded-2xl border px-10 py-3 text-sm",
-                      "bg-white text-slate-900 placeholder:text-slate-400",
-                      "border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-red-500/10 focus:outline-none",
+                      "peer w-full rounded-xl border border-[color:var(--color-border-light)] bg-white py-2.5 pl-10 pr-10 text-sm shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-all duration-300",
+                      "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+                      "focus:border-[color:var(--color-brand-400)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
                     )}
                   />
                   {locInput ? (
                     <button
                       onClick={() => setLocInput("")}
-                      className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                      className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-900"
                       aria-label="Clear location"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-3.5 w-3.5" />
                     </button>
                   ) : null}
                 </div>
               </div>
 
-              {/* Row 2: selects + meta */}
-              <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              {/* Row 2: Selects + Meta */}
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <div className="sm:w-48">
                     <Select
@@ -812,15 +876,15 @@ export default function CareersClient({
                       placeholder="Workplace type"
                       className="w-full cursor-pointer"
                       buttonClassName={cn(
-                        "w-full justify-between cursor-pointer",
-                        "border-slate-200 bg-white text-slate-900 shadow-none",
-                        "hover:bg-slate-50",
-                        "focus:ring-2 focus:ring-red-500/10 focus:outline-none",
+                        "w-full justify-between items-center cursor-pointer rounded-xl bg-white px-4 py-2.5 text-sm",
+                        "border border-[color:var(--color-border-light)] text-[color:var(--color-text-light)] shadow-[0_1px_4px_rgba(0,0,0,0.02)]",
+                        "transition-all duration-300",
+                        "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+                        "focus:border-[color:var(--color-brand-400)] focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
                       )}
                       menuClassName={cn(
-                        "border-slate-200 bg-white text-slate-900",
-                        "ring-1 ring-black/5",
-                        "shadow-[0_24px_60px_rgba(2,6,23,0.16)]",
+                        "mt-1 overflow-hidden rounded-xl border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] text-sm",
+                        "shadow-[0_12px_40px_rgba(0,0,0,0.08)] ring-1 ring-black/5",
                       )}
                     />
                   </div>
@@ -835,15 +899,15 @@ export default function CareersClient({
                       placeholder="Employment type"
                       className="w-full cursor-pointer"
                       buttonClassName={cn(
-                        "w-full justify-between cursor-pointer",
-                        "border-slate-200 bg-white text-slate-900 shadow-none",
-                        "hover:bg-slate-50",
-                        "focus:ring-2 focus:ring-red-500/10 focus:outline-none",
+                        "w-full justify-between items-center cursor-pointer rounded-xl bg-white px-4 py-2.5 text-sm",
+                        "border border-[color:var(--color-border-light)] text-[color:var(--color-text-light)] shadow-[0_1px_4px_rgba(0,0,0,0.02)]",
+                        "transition-all duration-300",
+                        "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+                        "focus:border-[color:var(--color-brand-400)] focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
                       )}
                       menuClassName={cn(
-                        "border-slate-200 bg-white text-slate-900",
-                        "ring-1 ring-black/5",
-                        "shadow-[0_24px_60px_rgba(2,6,23,0.16)]",
+                        "mt-1 overflow-hidden rounded-xl border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] text-sm",
+                        "shadow-[0_12px_40px_rgba(0,0,0,0.08)] ring-1 ring-black/5",
                       )}
                     />
                   </div>
@@ -859,31 +923,33 @@ export default function CareersClient({
                       placeholder="Sort"
                       className="w-full cursor-pointer"
                       buttonClassName={cn(
-                        "w-full justify-between cursor-pointer",
-                        "border-slate-200 bg-white text-slate-900 shadow-none",
-                        "hover:bg-slate-50",
-                        "focus:ring-2 focus:ring-red-500/10 focus:outline-none",
+                        "w-full justify-between items-center cursor-pointer rounded-xl bg-white px-4 py-2.5 text-sm",
+                        "border border-[color:var(--color-border-light)] text-slate-900 shadow-[0_1px_4px_rgba(0,0,0,0.02)]",
+                        "transition-all duration-300",
+                        "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+                        "focus:border-[color:var(--color-brand-400)] focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
                       )}
                       menuClassName={cn(
-                        "border-slate-200 bg-white text-slate-900",
-                        "ring-1 ring-black/5",
-                        "shadow-[0_24px_60px_rgba(2,6,23,0.16)]",
+                        "mt-1 overflow-hidden rounded-xl border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] text-sm",
+                        "shadow-[0_12px_40px_rgba(0,0,0,0.08)] ring-1 ring-black/5",
                       )}
                     />
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 lg:justify-end">
-                  <div className="text-xs text-slate-500">
+                <div className="flex flex-wrap items-center justify-between gap-3 lg:justify-end">
+                  <div className="text-xs font-medium text-[color:var(--color-subtle-light)]">
                     {loading ? (
-                      <span className="inline-flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5">
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        Searching…
+                        Validating…
                       </span>
                     ) : (
                       <span>
-                        {meta?.total ?? items.length} role
-                        {(meta?.total ?? items.length) === 1 ? "" : "s"}
+                        <span className="font-bold text-[color:var(--color-text-light)]">
+                          {meta?.total ?? items.length}
+                        </span>{" "}
+                        role{(meta?.total ?? items.length) === 1 ? "" : "s"} found
                       </span>
                     )}
                   </div>
@@ -905,12 +971,14 @@ export default function CareersClient({
                           { replaceUrl: true },
                         )
                       }
-                      className="cursor-pointer rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700 hover:bg-slate-50"
+                      className="cursor-pointer rounded-lg px-3 py-1.5 text-xs font-semibold text-[color:var(--color-brand-600)] transition-colors hover:bg-[rgba(220,38,38,0.08)]"
                     >
-                      Reset
+                      Clear all
                     </button>
                   ) : (
-                    <span className="text-xs text-slate-400">Tip: try “dispatch”</span>
+                    <span className="text-xs text-[color:var(--color-subtle-light)]">
+                      Tip: try searching “dispatch”
+                    </span>
                   )}
                 </div>
               </div>
@@ -918,34 +986,34 @@ export default function CareersClient({
           </div>
 
           {/* Listings */}
-          <div className="mt-6" ref={resultsRef}>
-            <div className="rounded-3xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-slate-900">Listings</h3>
-                <div className="text-xs text-slate-500">
+          <div className="mt-10" ref={resultsRef}>
+            <div className="relative overflow-hidden rounded-2xl site-card-surface p-5 sm:p-8">
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="text-[15px] font-semibold tracking-tight text-[color:var(--color-text-light)]">Available Listings</h3>
+                <div className="text-xs font-medium text-[color:var(--color-subtle-light)]">
                   Page{" "}
-                  <span className="font-semibold text-slate-900">{meta?.page ?? query.page}</span>{" "}
-                  of <span className="font-semibold text-slate-900">{meta?.totalPages ?? 1}</span>
+                  <span className="font-bold text-[color:var(--color-text-light)]">{meta?.page ?? query.page}</span>{" "}
+                  of <span className="font-bold text-[color:var(--color-text-light)]">{meta?.totalPages ?? 1}</span>
                 </div>
               </div>
 
               {error ? (
-                <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-slate-900">
+                <div className="mt-4 rounded-2xl border border-[color:var(--color-brand-100)] bg-[color:var(--color-brand-50)] p-5 text-sm">
                   <div className="font-medium">Couldn’t load jobs.</div>
-                  <div className="mt-1 text-slate-600">{error}</div>
+                  <div className="mt-1 text-[color:var(--color-muted-light)]">{error}</div>
                   <button
                     onClick={() => runFetch({}, { replaceUrl: false, scroll: false })}
-                    className="mt-3 cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 hover:bg-slate-50"
+                    className="mt-4 cursor-pointer rounded-lg border border-[color:var(--color-border-light)] bg-white px-4 py-2 text-xs font-semibold text-[color:var(--color-text-light)] shadow-sm transition hover:bg-[color:var(--color-surface-0-light)]"
                   >
                     Retry
                   </button>
                 </div>
               ) : null}
 
-              <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                <div className="grid grid-cols-1 divide-y divide-slate-200">
+              <div className="mt-2">
+                <div className="flex flex-col">
                   {loading ? (
-                    <div className="p-10 text-center text-sm text-slate-500">
+                    <div className="p-10 text-center text-sm text-[color:var(--color-subtle-light)]">
                       <span className="inline-flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Loading roles…
@@ -972,80 +1040,77 @@ export default function CareersClient({
                           target="_blank"
                           onClick={() =>
                             trackCtaClick({
-                              ctaId: `careers_open_job_${slug || "unknown"}`,
+                              ctaId: "careers_open_job_listing",
                               location: "careers_jobs_list",
                               destination: jobHref,
-                              label: j.title ? `Open job: ${j.title}` : "Open job",
+                              label: "Open job listing",
                             })
                           }
                           className={cn(
-                            "group block px-5 py-4 transition",
-                            "hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-ring)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                            "group block border-b border-[color:var(--color-border-light)] py-4 transition-colors duration-200 last:border-0",
+                            "hover:bg-[rgba(15,23,42,0.02)] focus-ring-light",
                           )}
                         >
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div className="min-w-0">
-                              <div className="truncate text-sm font-semibold text-slate-900 group-hover:underline">
+                              <div className="truncate text-[15px] font-semibold tracking-tight text-[color:var(--color-text-light)]">
                                 {j.title || "Untitled role"}
                               </div>
 
-                              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600">
+                              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[color:var(--color-muted-light)]">
                                 <span className="inline-flex items-center gap-1.5">
-                                  <MapPin className="h-3.5 w-3.5" />
+                                  <MapPin className="h-3.5 w-3.5 shrink-0" />
                                   {locLabel}
                                 </span>
-
                                 <span className="inline-flex items-center gap-1.5">
-                                  <Building2 className="h-3.5 w-3.5" />
+                                  <Building2 className="h-3.5 w-3.5 shrink-0" />
                                   {deptLabel}
                                 </span>
-
                                 <span className="inline-flex items-center gap-1.5">
-                                  <Briefcase className="h-3.5 w-3.5" />
+                                  <Briefcase className="h-3.5 w-3.5 shrink-0" />
                                   {empLabel}
                                 </span>
-
                                 <span className="inline-flex items-center gap-1.5">
-                                  <Briefcase className="h-3.5 w-3.5" />
+                                  <Home className="h-3.5 w-3.5 shrink-0" />
                                   {workLabel}
                                 </span>
-
                                 {publishedLabel ? (
                                   <span className="inline-flex items-center gap-1.5">
-                                    <Calendar className="h-3.5 w-3.5" />
+                                    <Calendar className="h-3.5 w-3.5 shrink-0" />
                                     {publishedLabel}
                                   </span>
                                 ) : null}
                               </div>
+
+                              {j.summary ? (
+                                <div className="mt-1.5 line-clamp-2 text-sm text-[color:var(--color-muted-light)]">
+                                  {j.summary}
+                                </div>
+                              ) : null}
                             </div>
 
-                            <div className="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-slate-900 sm:mt-0">
-                              View details <ArrowRight className="h-3.5 w-3.5" />
+                            <div className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-text-light)] sm:mt-0">
+                              View role
+                              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                             </div>
                           </div>
-
-                          {j.summary ? (
-                            <div className="mt-2 line-clamp-2 text-sm text-slate-600">
-                              {j.summary}
-                            </div>
-                          ) : null}
                         </Link>
                       );
                     })
                   ) : (
-                    <div className="p-10 text-center text-sm text-slate-500">
-                      No roles found. Try adjusting filters.
+                    <div className="rounded-xl border border-[color:var(--color-border-light)] bg-[color:var(--color-surface-0-light)]/30 p-8 text-center">
+                      <p className="text-sm font-medium text-[color:var(--color-text-light)]">No roles found</p>
+                      <p className="mt-0.5 text-xs text-[color:var(--color-muted-light)]">Try adjusting your search or filters.</p>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* PAGINATION */}
-              <div className="mt-8 flex justify-center">
+              <div className="mt-10 flex justify-center">
                 <div
                   className={cn(
-                    "inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1 shadow-sm",
-                    "ring-1 ring-red-500/5",
+                    "inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border-light)] bg-white px-2 py-1.5",
                     loading ? "opacity-80" : "",
                   )}
                 >
@@ -1061,22 +1126,22 @@ export default function CareersClient({
                       "min-w-[92px] text-center",
                       "cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition",
                       canPrev && !loading
-                        ? "text-slate-700 hover:bg-red-50/40 hover:text-slate-900"
-                        : "cursor-not-allowed text-slate-400",
+                        ? "text-[color:var(--color-text-light)] hover:bg-[rgba(220,38,38,0.06)] hover:text-[color:var(--color-brand-600)]"
+                        : "cursor-not-allowed text-[color:var(--color-subtle-light)]",
                     )}
                   >
                     Previous
                   </button>
 
-                  <div className="h-5 w-px bg-red-200/60" />
+                  <div className="h-5 w-px bg-[color:var(--color-border-light)]" />
 
-                  <div className="px-3 text-xs text-slate-500">
-                    <span className="font-semibold text-slate-900">{meta?.page ?? query.page}</span>
-                    <span className="mx-1 text-red-300/80">/</span>
+                  <div className="px-3 text-xs text-[color:var(--color-subtle-light)]">
+                    <span className="font-semibold text-[color:var(--color-text-light)]">{meta?.page ?? query.page}</span>
+                    <span className="mx-1 text-[color:var(--color-subtle-light)]">/</span>
                     <span>{meta?.totalPages ?? 1}</span>
                   </div>
 
-                  <div className="h-5 w-px bg-red-200/60" />
+                  <div className="h-5 w-px bg-[color:var(--color-border-light)]" />
 
                   <button
                     disabled={!canNext || loading}
@@ -1087,8 +1152,8 @@ export default function CareersClient({
                       "min-w-[92px] text-center",
                       "cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition",
                       canNext && !loading
-                        ? "text-slate-700 hover:bg-red-50/40 hover:text-slate-900"
-                        : "cursor-not-allowed text-slate-400",
+                        ? "text-[color:var(--color-text-light)] hover:bg-[rgba(220,38,38,0.06)] hover:text-[color:var(--color-brand-600)]"
+                        : "cursor-not-allowed text-[color:var(--color-subtle-light)]",
                     )}
                   >
                     Next
@@ -1096,7 +1161,7 @@ export default function CareersClient({
                 </div>
               </div>
 
-              <div className="mt-8 text-xs text-slate-500">
+              <div className="mt-8 text-center text-xs text-[color:var(--color-subtle-light)]">
                 Looking for a driver role? Jump to{" "}
                 <button
                   type="button"
@@ -1110,8 +1175,8 @@ export default function CareersClient({
                     scrollToId("drive");
                   }}
                   className={cn(
-                    "cursor-pointer font-semibold text-slate-900 underline underline-offset-2",
-                    focusRing,
+                    "cursor-pointer font-medium text-[color:var(--color-brand-600)] underline underline-offset-2 transition-colors hover:text-[color:var(--color-brand-700)]",
+                    "focus-ring-light",
                   )}
                 >
                   Driver Opportunities
@@ -1122,6 +1187,6 @@ export default function CareersClient({
           </div>
         </Container>
       </Section>
-    </div>
+    </>
   );
 }
