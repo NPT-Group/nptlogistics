@@ -12,6 +12,7 @@ import {
   type Resolver,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 
 import {
   ELogisticsPrimaryService,
@@ -21,15 +22,21 @@ import {
 
 import { logisticsQuoteSubmitSchema, type LogisticsQuoteSubmitValues } from "./schema";
 import { LOGISTICS_QUOTE_SUBMIT_DEFAULTS } from "./defaults";
-import { focusFirstError, toApiSubmitBody, resetFtlAddonsOnEquipmentChange } from "./helpers";
+import {
+  focusFirstError,
+  toApiSubmitBody,
+  resetFtlAddonsOnEquipmentChange,
+  LOGISTICS_FORM_ERROR_FOCUS_OPTIONS,
+} from "./helpers";
 
 import { ServiceSelectionSection } from "./sections/ServiceSelectionSection";
 import { ServiceConfigurationSection } from "./sections/ServiceConfigurationSection";
 import { IdentificationSection } from "./sections/IdentificationSection";
 import { ContactSection } from "./sections/ContactSection";
-import { AttachmentsSection } from "./sections/AttachmentsSection";
-import { FinalNotesSection } from "./sections/FinalNotesSection";
 import { SubmitSection } from "./sections/SubmitSection";
+import { Divider } from "./components/Divider";
+import { NotesAttachmentsSection } from "./sections/NotesAttachmentsSection";
+import { cn } from "@/lib/cn";
 
 function ServiceResetEffects({
   control,
@@ -82,17 +89,53 @@ function ServiceResetEffects({
   return null;
 }
 
-function SectionDivider() {
+type SubmitFeedback =
+  | { type: "success"; message: string }
+  | { type: "error"; message: string }
+  | null;
+
+function FeedbackBanner({
+  feedback,
+  innerRef,
+}: {
+  feedback: SubmitFeedback;
+  innerRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  if (!feedback) return null;
+
+  const isSuccess = feedback.type === "success";
+
   return (
-    <div className="py-2">
-      <div
-        className={[
-          "mx-auto h-px w-[88%]",
-          // thin edges, clearer in the center
-          "bg-[linear-gradient(90deg,transparent,rgba(15,23,42,0.16),rgba(15,23,42,0.22),rgba(15,23,42,0.16),transparent)]",
-        ].join(" ")}
-        aria-hidden="true"
-      />
+    <div
+      ref={innerRef}
+      tabIndex={-1}
+      aria-live="polite"
+      className={cn(
+        "rounded-2xl border px-4 py-4 sm:px-5",
+        isSuccess
+          ? "border-emerald-200 bg-emerald-50 text-emerald-950"
+          : "border-red-200 bg-red-50 text-red-950",
+      )}
+    >
+      <div className="flex items-start gap-3">
+        <span
+          className={cn(
+            "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border",
+            isSuccess
+              ? "border-emerald-200 bg-white text-emerald-700"
+              : "border-red-200 bg-white text-red-700",
+          )}
+        >
+          {isSuccess ? <CheckCircle2 className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
+        </span>
+
+        <div className="min-w-0">
+          <p className="text-sm font-semibold">
+            {isSuccess ? "Quote request submitted" : "Unable to submit quote request"}
+          </p>
+          <p className="mt-1 text-sm leading-relaxed">{feedback.message}</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -105,40 +148,97 @@ export default function LogisticsQuoteForm() {
   const methods = useForm<LogisticsQuoteSubmitValues>({
     resolver,
     defaultValues: LOGISTICS_QUOTE_SUBMIT_DEFAULTS,
-    shouldUnregister: true,
+    shouldUnregister: false,
+    shouldFocusError: false,
     mode: "onSubmit",
     reValidateMode: "onChange",
   });
 
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    reset,
-    formState: { errors },
-  } = methods;
+  const { handleSubmit, register, setValue, reset } = methods;
 
-  const onSubmit: SubmitHandler<LogisticsQuoteSubmitValues> = async (values) => {
-    const body = toApiSubmitBody(values);
+  const [submitFeedback, setSubmitFeedback] = React.useState<SubmitFeedback>(null);
 
-    const res = await fetch("/api/v1/quotes/logistics/submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+  const cardRef = React.useRef<HTMLDivElement | null>(null);
+  const feedbackRef = React.useRef<HTMLDivElement | null>(null);
+
+  const scrollToTopArea = React.useCallback(() => {
+    const target = feedbackRef.current ?? cardRef.current;
+    if (!target) return;
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+      inline: "nearest",
     });
 
-    const json = await res.json().catch(() => ({}));
+    window.setTimeout(() => {
+      target.focus?.();
+    }, 250);
+  }, []);
 
-    if (!res.ok) {
-      const msg = json?.message || json?.error?.message || "Failed to submit quote.";
-      throw new Error(msg);
+  const onSubmit: SubmitHandler<LogisticsQuoteSubmitValues> = async (values) => {
+    setSubmitFeedback(null);
+
+    try {
+      if (values.serviceDetails?.primaryService === ELogisticsPrimaryService.LTL) {
+        const lines = values.serviceDetails.palletLines ?? [];
+
+        const total = lines.reduce((sum, line) => {
+          const q = Number(line?.quantity ?? 0);
+          const w = Number(line?.weightValue ?? 0);
+          return sum + q * w;
+        }, 0);
+
+        values.serviceDetails.approximateTotalWeight.value = total;
+      }
+
+      const body = toApiSubmitBody(values);
+
+      const res = await fetch("/api/v1/quotes/logistics/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        const msg =
+          json?.message ||
+          json?.error?.message ||
+          "Something went wrong while submitting your quote request. Please try again.";
+        throw new Error(msg);
+      }
+
+      reset(LOGISTICS_QUOTE_SUBMIT_DEFAULTS);
+
+      setSubmitFeedback({
+        type: "success",
+        message:
+          "Thank you. Your quote request has been received successfully. Our team will review the details and contact you as soon as possible.",
+      });
+
+      window.requestAnimationFrame(() => {
+        scrollToTopArea();
+      });
+    } catch (err) {
+      setSubmitFeedback({
+        type: "error",
+        message:
+          err instanceof Error && err.message
+            ? err.message
+            : "Something went wrong while submitting your quote request. Please try again.",
+      });
+
+      window.requestAnimationFrame(() => {
+        scrollToTopArea();
+      });
     }
-
-    reset(LOGISTICS_QUOTE_SUBMIT_DEFAULTS);
   };
 
-  const onInvalid = () => {
-    focusFirstError(errors);
+  const onInvalid = (errors: typeof methods.formState.errors) => {
+    setSubmitFeedback(null);
+    focusFirstError(errors, LOGISTICS_FORM_ERROR_FOCUS_OPTIONS);
   };
 
   return (
@@ -147,38 +247,36 @@ export default function LogisticsQuoteForm() {
 
       <ServiceResetEffects control={methods.control} setValue={setValue} />
 
-      {/* White form card */}
       <div
+        ref={cardRef}
+        tabIndex={-1}
         className={[
+          "mx-auto w-full max-w-[960px] xl:max-w-[1100px]",
           "rounded-3xl bg-white shadow-sm",
           "border border-[color:var(--color-border-light)]",
         ].join(" ")}
       >
         <form
           onSubmit={handleSubmit(onSubmit, onInvalid)}
-          className="space-y-6 px-5 py-6 sm:px-7 sm:py-7"
+          className="space-y-6 px-5 py-6 sm:px-7 sm:py-7 lg:px-8"
         >
-          <ServiceSelectionSection />
+          <FeedbackBanner feedback={submitFeedback} innerRef={feedbackRef} />
 
-          <SectionDivider />
+          <ServiceSelectionSection />
 
           <ServiceConfigurationSection />
 
-          <SectionDivider />
+          <Divider />
 
           <IdentificationSection />
 
-          <SectionDivider />
+          <Divider />
 
           <ContactSection />
 
-          <SectionDivider />
+          <Divider />
 
-          <FinalNotesSection />
-
-          <AttachmentsSection />
-
-          <SectionDivider />
+          <NotesAttachmentsSection />
 
           <SubmitSection />
         </form>

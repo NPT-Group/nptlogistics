@@ -2,15 +2,44 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { cn } from "@/lib/cn";
 
 export function ShipmentDetailsSection({ children }: { children: ReactNode }) {
   return (
-    <section className="space-y-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+    <section className="space-y-5">
       <div>
         <h3 className="text-base font-semibold text-neutral-900">Shipment details</h3>
         <p className="mt-1 text-sm text-neutral-600">
           Provide the basic details for your shipment.
         </p>
+      </div>
+
+      <div className="space-y-4">{children}</div>
+    </section>
+  );
+}
+
+export function ShipmentDetailsBlock({
+  title,
+  description,
+  children,
+  className,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      className={cn(
+        "space-y-4 rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5",
+        className,
+      )}
+    >
+      <div className="space-y-1">
+        <h4 className="text-sm font-semibold text-neutral-900">{title}</h4>
+        {description ? <p className="text-sm text-neutral-600">{description}</p> : null}
       </div>
 
       {children}

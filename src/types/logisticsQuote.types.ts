@@ -7,20 +7,46 @@ import type { IFileAsset, ICountry } from "@/types/shared.types";
 BUSINESS RULE SUMMARY
 
 1. Primary service is SINGLE-SELECT (strict discriminator model).
+
 2. Country storage:
    - Always store ISO-2 country code (CA, US, MX, etc.).
    - FTL, LTL, Warehousing → ONLY NORTH_AMERICAN_COUNTRY_CODES.
    - International → ANY ISO country code allowed.
+
 3. Weight:
-   - ALWAYS requires unit (KG or LB).
+   - Shipment-level weight always uses LogisticsWeight = { value, unit }.
+   - unit must always be KG or LB.
+   - FTL → approximateTotalWeight is required.
+   - International → estimatedWeight is required.
+   - LTL:
+     - approximateTotalWeight is required.
+     - approximateTotalWeight.unit is the source of truth for the whole shipment.
+     - approximateTotalWeight.value is DERIVED in backend by summing all pallet line weights.
+     - Each pallet line stores only a scalar numeric weight (no per-pallet weight unit object).
+
 4. Dimensions:
    - Stored as numeric L/W/H only.
    - NO dimension unit stored (internal normalization).
+
 5. Cross-border:
    - Derived in backend:
      crossBorder = origin.countryCode !== destination.countryCode
+   - Applies only where origin/destination exists.
+
 6. Equipment-addon compatibility:
    - Must be validated in service layer / schema validation.
+
+7. LTL pallet-line modeling:
+   - Each pallet line stores:
+     - quantity
+     - dimensions
+     - weightValue
+   - weightValue is a positive number using the same unit as LTL approximateTotalWeight.unit.
+   - Per-pallet weight does NOT use LogisticsWeight.
+
+8. Backend normalization:
+   - Incoming payloads may be normalized/trimmed in validation layer.
+   - Derived fields such as LTL approximateTotalWeight.value and crossBorder are backend-owned.
 ────────────────────────────────────────────────────────────────────────────── */
 
 /* ───────────────────────────── Enums ───────────────────────────── */
@@ -177,7 +203,7 @@ export type QuoteFTLDetails = {
 export type QuoteLTLPalletLine = {
   quantity: number; // >= 1
   dimensions: LogisticsDimensions;
-  totalWeight?: LogisticsWeight;
+  weightValue: number; // >= 1, uses QuoteLTLDetails.approximateTotalWeight.unit
 };
 
 export type QuoteLTLDetails = {
@@ -196,7 +222,7 @@ export type QuoteLTLDetails = {
 
   palletLines: QuoteLTLPalletLine[];
 
-  approximateTotalWeight?: LogisticsWeight;
+  approximateTotalWeight: LogisticsWeight;
 
   addons?: ELTLAddon[];
 };

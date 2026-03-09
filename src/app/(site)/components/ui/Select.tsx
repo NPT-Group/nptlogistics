@@ -4,16 +4,10 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { ChevronDown, Check } from "lucide-react";
-import { cn } from "@/lib/utils/cn";
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/cn";
 
 export type SelectOption = { value: string; label: string; disabled?: boolean };
 type Pos = { top: number; left: number; width: number };
-
-// Merge helper that guarantees Tailwind conflict resolution
-function cx(...inputs: Array<string | false | null | undefined>) {
-  return twMerge(cn(...inputs));
-}
 
 export function Select({
   value,
@@ -291,7 +285,7 @@ export function Select({
     >
       <div
         ref={listboxRef}
-        className={cx(
+        className={cn(
           // neutral defaults; overridden by menuClassName reliably via twMerge
           "w-full overflow-hidden rounded-xl border shadow-lg",
           "border-black/10 bg-white text-slate-900",
@@ -325,7 +319,7 @@ export function Select({
                   setOpen(false);
                   btnRef.current?.focus();
                 }}
-                className={cx(
+                className={cn(
                   "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm",
                   "text-inherit",
                   "disabled:cursor-not-allowed disabled:opacity-50",
@@ -346,7 +340,7 @@ export function Select({
   ) : null;
 
   return (
-    <div ref={rootRef} className={cx("relative", className)}>
+    <div ref={rootRef} className={cn("relative", className)}>
       <button
         ref={btnRef}
         type="button"
@@ -376,7 +370,7 @@ export function Select({
           }
           setOpen((v) => !v);
         }}
-        className={cx(
+        className={cn(
           // neutral defaults; overridden by buttonClassName reliably via twMerge
           "flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm",
           "border-black/10 bg-white text-slate-900 shadow-sm",
@@ -388,10 +382,10 @@ export function Select({
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span className={cx("truncate", !active?.label && "opacity-70")}>
+        <span className={cn("truncate", !active?.label && "opacity-70")}>
           {active?.label ?? placeholder ?? "Select"}
         </span>
-        <ChevronDown className={cx("h-4 w-4 opacity-70 transition", open && "rotate-180")} />
+        <ChevronDown className={cn("h-4 w-4 opacity-70 transition", open && "rotate-180")} />
       </button>
 
       {mounted && typeof document !== "undefined" ? createPortal(menu, document.body) : null}

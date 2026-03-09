@@ -22,62 +22,156 @@ import type { IFileAsset } from "@/types/shared.types";
 /* ──────────────────────────────────────────────────────────────────────────────
   SUBMIT BODY schema (matches API expectation)
   Body shape:
-    { turnstileToken, serviceDetails?, identification, contact, finalNotes?, attachments?, sourceLabel? }
+    { turnstileToken, serviceDetails?, identification, contact, finalNotes?, attachments?, marketingEmailConsent  sourceLabel? }
 ────────────────────────────────────────────────────────────────────────────── */
 
-const trimStr = z.string().trim().min(1, "Required");
-const optTrimStr = z
-  .preprocess((v) => (typeof v === "string" ? v.trim() : v), z.string())
-  .optional();
+const requiredString = (label: string) => z.string().trim().min(1, `${label} is required`);
 
-const upper2 = z
+const optionalTrimmedString = () =>
+  z.preprocess((v) => {
+    if (typeof v !== "string") return v;
+    const trimmed = v.trim();
+    return trimmed === "" ? undefined : trimmed;
+  }, z.string().optional());
+
+const emailField = z
   .string()
   .trim()
-  .toUpperCase()
-  .refine((s) => s.length === 2, "Must be ISO-2 (2 letters)");
+  .min(1, "Email is required")
+  .toLowerCase()
+  .email("Please enter a valid email address");
 
-const lowerEmail = z.string().trim().toLowerCase().email("Invalid email");
+const phoneField = z
+  .preprocess((v) => {
+    if (typeof v !== "string") return v;
+    const trimmed = v.trim();
+    return trimmed === "" ? undefined : trimmed;
+  }, z.string().optional())
+  .refine((value) => {
+    if (!value) return true;
 
-const posNumber = z.coerce.number().refine((n) => Number.isFinite(n) && n > 0, "Must be > 0");
+    const allowedPattern = /^[+\d\s().\-xextEXT#]+$/;
+    if (!allowedPattern.test(value)) return false;
 
-const intMin1 = z.coerce
-  .number()
-  .refine((n) => Number.isFinite(n) && Math.floor(n) === n && n >= 1, "Must be an integer >= 1");
+    const digits = value.replace(/\D/g, "");
+    return digits.length >= 7 && digits.length <= 15;
+  }, "Please enter a valid phone number");
 
-const dateISO = z.union([z.string().trim().min(1, "Required"), z.date()]).transform((v) => {
-  const d = v instanceof Date ? v : new Date(String(v));
-  if (Number.isNaN(d.getTime())) throw new Error("Invalid date");
-  return d.toISOString();
-});
+const iso2CountryCode = z
+  .string()
+  .trim()
+  .min(1, "Country is required")
+  .transform((s) => s.toUpperCase())
+  .refine((s) => s.length === 2, "Please select a valid country");
+
+const numberFromInput = (label: string) =>
+  z.preprocess(
+    (value) => {
+      if (value === "" || value === null || value === undefined) {
+        return undefined;
+      }
+
+      if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (trimmed === "") return undefined;
+
+        const parsed = Number(trimmed);
+        return Number.isFinite(parsed) ? parsed : value;
+      }
+
+      return value;
+    },
+    z.number({
+      error: (issue) => {
+        if (issue.input === undefined) {
+          return `${label} is required`;
+        }
+
+        return `${label} must be a valid number`;
+      },
+    }),
+  );
+
+const positiveNumber = (label: string) =>
+  numberFromInput(label).refine((n) => n > 0, {
+    message: `${label} must be greater than 0`,
+  });
+
+const integerMin1 = (label: string) =>
+  numberFromInput(label)
+    .refine((n) => Number.isInteger(n), {
+      message: `${label} must be a whole number`,
+    })
+    .refine((n) => n >= 1, {
+      message: `${label} must be at least 1`,
+    });
+
+const isoDateField = (label: string) =>
+  z
+    .union([z.string().trim().min(1, `${label} is required`), z.date()])
+    .superRefine((v, ctx) => {
+      const d = v instanceof Date ? v : new Date(String(v));
+      if (Number.isNaN(d.getTime())) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `${label} is invalid`,
+        });
+      }
+    })
+    .transform((v) => {
+      const d = v instanceof Date ? v : new Date(String(v));
+      return d.toISOString();
+    });
+
+const enumField = <T extends Record<string, string | number>>(enumObj: T, message: string) =>
+  z.nativeEnum(enumObj, {
+    error: (issue) => {
+      if (issue.input === undefined || issue.input === "") {
+        return message;
+      }
+      return message;
+    },
+  });
 
 /** Shared: Address */
 export const logisticsAddressSchema = z.object({
-  street1: trimStr,
-  street2: optTrimStr,
-  city: trimStr,
-  region: trimStr,
-  postalCode: trimStr,
-  countryCode: upper2,
+  street1: requiredString("Street address"),
+  street2: optionalTrimmedString(),
+  city: requiredString("City"),
+  region: requiredString("State / province"),
+  postalCode: requiredString("Postal / ZIP code"),
+  countryCode: iso2CountryCode,
 });
 
 /** Shared: Weight */
+const weightUnitField = z
+  .union([z.nativeEnum(EWeightUnit), z.undefined()])
+  .superRefine((value, ctx) => {
+    if (!value) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please select a weight unit",
+      });
+    }
+  });
+
 export const logisticsWeightSchema = z.object({
-  value: posNumber,
-  unit: z.nativeEnum(EWeightUnit),
+  value: positiveNumber("Weight"),
+  unit: weightUnitField,
 });
 
 /** Shared: Dimensions (no unit stored) */
 export const logisticsDimensionsSchema = z.object({
-  length: posNumber,
-  width: posNumber,
-  height: posNumber,
+  length: positiveNumber("Length"),
+  width: positiveNumber("Width"),
+  height: positiveNumber("Height"),
 });
 
 /** Attachments */
 export const fileAssetSchema: z.ZodType<IFileAsset> = z.object({
-  url: trimStr,
-  s3Key: trimStr,
-  mimeType: z.string().min(1, "mimeType is required"),
+  url: requiredString("File URL"),
+  s3Key: requiredString("File key"),
+  mimeType: z.string().trim().min(1, "File type is required"),
   sizeBytes: z.number().optional(),
   originalName: z.string().optional(),
 });
@@ -118,23 +212,45 @@ export const FTL_ADDON_COMPAT: Record<EFTLEquipmentType, readonly EFTLAddon[]> =
   ],
 };
 
+const ftlEquipmentField = z
+  .union([z.nativeEnum(EFTLEquipmentType), z.undefined()])
+  .superRefine((value, ctx) => {
+    if (!value) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please select an equipment type",
+      });
+    }
+  });
+
+const internationalModeField = z
+  .union([z.nativeEnum(EInternationalMode), z.undefined()])
+  .superRefine((value, ctx) => {
+    if (!value) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please select a shipping mode",
+      });
+    }
+  });
+
 /* ───────────────────────────── Service Details ───────────────────────────── */
 
 export const ftlDetailsSchema = z
   .object({
     primaryService: z.literal(ELogisticsPrimaryService.FTL),
 
-    equipment: z.nativeEnum(EFTLEquipmentType),
+    equipment: ftlEquipmentField,
 
     origin: logisticsAddressSchema,
     destination: logisticsAddressSchema,
 
-    readyDate: dateISO,
-    commodityDescription: trimStr,
+    readyDate: isoDateField("Ready date"),
+    commodityDescription: requiredString("Commodity description"),
 
     approximateTotalWeight: logisticsWeightSchema,
 
-    estimatedPalletCount: intMin1.optional(),
+    estimatedPalletCount: integerMin1("Estimated pallet count").optional(),
     dimensions: logisticsDimensionsSchema.optional(),
 
     readyDateFlexible: z.coerce.boolean().optional(),
@@ -146,35 +262,37 @@ export const ftlDetailsSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["origin", "countryCode"],
-        message: "FTL origin must be CA/US/MX",
+        message: "Origin country must be Canada, United States, or Mexico",
       });
     }
+
     if (!isNorthAmerica(val.destination.countryCode)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["destination", "countryCode"],
-        message: "FTL destination must be CA/US/MX",
+        message: "Destination country must be Canada, United States, or Mexico",
       });
     }
 
-    if (val.addons && val.addons.length) {
+    if (val.addons?.length && val.equipment) {
       const allowed = new Set(FTL_ADDON_COMPAT[val.equipment] || []);
-      for (const a of val.addons) {
-        if (!allowed.has(a)) {
+      for (const addon of val.addons) {
+        if (!allowed.has(addon)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["addons"],
-            message: `FTL add-on ${a} is not compatible with equipment ${val.equipment}`,
+            message: "One or more selected add-ons are not available for the chosen equipment type",
           });
+          break;
         }
       }
     }
   });
 
 export const ltlPalletLineSchema = z.object({
-  quantity: intMin1,
+  quantity: integerMin1("Quantity"),
   dimensions: logisticsDimensionsSchema,
-  totalWeight: logisticsWeightSchema.optional(),
+  weightValue: positiveNumber("Weight"),
 });
 
 export const ltlDetailsSchema = z
@@ -184,14 +302,14 @@ export const ltlDetailsSchema = z
     origin: logisticsAddressSchema,
     destination: logisticsAddressSchema,
 
-    readyDate: dateISO,
-    commodityDescription: trimStr,
+    readyDate: isoDateField("Ready date"),
+    commodityDescription: requiredString("Commodity description"),
 
     stackable: z.coerce.boolean(),
 
-    palletLines: z.array(ltlPalletLineSchema).min(1, "palletLines must have at least 1 line"),
+    palletLines: z.array(ltlPalletLineSchema).min(1, "Add at least one pallet"),
 
-    approximateTotalWeight: logisticsWeightSchema.optional(),
+    approximateTotalWeight: logisticsWeightSchema,
 
     addons: z.array(z.nativeEnum(ELTLAddon)).optional(),
   })
@@ -200,14 +318,15 @@ export const ltlDetailsSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["origin", "countryCode"],
-        message: "LTL origin must be CA/US/MX",
+        message: "Origin country must be Canada, United States, or Mexico",
       });
     }
+
     if (!isNorthAmerica(val.destination.countryCode)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["destination", "countryCode"],
-        message: "LTL destination must be CA/US/MX",
+        message: "Destination country must be Canada, United States, or Mexico",
       });
     }
   });
@@ -215,22 +334,22 @@ export const ltlDetailsSchema = z
 export const intlDetailsSchema = z.object({
   primaryService: z.literal(ELogisticsPrimaryService.INTERNATIONAL),
 
-  mode: z.nativeEnum(EInternationalMode),
+  mode: internationalModeField,
 
   origin: logisticsAddressSchema,
   destination: logisticsAddressSchema,
 
-  readyDate: dateISO,
-  commodityDescription: trimStr,
+  readyDate: isoDateField("Ready date"),
+  commodityDescription: requiredString("Commodity description"),
 
   estimatedWeight: logisticsWeightSchema,
 
-  shipmentSize: z.nativeEnum(EInternationalShipmentSize).optional(),
+  shipmentSize: z.union([z.nativeEnum(EInternationalShipmentSize), z.undefined()]).optional(),
 });
 
 export const warehousingVolumeSchema = z.object({
-  volumeType: z.nativeEnum(EWarehousingVolumeType),
-  value: posNumber,
+  volumeType: enumField(EWarehousingVolumeType, "Please select a volume type"),
+  value: positiveNumber("Estimated volume"),
 });
 
 export const warehousingDetailsSchema = z
@@ -241,14 +360,14 @@ export const warehousingDetailsSchema = z
 
     estimatedVolume: warehousingVolumeSchema,
 
-    expectedDuration: z.nativeEnum(EWarehousingDuration),
+    expectedDuration: enumField(EWarehousingDuration, "Please select a storage duration"),
   })
   .superRefine((val, ctx) => {
     if (!isNorthAmerica(val.requiredLocation.countryCode)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["requiredLocation", "countryCode"],
-        message: "Warehousing requiredLocation must be CA/US/MX",
+        message: "Warehouse location must be in Canada, United States, or Mexico",
       });
     }
   });
@@ -262,28 +381,62 @@ export const serviceDetailsSchema = z.discriminatedUnion("primaryService", [
 
 /* ───────────────────────────── Identification + Contact ───────────────────────────── */
 
-export const identificationSchema = z.discriminatedUnion("identity", [
-  z.object({
-    identity: z.literal(ECustomerIdentity.SHIPPER),
-    brokerType: z.never().optional(),
-  }),
-  z.object({
-    identity: z.literal(ECustomerIdentity.BROKER),
-    brokerType: z.nativeEnum(EBrokerType),
-  }),
-]);
+export const identificationSchema = z
+  .object({
+    identity: z.union([z.nativeEnum(ECustomerIdentity), z.literal(""), z.undefined()]),
+    brokerType: z.union([z.nativeEnum(EBrokerType), z.undefined()]).optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (!val.identity) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["identity"],
+        message: "Please select who you are",
+      });
+      return;
+    }
 
-export const contactSchema = z.object({
-  firstName: trimStr,
-  lastName: trimStr,
-  email: lowerEmail,
-  company: trimStr,
+    if (val.identity === ECustomerIdentity.BROKER && !val.brokerType) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["brokerType"],
+        message: "Please select a broker type",
+      });
+    }
 
-  phone: optTrimStr,
-  preferredContactMethod: z.nativeEnum(EPreferredContactMethod).optional(),
+    if (val.identity !== ECustomerIdentity.BROKER && val.brokerType !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["brokerType"],
+        message: "Broker type is only allowed when customer type is Broker",
+      });
+    }
+  });
 
-  companyAddress: optTrimStr.refine((s) => s == null || s.length <= 400, "Max 400 characters"),
-});
+export const contactSchema = z
+  .object({
+    firstName: requiredString("First name"),
+    lastName: requiredString("Last name"),
+    email: emailField,
+    company: requiredString("Company name"),
+
+    phone: phoneField,
+    preferredContactMethod: z.nativeEnum(EPreferredContactMethod).optional(),
+
+    companyAddress: optionalTrimmedString().refine(
+      (s) => s == null || s.length <= 400,
+      "Company address must be 400 characters or less",
+    ),
+  })
+  .superRefine((val, ctx) => {
+    if (val.preferredContactMethod === EPreferredContactMethod.PHONE && !val.phone) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["phone"],
+        message: "Phone is required when phone is the preferred contact method",
+      });
+    }
+  });
 
 /* ───────────────────────────── SUBMIT BODY ───────────────────────────── */
 
@@ -291,17 +444,16 @@ export const logisticsQuoteSubmitSchema = z
   .object({
     turnstileToken: z.string().trim().min(1, "Please complete the verification challenge"),
 
-    // optional at load; required via superRefine below
     serviceDetails: serviceDetailsSchema.optional(),
 
     identification: identificationSchema,
     contact: contactSchema,
 
-    finalNotes: z
-      .string()
-      .optional()
-      .transform((s) => (typeof s === "string" ? s.trim() : s))
-      .refine((s) => s == null || s.length <= 6000, "finalNotes exceeds maximum length (6000)"),
+    finalNotes: z.preprocess((v) => {
+      if (typeof v !== "string") return v;
+      const trimmed = v.trim();
+      return trimmed === "" ? undefined : trimmed;
+    }, z.string().max(6000, "Final notes must be 6000 characters or less").optional()),
 
     attachments: z.array(fileAssetSchema).optional(),
 
@@ -310,12 +462,11 @@ export const logisticsQuoteSubmitSchema = z
     sourceLabel: z.string().optional(),
   })
   .superRefine((val, ctx) => {
-    // primary service must be selected
     if (!val.serviceDetails) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["serviceDetails", "primaryService"],
-        message: "Please select a primary service",
+        message: "Please select a service",
       });
     }
   });

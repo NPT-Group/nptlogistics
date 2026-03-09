@@ -21,7 +21,15 @@ export const logisticsQuoteSchema = new Schema<ILogisticsQuote>(
 
     finalNotes: { type: String, required: false, trim: true, maxlength: 6000 },
 
-    attachments: { type: [fileAssetSchema], required: false, default: [] },
+    attachments: {
+      type: [fileAssetSchema],
+      required: false,
+      default: [],
+      validate: {
+        validator: (v: unknown[]) => Array.isArray(v) && v.length <= 10,
+        message: "attachments cannot contain more than 10 files",
+      },
+    },
 
     marketingEmailConsent: { type: Boolean, required: false, default: false },
 

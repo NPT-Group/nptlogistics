@@ -104,7 +104,7 @@ const quoteLTLPalletLineSchema = new Schema(
   {
     quantity: { type: Number, required: true, min: 1 },
     dimensions: { type: logisticsDimensionsSchema, required: true },
-    totalWeight: { type: logisticsWeightSchema, required: false },
+    weightValue: { type: Number, required: true, min: 1 },
   },
   { _id: false },
 );
@@ -128,7 +128,7 @@ export const quoteLTLDetailsSchema = new Schema<Omit<QuoteLTLDetails, "primarySe
       ],
     },
 
-    approximateTotalWeight: { type: logisticsWeightSchema, required: false },
+    approximateTotalWeight: { type: logisticsWeightSchema, required: true },
 
     addons: { type: [String], required: false, default: [], enum: Object.values(ELTLAddon) },
   },
@@ -141,6 +141,26 @@ quoteLTLDetailsSchema.pre("validate", function () {
       "LTL origin/destination countryCode must be one of NORTH_AMERICAN_COUNTRY_CODES (CA/US/MX).",
     );
   }
+
+  const doc = this as any;
+
+  if (!doc.approximateTotalWeight?.unit) {
+    throw new Error("LTL approximateTotalWeight.unit is required");
+  }
+
+  if (!Array.isArray(doc.palletLines) || doc.palletLines.length === 0) {
+    throw new Error("At least one pallet line is required");
+  }
+
+  const sum = doc.palletLines.reduce((acc: number, line: any) => {
+    const n = Number(line?.weightValue);
+    if (!Number.isFinite(n) || n <= 0) {
+      throw new Error("Each pallet line weightValue must be a positive number");
+    }
+    return acc + n;
+  }, 0);
+
+  doc.approximateTotalWeight.value = sum;
 });
 
 /* --------------------------- International --------------------------- */

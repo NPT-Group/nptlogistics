@@ -17,7 +17,7 @@ export default function QuotePage() {
         "py-10 sm:py-12",
       )}
     >
-      <Container className="max-w-4xl px-4 sm:px-6">
+      <Container className="max-w-5xl px-4 sm:px-6 lg:px-8">
         <LogisticsQuoteForm />
       </Container>
     </main>

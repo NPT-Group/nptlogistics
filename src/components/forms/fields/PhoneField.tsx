@@ -28,7 +28,7 @@ export function PhoneField<TFieldValues extends FieldValues>({
         type: "tel",
         inputMode: inputProps?.inputMode ?? "tel",
         autoComplete: inputProps?.autoComplete ?? "tel",
-        placeholder: inputProps?.placeholder ?? "(555) 555-5555",
+        placeholder: inputProps?.placeholder ?? "+1 555 555 5555",
       }}
     />
   );

@@ -1,4 +1,5 @@
 // src/lib/mail/quotes/sendQuoteNotificationEmail.ts
+// src/lib/mail/quotes/sendQuoteNotificationEmail.ts
 import { sendMailAppOnly, type GraphAttachment } from "@/lib/mail/mailer";
 import { escapeHtml } from "@/lib/mail/utils";
 import { buildDefaultEmailTemplate } from "@/lib/mail/templates/defaultTemplate";
@@ -13,6 +14,12 @@ import {
   type LogisticsWeight,
   type LogisticsDimensions,
   type WarehousingVolume,
+  type QuoteFTLDetails,
+  type QuoteLTLDetails,
+  type QuoteInternationalDetails,
+  type QuoteWarehousingDetails,
+  type QuoteLTLPalletLine,
+  type EWeightUnit,
 } from "@/types/logisticsQuote.types";
 import { filenameForAsset } from "@/lib/utils/files/mime";
 import {
@@ -42,7 +49,6 @@ function fmtDate(v?: string | Date) {
   if (!v) return "—";
   const d = typeof v === "string" ? new Date(v) : v;
   if (Number.isNaN(d.getTime())) return escapeHtml(String(v));
-  // Keep it readable, timezone-agnostic (backend can decide later if needed).
   return escapeHtml(d.toISOString().slice(0, 10)); // YYYY-MM-DD
 }
 
@@ -70,6 +76,13 @@ function fmtWeight(w?: LogisticsWeight) {
   return `${escapeHtml(safeVal)} ${escapeHtml(w.unit)}`;
 }
 
+function fmtScalarWeight(value?: number, unit?: EWeightUnit) {
+  if (value === null || value === undefined) return "—";
+  const numeric = Number(value);
+  const safeVal = Number.isFinite(numeric) ? String(numeric) : escapeHtml(String(value));
+  return unit ? `${escapeHtml(safeVal)} ${escapeHtml(unit)}` : escapeHtml(safeVal);
+}
+
 function fmtDims(d?: LogisticsDimensions) {
   if (!d) return "—";
   const l = Number(d.length);
@@ -84,8 +97,7 @@ function fmtDims(d?: LogisticsDimensions) {
 function fmtWarehousingVolume(vol?: WarehousingVolume) {
   if (!vol) return "—";
   const label = labelFromMap(vol.volumeType, WAREHOUSING_VOLUME_TYPE_LABEL);
-  const value =
-    typeof vol.value === "number" ? String(vol.value) : escapeHtml(String((vol as any).value));
+  const value = typeof vol.value === "number" ? String(vol.value) : escapeHtml(String(vol.value));
   return `${escapeHtml(label)}: ${escapeHtml(value)}`;
 }
 
@@ -96,8 +108,8 @@ async function assetToAttachment(
   fallbackBase = "attachment",
 ): Promise<{ attachment?: GraphAttachment; note?: string }> {
   if (!asset) return {};
-  const url = (asset as any)?.url;
-  const mimeType = (asset as any)?.mimeType;
+  const url = (asset as Partial<IFileAsset> & { url?: string }).url;
+  const mimeType = (asset as Partial<IFileAsset> & { mimeType?: string }).mimeType;
 
   if (!url || !mimeType) {
     return { note: `${fallbackBase} missing url or mimeType (not attached).` };
@@ -123,10 +135,49 @@ async function assetToAttachment(
 
 /* ───────────────────────── Service-specific rendering ───────────────────────── */
 
+function renderLtlPalletLinesTable(
+  palletLines: QuoteLTLPalletLine[],
+  shipmentUnit?: EWeightUnit,
+): string {
+  if (!palletLines.length) {
+    return `<p style="margin:0 0 16px 0; color:#6b7280;">No pallet lines provided.</p>`;
+  }
+
+  return `
+    <table role="presentation" cellspacing="0" cellpadding="0" width="100%"
+           style="border-collapse:separate; border-spacing:0; border:1px solid #e5e7eb; border-radius:10px; overflow:hidden; margin:0 0 16px 0;">
+      <thead>
+        <tr>
+          <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Qty</th>
+          <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Dimensions (L×W×H)</th>
+          <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Line Weight</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${palletLines
+          .map((pl) => {
+            const qty = escapeHtml(String(pl.quantity ?? "—"));
+            const dims = fmtDims(pl.dimensions);
+            const lineWeight = fmtScalarWeight(pl.weightValue, shipmentUnit);
+
+            return `
+              <tr>
+                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${qty}</td>
+                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${dims}</td>
+                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${lineWeight}</td>
+              </tr>
+            `;
+          })
+          .join("")}
+      </tbody>
+    </table>
+  `;
+}
+
 function renderServiceSummary(service: QuoteServiceDetails): string {
   switch (service.primaryService) {
     case ELogisticsPrimaryService.FTL: {
-      const s: any = service;
+      const s: QuoteFTLDetails = service;
       return `
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (FTL)</p>
         <ul style="margin:0 0 16px 18px; padding:0;">
@@ -149,38 +200,12 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
     }
 
     case ELogisticsPrimaryService.LTL: {
-      const s: any = service;
+      const s: QuoteLTLDetails = service;
       const palletLines = Array.isArray(s.palletLines) ? s.palletLines : [];
-      const palletLinesHtml = palletLines.length
-        ? `
-          <table role="presentation" cellspacing="0" cellpadding="0" width="100%"
-                 style="border-collapse:separate; border-spacing:0; border:1px solid #e5e7eb; border-radius:10px; overflow:hidden; margin:0 0 16px 0;">
-            <thead>
-              <tr>
-                <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Qty</th>
-                <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Dimensions (L×W×H)</th>
-                <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Line Weight</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${palletLines
-                .map((pl: any) => {
-                  const qty = escapeHtml(String(pl?.quantity ?? "—"));
-                  const dims = fmtDims(pl?.dimensions);
-                  const w = pl?.totalWeight ? fmtWeight(pl.totalWeight) : "—";
-                  return `
-                    <tr>
-                      <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${qty}</td>
-                      <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${dims}</td>
-                      <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${w}</td>
-                    </tr>
-                  `;
-                })
-                .join("")}
-            </tbody>
-          </table>
-        `
-        : `<p style="margin:0 0 16px 0; color:#6b7280;">No pallet lines provided.</p>`;
+      const palletLinesHtml = renderLtlPalletLinesTable(
+        palletLines,
+        s.approximateTotalWeight?.unit,
+      );
 
       return `
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (LTL)</p>
@@ -190,7 +215,7 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
           <li style="margin:0 0 8px 0;">Ready Date: ${fmtDate(s.readyDate)}</li>
           <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
           <li style="margin:0 0 8px 0;">Stackable: ${yn(s.stackable)}</li>
-          <li style="margin:0 0 8px 0;">Approx. Total Weight: ${s.approximateTotalWeight ? fmtWeight(s.approximateTotalWeight) : "—"}</li>
+          <li style="margin:0 0 8px 0;">Approx. Total Weight: ${fmtWeight(s.approximateTotalWeight)}</li>
           <li style="margin:0;">
             Add-ons: ${(() => {
               const labels = labelsFromMap(s.addons, LTL_ADDON_LABEL);
@@ -205,7 +230,11 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
     }
 
     case ELogisticsPrimaryService.INTERNATIONAL: {
-      const s: any = service;
+      const s: QuoteInternationalDetails = service;
+      const shipmentSizeLabel = s.shipmentSize
+        ? escapeHtml(labelFromMap(s.shipmentSize, INTL_SIZE_LABEL))
+        : "—";
+
       return `
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (International)</p>
         <ul style="margin:0 0 16px 18px; padding:0;">
@@ -217,15 +246,13 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
           <li style="margin:0 0 8px 0;">Ready Date: ${fmtDate(s.readyDate)}</li>
           <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
           <li style="margin:0 0 8px 0;">Estimated Weight: ${fmtWeight(s.estimatedWeight)}</li>
-          <li style="margin:0;">
-            Shipment Size: ${escapeHtml(labelFromMap(s.shipmentSize, INTL_SIZE_LABEL))}
-          </li>
+          <li style="margin:0;">Shipment Size: ${shipmentSizeLabel}</li>
         </ul>
       `;
     }
 
     case ELogisticsPrimaryService.WAREHOUSING: {
-      const s: any = service;
+      const s: QuoteWarehousingDetails = service;
       return `
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (Warehousing)</p>
         <ul style="margin:0 0 16px 18px; padding:0;">
@@ -247,18 +274,19 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
 }
 
 function renderContactAndIdentification(q: ILogisticsQuote): string {
-  const c: any = q.contact || {};
-  const id: any = q.identification || {};
+  const c = q.contact || {};
+  const id = q.identification || {};
 
   const safeName = escapeHtml(`${c.firstName || ""} ${c.lastName || ""}`.trim() || "—");
   const safeEmail = c.email ? escapeHtml(String(c.email)) : "—";
   const safeCompany = c.company ? escapeHtml(String(c.company)) : "—";
   const safePhone = c.phone ? escapeHtml(String(c.phone)) : "";
 
-  const identity = id.identity ? escapeHtml(labelFromMap(id.identity, IDENTITY_LABEL)) : "—";
-  const brokerType = id.brokerType
-    ? escapeHtml(labelFromMap(id.brokerType, BROKER_TYPE_LABEL))
-    : "";
+  const identity = "identity" in id ? escapeHtml(labelFromMap(id.identity, IDENTITY_LABEL)) : "—";
+  const brokerType =
+    "brokerType" in id && id.brokerType
+      ? escapeHtml(labelFromMap(id.brokerType, BROKER_TYPE_LABEL))
+      : "";
   const preferred = c.preferredContactMethod
     ? escapeHtml(labelFromMap(c.preferredContactMethod, PREF_CONTACT_LABEL))
     : "—";
@@ -287,7 +315,8 @@ function renderContactAndIdentification(q: ILogisticsQuote): string {
           ? `<li style="margin:0 0 8px 0;">Phone: <a href="tel:${safePhone}" style="color:#2563eb; text-decoration:none;">${safePhone}</a></li>`
           : `<li style="margin:0 0 8px 0;">Phone: —</li>`
       }
-      <li style="margin:0;">Preferred Contact: ${preferred}</li>
+      <li style="margin:0 0 8px 0;">Preferred Contact: ${preferred}</li>
+      <li style="margin:0;">Marketing Consent: ${yn(q.marketingEmailConsent)}</li>
     </ul>
 
     <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Company Address</p>
@@ -298,13 +327,8 @@ function renderContactAndIdentification(q: ILogisticsQuote): string {
 /* ───────────────────────── Public API ───────────────────────── */
 
 export type SendQuoteNotificationEmailParams = {
-  /** Sales/ops mailbox recipient (often same as NPT_QUOTES_EMAIL) */
   to?: string;
-
-  /** Optional "reply-to" is not supported by current mailer; include in body if desired. */
   quote: ILogisticsQuote;
-
-  /** If you want the subject to mention website, campaign, etc. */
   sourceLabel?: string;
 };
 
@@ -316,14 +340,14 @@ export async function sendQuoteInternalNotificationEmail(
   const q = params.quote;
   const service = q.serviceDetails;
 
-  // Prefer Mongo id. Fall back safely if some upstream mapper adds `id`.
-  const safeId = escapeHtml(String((q as any)?._id || (q as any)?.id || "—"));
+  const safeId = escapeHtml(
+    String((q as { _id?: unknown; id?: unknown })?._id || (q as { id?: unknown })?.id || "—"),
+  );
   const safePrimary = escapeHtml(String(service?.primaryService || "QUOTE"));
   const safeSource = params.sourceLabel ? escapeHtml(params.sourceLabel) : "";
 
   const subject = `New Quote Received – ${safePrimary}${safeSource ? ` (${safeSource})` : ""}`;
 
-  // ───────────────────────── Attach ALL quote attachments ─────────────────────────
   const attachments: GraphAttachment[] = [];
   const attachmentNotes: string[] = [];
 
@@ -339,7 +363,6 @@ export async function sendQuoteInternalNotificationEmail(
       attachmentNotes.push(`Failed to attach ${fallbackBase} due to an unexpected error.`);
     }
   }
-  // ───────────────────────────────────────────────────────────────────────────────
 
   const attachmentsBlock = `
     <p style="margin:16px 0 8px 0; font-weight:600; color:#111827;">Attachments</p>
@@ -349,15 +372,21 @@ export async function sendQuoteInternalNotificationEmail(
           <ul style="margin:0 0 12px 18px; padding:0;">
             ${files
               .map((a, idx) => {
+                const meta = a as IFileAsset & {
+                  originalName?: string;
+                  filename?: string;
+                  name?: string;
+                  sizeBytes?: number;
+                  mimeType?: string;
+                };
+
                 const name =
-                  (a as any)?.originalName ||
-                  (a as any)?.filename ||
-                  (a as any)?.name ||
-                  `Attachment ${idx + 1}`;
-                const mime = (a as any)?.mimeType ? String((a as any).mimeType) : "";
-                const size = (a as any)?.sizeBytes ? `${Number((a as any).sizeBytes)} bytes` : "";
-                const meta = [mime, size].filter(Boolean).join(" • ");
-                return `<li style="margin:0 0 8px 0;">${escapeHtml(String(name))}${meta ? ` <span style="color:#6b7280;">(${escapeHtml(meta)})</span>` : ""}</li>`;
+                  meta.originalName || meta.filename || meta.name || `Attachment ${idx + 1}`;
+                const mime = meta.mimeType ? String(meta.mimeType) : "";
+                const size = meta.sizeBytes ? `${Number(meta.sizeBytes)} bytes` : "";
+                const metaText = [mime, size].filter(Boolean).join(" • ");
+
+                return `<li style="margin:0 0 8px 0;">${escapeHtml(String(name))}${metaText ? ` <span style="color:#6b7280;">(${escapeHtml(metaText)})</span>` : ""}</li>`;
               })
               .join("")}
           </ul>
@@ -379,7 +408,7 @@ export async function sendQuoteInternalNotificationEmail(
     }
   `;
 
-  const finalNotes = (q as any)?.finalNotes ? escapeHtml(String((q as any).finalNotes)) : "";
+  const finalNotes = q.finalNotes ? escapeHtml(String(q.finalNotes)) : "";
 
   const finalNotesBlock = `
     <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Final Notes</p>
@@ -399,8 +428,8 @@ export async function sendQuoteInternalNotificationEmail(
         • Primary Service: <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;">${safePrimary}</span>
       </p>
       <p style="margin:6px 0 0 0; font-size:13px; color:#6b7280;">
-        Created: ${fmtDate((q as any)?.createdAt)} • Updated: ${fmtDate((q as any)?.updatedAt)}
-        • Cross-border: ${yn((q as any)?.crossBorder)}
+        Created: ${fmtDate(q.createdAt)} • Updated: ${fmtDate(q.updatedAt)}
+        • Cross-border: ${yn(q.crossBorder)}
       </p>
     </div>
   `;

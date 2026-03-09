@@ -2,7 +2,6 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { Mail } from "lucide-react";
 
 import type { LogisticsQuoteSubmitValues } from "../schema";
 
@@ -12,84 +11,135 @@ import { SelectField } from "@/components/forms/fields/SelectField";
 
 import { EPreferredContactMethod } from "@/types/logisticsQuote.types";
 import { siteTextUi } from "@/app/(site)/components/forms/presets/siteFieldUi";
+import { cn } from "@/lib/cn";
 
 export function ContactSection() {
   const { control } = useFormContext<LogisticsQuoteSubmitValues>();
 
   return (
-    <section className="space-y-4">
-      <div className="flex items-center gap-2">
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[color:var(--color-brand-50)] text-[color:var(--color-brand-700)]">
-          <Mail className="h-4 w-4" />
-        </span>
-        <h2 className="text-sm font-semibold text-[color:var(--color-text-light)]">Contact</h2>
+    <section className="space-y-5">
+      {/* Section header */}
+      <div className="space-y-1">
+        <h3 className="text-sm font-semibold text-[color:var(--color-text-light)]">Contact</h3>
+        <p className="text-sm text-[color:var(--color-muted-light)]">
+          Share the best details for quote follow-up and coordination.
+        </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <TextField
-          control={control}
-          name="contact.firstName"
-          label="First name"
-          required
-          ui={siteTextUi}
+      {/* Card */}
+      <div
+        className={cn(
+          "rounded-2xl border border-[color:var(--color-border-light)] bg-white p-4 sm:p-5",
+          "space-y-6",
+        )}
+      >
+        {/* Contact fields */}
+        <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField
+              control={control}
+              name="contact.firstName"
+              fieldPathAttr="contact.firstName"
+              label="First name"
+              required
+              ui={siteTextUi}
+              inputProps={{ autoComplete: "given-name" }}
+            />
+
+            <TextField
+              control={control}
+              name="contact.lastName"
+              fieldPathAttr="contact.lastName"
+              label="Last name"
+              required
+              ui={siteTextUi}
+              inputProps={{ autoComplete: "family-name" }}
+            />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField
+              control={control}
+              name="contact.email"
+              fieldPathAttr="contact.email"
+              label="Email"
+              required
+              ui={siteTextUi}
+              inputProps={{
+                type: "email",
+                autoComplete: "email",
+                placeholder: "you@company.com",
+              }}
+            />
+
+            <PhoneField
+              control={control}
+              name="contact.phone"
+              fieldPathAttr="contact.phone"
+              label="Phone"
+              ui={siteTextUi}
+            />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField
+              control={control}
+              name="contact.company"
+              fieldPathAttr="contact.company"
+              label="Company"
+              required
+              ui={siteTextUi}
+              inputProps={{
+                placeholder: "Company name",
+                autoComplete: "organization",
+              }}
+            />
+
+            <SelectField
+              control={control}
+              name="contact.preferredContactMethod"
+              fieldPathAttr="contact.preferredContactMethod"
+              label="Preferred contact method"
+              ui={siteTextUi}
+              placeholder="Select..."
+              options={[
+                { label: "Email", value: EPreferredContactMethod.EMAIL },
+                { label: "Phone", value: EPreferredContactMethod.PHONE },
+              ]}
+            />
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div
+          className="h-px bg-[linear-gradient(90deg,transparent,rgba(15,23,42,0.10),rgba(15,23,42,0.16),rgba(15,23,42,0.10),transparent)]"
+          aria-hidden="true"
         />
-        <TextField
-          control={control}
-          name="contact.lastName"
-          label="Last name"
-          required
-          ui={siteTextUi}
-        />
+
+        {/* Address */}
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <h4 className="text-sm font-semibold text-[color:var(--color-text-light)]">
+              Business address
+            </h4>
+            <p className="text-sm text-[color:var(--color-muted-light)]">
+              Optional business address for coordination and record keeping.
+            </p>
+          </div>
+
+          <TextField
+            control={control}
+            name="contact.companyAddress"
+            fieldPathAttr="contact.companyAddress"
+            label="Business address"
+            ui={siteTextUi}
+            inputProps={{
+              placeholder: "Street, City, Region, Postal, Country (optional)",
+              autoComplete: "street-address",
+            }}
+          />
+        </div>
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <TextField
-          control={control}
-          name="contact.email"
-          label="Email"
-          required
-          ui={siteTextUi}
-          inputProps={{
-            type: "email",
-            autoComplete: "email",
-            placeholder: "you@company.com",
-          }}
-        />
-        <PhoneField control={control} name="contact.phone" label="Phone" ui={siteTextUi} />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <TextField
-          control={control}
-          name="contact.company"
-          label="Company"
-          required
-          ui={siteTextUi}
-          inputProps={{ placeholder: "Company name" }}
-        />
-
-        <SelectField
-          control={control}
-          name="contact.preferredContactMethod"
-          label="Preferred contact method"
-          ui={siteTextUi}
-          options={[
-            { label: "Email", value: EPreferredContactMethod.EMAIL },
-            { label: "Phone", value: EPreferredContactMethod.PHONE },
-          ]}
-        />
-      </div>
-
-      <TextField
-        control={control}
-        name="contact.companyAddress"
-        label="Company address"
-        ui={siteTextUi}
-        inputProps={{
-          placeholder: "Street, City, Region, Postal, Country (optional)",
-          autoComplete: "organization",
-        }}
-      />
     </section>
   );
 }

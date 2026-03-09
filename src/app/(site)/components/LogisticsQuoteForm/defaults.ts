@@ -1,11 +1,8 @@
 // src/app/(site)/components/LogisticsQuoteForm/defaults.ts
 import {
-  ECustomerIdentity,
-  EInternationalMode,
   ELogisticsPrimaryService,
   EWarehousingDuration,
   EWarehousingVolumeType,
-  EWeightUnit,
   type LogisticsAddress,
 } from "@/types/logisticsQuote.types";
 
@@ -20,12 +17,12 @@ export const EMPTY_ADDRESS: LogisticsAddress = {
   city: "",
   region: "",
   postalCode: "",
-  countryCode: "CA",
+  countryCode: "",
 };
 
 export const EMPTY_WEIGHT = {
   value: 0,
-  unit: EWeightUnit.LB,
+  unit: undefined,
 };
 
 export const EMPTY_DIMS = {
@@ -41,12 +38,10 @@ export function makeServiceDetailsDefaults(
     case ELogisticsPrimaryService.FTL:
       return {
         primaryService,
-        // set by EquipmentSelector step
-        // @ts-expect-error intentionally unset until equipment selection step
         equipment: undefined,
         origin: { ...EMPTY_ADDRESS },
         destination: { ...EMPTY_ADDRESS },
-        readyDate: new Date().toISOString(),
+        readyDate: "",
         commodityDescription: "",
         approximateTotalWeight: { ...EMPTY_WEIGHT },
         estimatedPalletCount: undefined,
@@ -60,27 +55,27 @@ export function makeServiceDetailsDefaults(
         primaryService,
         origin: { ...EMPTY_ADDRESS },
         destination: { ...EMPTY_ADDRESS },
-        readyDate: new Date().toISOString(),
+        readyDate: "",
         commodityDescription: "",
         stackable: false,
         palletLines: [
           {
-            quantity: 1,
+            quantity: 0,
             dimensions: { ...EMPTY_DIMS },
-            totalWeight: undefined,
+            weightValue: 0,
           },
         ],
-        approximateTotalWeight: undefined,
+        approximateTotalWeight: { ...EMPTY_WEIGHT },
         addons: [],
       };
 
     case ELogisticsPrimaryService.INTERNATIONAL:
       return {
         primaryService,
-        mode: EInternationalMode.AIR,
+        mode: undefined,
         origin: { ...EMPTY_ADDRESS },
         destination: { ...EMPTY_ADDRESS },
-        readyDate: new Date().toISOString(),
+        readyDate: "",
         commodityDescription: "",
         estimatedWeight: { ...EMPTY_WEIGHT },
         shipmentSize: undefined,
@@ -112,11 +107,10 @@ export const LOGISTICS_QUOTE_SUBMIT_DEFAULTS: LogisticsQuoteSubmitValues = {
   turnstileToken: "",
   sourceLabel: "NPT Logistics Quote Form",
 
-  // no primary service selected on load
   serviceDetails: undefined,
 
   identification: {
-    identity: ECustomerIdentity.SHIPPER,
+    identity: "",
   },
 
   contact: {
