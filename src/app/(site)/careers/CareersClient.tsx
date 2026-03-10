@@ -125,7 +125,6 @@ function buildUrlParams(q: Query) {
   if (q.workplaceType) qs.set("workplaceType", q.workplaceType);
   if (q.employmentType) qs.set("employmentType", q.employmentType);
 
-  // Only include non-default pagination/sort in the URL
   const page = clampPage(q.page);
   const pageSize = q.pageSize || DEFAULTS.pageSize;
 
@@ -171,7 +170,6 @@ export default function CareersClient({
   const [query, setQuery] = React.useState<Query>(initialQuery);
   const queryRef = React.useRef<Query>(initialQuery);
   const lastUrlRef = React.useRef<string>("");
-  const writingUrlRef = React.useRef(false);
   const didMountRef = React.useRef(false);
 
   React.useEffect(() => {
@@ -188,17 +186,19 @@ export default function CareersClient({
 
   const SECTION_SCROLL_MARGIN_TOP = `${NAV_OFFSET}px`;
 
-  // Local inputs (debounced)
-  const [qInput, setQInput] = React.useState(query.q ?? "");
-  const [deptInput, setDeptInput] = React.useState(query.department ?? "");
-  const [locInput, setLocInput] = React.useState(query.location ?? "");
+  // local inputs (debounced), same idea as blog
+  const [qInput, setQInput] = React.useState(initialQuery.q ?? "");
+  const [deptInput, setDeptInput] = React.useState(initialQuery.department ?? "");
+  const [locInput, setLocInput] = React.useState(initialQuery.location ?? "");
 
   const activeFilters = Boolean(
-    qInput.trim() ||
-    deptInput.trim() ||
-    locInput.trim() ||
+    query.q.trim() ||
+    query.department.trim() ||
+    query.location.trim() ||
     query.workplaceType ||
-    query.employmentType,
+    query.employmentType ||
+    query.sortBy !== DEFAULTS.sortBy ||
+    query.sortDir !== DEFAULTS.sortDir,
   );
 
   const scrollToResults = React.useCallback(() => {
@@ -214,33 +214,21 @@ export default function CareersClient({
       const merged: Query = { ...base, ...next };
 
       merged.page = clampPage(merged.page);
-      merged.pageSize = merged.pageSize || 12;
-      merged.sortBy = (merged.sortBy || "publishedAt") as SortBy;
-      merged.sortDir = (merged.sortDir || "desc") as SortDir;
+      merged.pageSize = merged.pageSize || DEFAULTS.pageSize;
+      merged.sortBy = (merged.sortBy || DEFAULTS.sortBy) as SortBy;
+      merged.sortDir = (merged.sortDir || DEFAULTS.sortDir) as SortDir;
 
       const qs = buildUrlParams(merged);
       const qsStr = qs.toString();
-      const hash = opts?.scroll
-        ? "#jobs"
-        : typeof window !== "undefined"
-          ? window.location.hash
-          : "";
+      const nextUrl = `/careers${qsStr ? `?${qsStr}` : ""}`;
 
-      const nextUrl = `/careers${qsStr ? `?${qsStr}` : ""}${hash || ""}`;
-
-      if (replaceUrl) {
-        if (lastUrlRef.current !== nextUrl) {
-          writingUrlRef.current = true;
-          lastUrlRef.current = nextUrl;
-          router.replace(nextUrl);
-          setTimeout(() => {
-            writingUrlRef.current = false;
-          }, 0);
-        }
+      if (replaceUrl && lastUrlRef.current !== nextUrl) {
+        lastUrlRef.current = nextUrl;
+        router.replace(nextUrl, { scroll: false });
       }
 
-      const ac = new AbortController();
       jobsAbortRef.current?.abort();
+      const ac = new AbortController();
       jobsAbortRef.current = ac;
 
       setLoading(true);
@@ -251,11 +239,6 @@ export default function CareersClient({
         setItems(resp.data.items ?? []);
         setMeta(resp.data.meta ?? {});
         setQuery(merged);
-
-        // keep inputs in sync if explicitly changed by caller
-        if (typeof next.q === "string") setQInput(next.q);
-        if (typeof next.department === "string") setDeptInput(next.department);
-        if (typeof next.location === "string") setLocInput(next.location);
 
         if (scroll) scrollToResults();
       } catch (e: any) {
@@ -268,10 +251,8 @@ export default function CareersClient({
     [router, scrollToResults],
   );
 
-  // Sync from URL (back/forward, external links)
+  // sync from URL like blog
   React.useEffect(() => {
-    if (writingUrlRef.current) return;
-
     const nextPage = clampPage(Number(sp.get("page") ?? String(DEFAULTS.page)));
     const nextPageSize =
       Number(sp.get("pageSize") ?? String(queryRef.current.pageSize ?? DEFAULTS.pageSize)) ||
@@ -311,17 +292,17 @@ export default function CareersClient({
       prev.sortBy !== next.sortBy ||
       prev.sortDir !== next.sortDir;
 
-    // If nothing changed, do nothing.
-    // This prevents a "setQInput(...)" -> debounce -> runFetch -> router.replace chain on client nav.
     if (!changed) return;
 
     setQuery(next);
-    setQInput(next.q);
-    setDeptInput(next.department);
-    setLocInput(next.location);
+
+    // blog-style input sync only when URL changed externally/browser nav
+    setQInput((prevVal) => (prevVal === next.q ? prevVal : next.q));
+    setDeptInput((prevVal) => (prevVal === next.department ? prevVal : next.department));
+    setLocInput((prevVal) => (prevVal === next.location ? prevVal : next.location));
   }, [sp]);
 
-  // Debounced fetch for the 3 text inputs
+  // debounced fetch for text inputs, same search behavior pattern as blog
   React.useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
@@ -329,6 +310,16 @@ export default function CareersClient({
     }
 
     const t = window.setTimeout(() => {
+      const current = queryRef.current;
+
+      if (
+        qInput === current.q &&
+        deptInput === current.department &&
+        locInput === current.location
+      ) {
+        return;
+      }
+
       runFetch(
         {
           q: qInput,
@@ -343,7 +334,7 @@ export default function CareersClient({
     return () => window.clearTimeout(t);
   }, [qInput, deptInput, locInput, runFetch]);
 
-  // Deep-link support: /careers#overview | #why | #drive | #jobs
+  // deep-link support: /careers#overview | #why | #drive | #jobs
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     const hash = window.location.hash || "";
@@ -368,9 +359,6 @@ export default function CareersClient({
 
   return (
     <>
-      {/* =========================
-          HERO (no filters here)
-         ========================= */}
       <Section
         id="overview"
         className="relative overflow-hidden bg-[color:var(--color-surface-0)]"
@@ -439,12 +427,13 @@ export default function CareersClient({
               <motion.p
                 variants={fadeUp}
                 transition={{ duration: reduceMotion ? 0 : 0.45, ease: "easeOut" }}
-                className="mt-3 max-w-2xl text-sm text-[rgba(255,255,255,0.85)] sm:text-base leading-relaxed"
+                className="mt-3 max-w-2xl text-sm leading-relaxed text-[rgba(255,255,255,0.85)] sm:text-base"
               >
-                Join a high-performance team where precision meets opportunity. Whether you're navigating the road or optimizing global supply chains, NPT provides the stability, scale, and strategic vision to accelerate your career.
+                Join a high-performance team where precision meets opportunity. Whether you're
+                navigating the road or optimizing global supply chains, NPT provides the stability,
+                scale, and strategic vision to accelerate your career.
               </motion.p>
 
-              {/* CTAs */}
               <motion.div
                 variants={fadeUp}
                 transition={{ duration: reduceMotion ? 0 : 0.45, ease: "easeOut" }}
@@ -491,7 +480,6 @@ export default function CareersClient({
                 </button>
               </motion.div>
 
-              {/* Micro trust strip */}
               <motion.div
                 variants={fadeUp}
                 transition={{ duration: reduceMotion ? 0 : 0.45, ease: "easeOut" }}
@@ -515,16 +503,12 @@ export default function CareersClient({
         </div>
       </Section>
 
-      {/* =========================
-          WHY JOIN NPT (dark section)
-         ========================= */}
       <Section
         id="why"
         className="relative py-14 sm:py-16"
         variant="light"
         style={{ scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
       >
-        {/* Subtle radial depth */}
         <div
           aria-hidden
           className="absolute inset-0"
@@ -543,10 +527,9 @@ export default function CareersClient({
             >
               <motion.div variants={fadeUp} className="flex items-end justify-between gap-4">
                 <div className="max-w-2xl">
-                  {/* Accent bar heading */}
                   <div className="mb-3 flex items-center gap-2.5">
                     <div className="h-[2px] w-10 bg-[color:var(--color-brand-500)] sm:w-14" />
-                    <span className="text-[10.5px] font-bold tracking-[0.15em] uppercase text-[color:var(--color-brand-500)]">
+                    <span className="text-[10.5px] font-bold tracking-[0.15em] text-[color:var(--color-brand-500)] uppercase">
                       The NPT Advantage
                     </span>
                   </div>
@@ -554,7 +537,9 @@ export default function CareersClient({
                     Uncompromising Standards. Unwavering Support.
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--color-muted-light)]">
-                    We operate at the intersection of speed and reliability. Our culture is built on operational clarity, direct communication, and an absolute commitment to safety—so you can focus on execution.
+                    We operate at the intersection of speed and reliability. Our culture is built on
+                    operational clarity, direct communication, and an absolute commitment to
+                    safety—so you can focus on execution.
                   </p>
                 </div>
 
@@ -600,7 +585,9 @@ export default function CareersClient({
                       <CheckCircle2 className="h-4 w-4 text-[color:var(--color-brand-600)]" />
                       {c.title}
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-[color:var(--color-muted-light)]">{c.desc}</p>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--color-muted-light)]">
+                      {c.desc}
+                    </p>
                   </div>
                 ))}
               </motion.div>
@@ -609,16 +596,15 @@ export default function CareersClient({
         </div>
       </Section>
 
-      {/* =========================
-          DRIVE FOR NPT
-         ========================= */}
       <Section
         id="drive"
         className="relative overflow-hidden"
         variant="dark"
-        style={{ backgroundColor: "var(--color-about-operating-bg)", scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
+        style={{
+          backgroundColor: "var(--color-about-operating-bg)",
+          scrollMarginTop: SECTION_SCROLL_MARGIN_TOP,
+        }}
       >
-        {/* Radial gradient depth */}
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle,rgba(220,38,38,0.06),transparent_60%)]" />
           <div className="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle,rgba(15,23,42,0.6),transparent_70%)]" />
@@ -626,10 +612,9 @@ export default function CareersClient({
         <Container className="site-page-container relative">
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
-              {/* Accent bar heading */}
               <div className="mb-3 flex items-center gap-2.5">
                 <div className="h-[2px] w-10 bg-[color:var(--color-brand-500)] sm:w-14" />
-                <span className="text-[10.5px] font-bold tracking-[0.15em] uppercase text-[color:var(--color-brand-500)]">
+                <span className="text-[10.5px] font-bold tracking-[0.15em] text-[color:var(--color-brand-500)] uppercase">
                   Fleet Operations
                 </span>
               </div>
@@ -639,7 +624,9 @@ export default function CareersClient({
               </h2>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[rgba(255,255,255,0.7)]">
-                We deploy a safety-first fleet backed by world-class dispatch intelligence. If you demand premium equipment, strategic routing, and a culture of respect, your future is behind the wheel at NPT.
+                We deploy a safety-first fleet backed by world-class dispatch intelligence. If you
+                demand premium equipment, strategic routing, and a culture of respect, your future
+                is behind the wheel at NPT.
               </p>
 
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -655,7 +642,8 @@ export default function CareersClient({
                     Premium Equipment &amp; Maintenance
                   </div>
                   <p className="mt-2 text-sm leading-6 text-[rgba(255,255,255,0.6)]">
-                    A modernized fleet with proactive, scheduled maintenance to keep you moving safely and efficiently.
+                    A modernized fleet with proactive, scheduled maintenance to keep you moving
+                    safely and efficiently.
                   </p>
                 </div>
 
@@ -667,36 +655,39 @@ export default function CareersClient({
                     boxShadow: "0 8px 32px rgba(0,0,0,0.30)",
                   }}
                 >
-                  <div className="text-sm font-semibold text-white">Strategic Dispatch &amp; Planning</div>
+                  <div className="text-sm font-semibold text-white">
+                    Strategic Dispatch &amp; Planning
+                  </div>
                   <p className="mt-2 text-sm leading-6 text-[rgba(255,255,255,0.6)]">
-                    Intelligent routing and 24/7 cross-functional support designed to maximize your time, earnings, and work-life balance.
+                    Intelligent routing and 24/7 cross-functional support designed to maximize your
+                    time, earnings, and work-life balance.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Premium Drivedock Application Card */}
             <div className="group relative overflow-hidden rounded-[2rem] p-[1px] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-              {/* Animated gradient border effect */}
-              <div 
-                className="absolute inset-0 bg-gradient-to-br from-[color:var(--color-brand-500)] via-transparent to-white/10 opacity-40 transition-opacity duration-500 group-hover:opacity-70" 
-                aria-hidden="true" 
+              <div
+                className="absolute inset-0 bg-gradient-to-br from-[color:var(--color-brand-500)] via-transparent to-white/10 opacity-40 transition-opacity duration-500 group-hover:opacity-70"
+                aria-hidden="true"
               />
-              
+
               <div className="relative h-full rounded-[calc(2rem-1px)] bg-[#0d111a]/95 p-6 backdrop-blur-2xl sm:p-8">
-                {/* Subtle internal glow */}
-                <div 
-                  className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[color:var(--color-brand-600)] opacity-20 blur-3xl mix-blend-screen transition-all duration-700 group-hover:scale-110 group-hover:opacity-30" 
-                  aria-hidden="true" 
+                <div
+                  className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[color:var(--color-brand-600)] opacity-20 mix-blend-screen blur-3xl transition-all duration-700 group-hover:scale-110 group-hover:opacity-30"
+                  aria-hidden="true"
                 />
 
                 <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-[rgba(220,38,38,0.25)] bg-[rgba(220,38,38,0.1)] shadow-[0_0_15px_rgba(220,38,38,0.15)]">
-                  <ArrowUpRight className="h-5 w-5 text-[color:var(--color-brand-400)] transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
+                  <ArrowUpRight className="h-5 w-5 text-[color:var(--color-brand-400)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
                 </div>
-                
-                <h3 className="mb-2 text-xl font-bold tracking-tight text-white">Drivedock Portal</h3>
+
+                <h3 className="mb-2 text-xl font-bold tracking-tight text-white">
+                  Drivedock Portal
+                </h3>
                 <p className="mb-8 text-sm leading-relaxed text-[rgba(255,255,255,0.65)]">
-                  Driver opportunities are managed through our exclusive external platform, engineered for a transparent, fast-tracked application process.
+                  Driver opportunities are managed through our exclusive external platform,
+                  engineered for a transparent, fast-tracked application process.
                 </p>
 
                 <a
@@ -718,9 +709,10 @@ export default function CareersClient({
                     "focus-ring-light",
                   )}
                 >
-                  <span className="font-semibold tracking-wide text-white">Start your application</span>
-                  {/* Premium glass-effect icon container */}
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 transition-all duration-300 group-hover/btn:bg-white group-hover/btn:text-[color:var(--color-brand-700)]">
+                  <span className="font-semibold tracking-wide text-white">
+                    Start your application
+                  </span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 backdrop-blur-md transition-all duration-300 group-hover/btn:bg-white group-hover/btn:text-[color:var(--color-brand-700)]">
                     <ArrowRight className="h-4 w-4 text-white transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:text-[color:var(--color-brand-700)]" />
                   </div>
                 </a>
@@ -730,7 +722,9 @@ export default function CareersClient({
                     <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
                     Accepting applications
                   </div>
-                  <div className="text-[10px] uppercase tracking-wider text-[rgba(255,255,255,0.3)]">Secure link</div>
+                  <div className="text-[10px] tracking-wider text-[rgba(255,255,255,0.3)] uppercase">
+                    Secure link
+                  </div>
                 </div>
               </div>
             </div>
@@ -738,16 +732,15 @@ export default function CareersClient({
         </Container>
       </Section>
 
-      {/* =========================
-          JOB LISTINGS
-         ========================= */}
       <Section
         id="jobs"
         className="relative overflow-hidden"
         variant="light"
-        style={{ backgroundColor: "var(--audience-bg)", scrollMarginTop: SECTION_SCROLL_MARGIN_TOP }}
+        style={{
+          backgroundColor: "var(--audience-bg)",
+          scrollMarginTop: SECTION_SCROLL_MARGIN_TOP,
+        }}
       >
-        {/* Subtle radial depth */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -759,10 +752,9 @@ export default function CareersClient({
         <Container className="site-page-container relative">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              {/* Accent bar heading */}
               <div className="mb-3 flex items-center gap-2.5">
                 <div className="h-[2px] w-10 bg-[color:var(--color-brand-500)] sm:w-14" />
-                <span className="text-[10.5px] font-bold tracking-[0.15em] uppercase text-[color:var(--color-brand-600)]">
+                <span className="text-[10.5px] font-bold tracking-[0.15em] text-[color:var(--color-brand-600)] uppercase">
                   Current Openings
                 </span>
               </div>
@@ -770,41 +762,41 @@ export default function CareersClient({
                 Shape the Future of Logistics
               </h2>
               <p className="mt-1 max-w-2xl text-sm text-[color:var(--color-muted-light)]">
-                Explore strategic opportunities across fleet operations, supply chain management, and corporate leadership. We seek high-caliber professionals dedicated to driving operational excellence.
+                Explore strategic opportunities across fleet operations, supply chain management,
+                and corporate leadership. We seek high-caliber professionals dedicated to driving
+                operational excellence.
               </p>
             </div>
 
             <div className="text-sm text-[color:var(--color-subtle-light)]">
               Total:{" "}
-              <span className="font-semibold text-[color:var(--color-text-light)]">{meta?.total ?? items.length}</span>
+              <span className="font-semibold text-[color:var(--color-text-light)]">
+                {meta?.total ?? items.length}
+              </span>
             </div>
           </div>
 
-          {/* Filters Card */}
           <div className="mt-6">
-            <div
-              className={cn(
-                "relative flex flex-col gap-4 rounded-2xl p-4 sm:p-5",
-                "site-card-surface",
-              )}
-            >
-              {/* Row 1: Search, Dept, Location */}
+            <div className="site-card-surface relative flex flex-col gap-4 rounded-2xl p-4 sm:p-5">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-                {/* Search */}
                 <div className="relative flex-1">
-                  <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[color:var(--color-subtle-light)] transition-colors duration-300 peer-focus:text-[color:var(--color-brand-600)]" />
+                  <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[color:var(--color-subtle-light)]" />
                   <input
                     value={qInput}
                     onChange={(e) => setQInput(e.target.value)}
                     placeholder="Search roles (e.g., dispatcher, safety, operations)…"
                     className={cn(
-                      "peer w-full rounded-xl border border-[color:var(--color-border-light)] bg-white py-2.5 pl-10 pr-10 text-sm shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-all duration-300",
-                      "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
-                      "focus:border-[color:var(--color-brand-400)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
+                      "w-full rounded-xl border bg-white py-2.5 pr-10 pl-10 text-sm transition-all duration-200",
+                      "border-black/[0.06] text-[color:var(--color-text-light)]",
+                      "shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
+                      "placeholder:text-[color:var(--color-subtle-light)]",
+                      "hover:border-[color:var(--color-brand-600)]",
+                      "focus:border-[color:var(--color-brand-600)] focus:ring-4 focus:ring-[color:var(--color-brand-600)]/10 focus:outline-none",
                     )}
                   />
                   {qInput ? (
                     <button
+                      type="button"
                       onClick={() => setQInput("")}
                       className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-900"
                       aria-label="Clear search"
@@ -814,21 +806,24 @@ export default function CareersClient({
                   ) : null}
                 </div>
 
-                {/* Department */}
                 <div className="relative lg:w-56">
-                  <Building2 className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[color:var(--color-subtle-light)] transition-colors duration-300 peer-focus:text-[color:var(--color-brand-600)]" />
+                  <Building2 className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[color:var(--color-subtle-light)]" />
                   <input
                     value={deptInput}
                     onChange={(e) => setDeptInput(e.target.value)}
                     placeholder="Department (optional)"
                     className={cn(
-                      "peer w-full rounded-xl border border-[color:var(--color-border-light)] bg-white py-2.5 pl-10 pr-10 text-sm shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-all duration-300",
-                      "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
-                      "focus:border-[color:var(--color-brand-400)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
+                      "w-full rounded-xl border bg-white py-2.5 pr-10 pl-10 text-sm transition-all duration-200",
+                      "border-black/[0.06] text-[color:var(--color-text-light)]",
+                      "shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
+                      "placeholder:text-[color:var(--color-subtle-light)]",
+                      "hover:border-[color:var(--color-brand-600)]",
+                      "focus:border-[color:var(--color-brand-600)] focus:ring-4 focus:ring-[color:var(--color-brand-600)]/10 focus:outline-none",
                     )}
                   />
                   {deptInput ? (
                     <button
+                      type="button"
                       onClick={() => setDeptInput("")}
                       className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-900"
                       aria-label="Clear department"
@@ -838,21 +833,24 @@ export default function CareersClient({
                   ) : null}
                 </div>
 
-                {/* Location */}
                 <div className="relative lg:w-56">
-                  <MapPin className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[color:var(--color-subtle-light)] transition-colors duration-300 peer-focus:text-[color:var(--color-brand-600)]" />
+                  <MapPin className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[color:var(--color-subtle-light)]" />
                   <input
                     value={locInput}
                     onChange={(e) => setLocInput(e.target.value)}
                     placeholder="Location (optional)"
                     className={cn(
-                      "peer w-full rounded-xl border border-[color:var(--color-border-light)] bg-white py-2.5 pl-10 pr-10 text-sm shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-all duration-300",
-                      "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
-                      "focus:border-[color:var(--color-brand-400)] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
+                      "w-full rounded-xl border bg-white py-2.5 pr-10 pl-10 text-sm transition-all duration-200",
+                      "border-black/[0.06] text-[color:var(--color-text-light)]",
+                      "shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
+                      "placeholder:text-[color:var(--color-subtle-light)]",
+                      "hover:border-[color:var(--color-brand-600)]",
+                      "focus:border-[color:var(--color-brand-600)] focus:ring-4 focus:ring-[color:var(--color-brand-600)]/10 focus:outline-none",
                     )}
                   />
                   {locInput ? (
                     <button
+                      type="button"
                       onClick={() => setLocInput("")}
                       className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-900"
                       aria-label="Clear location"
@@ -863,28 +861,27 @@ export default function CareersClient({
                 </div>
               </div>
 
-              {/* Row 2: Selects + Meta */}
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <div className="sm:w-48">
                     <Select
                       value={query.workplaceType || ""}
                       onChange={(v) =>
-                        runFetch({ workplaceType: v, page: 1 }, { replaceUrl: true })
+                        runFetch({ workplaceType: v, page: 1 }, { replaceUrl: true, scroll: false })
                       }
                       options={WORKPLACE_OPTIONS}
                       placeholder="Workplace type"
                       className="w-full cursor-pointer"
                       buttonClassName={cn(
-                        "w-full justify-between items-center cursor-pointer rounded-xl bg-white px-4 py-2.5 text-sm",
-                        "border border-[color:var(--color-border-light)] text-[color:var(--color-text-light)] shadow-[0_1px_4px_rgba(0,0,0,0.02)]",
-                        "transition-all duration-300",
-                        "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
-                        "focus:border-[color:var(--color-brand-400)] focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
+                        "w-full items-center justify-between rounded-xl bg-white px-4 py-2.5 text-sm",
+                        "border border-black/[0.06] text-[color:var(--color-text-light)]",
+                        "shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
+                        "transition-all duration-200 hover:border-[color:var(--color-brand-600)]",
+                        "focus:border-[color:var(--color-brand-600)] focus:outline-none focus:ring-4 focus:ring-[color:var(--color-brand-600)]/10",
                       )}
                       menuClassName={cn(
-                        "mt-1 overflow-hidden rounded-xl border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] text-sm",
-                        "shadow-[0_12px_40px_rgba(0,0,0,0.08)] ring-1 ring-black/5",
+                        "mt-1 overflow-hidden rounded-xl bg-white text-sm text-[color:var(--color-text-light)]",
+                        "border border-black/[0.06] shadow-[0_12px_36px_rgba(15,23,42,0.08)]",
                       )}
                     />
                   </div>
@@ -893,21 +890,24 @@ export default function CareersClient({
                     <Select
                       value={query.employmentType || ""}
                       onChange={(v) =>
-                        runFetch({ employmentType: v, page: 1 }, { replaceUrl: true })
+                        runFetch(
+                          { employmentType: v, page: 1 },
+                          { replaceUrl: true, scroll: false },
+                        )
                       }
                       options={EMPLOYMENT_OPTIONS}
                       placeholder="Employment type"
                       className="w-full cursor-pointer"
                       buttonClassName={cn(
-                        "w-full justify-between items-center cursor-pointer rounded-xl bg-white px-4 py-2.5 text-sm",
-                        "border border-[color:var(--color-border-light)] text-[color:var(--color-text-light)] shadow-[0_1px_4px_rgba(0,0,0,0.02)]",
-                        "transition-all duration-300",
-                        "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
-                        "focus:border-[color:var(--color-brand-400)] focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
+                        "w-full items-center justify-between rounded-xl bg-white px-4 py-2.5 text-sm",
+                        "border border-black/[0.06] text-[color:var(--color-text-light)]",
+                        "shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
+                        "transition-all duration-200 hover:border-[color:var(--color-brand-600)]",
+                        "focus:border-[color:var(--color-brand-600)] focus:outline-none focus:ring-4 focus:ring-[color:var(--color-brand-600)]/10",
                       )}
                       menuClassName={cn(
-                        "mt-1 overflow-hidden rounded-xl border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] text-sm",
-                        "shadow-[0_12px_40px_rgba(0,0,0,0.08)] ring-1 ring-black/5",
+                        "mt-1 overflow-hidden rounded-xl bg-white text-sm text-[color:var(--color-text-light)]",
+                        "border border-black/[0.06] shadow-[0_12px_36px_rgba(15,23,42,0.08)]",
                       )}
                     />
                   </div>
@@ -917,21 +917,21 @@ export default function CareersClient({
                       value={sortValue}
                       onChange={(v) => {
                         const { sortBy, sortDir } = parseSortValue(v);
-                        runFetch({ sortBy, sortDir, page: 1 }, { replaceUrl: true });
+                        runFetch({ sortBy, sortDir, page: 1 }, { replaceUrl: true, scroll: false });
                       }}
                       options={SORT_OPTIONS}
                       placeholder="Sort"
                       className="w-full cursor-pointer"
                       buttonClassName={cn(
-                        "w-full justify-between items-center cursor-pointer rounded-xl bg-white px-4 py-2.5 text-sm",
-                        "border border-[color:var(--color-border-light)] text-slate-900 shadow-[0_1px_4px_rgba(0,0,0,0.02)]",
-                        "transition-all duration-300",
-                        "hover:border-black/[0.15] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
-                        "focus:border-[color:var(--color-brand-400)] focus:outline-none focus:ring-4 focus:ring-[rgba(220,38,38,0.1)]",
+                        "w-full items-center justify-between rounded-xl bg-white px-4 py-2.5 text-sm",
+                        "border border-black/[0.06] text-[color:var(--color-text-light)]",
+                        "shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
+                        "transition-all duration-200 hover:border-[color:var(--color-brand-600)]",
+                        "focus:border-[color:var(--color-brand-600)] focus:outline-none focus:ring-4 focus:ring-[color:var(--color-brand-600)]/10",
                       )}
                       menuClassName={cn(
-                        "mt-1 overflow-hidden rounded-xl border-[color:var(--color-border-light)] bg-white text-[color:var(--color-text-light)] text-sm",
-                        "shadow-[0_12px_40px_rgba(0,0,0,0.08)] ring-1 ring-black/5",
+                        "mt-1 overflow-hidden rounded-xl bg-white text-sm text-[color:var(--color-text-light)]",
+                        "border border-black/[0.06] shadow-[0_12px_36px_rgba(15,23,42,0.08)]",
                       )}
                     />
                   </div>
@@ -942,7 +942,7 @@ export default function CareersClient({
                     {loading ? (
                       <span className="inline-flex items-center gap-1.5">
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        Validating…
+                        Searching…
                       </span>
                     ) : (
                       <span>
@@ -956,7 +956,11 @@ export default function CareersClient({
 
                   {activeFilters ? (
                     <button
-                      onClick={() =>
+                      type="button"
+                      onClick={() => {
+                        setQInput("");
+                        setDeptInput("");
+                        setLocInput("");
                         runFetch(
                           {
                             q: "",
@@ -964,14 +968,14 @@ export default function CareersClient({
                             location: "",
                             workplaceType: "",
                             employmentType: "",
-                            sortBy: "publishedAt",
-                            sortDir: "desc",
+                            sortBy: DEFAULTS.sortBy,
+                            sortDir: DEFAULTS.sortDir,
                             page: 1,
                           },
-                          { replaceUrl: true },
-                        )
-                      }
-                      className="cursor-pointer rounded-lg px-3 py-1.5 text-xs font-semibold text-[color:var(--color-brand-600)] transition-colors hover:bg-[rgba(220,38,38,0.08)]"
+                          { replaceUrl: true, scroll: false },
+                        );
+                      }}
+                      className="cursor-pointer rounded-lg px-3 py-1.5 text-xs font-semibold text-[color:var(--color-brand-600)] transition-colors hover:bg-[color:var(--color-brand-50)]"
                     >
                       Clear all
                     </button>
@@ -985,15 +989,21 @@ export default function CareersClient({
             </div>
           </div>
 
-          {/* Listings */}
           <div className="mt-10" ref={resultsRef}>
-            <div className="relative overflow-hidden rounded-2xl site-card-surface p-5 sm:p-8">
+            <div className="site-card-surface relative overflow-hidden rounded-2xl p-5 sm:p-8">
               <div className="mb-6 flex items-center justify-between">
-                <h3 className="text-[15px] font-semibold tracking-tight text-[color:var(--color-text-light)]">Available Listings</h3>
+                <h3 className="text-[15px] font-semibold tracking-tight text-[color:var(--color-text-light)]">
+                  Available Listings
+                </h3>
                 <div className="text-xs font-medium text-[color:var(--color-subtle-light)]">
                   Page{" "}
-                  <span className="font-bold text-[color:var(--color-text-light)]">{meta?.page ?? query.page}</span>{" "}
-                  of <span className="font-bold text-[color:var(--color-text-light)]">{meta?.totalPages ?? 1}</span>
+                  <span className="font-bold text-[color:var(--color-text-light)]">
+                    {meta?.page ?? query.page}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-bold text-[color:var(--color-text-light)]">
+                    {meta?.totalPages ?? 1}
+                  </span>
                 </div>
               </div>
 
@@ -1002,6 +1012,7 @@ export default function CareersClient({
                   <div className="font-medium">Couldn’t load jobs.</div>
                   <div className="mt-1 text-[color:var(--color-muted-light)]">{error}</div>
                   <button
+                    type="button"
                     onClick={() => runFetch({}, { replaceUrl: false, scroll: false })}
                     className="mt-4 cursor-pointer rounded-lg border border-[color:var(--color-border-light)] bg-white px-4 py-2 text-xs font-semibold text-[color:var(--color-text-light)] shadow-sm transition hover:bg-[color:var(--color-surface-0-light)]"
                   >
@@ -1048,7 +1059,7 @@ export default function CareersClient({
                           }
                           className={cn(
                             "group block border-b border-[color:var(--color-border-light)] py-4 transition-colors duration-200 last:border-0",
-                            "hover:bg-[rgba(15,23,42,0.02)] focus-ring-light",
+                            "focus-ring-light hover:bg-[rgba(15,23,42,0.02)]",
                           )}
                         >
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -1099,14 +1110,17 @@ export default function CareersClient({
                     })
                   ) : (
                     <div className="rounded-xl border border-[color:var(--color-border-light)] bg-[color:var(--color-surface-0-light)]/30 p-8 text-center">
-                      <p className="text-sm font-medium text-[color:var(--color-text-light)]">No roles found</p>
-                      <p className="mt-0.5 text-xs text-[color:var(--color-muted-light)]">Try adjusting your search or filters.</p>
+                      <p className="text-sm font-medium text-[color:var(--color-text-light)]">
+                        No roles found
+                      </p>
+                      <p className="mt-0.5 text-xs text-[color:var(--color-muted-light)]">
+                        Try adjusting your search or filters.
+                      </p>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* PAGINATION */}
               <div className="mt-10 flex justify-center">
                 <div
                   className={cn(
@@ -1119,14 +1133,14 @@ export default function CareersClient({
                     onClick={() =>
                       runFetch(
                         { page: Math.max(1, (meta?.page ?? query.page) - 1) },
-                        { scroll: true },
+                        { scroll: true, replaceUrl: true },
                       )
                     }
                     className={cn(
                       "min-w-[92px] text-center",
                       "cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition",
                       canPrev && !loading
-                        ? "text-[color:var(--color-text-light)] hover:bg-[rgba(220,38,38,0.06)] hover:text-[color:var(--color-brand-600)]"
+                        ? "text-[color:var(--color-text-light)] hover:bg-black/[0.04]"
                         : "cursor-not-allowed text-[color:var(--color-subtle-light)]",
                     )}
                   >
@@ -1136,8 +1150,10 @@ export default function CareersClient({
                   <div className="h-5 w-px bg-[color:var(--color-border-light)]" />
 
                   <div className="px-3 text-xs text-[color:var(--color-subtle-light)]">
-                    <span className="font-semibold text-[color:var(--color-text-light)]">{meta?.page ?? query.page}</span>
-                    <span className="mx-1 text-[color:var(--color-subtle-light)]">/</span>
+                    <span className="font-semibold text-[color:var(--color-text-light)]">
+                      {meta?.page ?? query.page}
+                    </span>
+                    <span className="mx-1">/</span>
                     <span>{meta?.totalPages ?? 1}</span>
                   </div>
 
@@ -1146,13 +1162,16 @@ export default function CareersClient({
                   <button
                     disabled={!canNext || loading}
                     onClick={() =>
-                      runFetch({ page: (meta?.page ?? query.page) + 1 }, { scroll: true })
+                      runFetch(
+                        { page: (meta?.page ?? query.page) + 1 },
+                        { scroll: true, replaceUrl: true },
+                      )
                     }
                     className={cn(
                       "min-w-[92px] text-center",
                       "cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition",
                       canNext && !loading
-                        ? "text-[color:var(--color-text-light)] hover:bg-[rgba(220,38,38,0.06)] hover:text-[color:var(--color-brand-600)]"
+                        ? "text-[color:var(--color-text-light)] hover:bg-black/[0.04]"
                         : "cursor-not-allowed text-[color:var(--color-subtle-light)]",
                     )}
                   >

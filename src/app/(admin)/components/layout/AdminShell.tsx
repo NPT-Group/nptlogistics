@@ -18,7 +18,7 @@ import {
   Tags,
 } from "lucide-react";
 
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import { AdminImage } from "@/components/media/AdminImage";
 import ProfileDropdown from "@/app/(admin)/components/ProfileDropdown";
 import { ThemeModeSwitcher } from "../theme/ThemeModeSwitcher";

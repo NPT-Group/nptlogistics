@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import { Check, ChevronDown } from "lucide-react";
 
 type Option = { value: string; label: string };

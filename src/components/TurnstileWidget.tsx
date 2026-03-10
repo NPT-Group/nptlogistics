@@ -15,33 +15,20 @@ declare global {
   }
 }
 
+export type TurnstileWidgetHandle = {
+  reset: () => void;
+};
+
 type Props = {
-  /** Turnstile "action" (optional, but nice for analytics / rules) */
   action?: string;
-  /** Called when token is issued (empty string means cleared/expired) */
   onToken: (token: string) => void;
-  /** Optional class wrapper */
   className?: string;
-  /** Optional: called when widget fails */
   onError?: (message: string) => void;
-
-  /** Form-driven invalid state (so it can highlight like other inputs) */
   invalid?: boolean;
-  /** Form-driven error message (typically RHF field error) */
   errorMessage?: string;
-
-  /** Optional: enterprise scroll-to-error targeting (works with or without RHF) */
   fieldPathAttr?: string;
-
-  /** Optional label/hint (useful outside RHF too) */
   label?: React.ReactNode;
   hint?: React.ReactNode;
-
-  /**
-   * Visual chrome control:
-   * - "default": bordered/padded card (existing behavior)
-   * - "bare": no border/padding card; just the widget + messages (for compact layouts)
-   */
   variant?: "default" | "bare";
 };
 
@@ -55,6 +42,7 @@ function loadTurnstileScript(): Promise<void> {
 
   window.__turnstileScriptLoadPromise = new Promise<void>((resolve, reject) => {
     const existing = document.querySelector<HTMLScriptElement>('script[data-turnstile="true"]');
+
     if (existing) {
       existing.addEventListener("load", () => {
         window.__turnstileScriptLoaded = true;
@@ -63,7 +51,8 @@ function loadTurnstileScript(): Promise<void> {
       existing.addEventListener("error", () =>
         reject(new Error("Failed to load Turnstile script")),
       );
-      if ((window as any).turnstile) {
+
+      if (window.turnstile) {
         window.__turnstileScriptLoaded = true;
         resolve();
       }
@@ -86,18 +75,21 @@ function loadTurnstileScript(): Promise<void> {
   return window.__turnstileScriptLoadPromise;
 }
 
-export default function TurnstileWidget({
-  action,
-  onToken,
-  className,
-  onError,
-  invalid,
-  errorMessage,
-  fieldPathAttr,
-  label,
-  hint,
-  variant = "default",
-}: Props) {
+const TurnstileWidget = React.forwardRef<TurnstileWidgetHandle, Props>(function TurnstileWidget(
+  {
+    action,
+    onToken,
+    className,
+    onError,
+    invalid,
+    errorMessage,
+    fieldPathAttr,
+    label,
+    hint,
+    variant = "default",
+  },
+  ref,
+) {
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   const containerRef = React.useRef<HTMLDivElement | null>(null);
@@ -118,6 +110,25 @@ export default function TurnstileWidget({
     "idle",
   );
   const [msg, setMsg] = React.useState<string>("");
+
+  React.useImperativeHandle(
+    ref,
+    () => ({
+      reset() {
+        setMsg("");
+        setStatus("ready");
+
+        if (widgetIdRef.current && window.turnstile) {
+          try {
+            window.turnstile.reset(widgetIdRef.current);
+          } catch {
+            // ignore
+          }
+        }
+      },
+    }),
+    [],
+  );
 
   React.useEffect(() => {
     if (!siteKey) {
@@ -222,8 +233,6 @@ export default function TurnstileWidget({
   }, [siteKey, action]);
 
   const showError = Boolean(errorMessage) || status === "error";
-
-  // Default (existing) chrome
   const borderClass =
     invalid || showError ? "border-red-300 bg-red-50" : "border-neutral-200 bg-white";
 
@@ -258,7 +267,6 @@ export default function TurnstileWidget({
       {variant === "default" ? (
         <div className={["rounded-xl border p-3", borderClass].join(" ")}>{content}</div>
       ) : (
-        // bare: no padding/border wrapper
         <div>{content}</div>
       )}
 
@@ -267,4 +275,6 @@ export default function TurnstileWidget({
       ) : null}
     </div>
   );
-}
+});
+
+export default TurnstileWidget;

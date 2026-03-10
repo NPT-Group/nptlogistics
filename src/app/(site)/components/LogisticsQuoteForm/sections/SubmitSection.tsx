@@ -6,16 +6,19 @@ import { useFormContext } from "react-hook-form";
 import { Send, AlertCircle } from "lucide-react";
 
 import type { LogisticsQuoteSubmitValues } from "../schema";
-import TurnstileWidget from "@/components/TurnstileWidget";
+import TurnstileWidget, { type TurnstileWidgetHandle } from "@/components/TurnstileWidget";
 import { CheckboxField } from "@/components/forms/fields/CheckboxField";
 import { siteCheckUi } from "@/app/(site)/components/forms/presets/siteFieldUi";
 import { cn } from "@/lib/cn";
 
-export function SubmitSection() {
+type SubmitSectionProps = {
+  turnstileRef: React.RefObject<TurnstileWidgetHandle | null>;
+};
+
+export function SubmitSection({ turnstileRef }: SubmitSectionProps) {
   const {
     control,
     setValue,
-    trigger,
     formState: { errors, isSubmitting },
   } = useFormContext<LogisticsQuoteSubmitValues>();
 
@@ -88,17 +91,25 @@ export function SubmitSection() {
       <div className="space-y-3 pt-1">
         <div className="flex justify-center">
           <TurnstileWidget
+            ref={turnstileRef}
             variant="bare"
             action="logistics-quote-submit"
             fieldPathAttr="turnstileToken"
             invalid={turnstileInvalid}
             errorMessage={turnstileError}
             onToken={(token) => {
-              setValue("turnstileToken", token, { shouldDirty: true, shouldTouch: true });
-              void trigger("turnstileToken");
+              setValue("turnstileToken", token, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              });
             }}
             onError={() => {
-              setValue("turnstileToken", "", { shouldDirty: true, shouldTouch: true });
+              setValue("turnstileToken", "", {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              });
             }}
           />
         </div>
@@ -108,8 +119,8 @@ export function SubmitSection() {
           disabled={isSubmitting}
           className={cn(
             "inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-white",
-            "bg-[color:var(--color-brand-600)] hover:bg-[color:var(--color-brand-700)] hover:cursor-pointer",
-            "shadow-[0_10px_28px_rgba(220,38,38,0.35)] transition focus:outline-none focus:ring-2 focus:ring-[color:var(--color-brand-500)]/45",
+            "bg-[color:var(--color-brand-600)] hover:cursor-pointer hover:bg-[color:var(--color-brand-700)]",
+            "shadow-[0_10px_28px_rgba(220,38,38,0.35)] transition focus:ring-2 focus:ring-[color:var(--color-brand-500)]/45 focus:outline-none",
             isSubmitting && "opacity-70",
           )}
         >

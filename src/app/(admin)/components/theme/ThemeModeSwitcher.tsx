@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Laptop, Moon, Sun } from "lucide-react";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import { useAdminTheme, type AdminThemeMode } from "./AdminThemeProvider";
 
 const modes: Array<{ mode: AdminThemeMode; label: string; Icon: typeof Sun }> = [

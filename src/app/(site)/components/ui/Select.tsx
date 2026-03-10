@@ -373,9 +373,9 @@ export function Select({
         className={cn(
           // neutral defaults; overridden by buttonClassName reliably via twMerge
           "flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm",
-          "border-black/10 bg-white text-slate-900 shadow-sm",
-          "hover:bg-black/5",
-          "focus:ring-2 focus:ring-red-500/30 focus:outline-none",
+          "border-black/[0.08] bg-white text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
+          "hover:border-black/[0.12]",
+          "focus:ring-4 focus:ring-black/[0.04] focus:outline-none",
           "disabled:cursor-not-allowed disabled:opacity-60",
           buttonClassName,
         )}

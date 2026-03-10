@@ -1,7 +1,7 @@
 // src/app/(admin)/components/ui/Checkbox.tsx
 "use client";
 
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import { Check } from "lucide-react";
 
 export function Checkbox({

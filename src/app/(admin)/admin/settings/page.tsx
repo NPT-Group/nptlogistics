@@ -2,7 +2,7 @@
 "use client";
 
 import { Laptop, Moon, Sun, Settings as SettingsIcon } from "lucide-react";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import {
   useAdminTheme,
   type AdminThemeMode,
