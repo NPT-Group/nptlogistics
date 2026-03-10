@@ -140,10 +140,10 @@ export function IdentificationSection() {
   return (
     <section className="space-y-5">
       <div className="space-y-1">
-        <h3 className="text-sm font-semibold text-[color:var(--color-text-light)]">
+        <h3 className="text-[13px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-muted-light)]">
           Identification
         </h3>
-        <p className="text-sm text-[color:var(--color-muted-light)]">
+        <p className="text-sm text-[color:var(--color-text-light)]">
           Tell us who you are so we can route your quote correctly.
         </p>
       </div>

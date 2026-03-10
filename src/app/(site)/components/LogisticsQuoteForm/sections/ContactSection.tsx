@@ -20,8 +20,10 @@ export function ContactSection() {
     <section className="space-y-5">
       {/* Section header */}
       <div className="space-y-1">
-        <h3 className="text-sm font-semibold text-[color:var(--color-text-light)]">Contact</h3>
-        <p className="text-sm text-[color:var(--color-muted-light)]">
+        <h3 className="text-[13px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-muted-light)]">
+          Contact
+        </h3>
+        <p className="text-sm text-[color:var(--color-text-light)]">
           Share the best details for quote follow-up and coordination.
         </p>
       </div>

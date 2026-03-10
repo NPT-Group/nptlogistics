@@ -63,12 +63,12 @@ export function IconCardSelector<T extends string>({
         aria-pressed={active}
         aria-describedby={errorId}
         className={cn(
-          "group relative w-full overflow-hidden border text-left transition",
+          "group relative flex h-full w-full flex-col overflow-hidden border text-left transition",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10",
           "hover:cursor-pointer",
 
           active
-            ? "border-neutral-900 bg-neutral-50/80"
+            ? "border-[color:var(--color-text-light)] bg-white"
             : "border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/70",
 
           invalid && !active && "border-red-300",
@@ -118,7 +118,7 @@ export function IconCardSelector<T extends string>({
                     "inline-flex shrink-0 items-center justify-center border transition",
                     hasSupportingText ? "mt-0.5 h-10 w-10 rounded-xl" : "h-9 w-9 rounded-xl",
                     active
-                      ? "border-neutral-900 bg-neutral-900 text-white"
+                      ? "border-[color:var(--color-text-light)] bg-white text-[color:var(--color-text-light)]"
                       : "border-neutral-200 bg-white text-[color:var(--color-text-light)] group-hover:border-neutral-300",
                   )}
                 >
@@ -154,7 +154,7 @@ export function IconCardSelector<T extends string>({
                 "relative mb-2 flex items-center justify-center border transition",
                 isPrimary ? "size-10 rounded-full" : "size-9 rounded-full",
                 active
-                  ? "border-neutral-900 bg-neutral-900 text-white"
+                  ? "border-[color:var(--color-text-light)] bg-white text-[color:var(--color-text-light)]"
                   : "border-neutral-200 bg-white text-[color:var(--color-text-light)] group-hover:border-neutral-300",
               )}
             >
@@ -183,9 +183,9 @@ export function IconCardSelector<T extends string>({
         {active && !isDetailed ? (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute top-3 right-3 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-neutral-900 bg-white"
+            className="pointer-events-none absolute top-3 right-3 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[color:var(--color-text-light)] bg-white"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-neutral-900" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-text-light)]" />
           </span>
         ) : null}
 
@@ -224,5 +224,5 @@ export function IconCardSelector<T extends string>({
     );
   });
 
-  return <div className={cn("grid gap-3", columnsClassName, className)}>{content}</div>;
+  return <div className={cn("grid items-stretch gap-3", columnsClassName, className)}>{content}</div>;
 }

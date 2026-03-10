@@ -108,8 +108,8 @@ export function SubmitSection() {
           disabled={isSubmitting}
           className={cn(
             "inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-white",
-            "bg-black hover:cursor-pointer hover:bg-neutral-800",
-            "transition focus:ring-2 focus:ring-black/15 focus:outline-none",
+            "bg-[color:var(--color-brand-600)] hover:bg-[color:var(--color-brand-700)] hover:cursor-pointer",
+            "shadow-[0_10px_28px_rgba(220,38,38,0.35)] transition focus:outline-none focus:ring-2 focus:ring-[color:var(--color-brand-500)]/45",
             isSubmitting && "opacity-70",
           )}
         >

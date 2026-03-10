@@ -2832,13 +2832,14 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           "Temperature-controlled service is for cargo whose quality or compliance depends on maintaining a defined thermal range in transit. This guide helps determine if temperature-controlled is the right fit for your load—and what to use instead when it isn't.",
         diagram: "/_optimized/equipment-diagrams/tempCntrl.webp",
         diagramAlt:
-          "Temperature-controlled and reefer equipment diagram with setpoint and capacity guidance",
+          "Temperature-controlled equipment diagram with setpoint and capacity guidance",
         specs: {
-          length: "Reefer trailer; 48 ft or 53 ft typical",
-          width: "Standard reefer width; dockable",
-          height: "Interior clearance; setpoint and airflow considered",
-          weight: "Legal payload; typical reefer capacity",
-          pallets: "Varies by trailer and load configuration; typically 24–26 pallets in 53 ft",
+          length: "Temperature-controlled trailer; 48 ft or 53 ft typical",
+          width: "Standard temperature-controlled width; dockable",
+          height: "Interior clearance; temperature management and airflow considered",
+          weight: "Legal payload; typical temperature-controlled capacity",
+          pallets:
+            "Varies by trailer and load configuration; typically 24–26 pallets in a 53 ft temperature-controlled trailer",
         },
         rules: [
           {

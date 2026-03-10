@@ -250,15 +250,16 @@ export default function LogisticsQuoteForm() {
       <div
         ref={cardRef}
         tabIndex={-1}
-        className={[
-          "mx-auto w-full",
-          "rounded-3xl bg-white shadow-sm",
-          "border border-[color:var(--color-border-light)]",
-        ].join(" ")}
+        className={cn(
+          "relative mx-auto w-full overflow-hidden",
+          "rounded-3xl border border-[color:var(--color-border-light)] bg-white/95",
+          "shadow-[0_18px_45px_rgba(15,23,42,0.12)]",
+          "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-1.5 before:bg-[linear-gradient(90deg,rgba(220,38,38,0.85),rgba(30,64,175,0.9))]",
+        )}
       >
         <form
           onSubmit={handleSubmit(onSubmit, onInvalid)}
-          className="space-y-6 px-5 py-6 sm:px-7 sm:py-7 lg:px-8"
+          className="space-y-7 px-5 pt-7 pb-7 sm:px-7 lg:px-8"
         >
           <FeedbackBanner feedback={submitFeedback} innerRef={feedbackRef} />
 
