@@ -44,6 +44,7 @@ export type SubServiceSection = {
   label: string; // nav label
   title: string;
   description: string;
+  detailParagraph?: string; // optional second paragraph (e.g. equipment relation)
   image: string;
   imageAlt: string;
   overlay?: "red" | "blue" | "slate" | "dark";
@@ -62,15 +63,55 @@ export type SubServiceSection = {
     intro: string;
     items: string[];
   };
-  relatedServices?: Array<{ label: string; href: string; icon?: string }>;
+  freightFit?: {
+    title: string;
+    intro: string;
+    diagram: string;
+    diagramAlt: string;
+    specs: {
+      length: string;
+      width: string;
+      height: string;
+      weight: string;
+      pallets?: string;
+    };
+    rules: Array<{
+      condition: string;
+      recommendation: string;
+      serviceSlug?: string;
+      description: string;
+    }>;
+    disclaimer?: string;
+  };
+  showRelated?: boolean;
   ctas: {
     primary: { label: string; href: string; ctaId: string };
     secondary?: { label: string; href: string; ctaId: string };
   };
 };
 
+export type SingleServiceFreightFit = {
+  title: string;
+  intro: string;
+  diagram: string;
+  diagramAlt: string;
+  specs: {
+    length: string;
+    width: string;
+    height: string;
+    weight: string;
+    pallets?: string;
+  };
+  rules: Array<{
+    condition: string;
+    recommendation: string;
+    serviceSlug?: string;
+    description: string;
+  }>;
+  disclaimer?: string;
+};
+
 export type SingleServiceLayout = {
-  snapshot: { title: string; items: string[] };
   whenToUse: { title: string; intro: string; items: string[] };
   howItWorks: {
     title: string;
@@ -81,6 +122,12 @@ export type SingleServiceLayout = {
   riskAndCompliance: { title: string; intro: string; items: string[] };
   conversion: { title: string; body: string; signals: string[] };
   relatedServices: Array<{ label: string; href: string; reason: string }>;
+  /** Fortune 500 pattern: Freight Fit Guide + How to use + merged Execution block */
+  freightFit?: SingleServiceFreightFit;
+  howToUse?: { intro: string; items: string[] };
+  highlights?: Array<{ title: string; description: string }>;
+  trustSnippet?: { title: string; body: string };
+  showRelated?: boolean;
 };
 
 export type ServicePageModel = {
@@ -169,8 +216,8 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         ],
 
         trustSnippet: {
-          title: "Built for enterprise shipping teams",
-          body: "Dry van operations are structured around dock efficiency, documentation integrity, and secure trade compliance. The result: fewer disruptions, tighter closeout, and better alignment between procurement and operations.",
+          title: "Compliance and execution controls that reduce variance",
+          body: "Dry van execution is governed by appointment discipline, clean documentation handoff, and proactive exception management to protect OTIF performance.",
         },
 
         whenToUse: {
@@ -186,38 +233,77 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         },
 
         howToUse: {
-          intro:
-            "For the fastest, cleanest quoting and execution, provide complete lane and facility requirements upfront.",
+          intro: "Here’s how to use NPT’s Dry Van service from quote to delivery.",
           items: [
-            "Pickup and delivery addresses, dock hours, and appointment processes",
-            "Commodity description, NMFC/class (if applicable), and handling requirements",
-            "Pallet count, dimensions/linear feet, and total shipment weight",
-            "Target service level, delivery window, and receiver constraints",
-            "Reference numbers and documentation requirements (BOL/POD/invoice)",
-            "Exception protocol for detention, reconsignment, and missed appointments",
+            "Share pickup and delivery addresses, dock hours, and appointment process so we can plan the lane.",
+            "Provide commodity description, NMFC/class if known, and any handling requirements.",
+            "Give pallet count, dimensions or linear feet, and total weight so we can confirm trailer fit.",
+            "Specify target service level, delivery window, and receiver constraints (e.g. appointment-only).",
+            "Include reference numbers and documentation needs (BOL, POD, invoice) for clean handoff.",
+            "Confirm exception protocol for detention, reconsignment, or missed appointments so we can respond consistently.",
           ],
         },
 
         capabilities: {
           intro:
-            "Dry van capabilities are designed for enterprise visibility, compliance, and lane-level cost control.",
+            "Operational coverage is structured to keep enclosed freight moving with consistent service standards.",
           items: [
-            "53’ dry van capacity across North America (CA–US–MX)",
-            "Drop trailer and preload programs where facility design supports it",
-            "Multi-stop retail and distribution routing with controlled appointment sequencing",
-            "Cross-border execution aligned to secure trade and customs requirements",
-            "Detention-aware planning to reduce accessorial exposure and variance",
-            "Clean POD closeout and documentation workflows to support billing accuracy",
+            "53' dry van lane coverage across North America (CA-US-MX)",
+            "Drop trailer and preload support where facility flow allows",
+            "Appointment-sequenced retail and distribution routing",
+            "Cross-border handoff coordination aligned to customs workflows",
+            "Detention-aware planning and exception escalation protocol",
+            "POD and documentation closeout discipline for clean billing",
           ],
         },
 
-        relatedServices: [
-          { label: "LTL", href: "/services/ltl", icon: "●" },
-          { label: "RGN / Oversize", href: "/services/truckload#section-rgn-oversize", icon: "●" },
-          { label: "Automotive", href: "/#solutions", icon: "●" },
-          { label: "Retail & CPG", href: "/#solutions", icon: "●" },
-        ],
-
+        freightFit: {
+          title: "Dry Van Freight Fit Guide",
+          intro:
+            "Dry van trailers are the most widely used enclosed freight solution in North America. This guide helps determine if a standard dry van is the right fit for your load—and what to use instead when it isn't.",
+          diagram: "/_optimized/equipment-diagrams/dry-van.svg",
+          diagramAlt: "Dry van trailer equipment diagram with dimensions and payload guidance",
+          specs: {
+            length: "53 ft trailer",
+            width: "8.5 ft (102 inches)",
+            height: "~9 ft interior clearance",
+            weight: "~43,000-45,000 lbs typical legal payload",
+            pallets: "Typically up to 26 standard pallets",
+          },
+          rules: [
+            {
+              condition: "Small palletized shipments",
+              description:
+                "If your freight is under 12 pallets or under 15,000 lbs, booking an entire truck may not be the most efficient option.",
+              recommendation: "LTL Freight",
+              serviceSlug: "ltl",
+            },
+            {
+              condition: "Freight taller than enclosed dry van limits or oversized",
+              description:
+                "If your freight exceeds enclosed trailer height constraints or requires top/side loading for safe handling.",
+              recommendation: "Flatbed / Step Deck (Oversize)",
+              serviceSlug: "flatbed",
+            },
+            {
+              condition: "Freight requiring temperature control",
+              description:
+                "If your cargo must remain within a controlled temperature range, such as food, pharmaceuticals, or perishables.",
+              recommendation: "Refrigerated Truckload",
+              serviceSlug: "reefer",
+            },
+            {
+              condition: "Freight requiring hazardous materials handling",
+              description:
+                "If your shipment is classified as hazardous under transport regulations and requires placarding, documentation, or carrier credentials.",
+              recommendation: "HAZMAT",
+              serviceSlug: "hazmat",
+            },
+          ],
+          disclaimer:
+            "Planning values only. Final legal fit depends on route, axle configuration, equipment, and applicable regulations; confirm at dispatch.",
+        },
+        showRelated: false,
         ctas: {
           primary: {
             label: "Request a Dry Van Quote",
@@ -234,10 +320,13 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
 
       {
         key: "flatbed",
-        label: "Flatbed",
-        title: "Flatbed & Open Deck Truckload | Engineered for Industrial & Project Freight",
+        label: "Flatbed / Step Deck (Oversize)",
+        title:
+          "Flatbed / Step Deck (Oversize) | Open Deck Truckload for Industrial & Project Freight",
         description:
-          "Flatbed is a specialized open-deck truckload solution built for freight that exceeds standard trailer dimensions or requires crane, side-load, or top-load access. It supports industrial and project-driven shipments where securement standards, route planning, and jobsite coordination directly impact schedule integrity. Common commodities include structural steel, lumber, construction materials, heavy equipment, machinery, and oversized industrial components moving across North America.",
+          "Flatbed and step deck are open-deck truckload solutions built for freight that exceeds standard trailer dimensions or requires crane, side-load, or top-load access. They support industrial and project-driven shipments where securement standards, route planning, and jobsite coordination directly impact schedule integrity. Common commodities include structural steel, lumber, construction materials, heavy equipment, machinery, and oversized industrial components moving across North America.",
+        detailParagraph:
+          'Flatbed trailers have a single-level deck and are the standard choice for most open-deck freight. Step deck (also called step-deck or drop-deck) trailers have a lower forward section—a "step down"—that reduces overall load height and allows taller cargo to stay within legal height limits. We match your load dimensions and route to the right equipment: flatbed when a single deck is sufficient, step deck when extra vertical clearance is needed.',
 
         image: "/_optimized/services/truckload/flatbed.webp",
         imageAlt: "Flatbed trailer hauling industrial freight with securement in place",
@@ -280,14 +369,14 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
 
         howToUse: {
           intro:
-            "To reduce exceptions, confirm handling conditions and securement requirements before tendering the load.",
+            "Here’s how to use NPT’s Flatbed / Step Deck (Oversize) service from quote to delivery.",
           items: [
-            "Exact dimensions, weight, and weight distribution / center-of-gravity details",
-            "Loading/unloading method, equipment availability, and access restrictions",
-            "Securement requirements, protection needs, and handling constraints",
-            "Appointment windows, jobsite protocols, and unloading sequence expectations",
-            "Milestone update cadence and on-site delivery confirmation requirements",
-            "Contingency rules for weather, delays, or access changes",
+            "Share exact dimensions, weight, and weight distribution or center-of-gravity so we can confirm deck fit and securement approach.",
+            "Provide loading and unloading method, equipment on site (crane, forklift), and any access or height restrictions.",
+            "Specify securement requirements, protection needs (tarps, blocking), and handling constraints for the commodity.",
+            "Give appointment windows, jobsite protocols, and unloading sequence so we can plan driver and equipment timing.",
+            "Confirm milestone update cadence and on-site delivery confirmation (sign-off, photos) so stakeholders stay aligned.",
+            "Clarify contingency rules for weather, delays, or access changes so we can respond without rework.",
           ],
         },
 
@@ -304,9 +393,57 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           ],
         },
 
+        freightFit: {
+          title: "Flatbed / Step Deck (Oversize) Freight Fit Guide",
+          intro:
+            "Flatbed and step deck trailers are built for freight that needs top, side, or crane access, or exceeds enclosed trailer dimensions. This guide helps determine if flatbed or step deck is the right fit for your load—and what to use instead when it isn't.",
+          diagram: "/_optimized/equipment-diagrams/flatbed.webp",
+          diagramAlt: "Flatbed trailer equipment diagram with dimensions and payload guidance",
+          specs: {
+            length: "48 ft or 53 ft deck (typical)",
+            width: "8.5 ft (102 in) deck width",
+            height: "Open; no enclosed height limit",
+            weight: "Varies by axle configuration; typical legal payload ~43,000–48,000 lbs",
+            pallets: "N/A — deck-loaded, not pallet-count driven",
+          },
+          rules: [
+            {
+              condition: "Small or palletized shipments that fit enclosed",
+              description:
+                "If your freight fits inside a dry van and does not require crane or top-load access, enclosed transport is usually more efficient and weather-protected.",
+              recommendation: "Dry Van Truckload",
+              serviceSlug: "dry-van",
+            },
+            {
+              condition: "Oversize, overweight, or permit-required",
+              description:
+                "If your load exceeds standard legal dimensions or axle limits and requires permits or specialized low-bed equipment.",
+              recommendation: "RGN (Oversize)",
+              serviceSlug: "rgn-oversize",
+            },
+            {
+              condition: "Shipments under deck capacity",
+              description:
+                "If your shipment is under roughly 12 linear feet or 15,000 lbs and does not need open-deck access, LTL may be more cost-effective.",
+              recommendation: "LTL Freight",
+              serviceSlug: "ltl",
+            },
+            {
+              condition: "Freight requiring temperature control",
+              description:
+                "If your cargo must remain within a controlled temperature range, open deck is not suitable.",
+              recommendation: "Refrigerated Truckload",
+              serviceSlug: "reefer",
+            },
+          ],
+          disclaimer:
+            "Planning values only. Final legal fit depends on route, axle configuration, equipment, and applicable regulations; confirm at dispatch.",
+        },
+        showRelated: false,
+
         ctas: {
           primary: {
-            label: "Request a Flatbed Quote",
+            label: "Request a Flatbed / Step Deck Quote",
             href: "/quote?service=truckload&mode=flatbed",
             ctaId: "service_truckload_flatbed_request_pricing",
           },
@@ -320,8 +457,8 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
 
       {
         key: "rgn-oversize",
-        label: "RGN / Oversize",
-        title: "RGN & Heavy Haul | Oversize, Overweight & Permit-Controlled Transport",
+        label: "RGN (Oversize)",
+        title: "RGN (Oversize) & Heavy Haul | Oversize, Overweight & Permit-Controlled Transport",
         description:
           "RGN and Heavy Haul services are engineered for freight that exceeds standard legal dimensions or axle weight limits and requires permit-governed execution. Designed for project-critical and high-value cargo, this mode integrates specialized trailer configurations, route feasibility analysis, axle distribution planning, and multi-jurisdiction compliance management. Typical shipments include construction and mining equipment, power generation components, transformers, and oversized industrial machinery moving across North America.",
 
@@ -365,15 +502,14 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         },
 
         howToUse: {
-          intro:
-            "Heavy-haul success starts with accurate data. Provide engineering-grade details early in the process.",
+          intro: "Here’s how to use NPT’s RGN and Oversize service from quote to delivery.",
           items: [
-            "Exact dimensions, axle weights, and loading diagrams (if available)",
-            "Pickup and delivery site access details for specialized equipment",
-            "Jurisdictional constraints, permit timing requirements, and route limitations",
-            "Escort requirements, safety protocols, and on-site coordination rules",
-            "Milestone checkpoints and decision-makers for escalation",
-            "Contingency protocol for permits, weather events, and schedule variance",
+            "Share exact dimensions, axle weights, and loading diagrams (if available) so we can confirm equipment fit and permit scope.",
+            "Provide pickup and delivery site access details for low-bed and specialized equipment so we can plan moves and staging.",
+            "Specify jurisdictional constraints, permit timing requirements, and route limitations so we can sequence permits and avoid rework.",
+            "Give escort requirements, safety protocols, and on-site coordination rules so we can align carriers and jobsite expectations.",
+            "Confirm milestone checkpoints and decision-makers for escalation so we can keep the project on track.",
+            "Clarify contingency protocol for permits, weather, and schedule variance so we can respond without delay.",
           ],
         },
 
@@ -389,6 +525,54 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Cross-border heavy-haul support across CA–US–MX corridors",
           ],
         },
+
+        freightFit: {
+          title: "RGN (Oversize) Freight Fit Guide",
+          intro:
+            "RGN and heavy-haul equipment are built for freight that exceeds standard legal dimensions or axle weight limits and requires permit-governed execution. This guide helps determine if RGN or oversize is the right fit for your load—and what to use instead when it isn't.",
+          diagram: "/_optimized/equipment-diagrams/RGN_oversize.webp",
+          diagramAlt: "RGN and oversize equipment diagram with dimensions and payload guidance",
+          specs: {
+            length: "Variable; low-bed and detachable configurations to suit load",
+            width: "Deck width varies; legal width and permit dimensions apply",
+            height: "Low deck for tall cargo; height clearance is route- and permit-dependent",
+            weight: "Axle- and configuration-dependent; often 80,000+ lbs gross with permits",
+            pallets: "N/A — project and dimension-driven, not pallet-count",
+          },
+          rules: [
+            {
+              condition: "Standard legal freight that fits enclosed",
+              description:
+                "If your freight fits within dry van dimensions and legal weight, enclosed transport is typically more efficient.",
+              recommendation: "Dry Van Truckload",
+              serviceSlug: "dry-van",
+            },
+            {
+              condition: "Freight that fits on standard flatbed",
+              description:
+                "If your load fits on a 48–53 ft flatbed within legal dimensions and weight without permits or specialized equipment.",
+              recommendation: "Flatbed / Step Deck (Oversize)",
+              serviceSlug: "flatbed",
+            },
+            {
+              condition: "Shipments under truckload scope",
+              description:
+                "If your shipment is under roughly 12 linear feet or 15,000 lbs and does not require specialized handling.",
+              recommendation: "LTL Freight",
+              serviceSlug: "ltl",
+            },
+            {
+              condition: "Freight requiring temperature control",
+              description:
+                "If your cargo must remain within a controlled temperature range, heavy-haul open deck is not suitable.",
+              recommendation: "Refrigerated Truckload",
+              serviceSlug: "reefer",
+            },
+          ],
+          disclaimer:
+            "Planning values only. Final equipment fit, permits, and legal limits depend on route, jurisdiction, and configuration; confirm at dispatch.",
+        },
+        showRelated: false,
 
         ctas: {
           primary: {
@@ -406,8 +590,9 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
 
       {
         key: "roll-tite-conestoga",
-        label: "Conestoga",
-        title: "Conestoga & Covered Deck Truckload | Weather-Protected Open-Deck Capacity",
+        label: "Roll-Tite / Conestoga",
+        title:
+          "Roll-Tite / Conestoga | Covered Deck Truckload for Weather-Protected Open-Deck Capacity",
         description:
           "Conestoga is a covered-deck truckload solution that combines full weather protection with the loading flexibility of an open trailer. It is purpose-built for freight that cannot be exposed to the elements yet requires side or overhead access for safe handling. Ideal for high-value industrial cargo and specialized equipment, Conestoga capacity supports crated machinery, aluminum products, engineered materials, and finished industrial goods moving across North America.",
 
@@ -451,15 +636,14 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         },
 
         howToUse: {
-          intro:
-            "For consistent execution, define protection priorities and handling constraints before tendering the shipment.",
+          intro: "Here's how to use NPT's Roll-Tite / Conestoga service from quote to delivery.",
           items: [
-            "Commodity sensitivity, packaging profile, and protection/securement requirements",
-            "Loading method and whether side-load or overhead access is required",
-            "Pickup and delivery constraints, including site access and unload conditions",
-            "Target timeline, appointment process, and receiver compliance requirements",
-            "Status cadence expectations and POD closeout requirements",
-            "Contingency rules for weather disruption and schedule variance",
+            "Share commodity sensitivity, packaging profile, and protection or securement requirements so we can plan cover and tie-down approach.",
+            "Provide loading method and whether side-load or overhead access is required at origin and destination.",
+            "Specify pickup and delivery constraints, site access, and unload conditions so we can match equipment and timing.",
+            "Give target timeline, appointment process, and receiver compliance requirements for clean handoff.",
+            "Confirm status cadence expectations and POD closeout requirements so stakeholders stay aligned.",
+            "Clarify contingency rules for weather disruption and schedule variance so we can respond consistently.",
           ],
         },
 
@@ -475,6 +659,55 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Cross-border support for protected freight programs",
           ],
         },
+
+        freightFit: {
+          title: "Roll-Tite / Conestoga Freight Fit Guide",
+          intro:
+            "Roll-Tite and Conestoga trailers offer covered-deck capacity with side and top loading access—ideal when freight must be protected from the elements but does not fit or load efficiently in a dry van. This guide helps determine if Roll-Tite or Conestoga is the right fit for your load—and what to use instead when it isn't.",
+          diagram: "/_optimized/equipment-diagrams/rollTite_conestoga.webp",
+          diagramAlt:
+            "Roll-Tite / Conestoga covered-deck equipment diagram with dimensions and payload guidance",
+          specs: {
+            length: "48 ft or 53 ft covered deck (typical)",
+            width: "8.5 ft (102 in) deck width",
+            height: "Covered; flexible clearance with roll-tarp or fixed cover",
+            weight: "Varies by axle configuration; typical legal payload similar to flatbed",
+            pallets: "N/A — deck-loaded, not pallet-count driven",
+          },
+          rules: [
+            {
+              condition: "Standard palletized freight that fits enclosed",
+              description:
+                "If your freight loads through standard dock doors and fits inside a dry van, enclosed transport is usually simpler and cost-effective.",
+              recommendation: "Dry Van Truckload",
+              serviceSlug: "dry-van",
+            },
+            {
+              condition: "Freight that can be exposed to weather",
+              description:
+                "If your cargo can tolerate rain, road spray, or open-deck transit and does not need full weather protection.",
+              recommendation: "Flatbed / Step Deck (Oversize)",
+              serviceSlug: "flatbed",
+            },
+            {
+              condition: "Freight requiring temperature control",
+              description:
+                "If your cargo must remain within a controlled temperature range; Conestoga provides weather protection only, not refrigeration.",
+              recommendation: "Refrigerated Truckload",
+              serviceSlug: "reefer",
+            },
+            {
+              condition: "Shipments under truckload scope",
+              description:
+                "If your shipment is under roughly 12 linear feet or 15,000 lbs and does not require specialized handling.",
+              recommendation: "LTL Freight",
+              serviceSlug: "ltl",
+            },
+          ],
+          disclaimer:
+            "Planning values only. Final equipment fit depends on route, cover type, and load profile; confirm at dispatch.",
+        },
+        showRelated: false,
 
         ctas: {
           primary: {
@@ -584,14 +817,14 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           ],
         },
         howToUse: {
-          intro:
-            "Expedited quoting and dispatch improve when timing constraints and facility realities are defined at intake.",
+          intro: "Here's how to use NPT's Expedited service from quote to delivery.",
           items: [
-            "Ready time, hard delivery deadline, and latest-acceptable arrival window",
-            "Exact dimensions, piece count, and total weight for equipment fit",
-            "Pickup/delivery facility constraints, dock process, and access limitations",
-            "After-hours contacts and escalation owners on shipper and receiver sides",
-            "Shipment-critical references and proof-of-delivery expectations",
+            "Share ready time, hard delivery deadline, and latest-acceptable arrival window so we can confirm feasibility.",
+            "Provide exact dimensions, piece count, and total weight so we can match equipment and route.",
+            "Specify pickup and delivery facility constraints, dock process, and access limitations for planning.",
+            "Give after-hours contacts and escalation owners on shipper and receiver sides for exception response.",
+            "Include shipment-critical references and proof-of-delivery expectations for clean closeout.",
+            "Confirm communication cadence and milestone expectations so we can meet your visibility needs.",
           ],
         },
         capabilities: {
@@ -605,15 +838,53 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Structured closeout with decision-grade shipment updates",
           ],
         },
-        relatedServices: [
-          { label: "Air Freight", href: "/services/cross-border#section-air-freight", icon: "●" },
-          { label: "Truckload (TL)", href: "/services/truckload", icon: "●" },
-          {
-            label: "Managed Capacity",
-            href: "/services/value-added#section-managed-capacity",
-            icon: "●",
+        freightFit: {
+          title: "Expedited Freight Fit Guide",
+          intro:
+            "Expedited freight is for shipments where delivery timing directly affects production, customer commitments, or recovery. This guide helps determine if expedited is the right fit for your load—and what to use instead when it isn't.",
+          diagram: "/_optimized/equipment-diagrams/Expedited.webp",
+          diagramAlt: "Expedited freight equipment and priority execution diagram",
+          specs: {
+            length: "Equipment matched to load; direct routing typical",
+            width: "Standard dockable dimensions unless specialized",
+            height: "Standard clearance; specialized equipment as needed",
+            weight: "Per shipment; equipment and route selected to deadline",
+            pallets: "Varies; expedited is urgency-driven, not volume-optimized",
           },
-        ],
+          rules: [
+            {
+              condition: "Standard lane with no urgency pressure",
+              description:
+                "If your shipment can meet normal transit windows and cost is a priority, truckload or intermodal is usually more economical.",
+              recommendation: "Dry Van Truckload",
+              serviceSlug: "dry-van",
+            },
+            {
+              condition: "Small or LTL-volume shipments",
+              description:
+                "If your volume does not justify dedicated expedited equipment and standard LTL transit is acceptable.",
+              recommendation: "LTL Freight",
+              serviceSlug: "ltl",
+            },
+            {
+              condition: "Freight requiring temperature control",
+              description:
+                "If your cargo must remain within a controlled temperature range; dedicated temperature-controlled expedited is a different program.",
+              recommendation: "Refrigerated Truckload",
+              serviceSlug: "reefer",
+            },
+            {
+              condition: "Oversized or specialized equipment needs",
+              description:
+                "If your load requires flatbed, RGN, or exotic/specialized vehicle equipment rather than standard expedited capacity.",
+              recommendation: "Flatbed / Step Deck (Oversize)",
+              serviceSlug: "flatbed",
+            },
+          ],
+          disclaimer:
+            "Expedited feasibility depends on lane, equipment, and timing; confirm with our priority team at quote.",
+        },
+        showRelated: false,
         ctas: {
           primary: {
             label: "Request an Expedited Quote",
@@ -630,7 +901,8 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       {
         key: "specialized-vehicle-programs",
         label: "Specialized Vehicle Programs",
-        title: "Exotic & Specialized Vehicle Hauling | Premium-Asset, Constraint-Controlled Transport",
+        title:
+          "Exotic & Specialized Vehicle Hauling | Premium-Asset, Constraint-Controlled Transport",
         description:
           "This program is purpose-built for exotic and specialty vehicle transport where condition integrity, enclosed handling, and route realism are non-negotiable. It also supports non-standard cargo profiles that require strict access, permit, or dimensional controls before dispatch.",
         image: "/_optimized/services/specialized&time-sensitive/exoticCarhaulingImg2.webp",
@@ -669,14 +941,14 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           ],
         },
         howToUse: {
-          intro:
-            "Program accuracy depends on complete vehicle profile, condition expectations, and site constraints before quote confirmation.",
+          intro: "Here's how to use NPT's Specialized Vehicle Programs from quote to delivery.",
           items: [
-            "Verified vehicle dimensions, ride-height/special handling notes, and securement requirements",
-            "Origin/destination access details including ramp angle, loading method, and receiver constraints",
-            "Known route, permit, escort, or delivery-window restrictions before dispatch commitment",
-            "Target milestone plan with condition-confirmation checkpoints and escalation contacts",
-            "Documentation package required for secure release, transit accountability, and delivery closeout",
+            "Share verified vehicle dimensions, ride-height, special handling notes, and securement requirements so we can confirm equipment fit.",
+            "Provide origin and destination access details—ramp angle, loading method, receiver constraints—so we can plan the move.",
+            "Specify any route, permit, escort, or delivery-window restrictions before we commit to dispatch.",
+            "Give target milestone plan with condition-confirmation checkpoints and escalation contacts for accountability.",
+            "Include documentation requirements for secure release, transit accountability, and delivery closeout.",
+            "Confirm condition expectations and handoff sign-off process so we can meet your standards.",
           ],
         },
         capabilities: {
@@ -690,15 +962,52 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Program-level support for recurring exotic and specialized lane requirements",
           ],
         },
-        relatedServices: [
-          { label: "RGN / Oversize", href: "/services/truckload#section-rgn-oversize", icon: "●" },
-          {
-            label: "Project-Specific / Oversize",
-            href: "/services/value-added#section-project-oversize-programs",
-            icon: "●",
+        freightFit: {
+          title: "Specialized Vehicle Programs Freight Fit Guide",
+          intro:
+            "Specialized Vehicle Programs are for exotic and specialty vehicles—and non-standard cargo—where condition integrity, enclosed handling, and route feasibility are non-negotiable. This guide helps determine if this program is the right fit for your load—and what to use instead when it isn't.",
+          diagram: "/_optimized/equipment-diagrams/specializedVehicle.webp",
+          diagramAlt: "Specialized vehicle and enclosed transport equipment diagram",
+          specs: {
+            length: "Enclosed trailer; dimensions matched to vehicle or cargo profile",
+            width: "Standard enclosed width; access and clearance validated per move",
+            height: "Interior clearance and load height confirmed before commitment",
+            weight: "Per vehicle or load; equipment and securement planned accordingly",
+            pallets: "N/A — vehicle or specialized cargo, not pallet-based",
           },
-          { label: "Cross-Border & Global", href: "/services/cross-border", icon: "●" },
-        ],
+          rules: [
+            {
+              condition: "Standard vehicles without premium handling needs",
+              description:
+                "If your vehicle or cargo does not require enclosed, condition-accountable transport, expedited or standard truckload may be more efficient.",
+              recommendation: "Expedited",
+              serviceSlug: "expedited-specialized",
+            },
+            {
+              condition: "Oversize, overweight, or permit-required moves",
+              description:
+                "If your load exceeds standard dimensions or requires permits and specialized low-bed equipment.",
+              recommendation: "RGN (Oversize)",
+              serviceSlug: "rgn-oversize",
+            },
+            {
+              condition: "Freight requiring temperature control",
+              description: "If your cargo must remain within a controlled temperature range.",
+              recommendation: "Refrigerated Truckload",
+              serviceSlug: "reefer",
+            },
+            {
+              condition: "Shipments under trailer utilization",
+              description:
+                "If your shipment does not require dedicated specialized equipment and fits standard LTL or truckload.",
+              recommendation: "LTL Freight",
+              serviceSlug: "ltl",
+            },
+          ],
+          disclaimer:
+            "Equipment fit and route feasibility depend on vehicle profile and site constraints; confirm with our specialized team at quote.",
+        },
+        showRelated: false,
         ctas: {
           primary: {
             label: "Request a Specialized Program Quote",
@@ -809,12 +1118,14 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         },
         howToUse: {
           intro:
-            "For faster setup and cleaner execution, share commercial and operational requirements at tender.",
+            "Here's how to use NPT's Canada ↔ USA cross-border service from quote to delivery.",
           items: [
-            "Importer/exporter details and customs broker contacts",
-            "Commodity profile, values, and commercial invoice requirements",
-            "Pickup and delivery appointment windows with facility rules",
-            "Reference numbers, document return workflow, and POD expectations",
+            "Share importer/exporter details and customs broker contacts so we can align documentation and handoffs.",
+            "Provide commodity profile, values, and commercial invoice requirements for customs readiness.",
+            "Specify pickup and delivery appointment windows and facility rules so we can plan border timing.",
+            "Give reference numbers, document return workflow, and POD expectations for clean closeout.",
+            "Confirm exception and escalation preferences for holds, inspections, or timing changes so we can respond consistently.",
+            "Include any carrier or lane preferences so we can match capacity to your compliance and service needs.",
           ],
         },
         capabilities: {
@@ -826,6 +1137,53 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Support for both spot shipments and repeat lane programs",
           ],
         },
+        freightFit: {
+          title: "Canada ↔ USA Cross-Border Freight Fit Guide",
+          intro:
+            "Canada-USA cross-border service is for freight moving between Canadian and U.S. facilities with customs and documentation control. This guide helps determine if this service is the right fit for your load—and what to use instead when it isn't.",
+          diagram: "/_optimized/equipment-diagrams/crossBorderUSA_Canada.webp",
+          diagramAlt: "Canada-USA cross-border freight and customs workflow diagram",
+          specs: {
+            length: "Mode-dependent; truck, rail, or intermodal as lane requires",
+            width: "Standard equipment dimensions; load and border requirements apply",
+            height: "Per equipment type and route",
+            weight: "Legal and equipment limits; customs declaration aligned",
+            pallets: "Varies by mode and equipment; standard when truckload",
+          },
+          rules: [
+            {
+              condition: "Domestic-only lanes (US–US or Canada–Canada)",
+              description:
+                "If your freight moves entirely within one country and does not cross the border, domestic truckload or LTL is typically more direct.",
+              recommendation: "Dry Van Truckload",
+              serviceSlug: "dry-van",
+            },
+            {
+              condition: "Mexico cross-border freight",
+              description:
+                "If your lane involves Mexico–USA border crossing, our Mexico cross-border program is designed for that workflow.",
+              recommendation: "Mexico Cross-Border",
+              serviceSlug: "mexico-cross-border",
+            },
+            {
+              condition: "International ocean moves",
+              description:
+                "If your shipment is moving by ocean (FCL/LCL) rather than over-the-road cross-border.",
+              recommendation: "Ocean Freight",
+              serviceSlug: "ocean-freight",
+            },
+            {
+              condition: "International air or expedited",
+              description:
+                "If your cargo requires air freight or expedited international movement rather than surface cross-border.",
+              recommendation: "Air Freight",
+              serviceSlug: "air-freight",
+            },
+          ],
+          disclaimer:
+            "Border requirements and documentation depend on commodity, origin, and destination; confirm with our border team at quote.",
+        },
+        showRelated: false,
         ctas: {
           primary: {
             label: "Request a Canada-USA Quote",
@@ -879,13 +1237,14 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           ],
         },
         howToUse: {
-          intro:
-            "Provide full lane and customs details up front so execution can be engineered correctly.",
+          intro: "Here's how to use NPT's Mexico Cross-Border service from quote to delivery.",
           items: [
-            "Shipper/consignee legal entities and customs participants",
-            "Commodity, values, and required trade/commercial documents",
-            "Expected border crossing points and timing constraints",
-            "Communication protocol for border exceptions and release events",
+            "Share shipper/consignee legal entities and customs participants so we can align roles and responsibilities.",
+            "Provide commodity details, values, and required trade/commercial documents for customs readiness.",
+            "Specify expected border crossing points, transfer yards, and timing constraints to engineer the workflow.",
+            "Give communication protocol for border exceptions and release events so updates reach the right teams.",
+            "Include reference numbers and document-return expectations for audit trail and billing.",
+            "Confirm escalation paths for delays, inspections, or holds so we can respond consistently.",
           ],
         },
         capabilities: {
@@ -897,6 +1256,53 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Visibility practices aligned to shipper and consignee needs",
           ],
         },
+        freightFit: {
+          title: "Mexico Cross-Border Freight Fit Guide",
+          intro:
+            "Mexico cross-border service is for freight moving between Mexico and the United States where drayage, transload, customs, and linehaul must operate as one flow. This guide helps determine if our Mexico program is the right fit for your load—and what to use instead when it isn't.",
+          diagram: "/_optimized/solutions/card-cross-border-mexico.webp",
+          diagramAlt: "Mexico–USA cross-border freight and multi-party handoff diagram",
+          specs: {
+            length: "Multi-leg moves; dray, transload, and linehaul segments",
+            width: "Standard equipment dimensions; transfer-yard fit validated",
+            height: "Per equipment and route; clearance checked at planning",
+            weight: "Legal and route limits across Mexico and U.S. segments",
+            pallets: "Varies by equipment and transfer profile; typically truckload-based",
+          },
+          rules: [
+            {
+              condition: "Domestic-only lanes within Mexico or the United States",
+              description:
+                "If your freight stays within one country and does not cross the MX–US border, domestic truckload or LTL is typically more direct.",
+              recommendation: "Dry Van Truckload",
+              serviceSlug: "dry-van",
+            },
+            {
+              condition: "Canada–USA cross-border lanes",
+              description:
+                "If your corridor is Canada–USA rather than Mexico–USA, our Canada ↔ USA program is designed for that flow.",
+              recommendation: "Canada ↔ USA",
+              serviceSlug: "canada-us",
+            },
+            {
+              condition: "Ocean-based international moves",
+              description:
+                "If your freight is moving by ocean (FCL/LCL) with inland legs rather than primary Mexico–U.S. surface crossing.",
+              recommendation: "Ocean Freight",
+              serviceSlug: "ocean-freight",
+            },
+            {
+              condition: "Air or highly expedited international moves",
+              description:
+                "If your shipment requires air freight or highly expedited international transit instead of surface cross-border.",
+              recommendation: "Air Freight",
+              serviceSlug: "air-freight",
+            },
+          ],
+          disclaimer:
+            "Border workflow, routing, and documentation depend on corridor and stakeholders; confirm with our Mexico team at quote.",
+        },
+        showRelated: false,
         ctas: {
           primary: {
             label: "Request a Mexico Cross-Border Quote",
@@ -951,13 +1357,14 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           ],
         },
         howToUse: {
-          intro:
-            "Provide shipment readiness and destination requirements early to secure cleaner bookings and delivery plans.",
+          intro: "Here's how to use NPT's Ocean Freight service from quote to delivery.",
           items: [
-            "Origin, destination, incoterms, and cargo-ready dates",
-            "Container profile, commodity details, and special handling needs",
-            "Required documents and customs/broker participants",
-            "Final delivery requirements and receiving windows",
+            "Share origin, destination, Incoterms, and cargo-ready dates so we can design realistic sailings and routing.",
+            "Provide container profile, commodity details, and any special handling needs for booking and stowage planning.",
+            "Specify required documents and customs/broker participants so we can align paperwork and handoffs.",
+            "Give final delivery requirements, receiving windows, and inland constraints so port-to-door plans are accurate.",
+            "Confirm visibility expectations and exception communication preferences for rollover, delays, or schedule changes.",
+            "Include reference numbers and documentation expectations for end-to-end audit trail and billing.",
           ],
         },
         capabilities: {
@@ -969,6 +1376,53 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Exception governance for rollover, delays, and schedule changes",
           ],
         },
+        freightFit: {
+          title: "Ocean Freight Fit Guide",
+          intro:
+            "Ocean freight is designed for international moves where cost efficiency and planned transit windows outweigh maximum speed. This guide helps determine if ocean is the right fit for your load—and what to use instead when it isn't.",
+          diagram: "/_optimized/solutions/card-ocean-freight.webp",
+          diagramAlt: "Ocean container freight operations for international supply chains",
+          specs: {
+            length: "Container-based; 20 ft, 40 ft, 40 ft HC typical",
+            width: "Standard container width (8 ft); dock- and yard-compatible",
+            height: "Standard or high-cube clearance per container type",
+            weight: "Per container; vessel, terminal, and inland limits apply",
+            pallets: "Typically 20–24 pallets in 40 ft, lane- and load-dependent",
+          },
+          rules: [
+            {
+              condition: "Short-haul or time-critical lanes",
+              description:
+                "If your lane requires fast transit or tight appointment windows, air freight or expedited surface is usually more appropriate.",
+              recommendation: "Air Freight",
+              serviceSlug: "air-freight",
+            },
+            {
+              condition: "North American surface-only moves",
+              description:
+                "If your freight moves within North America without international ocean legs, truckload, intermodal, or cross-border programs are typically a better fit.",
+              recommendation: "Truckload or Intermodal",
+              serviceSlug: "truckload",
+            },
+            {
+              condition: "Very small parcel or sample shipments",
+              description:
+                "If your cargo is parcel-sized or highly urgent samples, small-package or air solutions are generally more effective.",
+              recommendation: "Air Freight",
+              serviceSlug: "air-freight",
+            },
+            {
+              condition: "Temperature-critical or highly regulated cargo",
+              description:
+                "If your cargo requires strict temperature control or complex compliance handling, specialized reefer or HAZMAT programs may be required.",
+              recommendation: "Temperature-Controlled or HAZMAT",
+              serviceSlug: "temperature-controlled",
+            },
+          ],
+          disclaimer:
+            "Ocean mode fit depends on lane, product profile, and transit expectations; confirm with our ocean team at quote.",
+        },
+        showRelated: false,
         ctas: {
           primary: {
             label: "Request an Ocean Freight Quote",
@@ -1022,13 +1476,14 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           ],
         },
         howToUse: {
-          intro:
-            "To accelerate booking and movement, provide complete shipment and timing requirements upfront.",
+          intro: "Here's how to use NPT's Air Freight service from quote to delivery.",
           items: [
-            "Ready date, required delivery date, and urgency rationale",
-            "Commodity details, dimensions, and total chargeable weight",
-            "Origin/destination handling constraints and contact workflow",
-            "Documentation and customs release requirements",
+            "Share ready date, required delivery date, and urgency rationale so we can confirm feasibility and routing.",
+            "Provide commodity details, dimensions, and total chargeable weight for booking and capacity fit.",
+            "Specify origin and destination handling constraints and contact workflow so we can align handoffs.",
+            "Give documentation and customs release requirements for smooth clearance and delivery.",
+            "Confirm milestone and exception communication preferences so critical updates reach the right teams.",
+            "Include reference numbers and proof-of-delivery expectations for audit trail and billing.",
           ],
         },
         capabilities: {
@@ -1040,6 +1495,53 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Integration with truck or ocean workflows when needed",
           ],
         },
+        freightFit: {
+          title: "Air Freight Fit Guide",
+          intro:
+            "Air freight is for urgent international cargo where transit speed and schedule confidence outweigh cost. This guide helps determine if air is the right fit for your load—and what to use instead when it isn't.",
+          diagram: "/_optimized/solutions/card-air-freight.webp",
+          diagramAlt: "Air cargo logistics for time-critical international shipments",
+          specs: {
+            length: "Chargeable weight and volume; ULD or loose cargo as required",
+            width: "Per piece and ULD; airline and handling limits apply",
+            height: "Per piece; dimensional weight and handling considered",
+            weight: "Chargeable weight (gross or volumetric); carrier limits apply",
+            pallets: "Varies; often palletized or unitized for handling and security",
+          },
+          rules: [
+            {
+              condition: "Cost-sensitive or planned international moves",
+              description:
+                "If your shipment can meet longer transit windows and landed cost is a priority, ocean freight is typically more economical.",
+              recommendation: "Ocean Freight",
+              serviceSlug: "ocean-freight",
+            },
+            {
+              condition: "North American domestic or surface cross-border",
+              description:
+                "If your freight moves within North America or Canada–USA/Mexico surface lanes without international air legs, truckload or cross-border programs are usually a better fit.",
+              recommendation: "Canada ↔ USA or Truckload",
+              serviceSlug: "canada-us",
+            },
+            {
+              condition: "Non-urgent or high-volume international",
+              description:
+                "If timing is flexible and volume supports containerized movement, ocean or intermodal may offer better value.",
+              recommendation: "Ocean Freight",
+              serviceSlug: "ocean-freight",
+            },
+            {
+              condition: "Temperature-critical or regulated hazardous cargo",
+              description:
+                "If your cargo requires controlled temperature or HAZMAT handling, specialized programs may be required in addition to or instead of standard air.",
+              recommendation: "Temperature-Controlled or HAZMAT",
+              serviceSlug: "temperature-controlled",
+            },
+          ],
+          disclaimer:
+            "Air feasibility depends on lane, weight, and carrier capacity; confirm with our air team at quote.",
+        },
+        showRelated: false,
         ctas: {
           primary: {
             label: "Request an Air Freight Quote",
@@ -1150,12 +1652,14 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           ],
         },
         howToUse: {
-          intro: "For fast onboarding, define profile, throughput, and SLA requirements early.",
+          intro:
+            "Here's how to use NPT's Warehousing & Distribution from program design to go-live.",
           items: [
-            "SKU profile, velocity segmentation, and storage constraints",
-            "Inbound schedule, receiving standards, and put-away expectations",
-            "Order rules, cutoffs, wave strategy, and carrier routing logic",
-            "SLA targets for pick accuracy, ship timeliness, and exception handling",
+            "Share SKU profile, velocity segmentation, and storage constraints so we can size space and labor.",
+            "Define inbound schedule, receiving standards, and put-away expectations for consistent handoffs.",
+            "Specify order rules, cutoffs, wave strategy, and carrier routing logic so outbound matches your SLA.",
+            "Set SLA targets for pick accuracy, ship timeliness, and exception handling so we can govern to them.",
+            "Confirm reporting and review cadence so throughput, accuracy, and variance stay visible.",
           ],
         },
         capabilities: {
@@ -1168,6 +1672,46 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Performance reporting for throughput, accuracy, and SLA adherence",
           ],
         },
+        freightFit: {
+          title: "Warehousing & Distribution Fit Guide",
+          intro:
+            "Warehousing and distribution fit when inventory positioning and fulfillment performance directly support customer commitments. This guide helps determine if a warehousing program is the right fit for your operation—and what to use instead when it isn't.",
+          diagram: "/_optimized/solutions/card-warehousing-distribution.webp",
+          diagramAlt: "Warehouse distribution operations and inventory handling",
+          specs: {
+            length: "Order cycle and lead time from receipt to ship",
+            width: "SKU breadth, lane count, and channel mix",
+            height: "Peak throughput and storage profile",
+            weight: "Volume and weight profile for labor and equipment",
+            pallets: "Unit handling, pallet types, and slotting needs",
+          },
+          rules: [
+            {
+              condition: "Transport-only or ad-hoc storage needs",
+              description:
+                "If you need freight movement without ongoing inventory or fulfillment, truckload, LTL, or managed capacity may fit better.",
+              recommendation: "Managed Capacity or LTL",
+              serviceSlug: "managed-capacity",
+            },
+            {
+              condition: "Dedicated equipment and lane commitment",
+              description:
+                "If the priority is committed capacity and lane-level consistency rather than warehouse operations, dedicated/contract is a better fit.",
+              recommendation: "Dedicated / Contract",
+              serviceSlug: "dedicated-contract",
+            },
+            {
+              condition: "Oversize or project cargo with route/permit focus",
+              description:
+                "If the move is project or oversize with route, permit, and site coordination as the main need, project-specific programs are designed for that.",
+              recommendation: "Project-Specific (Oversize) Programs",
+              serviceSlug: "project-oversize-programs",
+            },
+          ],
+          disclaimer:
+            "Program design depends on volume, SKU profile, and SLA targets; confirm scope with our distribution team.",
+        },
+        showRelated: false,
         ctas: {
           primary: {
             label: "Request a Warehousing Program Quote",
@@ -1223,12 +1767,13 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         },
         howToUse: {
           intro:
-            "Start with baseline lane and performance data so priorities can be mapped quickly.",
+            "Here's how to use NPT's Managed Capacity from assessment to steady-state governance.",
           items: [
-            "Current carrier mix, lane map, and mode profile",
-            "Service-level targets and key failure/exception patterns",
-            "Cost baseline including accessorial and expedite drivers",
-            "Governance cadence, reporting expectations, and stakeholder owners",
+            "Share current carrier mix, lane map, and mode profile so we can baseline and identify gaps.",
+            "Define service-level targets and key failure/exception patterns so priorities are clear.",
+            "Provide cost baseline including accessorial and expedite drivers for improvement tracking.",
+            "Set governance cadence, reporting expectations, and stakeholder owners so we operate in rhythm.",
+            "Confirm KPI and continuous-improvement process so lane and mode decisions stay data-led.",
           ],
         },
         capabilities: {
@@ -1240,6 +1785,46 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Performance dashboards and recurring continuous-improvement reviews",
           ],
         },
+        freightFit: {
+          title: "Managed Capacity Fit Guide",
+          intro:
+            "Managed capacity fits when transportation planning, procurement, and performance need to be centralized and governed. This guide helps determine if a managed program is the right fit—and what to use instead when it isn't.",
+          diagram: "/_optimized/equipment-diagrams/managedCapacity.webp",
+          diagramAlt: "Transportation control tower and managed capacity planning",
+          specs: {
+            length: "Lane count and geographic scope",
+            width: "Mode mix and carrier strategy breadth",
+            height: "Volume and peak demand profile",
+            weight: "Cost and service KPI targets",
+            pallets: "Shipment profile and accessorial exposure",
+          },
+          rules: [
+            {
+              condition: "Warehouse and fulfillment are the primary need",
+              description:
+                "If inventory positioning and outbound fulfillment are the main focus, warehousing and distribution is the right program.",
+              recommendation: "Warehousing & Distribution",
+              serviceSlug: "warehousing-distribution",
+            },
+            {
+              condition: "Committed dedicated capacity per lane",
+              description:
+                "If you need embedded equipment and staffing for recurring lanes, dedicated/contract programs provide that commitment.",
+              recommendation: "Dedicated / Contract",
+              serviceSlug: "dedicated-contract",
+            },
+            {
+              condition: "Single project or oversize move",
+              description:
+                "If the need is one-off project or oversize with route and permit focus, project-specific programs are designed for that.",
+              recommendation: "Project-Specific (Oversize) Programs",
+              serviceSlug: "project-oversize-programs",
+            },
+          ],
+          disclaimer:
+            "Scope and savings depend on lane data and governance commitment; our team will size during assessment.",
+        },
+        showRelated: false,
         ctas: {
           primary: {
             label: "Request a Managed Capacity Assessment",
@@ -1294,12 +1879,13 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         },
         howToUse: {
           intro:
-            "Define demand shape, service targets, and governance model before launch planning.",
+            "Here's how to use NPT's Dedicated / Contract programs from design through launch and steady state.",
           items: [
-            "Volume profile by lane, seasonality, and peak-period requirements",
-            "Target service metrics and escalation protocol definitions",
-            "Resource model expectations for staffing and operational ownership",
-            "Review cadence, performance reporting, and continuous-improvement process",
+            "Share volume profile by lane, seasonality, and peak-period requirements so we can size capacity and labor.",
+            "Define target service metrics and escalation protocol definitions so accountability is clear.",
+            "Set resource model expectations for staffing and operational ownership so roles are aligned.",
+            "Establish review cadence, performance reporting, and continuous-improvement process so we govern to outcomes.",
+            "Confirm proof-of-delivery and exception workflows so day-to-day execution stays consistent.",
           ],
         },
         capabilities: {
@@ -1312,6 +1898,46 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Structured improvement plans tied to cost and service objectives",
           ],
         },
+        freightFit: {
+          title: "Dedicated / Contract Fit Guide",
+          intro:
+            "Dedicated and contract programs fit when recurring volume and service criticality justify committed capacity and operating discipline. This guide helps determine if dedicated/contract is the right fit—and what to use instead when it isn't.",
+          diagram: "/_optimized/equipment-diagrams/dedicatedContract.webp",
+          diagramAlt: "Dedicated logistics operations with consistent fleet and service planning",
+          specs: {
+            length: "Lane commitment and service windows",
+            width: "Equipment mix and coverage breadth",
+            height: "Peak volume and seasonal swing",
+            weight: "Service and cost KPI targets",
+            pallets: "Shipment profile and handling requirements",
+          },
+          rules: [
+            {
+              condition: "Planning and procurement focus without committed equipment",
+              description:
+                "If you need centralized planning and carrier governance without dedicated fleet, managed capacity is the right fit.",
+              recommendation: "Managed Capacity",
+              serviceSlug: "managed-capacity",
+            },
+            {
+              condition: "Warehouse and fulfillment as primary need",
+              description:
+                "If inventory and outbound fulfillment are the core need, warehousing and distribution is designed for that.",
+              recommendation: "Warehousing & Distribution",
+              serviceSlug: "warehousing-distribution",
+            },
+            {
+              condition: "One-off project or oversize with route/permit focus",
+              description:
+                "If the move is project or oversize with route, permit, and site coordination as the main need, project-specific programs are the right fit.",
+              recommendation: "Project-Specific (Oversize) Programs",
+              serviceSlug: "project-oversize-programs",
+            },
+          ],
+          disclaimer:
+            "Program structure depends on volume, lane stability, and service targets; our team will design during consultation.",
+        },
+        showRelated: false,
         ctas: {
           primary: {
             label: "Request a Dedicated Program Consultation",
@@ -1327,9 +1953,9 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       },
       {
         key: "project-oversize-programs",
-        label: "Project-Specific / Oversize Programs",
+        label: "Project-Specific (Oversize) Programs",
         title:
-          "Project-Specific / Oversize Programs | Route, Permit, and Multi-Party Execution Control",
+          "Project-Specific (Oversize) Programs | Route, Permit, and Multi-Party Execution Control",
         description:
           "Project and oversize programs require engineering-grade planning, permit governance, route validation, and synchronized stakeholder execution. We coordinate each handoff from pre-move analysis through final delivery to reduce schedule and compliance risk.",
         image: "/_optimized/solutions/card-project-oversize.webp",
@@ -1367,12 +1993,13 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         },
         howToUse: {
           intro:
-            "Provide engineering and site details early so route/permit workflows can be built correctly.",
+            "Here's how to use NPT's Project-Specific (Oversize) programs from feasibility through delivery.",
           items: [
-            "Load specs including dimensions, weight, and handling points",
-            "Origin/destination site constraints and equipment requirements",
-            "Jurisdictional permit needs, route limitations, and timing windows",
-            "Stakeholder map and escalation owners for execution exceptions",
+            "Share load specs including dimensions, weight, and handling points so route and permit planning can start.",
+            "Define origin/destination site constraints and equipment requirements so handoffs are planned up front.",
+            "Specify jurisdictional permit needs, route limitations, and timing windows so compliance is sequenced.",
+            "Provide stakeholder map and escalation owners for execution exceptions so we coordinate from one plan.",
+            "Confirm milestone and proof-of-delivery expectations so schedule and compliance risk stay controlled.",
           ],
         },
         capabilities: {
@@ -1385,6 +2012,46 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             "Contingency planning for weather, permit, and route disruptions",
           ],
         },
+        freightFit: {
+          title: "Project-Specific (Oversize) Fit Guide",
+          intro:
+            "Project and oversize programs fit when route, permit, and multi-party execution risk cannot be managed transactionally. This guide helps determine if a project-specific program is the right fit for your move—and what to use instead when it isn't.",
+          diagram: "/_optimized/equipment-diagrams/projectSpecific.webp",
+          diagramAlt: "Project cargo and oversize logistics planning execution",
+          specs: {
+            length: "Load dimensions and route clearance requirements",
+            width: "Jurisdiction and permit scope",
+            height: "Site and equipment constraints",
+            weight: "Axle and bridge limits",
+            pallets: "Handling points and sequence dependencies",
+          },
+          rules: [
+            {
+              condition: "Standard dimensions and no special permits",
+              description:
+                "If freight fits standard equipment and does not require oversize permits or route engineering, truckload or LTL is typically more efficient.",
+              recommendation: "Dry Van Truckload or LTL",
+              serviceSlug: "dry-van",
+            },
+            {
+              condition: "Recurring lane demand with committed capacity",
+              description:
+                "If you need ongoing dedicated capacity on recurring lanes, dedicated/contract programs are designed for that.",
+              recommendation: "Dedicated / Contract",
+              serviceSlug: "dedicated-contract",
+            },
+            {
+              condition: "Transport planning without warehouse or project cargo",
+              description:
+                "If the need is centralized planning and carrier governance without project or oversize moves, managed capacity may fit better.",
+              recommendation: "Managed Capacity",
+              serviceSlug: "managed-capacity",
+            },
+          ],
+          disclaimer:
+            "Feasibility and cost depend on route, permit lead times, and site constraints; confirm with our project team.",
+        },
+        showRelated: false,
         ctas: {
           primary: {
             label: "Request a Project Logistics Review",
@@ -1451,15 +2118,6 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
     },
     subnavLabel: "LTL service overview",
     singleLayout: {
-      snapshot: {
-        title: "What this LTL program is built to improve",
-        items: [
-          "Shipment consolidation economics",
-          "Class and handling accuracy at tender",
-          "Pickup and delivery consistency",
-          "Exception visibility before customer impact",
-        ],
-      },
       whenToUse: {
         title: "When to use this service",
         intro:
@@ -1519,6 +2177,85 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           "Exception protocol for delay, reclass, and accessorial events",
         ],
       },
+      freightFit: {
+        title: "LTL Freight Fit Guide",
+        intro:
+          "LTL is built for shipments that do not require a dedicated trailer. This guide helps determine if LTL is the right fit for your load—and what to use instead when it isn't.",
+        diagram: "/_optimized/equipment-diagrams/lessThanTruckLoad.webp",
+        diagramAlt:
+          "LTL freight equipment and network diagram with dimensions and capacity guidance",
+        specs: {
+          length: "Multi-stop; trailer shared across shipments",
+          width: "Standard dock and pallet dimensions",
+          height: "Standard trailer clearance; stackable freight",
+          weight: "Per-shipment; typically under 15,000 lbs for LTL efficiency",
+          pallets: "Typically 1–12 pallets; more may justify truckload",
+        },
+        rules: [
+          {
+            condition: "Full truckload volume",
+            description:
+              "If your shipment consistently fills 12+ pallets or 15,000+ lbs and fits a single trailer, dedicated truckload is usually more efficient.",
+            recommendation: "Dry Van Truckload",
+            serviceSlug: "dry-van",
+          },
+          {
+            condition: "Freight requiring temperature control",
+            description: "If your cargo must remain within a controlled temperature range.",
+            recommendation: "Refrigerated Truckload",
+            serviceSlug: "reefer",
+          },
+          {
+            condition: "Open-deck or oversized freight",
+            description:
+              "If your freight requires flatbed, step deck, or RGN equipment due to dimensions or handling.",
+            recommendation: "Flatbed / Step Deck (Oversize)",
+            serviceSlug: "flatbed",
+          },
+          {
+            condition: "Long-haul lanes with cost focus",
+            description:
+              "If your lane is long-haul and cost optimization is a priority, intermodal may offer better economics.",
+            recommendation: "Intermodal",
+            serviceSlug: "intermodal",
+          },
+        ],
+        disclaimer:
+          "Planning values only. Lane density, class, and service levels affect fit; confirm with your LTL specialist.",
+      },
+      howToUse: {
+        intro: "Here's how to use NPT's LTL service from quote to delivery.",
+        items: [
+          "Share origin, destination, and shipment profile (pallet count, weight, dimensions, class) so we can provide class-ready quotes.",
+          "Provide pickup and delivery windows and any facility or appointment constraints so we can plan routing.",
+          "Specify handling requirements, accessorials, and documentation needs (BOL, POD) for clean execution.",
+          "Confirm service-level expectations and exception communication preferences so we can meet your targets.",
+          "Include reference numbers and billing instructions for accurate closeout and invoicing.",
+          "Clarify contingency for reclass, delay, or accessorial events so we can respond consistently.",
+        ],
+      },
+      highlights: [
+        {
+          title: "Consolidation efficiency",
+          description:
+            "Lane-fit planning and carrier selection aligned to cost and service targets—built for predictable LTL execution.",
+        },
+        {
+          title: "Class and handling discipline",
+          description:
+            "Classification and handling inputs validated at intake to reduce rework, reclass, and accessorial surprises.",
+        },
+        {
+          title: "Milestone visibility",
+          description:
+            "Pickup, in-transit, and delivery updates aligned to decision points so exceptions are caught early.",
+        },
+      ],
+      trustSnippet: {
+        title: "Execution controls that protect LTL performance",
+        body: "LTL outcomes improve when shipment profile, facility constraints, and service expectations are defined before tender. We validate class and handling up front and align communication to your program.",
+      },
+      showRelated: false,
       conversion: {
         title: "Plan your LTL lane strategy with our team",
         body: "Share your shipment profile and lane priorities to receive a structured LTL execution plan.",
@@ -1598,15 +2335,6 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
     },
     subnavLabel: "Intermodal service overview",
     singleLayout: {
-      snapshot: {
-        title: "What intermodal is designed to improve",
-        items: [
-          "Long-haul transportation cost stability",
-          "Capacity resilience on predictable lanes",
-          "Mode-fit planning by lane characteristics",
-          "Operational control across rail-truck handoffs",
-        ],
-      },
       whenToUse: {
         title: "When to use this service",
         intro:
@@ -1664,6 +2392,86 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           "Exception communication model across rail/truck interfaces",
         ],
       },
+      freightFit: {
+        title: "Intermodal Freight Fit Guide",
+        intro:
+          "Intermodal combines rail and truck dray for long-haul lanes where cost stability and capacity matter. This guide helps determine if intermodal is the right fit for your load—and what to use instead when it isn't.",
+        diagram: "/_optimized/equipment-diagrams/intermodal.webp",
+        diagramAlt:
+          "Intermodal rail and truck equipment diagram with dimensions and capacity guidance",
+        specs: {
+          length: "Container-based; 20 ft, 40 ft, 40 ft HC typical",
+          width: "Standard container width (8 ft); dockable",
+          height: "Standard or high-cube clearance per container type",
+          weight: "Per container; legal and rail limits apply",
+          pallets: "Container capacity; typically 20–24 pallets in 40 ft",
+        },
+        rules: [
+          {
+            condition: "Short-haul or time-critical lanes",
+            description:
+              "If your lane is under roughly 500 miles or requires expedited, appointment-tight delivery, truckload is usually more suitable.",
+            recommendation: "Dry Van Truckload",
+            serviceSlug: "dry-van",
+          },
+          {
+            condition: "Shipments below trailer utilization",
+            description:
+              "If your volume does not fill a container or you need multi-stop flexibility, LTL may be more efficient.",
+            recommendation: "LTL Freight",
+            serviceSlug: "ltl",
+          },
+          {
+            condition: "Freight requiring temperature control",
+            description:
+              "If your cargo must remain within a controlled temperature range; intermodal reefers exist but lane and equipment fit vary.",
+            recommendation: "Refrigerated Truckload",
+            serviceSlug: "reefer",
+          },
+          {
+            condition: "Expedited or single-load priority",
+            description:
+              "If you need guaranteed fast transit or dedicated equipment for one-off moves, expedited or truckload is a better fit.",
+            recommendation: "Expedited & Specialized",
+            serviceSlug: "expedited-specialized",
+          },
+        ],
+        disclaimer:
+          "Lane fit depends on corridor, volume, and transit requirements; confirm with your intermodal specialist.",
+      },
+      howToUse: {
+        intro: "Here's how to use NPT's Intermodal service from quote to delivery.",
+        items: [
+          "Share origin, destination, and lane characteristics (length, frequency, volume) so we can assess mode-fit.",
+          "Provide transit and service-level expectations so we can align rail and dray planning.",
+          "Specify container type preferences (20 ft, 40 ft, high-cube) and any equipment or handling constraints.",
+          "Confirm dray requirements at origin and destination (ramp, facility, appointment needs) for clean handoffs.",
+          "Include reference numbers and documentation needs so we can track and close out each move.",
+          "Clarify exception and escalation preferences so we can respond consistently across rail and truck interfaces.",
+        ],
+      },
+      highlights: [
+        {
+          title: "Lane-fit and conversion support",
+          description:
+            "We help identify corridors where intermodal improves cost and capacity—with clear transit and handoff expectations.",
+        },
+        {
+          title: "Rail-truck handoff control",
+          description:
+            "Origin dray, rail movement, and destination dray are planned and monitored as one flow with defined ownership.",
+        },
+        {
+          title: "Transit and cost governance",
+          description:
+            "Service and cost outcomes are tracked by lane so you can refine conversion decisions and capacity strategy.",
+        },
+      ],
+      trustSnippet: {
+        title: "Execution controls that protect intermodal reliability",
+        body: "Intermodal results improve when handoff dependencies, transit windows, and service thresholds are defined up front. We align dray and rail planning so exceptions are caught early and capacity stays predictable.",
+      },
+      showRelated: false,
       conversion: {
         title: "Evaluate lane-fit for intermodal conversion",
         body: "Share your corridor profile and service expectations to see where intermodal adds real value.",
@@ -1723,9 +2531,9 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
     },
     hero: {
       kicker: "Hazardous Materials (HAZMAT)",
-      title: "HAZMAT Logistics Engineered Around Compliance and Risk Control.",
+      title: "HAZMAT Logistics Built for Compliance Discipline and Delivery Confidence.",
       description:
-        "NPT coordinates hazardous materials freight with process discipline across documentation, handling controls, and execution governance. We align operational workflows to regulatory requirements and shipper-specific risk protocols.",
+        "NPT executes hazardous materials freight with end-to-end process discipline: accurate classification, shipping-paper and labeling controls, carrier and handler alignment, and clear escalation when compliance or safety is at stake. We help shippers and receivers maintain regulatory alignment and audit-ready documentation across North American HAZMAT lanes—so regulated freight moves with accountability from pickup through proof of delivery.",
       microNote:
         "Compliance-first planning, documentation discipline, and controlled escalation for regulated freight.",
       image: "/_optimized/solutions/card-hazmat.webp",
@@ -1744,15 +2552,6 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
     },
     subnavLabel: "Hazmat service overview",
     singleLayout: {
-      snapshot: {
-        title: "What this HAZMAT service protects",
-        items: [
-          "Regulatory alignment and documentation accuracy",
-          "Handling and communication controls during transit",
-          "Exception escalation for compliance-impacting events",
-          "Operational consistency for recurring regulated lanes",
-        ],
-      },
       whenToUse: {
         title: "When to use this service",
         intro:
@@ -1810,6 +2609,85 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           "Required shipping paper fields and contact/escalation protocol",
         ],
       },
+      freightFit: {
+        title: "HAZMAT Freight Fit Guide",
+        intro:
+          "HAZMAT service is for freight classified as hazardous under transport regulations and requiring compliant handling, documentation, and carrier credentials. This guide helps determine if HAZMAT is the right fit for your load—and what to use instead when it isn't.",
+        diagram: "/_optimized/equipment-diagrams/Hazmat.webp",
+        diagramAlt: "HAZMAT freight and compliance-controlled transport diagram",
+        specs: {
+          length: "Equipment matched to load and placard requirements",
+          width: "Standard dockable; securement and segregation as required",
+          height: "Clearance and load profile per classification",
+          weight: "Per shipment; legal and equipment limits apply",
+          pallets: "Varies; packaging and segregation drive capacity",
+        },
+        rules: [
+          {
+            condition: "Non-hazardous or general freight",
+            description:
+              "If your shipment is not classified as hazardous under transport regulations, standard dry van or LTL is typically more straightforward.",
+            recommendation: "Dry Van Truckload",
+            serviceSlug: "dry-van",
+          },
+          {
+            condition: "Hazardous freight requiring temperature control",
+            description:
+              "If your regulated cargo must also maintain a controlled temperature range, temperature-controlled service may be required.",
+            recommendation: "Refrigerated Truckload",
+            serviceSlug: "reefer",
+          },
+          {
+            condition: "Small non-hazardous shipments",
+            description:
+              "If your shipment is below truckload volume and does not require hazardous handling or documentation.",
+            recommendation: "LTL Freight",
+            serviceSlug: "ltl",
+          },
+          {
+            condition: "Expedited non-hazardous freight",
+            description:
+              "If timing is critical and the shipment is not regulated as hazardous, expedited service may be a better fit.",
+            recommendation: "Expedited",
+            serviceSlug: "expedited-specialized",
+          },
+        ],
+        disclaimer:
+          "Classification and carrier capability depend on commodity and route; confirm with our compliance team at quote.",
+      },
+      howToUse: {
+        intro: "Here's how to use NPT's HAZMAT service from quote to delivery.",
+        items: [
+          "Share hazard classification, proper shipping name, UN/ID, and packing group so we can confirm carrier and equipment fit.",
+          "Provide packaging and marking details and any handling or segregation requirements for planning.",
+          "Specify required shipping paper fields and emergency contact/escalation protocol so we can align documentation.",
+          "Give origin and destination details, including any facility or routing restrictions for regulated freight.",
+          "Include reference numbers and documentation expectations for audit trail and closeout.",
+          "Confirm exception and compliance-escalation process so we can respond consistently to any variance.",
+        ],
+      },
+      highlights: [
+        {
+          title: "Classification and documentation discipline",
+          description:
+            "We validate hazard classification and shipping description up front so documentation and carrier selection stay compliant.",
+        },
+        {
+          title: "Protocol-led execution",
+          description:
+            "Handling, communication, and milestone updates follow defined protocols to protect compliance and reduce risk.",
+        },
+        {
+          title: "Exception and escalation control",
+          description:
+            "Compliance-impacting events are escalated with clear ownership so issues are resolved without documentation or safety gaps.",
+        },
+      ],
+      trustSnippet: {
+        title: "Execution controls that protect HAZMAT compliance",
+        body: "HAZMAT results improve when classification, packaging, and shipping-paper details are complete and validated before dispatch. We align documentation and handoff process so regulated freight moves with full audit trail.",
+      },
+      showRelated: false,
       conversion: {
         title: "Plan your regulated freight workflow with our team",
         body: "Share shipment and compliance requirements to receive a structured execution approach.",
@@ -1890,15 +2768,6 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
     },
     subnavLabel: "Temperature-controlled service overview",
     singleLayout: {
-      snapshot: {
-        title: "What this temperature-controlled service improves",
-        items: [
-          "Product integrity across planned transit windows",
-          "Setpoint and handling discipline before and during movement",
-          "Visibility for time- and temperature-sensitive milestones",
-          "Controlled exception response to reduce exposure",
-        ],
-      },
       whenToUse: {
         title: "When to use this service",
         intro:
@@ -1957,6 +2826,86 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           "Exception escalation rules for out-of-range or delay events",
         ],
       },
+      freightFit: {
+        title: "Temperature-Controlled Freight Fit Guide",
+        intro:
+          "Temperature-controlled service is for cargo whose quality or compliance depends on maintaining a defined thermal range in transit. This guide helps determine if temperature-controlled is the right fit for your load—and what to use instead when it isn't.",
+        diagram: "/_optimized/equipment-diagrams/tempCntrl.webp",
+        diagramAlt:
+          "Temperature-controlled and reefer equipment diagram with setpoint and capacity guidance",
+        specs: {
+          length: "Reefer trailer; 48 ft or 53 ft typical",
+          width: "Standard reefer width; dockable",
+          height: "Interior clearance; setpoint and airflow considered",
+          weight: "Legal payload; typical reefer capacity",
+          pallets: "Varies by trailer and load configuration; typically 24–26 pallets in 53 ft",
+        },
+        rules: [
+          {
+            condition: "Non-temperature-sensitive freight",
+            description:
+              "If your cargo does not require a controlled temperature range in transit, dry van is usually more economical.",
+            recommendation: "Dry Van Truckload",
+            serviceSlug: "dry-van",
+          },
+          {
+            condition: "Small or LTL-volume temperature shipments",
+            description:
+              "If your temperature-sensitive shipment is below full truckload volume, LTL temperature-controlled may be a better fit.",
+            recommendation: "LTL Freight",
+            serviceSlug: "ltl",
+          },
+          {
+            condition: "Hazardous materials with compliance requirements",
+            description:
+              "If your freight is regulated as hazardous and requires documentation and handling controls in addition to temperature.",
+            recommendation: "HAZMAT",
+            serviceSlug: "hazmat",
+          },
+          {
+            condition: "Expedited non-temperature-critical freight",
+            description:
+              "If timing is the priority and your cargo does not require strict thermal control, expedited service may be more appropriate.",
+            recommendation: "Expedited",
+            serviceSlug: "expedited-specialized",
+          },
+        ],
+        disclaimer:
+          "Setpoint and equipment fit depend on commodity, lane, and receiver requirements; confirm with our temperature-control team at quote.",
+      },
+      howToUse: {
+        intro: "Here's how to use NPT's Temperature-Controlled service from quote to delivery.",
+        items: [
+          "Share required setpoint range, commodity sensitivity, and any validated thermal thresholds so we can confirm equipment and protocol.",
+          "Provide origin and destination details and receiver temperature-compliance requirements for planning.",
+          "Specify pre-load expectations (pre-cool, load conditions) and in-transit visibility needs so we can align to your program.",
+          "Give reference numbers and documentation expectations for delivery closeout and quality records.",
+          "Include exception and escalation preferences for out-of-range or delay events so we can respond consistently.",
+          "Confirm delivery sign-off and thermal-condition confirmation process so we can meet your integrity standards.",
+        ],
+      },
+      highlights: [
+        {
+          title: "Setpoint and profile discipline",
+          description:
+            "We align thermal requirements and commodity profile at intake so equipment and handling protocol match your product.",
+        },
+        {
+          title: "Monitored transit and visibility",
+          description:
+            "Milestone checkpoints and exception communication are built for time- and temperature-sensitive programs.",
+        },
+        {
+          title: "Controlled exception response",
+          description:
+            "Out-of-range or delay events trigger defined escalation so exposure is minimized and recovery stays on protocol.",
+        },
+      ],
+      trustSnippet: {
+        title: "Execution controls that protect temperature-control integrity",
+        body: "Temperature-sensitive programs perform best when setpoint discipline, pre-load readiness, and escalation rules are defined before movement. We align equipment and communication to your thermal and delivery requirements.",
+      },
+      showRelated: false,
       conversion: {
         title: "Design the right temperature-control execution plan",
         body: "Share commodity profile and lane requirements to receive a structured temperature-control strategy.",

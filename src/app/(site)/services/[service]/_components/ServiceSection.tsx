@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { SectionImage } from "@/components/media/SectionImage";
+import { FreightFitGuideMedia, FreightFitGuideRecommendations } from "./FreightFitGuide";
 import { cn } from "@/lib/cn";
 import { trackCtaClick, toCtaSlug } from "@/lib/analytics/cta";
 import type { ServiceKey, SubServiceSection } from "@/config/services";
@@ -49,12 +50,12 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
   ],
   flatbed: [
     {
-      label: "RGN / Oversize",
+      label: "RGN (Oversize)",
       href: "/services/truckload#section-rgn-oversize",
       reason: "When dimensions, axle weights, or permits exceed flatbed thresholds.",
     },
     {
-      label: "Conestoga",
+      label: "Roll-Tite / Conestoga",
       href: "/services/truckload#section-roll-tite-conestoga",
       reason: "When you need weather protection without losing side-load access.",
     },
@@ -66,12 +67,12 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
   ],
   "rgn-oversize": [
     {
-      label: "Flatbed",
+      label: "Flatbed / Step Deck (Oversize)",
       href: "/services/truckload#section-flatbed",
       reason: "For open-deck freight that does not require heavy-haul configuration.",
     },
     {
-      label: "Conestoga",
+      label: "Roll-Tite / Conestoga",
       href: "/services/truckload#section-roll-tite-conestoga",
       reason: "For high-value freight requiring covered-deck protection.",
     },
@@ -83,7 +84,7 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
   ],
   "roll-tite-conestoga": [
     {
-      label: "Flatbed",
+      label: "Flatbed / Step Deck (Oversize)",
       href: "/services/truckload#section-flatbed",
       reason: "For open-deck freight where weather exposure is acceptable.",
     },
@@ -102,7 +103,8 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
     {
       label: "Air Freight",
       href: "/services/cross-border#section-air-freight",
-      reason: "For cross-region urgent moves when timeline compression outweighs landed-cost priority.",
+      reason:
+        "For cross-region urgent moves when timeline compression outweighs landed-cost priority.",
     },
     {
       label: "Truckload (TL)",
@@ -119,17 +121,20 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
     {
       label: "Expedited",
       href: "/services/expedited-specialized#section-expedited",
-      reason: "For exotic and specialty vehicle moves tied to hard delivery windows, event timing, or urgent recovery timelines.",
+      reason:
+        "For exotic and specialty vehicle moves tied to hard delivery windows, event timing, or urgent recovery timelines.",
     },
     {
       label: "Dry Van",
       href: "/services/truckload#section-dry-van",
-      reason: "For automotive parts and unfinished manufacturing components that need enclosed, schedule-disciplined lane execution.",
+      reason:
+        "For automotive parts and unfinished manufacturing components that need enclosed, schedule-disciplined lane execution.",
     },
     {
       label: "Truckload (TL)",
       href: "/services/truckload",
-      reason: "For general vehicle-unit program support where lane consistency, appointment control, and scalable capacity matter.",
+      reason:
+        "For general vehicle-unit program support where lane consistency, appointment control, and scalable capacity matter.",
     },
   ],
   "canada-us": [
@@ -253,7 +258,7 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
   ],
   "project-oversize-programs": [
     {
-      label: "RGN / Oversize",
+      label: "RGN (Oversize)",
       href: "/services/truckload#section-rgn-oversize",
       reason: "For heavy-haul execution when project loads exceed standard legal thresholds.",
     },
@@ -272,9 +277,9 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
 
 const CONVERSION_SIGNALS_BY_TYPE: Record<SubServiceSection["key"], string[]> = {
   "dry-van": [
-    "Dedicated capacity options on primary lanes",
-    "Appointment and POD workflow alignment",
-    "Response target within one business cycle",
+    "Equipment-fit and lane assumptions defined before tender",
+    "Appointment, POD, and exception workflows aligned at intake",
+    "Structured quote response within one business cycle",
   ],
   flatbed: [
     "Securement planning before dispatch release",
@@ -396,21 +401,21 @@ const SHIPPER_FAQS_BY_TYPE: Record<
     title: "Dry Van shipper FAQs",
     items: [
       {
-        q: "When is dry van the right mode?",
-        a: "Best for enclosed, non-temperature freight where dock scheduling, OTIF performance, and documentation quality drive outcomes.",
+        q: "What details do you need to return a precise quote?",
+        a: "Lane, pickup and delivery windows, pallet count, dimensions, total weight, and any dock constraints or appointment rules.",
       },
       {
-        q: "Can you support cross-border dry van?",
-        a: "Yes. We support Canada-USA cross-border moves with coordinated document handoff and exception visibility.",
+        q: "Can you support cross-border dry van execution?",
+        a: "Yes. We coordinate CA-US-MX dry van lanes with documentation-ready handoff and milestone visibility across border transitions.",
       },
       {
-        q: "What helps quoting move faster?",
-        a: "Provide lane, dimensions, pallet profile, delivery window, and facility constraints so we can return an execution-ready quote.",
+        q: "How are legal fit and payload confirmed?",
+        a: "Published specs are planning ranges. Final legal fit is confirmed at dispatch using route, axle configuration, and equipment details.",
       },
     ],
   },
   flatbed: {
-    title: "Flatbed shipper FAQs",
+    title: "Flatbed / Step Deck (Oversize) shipper FAQs",
     items: [
       {
         q: "When should flatbed be selected?",
@@ -427,7 +432,7 @@ const SHIPPER_FAQS_BY_TYPE: Record<
     ],
   },
   "rgn-oversize": {
-    title: "RGN / Oversize shipper FAQs",
+    title: "RGN (Oversize) shipper FAQs",
     items: [
       {
         q: "What shipments need RGN or oversize handling?",
@@ -444,7 +449,7 @@ const SHIPPER_FAQS_BY_TYPE: Record<
     ],
   },
   "roll-tite-conestoga": {
-    title: "Conestoga shipper FAQs",
+    title: "Roll-Tite / Conestoga shipper FAQs",
     items: [
       {
         q: "Why choose Conestoga over flatbed?",
@@ -531,41 +536,41 @@ const SHIPPER_FAQS_BY_TYPE: Record<
 const PILL_ACCENTS_BY_TYPE: Record<SubServiceSection["key"], string[]> = {
   "dry-van": [
     // Requested: grey outline pill near top-left around intro start.
-    "left-[9%] top-[2.4%] h-9 w-36 border border-slate-300/55 bg-transparent",
+    "left-[10%] top-[4.4%] h-9 w-36 border border-slate-300/55 bg-transparent",
     // Soft brand fills for luxury depth.
-    "right-[10%] top-[20%] h-8 w-32 border border-transparent bg-[rgba(220,38,38,0.10)]",
-    "left-[15%] top-[25%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
+    "right-[10%] top-[23.4%] h-8 w-32 border border-transparent bg-[rgba(220,38,38,0.10)]",
+    "left-[15%] top-[27%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
     // Neutral outline near lower right.
-    "right-[11%] bottom-[2.5%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
+    "right-[11%] bottom-[2.65%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
   ],
   flatbed: [
-    "left-[9%] top-[2.5%] h-9 w-34 border border-slate-300/50 bg-transparent",
-    "right-[10%] top-[20%] h-8 w-36 border border-transparent bg-[rgba(217,119,6,0.11)]",
-    "left-[18%] top-[23.5%] h-8 w-30 border border-transparent bg-[rgba(15,23,42,0.05)]",
-   "right-[11%] bottom-[2.5%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
+    "left-[10%] top-[3.9%] h-9 w-36 border border-slate-300/50 bg-transparent",
+    "right-[10%] top-[27.4%] h-8 w-32 border border-transparent bg-[rgba(217,119,6,0.11)]",
+    "left-[15%] top-[31%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
+    "right-[11%] bottom-[2.5%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
   ],
   "rgn-oversize": [
-    "left-[9%] top-[2.5%] h-9 w-34 border border-slate-300/50 bg-transparent",
-    "right-[11%] top-[20%] h-8 w-34 border border-transparent bg-[rgba(185,28,28,0.11)]",
-    "left-[15%] top-[25%] h-8 w-30 border border-transparent bg-[rgba(2,6,23,0.06)]",
+    "left-[10%] top-[3.9%] h-9 w-36 border border-slate-300/50 bg-transparent",
+    "right-[10%] top-[27.9%] h-8 w-32 border border-transparent bg-[rgba(185,28,28,0.11)]",
+    "left-[15%] top-[31%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
     "right-[11%] bottom-[2.5%] h-9 w-42 border border-slate-300/44 bg-transparent",
   ],
   "roll-tite-conestoga": [
-    "left-[9%] top-[2.5%] h-9 w-34 border border-slate-300/50 bg-transparent",
-    "right-[10%] top-[20%] h-8 w-35 border border-transparent bg-[rgba(37,99,235,0.10)]",
-   "left-[18%] top-[23.5%]  h-8 w-30 border border-transparent bg-[rgba(15,23,42,0.05)]",
+    "left-[10%] top-[3.9%] h-9 w-36 border border-slate-300/50 bg-transparent",
+    "right-[10%] top-[23%] h-8 w-32 border border-transparent bg-[rgba(37,99,235,0.10)]",
+    "left-[18%] top-[23.5%]  h-8 w-30 border border-transparent bg-[rgba(15,23,42,0.05)]",
     "right-[11%] bottom-[2.5%] h-9 w-40 border border-slate-300/42 bg-transparent",
   ],
   expedited: [
-    "left-[9%] top-[2.5%] h-9 w-36 border border-slate-300/50 bg-transparent",
-    "right-[10%] top-[20%] h-8 w-34 border border-transparent bg-[rgba(244,63,94,0.11)]",
-    "left-[17%] top-[24%] h-8 w-30 border border-transparent bg-[rgba(15,23,42,0.06)]",
-    "right-[11%] bottom-[2.5%] h-8 w-34 border border-slate-300/42 bg-transparent",
+    "left-[10%] top-[3.9%] h-9 w-36 border border-slate-300/50 bg-transparent",
+    "right-[10%] top-[22.8%] h-8 w-34 border border-transparent bg-[rgba(244,63,94,0.11)]",
+    "left-[15.5%] top-[31.5%]  h-8 w-30 border border-transparent bg-[rgba(15,23,42,0.06)]",
+    "right-[11%] bottom-[2.7%] h-8 w-34 border border-slate-300/42 bg-transparent",
   ],
   "specialized-vehicle-programs": [
-    "left-[9%] top-[2.5%] h-9 w-40 border border-slate-300/50 bg-transparent",
-    "right-[10%] top-[20%] h-8 w-38 border border-transparent bg-[rgba(124,58,237,0.11)]",
-    "left-[16%] top-[24%] h-8 w-31 border border-transparent bg-[rgba(15,23,42,0.06)]",
+    "left-[10%] top-[3.9%] h-9 w-36 border border-slate-300/50 bg-transparent",
+    "right-[10%] top-[25.35%] h-8 w-38 border border-transparent bg-[rgba(124,58,237,0.11)]",
+    "left-[15.3%] top-[31%] h-8 w-31 border border-transparent bg-[rgba(15,23,42,0.06)]",
     "right-[10.5%] bottom-[2.5%] h-8 w-36 border border-slate-300/42 bg-transparent",
   ],
   "canada-us": [
@@ -628,9 +633,9 @@ const SECTION_THEME: Record<
   "dry-van": {
     accent: "#dc2626",
     glow: "rgba(220,38,38,0.1)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(248,250,252,0.985),rgba(244,247,251,0.97))]",
-    sectionVeil: "bg-[radial-gradient(960px_460px_at_52%_-10%,rgba(220,38,38,0.04),transparent_66%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(248,250,252,0.985),rgba(244,247,251,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(960px_460px_at_52%_-10%,rgba(220,38,38,0.04),transparent_66%)]",
     auraA: "bg-[radial-gradient(920px_520px_at_14%_12%,rgba(220,38,38,0.082),transparent_60%)]",
     auraB: "bg-[radial-gradient(860px_560px_at_92%_86%,rgba(37,99,235,0.044),transparent_66%)]",
     gridStroke: "rgba(15,23,42,0.018)",
@@ -641,9 +646,9 @@ const SECTION_THEME: Record<
   flatbed: {
     accent: "#d97706",
     glow: "rgba(217,119,6,0.1)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(249,250,252,0.99),rgba(244,247,251,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_480px_at_42%_-12%,rgba(217,119,6,0.043),transparent_68%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(249,250,252,0.99),rgba(244,247,251,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_480px_at_42%_-12%,rgba(217,119,6,0.043),transparent_68%)]",
     auraA: "bg-[radial-gradient(940px_560px_at_18%_8%,rgba(217,119,6,0.082),transparent_62%)]",
     auraB: "bg-[radial-gradient(900px_520px_at_88%_86%,rgba(2,132,199,0.04),transparent_67%)]",
     gridStroke: "rgba(120,53,15,0.02)",
@@ -654,9 +659,9 @@ const SECTION_THEME: Record<
   "rgn-oversize": {
     accent: "#b91c1c",
     glow: "rgba(185,28,28,0.11)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(249,250,252,0.99),rgba(244,247,251,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_55%_-14%,rgba(185,28,28,0.047),transparent_68%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(249,250,252,0.99),rgba(244,247,251,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_55%_-14%,rgba(185,28,28,0.047),transparent_68%)]",
     auraA: "bg-[radial-gradient(940px_560px_at_18%_8%,rgba(185,28,28,0.086),transparent_62%)]",
     auraB: "bg-[radial-gradient(860px_560px_at_90%_84%,rgba(15,23,42,0.06),transparent_68%)]",
     gridStroke: "rgba(127,29,29,0.02)",
@@ -667,9 +672,9 @@ const SECTION_THEME: Record<
   "roll-tite-conestoga": {
     accent: "#2563eb",
     glow: "rgba(37,99,235,0.1)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(249,250,252,0.99),rgba(244,247,251,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_48%_-10%,rgba(37,99,235,0.043),transparent_68%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(249,250,252,0.99),rgba(244,247,251,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_48%_-10%,rgba(37,99,235,0.043),transparent_68%)]",
     auraA: "bg-[radial-gradient(920px_520px_at_15%_10%,rgba(37,99,235,0.08),transparent_62%)]",
     auraB: "bg-[radial-gradient(860px_560px_at_88%_86%,rgba(220,38,38,0.038),transparent_68%)]",
     gridStroke: "rgba(30,64,175,0.019)",
@@ -680,9 +685,9 @@ const SECTION_THEME: Record<
   expedited: {
     accent: "#e11d48",
     glow: "rgba(225,29,72,0.1)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(252,248,251,0.99),rgba(250,244,248,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_48%_-11%,rgba(225,29,72,0.047),transparent_67%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(252,248,251,0.99),rgba(250,244,248,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_48%_-11%,rgba(225,29,72,0.047),transparent_67%)]",
     auraA: "bg-[radial-gradient(920px_520px_at_15%_10%,rgba(225,29,72,0.082),transparent_62%)]",
     auraB: "bg-[radial-gradient(860px_560px_at_89%_86%,rgba(99,102,241,0.036),transparent_68%)]",
     gridStroke: "rgba(159,18,57,0.02)",
@@ -693,9 +698,9 @@ const SECTION_THEME: Record<
   "specialized-vehicle-programs": {
     accent: "#7c3aed",
     glow: "rgba(124,58,237,0.1)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(249,248,255,0.99),rgba(245,244,252,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(124,58,237,0.046),transparent_67%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(249,248,255,0.99),rgba(245,244,252,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(124,58,237,0.046),transparent_67%)]",
     auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(124,58,237,0.08),transparent_62%)]",
     auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(2,132,199,0.033),transparent_68%)]",
     gridStroke: "rgba(91,33,182,0.02)",
@@ -706,9 +711,9 @@ const SECTION_THEME: Record<
   "canada-us": {
     accent: "#2563eb",
     glow: "rgba(37,99,235,0.1)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(248,251,255,0.99),rgba(243,248,255,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_48%_-12%,rgba(37,99,235,0.048),transparent_67%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(248,251,255,0.99),rgba(243,248,255,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_48%_-12%,rgba(37,99,235,0.048),transparent_67%)]",
     auraA: "bg-[radial-gradient(920px_520px_at_14%_9%,rgba(37,99,235,0.082),transparent_62%)]",
     auraB: "bg-[radial-gradient(900px_560px_at_89%_86%,rgba(14,116,144,0.04),transparent_68%)]",
     gridStroke: "rgba(30,64,175,0.019)",
@@ -719,9 +724,9 @@ const SECTION_THEME: Record<
   "mexico-cross-border": {
     accent: "#dc2626",
     glow: "rgba(220,38,38,0.1)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(255,250,250,0.99),rgba(252,246,246,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_50%_-12%,rgba(220,38,38,0.045),transparent_67%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(255,250,250,0.99),rgba(252,246,246,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_50%_-12%,rgba(220,38,38,0.045),transparent_67%)]",
     auraA: "bg-[radial-gradient(940px_520px_at_18%_10%,rgba(220,38,38,0.08),transparent_62%)]",
     auraB: "bg-[radial-gradient(860px_560px_at_88%_86%,rgba(30,64,175,0.038),transparent_68%)]",
     gridStroke: "rgba(127,29,29,0.02)",
@@ -732,9 +737,9 @@ const SECTION_THEME: Record<
   "ocean-freight": {
     accent: "#0e7490",
     glow: "rgba(14,116,144,0.11)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(248,251,252,0.99),rgba(242,248,250,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_48%_-12%,rgba(14,116,144,0.048),transparent_67%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(248,251,252,0.99),rgba(242,248,250,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_48%_-12%,rgba(14,116,144,0.048),transparent_67%)]",
     auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(14,116,144,0.082),transparent_62%)]",
     auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(37,99,235,0.038),transparent_68%)]",
     gridStroke: "rgba(15,118,110,0.02)",
@@ -745,9 +750,9 @@ const SECTION_THEME: Record<
   "air-freight": {
     accent: "#0284c7",
     glow: "rgba(2,132,199,0.11)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(248,252,255,0.99),rgba(244,249,253,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_48%_-10%,rgba(2,132,199,0.045),transparent_67%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(248,252,255,0.99),rgba(244,249,253,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_48%_-10%,rgba(2,132,199,0.045),transparent_67%)]",
     auraA: "bg-[radial-gradient(920px_520px_at_14%_9%,rgba(2,132,199,0.08),transparent_62%)]",
     auraB: "bg-[radial-gradient(860px_560px_at_89%_86%,rgba(220,38,38,0.035),transparent_68%)]",
     gridStroke: "rgba(3,105,161,0.019)",
@@ -758,9 +763,9 @@ const SECTION_THEME: Record<
   "warehousing-distribution": {
     accent: "#059669",
     glow: "rgba(5,150,105,0.1)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(248,252,250,0.99),rgba(242,250,247,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(5,150,105,0.045),transparent_67%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(248,252,250,0.99),rgba(242,250,247,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(5,150,105,0.045),transparent_67%)]",
     auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(16,185,129,0.08),transparent_62%)]",
     auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(2,132,199,0.035),transparent_68%)]",
     gridStroke: "rgba(5,150,105,0.02)",
@@ -771,9 +776,9 @@ const SECTION_THEME: Record<
   "managed-capacity": {
     accent: "#2563eb",
     glow: "rgba(37,99,235,0.1)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(248,251,255,0.99),rgba(242,248,255,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(37,99,235,0.045),transparent_67%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(248,251,255,0.99),rgba(242,248,255,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(37,99,235,0.045),transparent_67%)]",
     auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(59,130,246,0.08),transparent_62%)]",
     auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(16,185,129,0.033),transparent_68%)]",
     gridStroke: "rgba(30,64,175,0.019)",
@@ -784,9 +789,9 @@ const SECTION_THEME: Record<
   "dedicated-contract": {
     accent: "#4f46e5",
     glow: "rgba(79,70,229,0.1)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(249,250,255,0.99),rgba(244,246,255,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(79,70,229,0.045),transparent_67%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(249,250,255,0.99),rgba(244,246,255,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(79,70,229,0.045),transparent_67%)]",
     auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(99,102,241,0.08),transparent_62%)]",
     auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(30,64,175,0.033),transparent_68%)]",
     gridStroke: "rgba(79,70,229,0.02)",
@@ -797,9 +802,9 @@ const SECTION_THEME: Record<
   "project-oversize-programs": {
     accent: "#d97706",
     glow: "rgba(217,119,6,0.1)",
-    sectionBase:
-      "bg-[linear-gradient(180deg,rgba(253,251,247,0.99),rgba(250,246,239,0.97))]",
-    sectionVeil: "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(217,119,6,0.045),transparent_67%)]",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(253,251,247,0.99),rgba(250,246,239,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_500px_at_49%_-12%,rgba(217,119,6,0.045),transparent_67%)]",
     auraA: "bg-[radial-gradient(920px_520px_at_15%_9%,rgba(245,158,11,0.08),transparent_62%)]",
     auraB: "bg-[radial-gradient(900px_560px_at_88%_85%,rgba(185,28,28,0.03),transparent_68%)]",
     gridStroke: "rgba(180,83,9,0.02)",
@@ -878,14 +883,13 @@ export function ServiceSection({
   const flowSteps = CROSS_BORDER_FLOW_STEPS[section.key] ?? [];
   const valueAddedOutcomes = VALUE_ADDED_OUTCOMES[section.key] ?? [];
   const esPriorityTags = ES_PRIORITY_TAGS[section.key] ?? [];
+  const freightFit = section.freightFit;
+  const showRelated = section.showRelated !== false;
 
   return (
     <section
       id={sectionId}
-      className={cn(
-        "relative overflow-hidden transition-colors duration-500",
-        theme.sectionBase,
-      )}
+      className={cn("relative overflow-hidden transition-colors duration-500", theme.sectionBase)}
       style={scrollMarginTopStyle}
     >
       {/* Premium background with section-specific light language */}
@@ -897,7 +901,10 @@ export function ServiceSection({
         {/* Decorative pill accents: balanced filled + outline */}
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
           {pillAccents.map((pillClass, idx) => (
-            <div key={`${section.key}-pill-${idx}`} className={cn("absolute rounded-full", pillClass)} />
+            <div
+              key={`${section.key}-pill-${idx}`}
+              className={cn("absolute rounded-full", pillClass)}
+            />
           ))}
         </div>
 
@@ -917,15 +924,15 @@ export function ServiceSection({
               height="96"
               patternUnits="userSpaceOnUse"
             >
-              <path
-                d="M 96 0 L 0 0 0 96"
-                fill="none"
-                stroke={theme.gridStroke}
-                strokeWidth="1"
-              />
+              <path d="M 96 0 L 0 0 0 96" fill="none" stroke={theme.gridStroke} strokeWidth="1" />
             </pattern>
           </defs>
-          <rect width="100%" height="100%" fill={`url(#grid-pattern-${section.key})`} opacity={theme.gridOpacity} />
+          <rect
+            width="100%"
+            height="100%"
+            fill={`url(#grid-pattern-${section.key})`}
+            opacity={theme.gridOpacity}
+          />
         </svg>
       </div>
 
@@ -960,6 +967,11 @@ export function ServiceSection({
               <p className="mt-4 text-[15px] leading-[1.72] text-[color:var(--color-muted-light)] sm:text-[15.5px]">
                 {section.description}
               </p>
+              {section.detailParagraph ? (
+                <p className="mt-4 text-[15px] leading-[1.72] text-[color:var(--color-muted-light)] sm:text-[15.5px]">
+                  {section.detailParagraph}
+                </p>
+              ) : null}
 
               {isCrossBorderMode ? (
                 <div className="mt-4 flex items-center gap-2.5">
@@ -972,7 +984,10 @@ export function ServiceSection({
                         {step}
                       </span>
                       {idx < flowSteps.length - 1 ? (
-                        <span className="h-px w-5 bg-[color:var(--color-border-light)]" aria-hidden="true" />
+                        <span
+                          className="h-px w-5 bg-[color:var(--color-border-light)]"
+                          aria-hidden="true"
+                        />
                       ) : null}
                     </div>
                   ))}
@@ -1009,29 +1024,44 @@ export function ServiceSection({
             <div
               className={cn(
                 "relative border-t border-[color:var(--color-border-light)]/65 bg-white/60 lg:border-t-0",
-                isCrossBorderMode ? "lg:order-2 lg:col-span-6 lg:border-l" : "lg:col-span-6 lg:border-l",
+                isCrossBorderMode
+                  ? "lg:order-2 lg:col-span-6 lg:border-l"
+                  : "lg:col-span-6 lg:border-l",
               )}
             >
-              <div
-                className={cn(
-                  "relative h-[260px] w-full sm:h-[300px]",
-                  isCrossBorderMode ? "lg:h-[380px]" : "lg:h-full",
-                )}
-              >
-                <SectionImage
-                  src={section.image}
-                  alt={section.imageAlt}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-                <div className={cn("absolute inset-0", overlayClass(section.overlay))} />
-                <div className={cn("absolute inset-0", theme.imageWash)} />
+              {freightFit ? (
+                <div className="px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6">
+                  <FreightFitGuideMedia
+                    diagram={freightFit.diagram}
+                    diagramAlt={freightFit.diagramAlt}
+                    specs={freightFit.specs}
+                    disclaimer={freightFit.disclaimer}
+                  />
+                </div>
+              ) : (
                 <div
-                  className="absolute inset-0"
-                  style={{ background: `radial-gradient(560px 320px at 50% 50%, ${theme.glow}, transparent 72%)` }}
-                />
-              </div>
+                  className={cn(
+                    "relative h-[260px] w-full sm:h-[300px]",
+                    isCrossBorderMode ? "lg:h-[380px]" : "lg:h-full",
+                  )}
+                >
+                  <SectionImage
+                    src={section.image}
+                    alt={section.imageAlt}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                  <div className={cn("absolute inset-0", overlayClass(section.overlay))} />
+                  <div className={cn("absolute inset-0", theme.imageWash)} />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: `radial-gradient(560px 320px at 50% 50%, ${theme.glow}, transparent 72%)`,
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -1046,14 +1076,28 @@ export function ServiceSection({
             )}
           >
             <div className="order-1 bg-white/64 px-5 py-6 sm:px-8 sm:py-8 md:px-9 md:py-9 lg:order-1 lg:col-span-7 lg:px-9 lg:py-10">
-              {section.whenToUse && (
+              {freightFit ? (
+                <FreightFitGuideRecommendations
+                  title={freightFit.title}
+                  intro={freightFit.intro}
+                  rules={freightFit.rules}
+                  onRecommendationClick={(rule, href) =>
+                    trackCtaClick({
+                      ctaId: `service_section_fit_${serviceKey}_${section.key}_${toCtaSlug(rule.recommendation)}`,
+                      location: `service_section_fit:${serviceKey}:${section.key}`,
+                      destination: href,
+                      label: rule.recommendation,
+                    })
+                  }
+                />
+              ) : section.whenToUse ? (
                 <ContentSection
                   title="When to use this Service"
                   intro={section.whenToUse.intro}
                   items={section.whenToUse.items}
                   accent={theme.accent}
                 />
-              )}
+              ) : null}
 
               {section.howToUse && (
                 <ContentSection
@@ -1066,7 +1110,11 @@ export function ServiceSection({
 
               {section.capabilities && (
                 <ContentSection
-                  title="Capabilities and Options"
+                  title={
+                    freightFit
+                      ? "Operational Coverage & Service Standards"
+                      : "Capabilities and Options"
+                  }
                   intro={section.capabilities.intro}
                   items={section.capabilities.items}
                   accent={theme.accent}
@@ -1083,7 +1131,7 @@ export function ServiceSection({
                     ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,250,252,0.72))]"
                     : isSpecializedMode
                       ? "bg-[linear-gradient(180deg,rgba(252,248,251,0.8),rgba(247,243,255,0.68))]"
-                    : "bg-white/60",
+                      : "bg-white/60",
               )}
             >
               <div className="flex h-full flex-col gap-4">
@@ -1096,9 +1144,9 @@ export function ServiceSection({
                       ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.93),rgba(239,246,255,0.74))]"
                       : isValueAddedMode
                         ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,250,252,0.74))]"
-                      : isSpecializedMode
-                        ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.93),rgba(250,245,255,0.74))]"
-                        : "bg-white/82",
+                        : isSpecializedMode
+                          ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.93),rgba(250,245,255,0.74))]"
+                          : "bg-white/82",
                     "p-4 sm:p-5 md:p-6",
                   )}
                 >
@@ -1107,7 +1155,8 @@ export function ServiceSection({
                       Get pricing and capacity for this mode
                     </h3>
                     <p className="mt-3 text-[14px] leading-[1.65] text-[color:var(--color-muted-light)]">
-                      Share your lane requirements and we will return a structured quote with equipment fit, timing expectations, and operating assumptions.
+                      Share your lane requirements and we will return a structured quote with
+                      equipment fit, timing expectations, and operating assumptions.
                     </p>
                     <ul className="mt-4 space-y-1.5">
                       {conversionSignals.map((signal) => (
@@ -1115,7 +1164,10 @@ export function ServiceSection({
                           key={signal}
                           className="flex items-center gap-2 text-xs text-[color:var(--color-muted-light)]"
                         >
-                          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: theme.accent }} />
+                          <span
+                            className="h-1.5 w-1.5 rounded-full"
+                            style={{ backgroundColor: theme.accent }}
+                          />
                           {signal}
                         </li>
                       ))}
@@ -1165,44 +1217,46 @@ export function ServiceSection({
                   </div>
                 </div>
 
-                {/* Why shippers trust this mode */}
-                <div
-                  className={cn(
-                    "relative overflow-hidden rounded-lg",
-                    "border border-[color:var(--color-border-light)]",
-                    isCrossBorderMode
-                      ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(241,245,249,0.72))]"
-                      : isValueAddedMode
-                        ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(243,244,246,0.72))]"
-                      : isSpecializedMode
-                        ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(248,244,255,0.72))]"
-                        : "bg-white/78",
-                    "p-4 sm:p-5 md:p-6",
-                  )}
-                >
-                  <div className="relative">
-                    <h3 className="text-[1.14rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
-                      {section.trustSnippet.title}
-                    </h3>
-                    <p className="mt-3 text-[14px] leading-[1.65] text-[color:var(--color-muted-light)]">
-                      {section.trustSnippet.body}
-                    </p>
+                {/* Why shippers trust this mode (hidden when trust is merged into execution block below, e.g. Dry Van) */}
+                {!freightFit ? (
+                  <div
+                    className={cn(
+                      "relative overflow-hidden rounded-lg",
+                      "border border-[color:var(--color-border-light)]",
+                      isCrossBorderMode
+                        ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(241,245,249,0.72))]"
+                        : isValueAddedMode
+                          ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(243,244,246,0.72))]"
+                          : isSpecializedMode
+                            ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(248,244,255,0.72))]"
+                            : "bg-white/78",
+                      "p-4 sm:p-5 md:p-6",
+                    )}
+                  >
+                    <div className="relative">
+                      <h3 className="text-[1.14rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
+                        {section.trustSnippet.title}
+                      </h3>
+                      <p className="mt-3 text-[14px] leading-[1.65] text-[color:var(--color-muted-light)]">
+                        {section.trustSnippet.body}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                ) : null}
 
                 {/* Practical Q&A card (non-redundant decision support) */}
                 {shipperFaqs.items.length > 0 ? (
                   <div
                     className={cn(
-                      "relative overflow-hidden rounded-lg flex-1",
+                      "relative flex-1 overflow-hidden rounded-lg",
                       "border border-[color:var(--color-border-light)]",
                       isCrossBorderMode
                         ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(239,246,255,0.72))]"
                         : isValueAddedMode
                           ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(243,244,246,0.72))]"
-                        : isSpecializedMode
-                          ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(248,244,255,0.72))]"
-                          : "bg-white/78",
+                          : isSpecializedMode
+                            ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(248,244,255,0.72))]"
+                            : "bg-white/78",
                       "p-4 sm:p-5 md:p-6",
                     )}
                   >
@@ -1227,10 +1281,12 @@ export function ServiceSection({
                   </div>
                 ) : null}
 
-                {isCrossBorderService && shipperFaqs.items.length === 0 && borderPriorities.length > 0 ? (
+                {isCrossBorderService &&
+                shipperFaqs.items.length === 0 &&
+                borderPriorities.length > 0 ? (
                   <div
                     className={cn(
-                      "relative overflow-hidden rounded-lg flex-1",
+                      "relative flex-1 overflow-hidden rounded-lg",
                       "border border-[color:var(--color-border-light)]",
                       "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(239,246,255,0.72))]",
                       "p-4 sm:p-5 md:p-6",
@@ -1264,21 +1320,33 @@ export function ServiceSection({
 
           {/* Utility row (balanced lower closure) */}
           <div className="grid gap-0 border-b border-[color:var(--color-border-light)]/70 lg:grid-cols-12 lg:items-stretch">
-            <div className="bg-white/62 px-6 py-7 sm:px-8 sm:py-8 lg:col-span-6 lg:px-9 lg:py-9">
+            <div
+              className={cn(
+                "bg-white/62 px-6 py-7 sm:px-8 sm:py-8 lg:px-9 lg:py-9",
+                showRelated ? "lg:col-span-6" : "lg:col-span-12",
+              )}
+            >
               <div
                 className={cn(
                   "h-full rounded-lg border border-[color:var(--color-border-light)] bg-white/82 p-5 sm:p-6",
                 )}
               >
                 <div className="text-xs font-semibold tracking-wide text-[color:var(--color-muted-light)]">
-                  {isCrossBorderMode
-                    ? "Cross-border execution standards"
-                    : isValueAddedMode
-                      ? "Program standards included"
-                      : isSpecializedMode
-                        ? "Priority and control standards"
-                      : "Execution standards included"}
+                  {freightFit
+                    ? "Execution and compliance"
+                    : isCrossBorderMode
+                      ? "Cross-border execution standards"
+                      : isValueAddedMode
+                        ? "Program standards included"
+                        : isSpecializedMode
+                          ? "Priority and control standards"
+                          : "Execution standards included"}
                 </div>
+                {freightFit && section.trustSnippet?.body ? (
+                  <p className="mt-3 text-[14px] leading-[1.65] text-[color:var(--color-muted-light)]">
+                    {section.trustSnippet.body}
+                  </p>
+                ) : null}
                 <ul className="mt-4 space-y-3">
                   {section.highlights.map((h) => (
                     <li
@@ -1297,104 +1365,106 @@ export function ServiceSection({
               </div>
             </div>
 
-            <div className="border-t border-[color:var(--color-border-light)]/65 bg-white/60 px-6 py-7 sm:px-8 sm:py-8 lg:col-span-6 lg:border-t-0 lg:border-l lg:px-9 lg:py-9">
-              <div
-                className={cn(
-                  "h-full rounded-lg border border-[color:var(--color-border-light)] bg-white/80 p-5 sm:p-6",
-                )}
-              >
-                <h3 className="text-[1.14rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
-                  {isCrossBorderMode
-                    ? `Connected mode pairings for ${section.label}`
-                    : isValueAddedMode
-                      ? `Program adjacencies for ${section.label}`
-                      : isSpecializedMode
-                        ? `Critical-support services for ${section.label}`
-                      : `Related for ${section.label}`}
-                </h3>
-                <p className="mt-1 text-xs text-[color:var(--color-muted-light)]">
-                  {isCrossBorderMode
-                    ? "Mode combinations frequently used to balance urgency, landed cost, and border reliability."
-                    : isValueAddedMode
-                      ? "Adjacent services that improve end-to-end program performance and governance."
-                    : isSpecializedMode
-                      ? "Service pairings commonly used to protect urgent timelines and high-constraint shipments."
-                    : "Suggestions based on equipment fit, risk profile, and shipment constraints."}
-                </p>
-                <div className="mt-4 grid gap-2.5">
-                  {contextualRelated.map((service, idx) => {
-                    const colors = isCrossBorderMode
-                      ? [
-                          "bg-blue-500/10 text-blue-700",
-                          "bg-cyan-500/10 text-cyan-700",
-                          "bg-slate-500/12 text-slate-700",
-                          "bg-indigo-500/10 text-indigo-700",
-                        ]
+            {showRelated ? (
+              <div className="border-t border-[color:var(--color-border-light)]/65 bg-white/60 px-6 py-7 sm:px-8 sm:py-8 lg:col-span-6 lg:border-t-0 lg:border-l lg:px-9 lg:py-9">
+                <div
+                  className={cn(
+                    "h-full rounded-lg border border-[color:var(--color-border-light)] bg-white/80 p-5 sm:p-6",
+                  )}
+                >
+                  <h3 className="text-[1.14rem] font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-[1.2rem]">
+                    {isCrossBorderMode
+                      ? `Connected mode pairings for ${section.label}`
                       : isValueAddedMode
-                        ? [
-                            "bg-emerald-500/10 text-emerald-700",
-                            "bg-indigo-500/10 text-indigo-700",
-                            "bg-amber-500/10 text-amber-700",
-                            "bg-slate-500/12 text-slate-700",
-                          ]
+                        ? `Program adjacencies for ${section.label}`
                         : isSpecializedMode
+                          ? `Critical-support services for ${section.label}`
+                          : `Related for ${section.label}`}
+                  </h3>
+                  <p className="mt-1 text-xs text-[color:var(--color-muted-light)]">
+                    {isCrossBorderMode
+                      ? "Mode combinations frequently used to balance urgency, landed cost, and border reliability."
+                      : isValueAddedMode
+                        ? "Adjacent services that improve end-to-end program performance and governance."
+                        : isSpecializedMode
+                          ? "Service pairings commonly used to protect urgent timelines and high-constraint shipments."
+                          : "Suggestions based on equipment fit, risk profile, and shipment constraints."}
+                  </p>
+                  <div className="mt-4 grid gap-2.5">
+                    {contextualRelated.map((service, idx) => {
+                      const colors = isCrossBorderMode
+                        ? [
+                            "bg-blue-500/10 text-blue-700",
+                            "bg-cyan-500/10 text-cyan-700",
+                            "bg-slate-500/12 text-slate-700",
+                            "bg-indigo-500/10 text-indigo-700",
+                          ]
+                        : isValueAddedMode
                           ? [
-                              "bg-rose-500/10 text-rose-700",
-                              "bg-violet-500/10 text-violet-700",
-                              "bg-fuchsia-500/10 text-fuchsia-700",
+                              "bg-emerald-500/10 text-emerald-700",
+                              "bg-indigo-500/10 text-indigo-700",
+                              "bg-amber-500/10 text-amber-700",
                               "bg-slate-500/12 text-slate-700",
                             ]
-                        : [
-                          "bg-pink-500/10 text-pink-600",
-                          "bg-red-500/10 text-red-600",
-                          "bg-blue-500/10 text-blue-600",
-                          "bg-green-500/10 text-green-600",
-                        ];
-                    const colorClass = colors[idx % colors.length];
+                          : isSpecializedMode
+                            ? [
+                                "bg-rose-500/10 text-rose-700",
+                                "bg-violet-500/10 text-violet-700",
+                                "bg-fuchsia-500/10 text-fuchsia-700",
+                                "bg-slate-500/12 text-slate-700",
+                              ]
+                            : [
+                                "bg-pink-500/10 text-pink-600",
+                                "bg-red-500/10 text-red-600",
+                                "bg-blue-500/10 text-blue-600",
+                                "bg-green-500/10 text-green-600",
+                              ];
+                      const colorClass = colors[idx % colors.length];
 
-                    return (
-                      <Link
-                        key={service.href}
-                        href={service.href}
-                        onClick={() =>
-                          trackCtaClick({
-                            ctaId: `service_section_related_${serviceKey}_${section.key}_${toCtaSlug(service.label)}`,
-                            location: `service_section_related:${serviceKey}:${section.key}`,
-                            destination: service.href,
-                            label: service.label,
-                          })
-                        }
-                        className={cn(
-                          "group flex items-center gap-3 rounded-xl border border-[color:var(--color-border-light)]",
-                          "bg-white px-4 py-3 transition-all",
-                          "hover:border-[color:var(--color-brand-500)]/40 hover:bg-[color:var(--color-surface-0-light)]",
-                          "hover:shadow-[0_4px_12px_rgba(2,6,23,0.06)]",
-                          "focus-ring-light",
-                        )}
-                      >
-                        <div
+                      return (
+                        <Link
+                          key={service.href}
+                          href={service.href}
+                          onClick={() =>
+                            trackCtaClick({
+                              ctaId: `service_section_related_${serviceKey}_${section.key}_${toCtaSlug(service.label)}`,
+                              location: `service_section_related:${serviceKey}:${section.key}`,
+                              destination: service.href,
+                              label: service.label,
+                            })
+                          }
                           className={cn(
-                            "h-8 w-8 shrink-0 rounded-lg",
-                            colorClass,
-                            "flex items-center justify-center font-semibold",
+                            "group flex items-center gap-3 rounded-xl border border-[color:var(--color-border-light)]",
+                            "bg-white px-4 py-3 transition-all",
+                            "hover:border-[color:var(--color-brand-500)]/40 hover:bg-[color:var(--color-surface-0-light)]",
+                            "hover:shadow-[0_4px_12px_rgba(2,6,23,0.06)]",
+                            "focus-ring-light",
                           )}
                         >
-                          <span className="text-xs">●</span>
-                        </div>
-                        <div>
-                          <div className="text-[14px] font-semibold text-[color:var(--color-text-light)] group-hover:text-[color:var(--color-brand-600)]">
-                            {service.label}
+                          <div
+                            className={cn(
+                              "h-8 w-8 shrink-0 rounded-lg",
+                              colorClass,
+                              "flex items-center justify-center font-semibold",
+                            )}
+                          >
+                            <span className="text-xs">●</span>
                           </div>
-                          <div className="mt-0.5 text-[11.5px] leading-relaxed text-[color:var(--color-muted-light)]">
-                            {service.reason}
+                          <div>
+                            <div className="text-[14px] font-semibold text-[color:var(--color-text-light)] group-hover:text-[color:var(--color-brand-600)]">
+                              {service.label}
+                            </div>
+                            <div className="mt-0.5 text-[11.5px] leading-relaxed text-[color:var(--color-muted-light)]">
+                              {service.reason}
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : null}
           </div>
         </div>
       </Container>
