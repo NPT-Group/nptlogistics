@@ -37,6 +37,7 @@ import { SubmitSection } from "./sections/SubmitSection";
 import { Divider } from "./components/Divider";
 import { NotesAttachmentsSection } from "./sections/NotesAttachmentsSection";
 import { cn } from "@/lib/cn";
+import { TurnstileWidgetHandle } from "@/components/TurnstileWidget";
 
 function ServiceResetEffects({
   control,
@@ -150,7 +151,7 @@ export default function LogisticsQuoteForm() {
     defaultValues: LOGISTICS_QUOTE_SUBMIT_DEFAULTS,
     shouldUnregister: false,
     shouldFocusError: false,
-    mode: "onSubmit",
+    mode: "onTouched",
     reValidateMode: "onChange",
   });
 
@@ -160,6 +161,7 @@ export default function LogisticsQuoteForm() {
 
   const cardRef = React.useRef<HTMLDivElement | null>(null);
   const feedbackRef = React.useRef<HTMLDivElement | null>(null);
+  const turnstileRef = React.useRef<TurnstileWidgetHandle | null>(null);
 
   const scrollToTopArea = React.useCallback(() => {
     const target = feedbackRef.current ?? cardRef.current;
@@ -211,6 +213,7 @@ export default function LogisticsQuoteForm() {
       }
 
       reset(LOGISTICS_QUOTE_SUBMIT_DEFAULTS);
+      turnstileRef.current?.reset();
 
       setSubmitFeedback({
         type: "success",
@@ -264,22 +267,14 @@ export default function LogisticsQuoteForm() {
           <FeedbackBanner feedback={submitFeedback} innerRef={feedbackRef} />
 
           <ServiceSelectionSection />
-
           <ServiceConfigurationSection />
-
           <Divider />
-
           <IdentificationSection />
-
           <Divider />
-
           <ContactSection />
-
           <Divider />
-
           <NotesAttachmentsSection />
-
-          <SubmitSection />
+          <SubmitSection turnstileRef={turnstileRef} />
         </form>
       </div>
     </FormProvider>
