@@ -19,21 +19,14 @@ export type RadioGroupFieldProps<
 > = {
   control: Control<TFieldValues>;
   name: Path<TFieldValues>;
-
   legend?: React.ReactNode;
   hint?: React.ReactNode;
   required?: boolean;
-
   ui: FieldUi;
-
-  /** For enterprise scroll-to-error targeting. Defaults to `name`. */
   fieldPathAttr?: string;
-
   options: ReadonlyArray<RadioOption<TValue>>;
-
-  /** Optional: render radios in columns */
   columnsClassName?: string;
-
+  invalidClassName?: string;
   radioProps?: Omit<
     React.InputHTMLAttributes<HTMLInputElement>,
     "type" | "checked" | "onChange" | "name" | "value"
@@ -50,14 +43,18 @@ export function RadioGroupField<TFieldValues extends FieldValues, TValue extends
   fieldPathAttr,
   options,
   columnsClassName = "space-y-2",
+  invalidClassName = "border-red-500 focus-within:border-red-500 focus-within:ring-red-500/15",
   radioProps,
 }: RadioGroupFieldProps<TFieldValues, TValue>) {
   const { field, fieldState } = useController({ control, name });
   const error = fieldState.error?.message;
+  const invalid = Boolean(error);
   const current = (field.value ?? "") as string;
+  const path = fieldPathAttr ?? String(name);
+  const describedBy = `${path}-hint ${path}-error`;
 
   return (
-    <fieldset className={ui.container} data-field-path={fieldPathAttr ?? String(name)}>
+    <fieldset className={ui.container} data-field-path={path} aria-describedby={describedBy}>
       {legend ? (
         <legend className={ui.label}>
           {legend}
@@ -72,7 +69,12 @@ export function RadioGroupField<TFieldValues extends FieldValues, TValue extends
           return (
             <label
               key={opt.value}
-              className={cn(ui.controlRow, "flex items-start gap-3", opt.disabled && "opacity-60")}
+              className={cn(
+                ui.controlRow,
+                "flex items-start gap-3",
+                opt.disabled && "opacity-60",
+                invalid && invalidClassName,
+              )}
             >
               <input
                 {...radioProps}
@@ -83,6 +85,8 @@ export function RadioGroupField<TFieldValues extends FieldValues, TValue extends
                 disabled={opt.disabled}
                 onBlur={field.onBlur}
                 onChange={() => field.onChange(opt.value)}
+                aria-invalid={invalid}
+                aria-describedby={describedBy}
                 className={cn(ui.controlBox)}
                 ref={idx === 0 ? field.ref : undefined}
               />
@@ -96,11 +100,13 @@ export function RadioGroupField<TFieldValues extends FieldValues, TValue extends
       </div>
 
       {error ? (
-        <p role="alert" className={ui.error}>
+        <p id={`${path}-error`} role="alert" className={ui.error}>
           {error}
         </p>
       ) : hint ? (
-        <p className={ui.hint}>{hint}</p>
+        <p id={`${path}-hint`} className={ui.hint}>
+          {hint}
+        </p>
       ) : null}
     </fieldset>
   );

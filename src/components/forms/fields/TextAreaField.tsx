@@ -9,18 +9,13 @@ import type { FieldUi } from "../ui/types";
 export type TextAreaFieldProps<TFieldValues extends FieldValues> = {
   control: Control<TFieldValues>;
   name: Path<TFieldValues>;
-
   label?: React.ReactNode;
   hint?: React.ReactNode;
+  footer?: React.ReactNode;
   required?: boolean;
-
   ui: FieldUi;
-
-  /** For enterprise scroll-to-error targeting. Defaults to `name`. */
   fieldPathAttr?: string;
-
   textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>;
-
   invalidClassName?: string;
 };
 
@@ -29,6 +24,7 @@ export function TextAreaField<TFieldValues extends FieldValues>({
   name,
   label,
   hint,
+  footer,
   required,
   ui,
   fieldPathAttr,
@@ -39,31 +35,43 @@ export function TextAreaField<TFieldValues extends FieldValues>({
 
   const error = fieldState.error?.message;
   const invalid = !!error;
+  const path = fieldPathAttr ?? String(name);
+  const inputId = `${path}-input`;
+
+  const describedBy = [error ? `${path}-error` : null, !error && hint ? `${path}-hint` : null]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div className={ui.container} data-field-path={fieldPathAttr ?? String(name)}>
+    <div className={ui.container} data-field-path={path}>
       {label ? (
-        <label className={ui.label}>
+        <label htmlFor={inputId} className={ui.label}>
           {label}
           {required ? <span className="ml-1">*</span> : null}
         </label>
       ) : null}
 
       <textarea
+        id={inputId}
         {...textareaProps}
         {...field}
         value={field.value ?? ""}
         aria-invalid={invalid}
+        aria-describedby={describedBy || undefined}
         className={cn(ui.control, invalid && invalidClassName)}
       />
 
       {error ? (
-        <p role="alert" className={ui.error}>
+        <p id={`${path}-error`} role="alert" className={ui.error}>
           {error}
         </p>
       ) : hint ? (
-        <p className={ui.hint}>{hint}</p>
+        <p id={`${path}-hint`} className={ui.hint}>
+          {hint}
+        </p>
       ) : null}
+
+      {!error && footer ? <div className="mt-2">{footer}</div> : null}
     </div>
   );
 }

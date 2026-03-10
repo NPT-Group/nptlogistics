@@ -11,24 +11,15 @@ type NumberLike = number | undefined | null;
 export type NumberFieldProps<TFieldValues extends FieldValues> = {
   control: Control<TFieldValues>;
   name: Path<TFieldValues>;
-
   label?: React.ReactNode;
   hint?: React.ReactNode;
   required?: boolean;
-
   ui: FieldUi;
-
-  /** For enterprise scroll-to-error targeting. Defaults to `name`. */
   fieldPathAttr?: string;
-
-  /**
-   * By default, stores a number in RHF.
-   * If false, stores raw string (rare).
-   */
   parseAsNumber?: boolean;
-
+  disallowNegative?: boolean;
+  disallowExponent?: boolean;
   inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "onChange">;
-
   invalidClassName?: string;
 };
 
@@ -41,34 +32,71 @@ export function NumberField<TFieldValues extends FieldValues>({
   ui,
   fieldPathAttr,
   parseAsNumber = true,
+  disallowNegative = false,
+  disallowExponent = false,
   inputProps,
   invalidClassName = "border-red-500 focus:ring-red-500/20",
 }: NumberFieldProps<TFieldValues>) {
   const { field, fieldState } = useController({ control, name });
   const error = fieldState.error?.message;
   const invalid = !!error;
-
   const value: NumberLike = field.value as any;
+  const path = fieldPathAttr ?? String(name);
+  const inputId = `${path}-input`;
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    inputProps?.onKeyDown?.(e);
+    if (e.defaultPrevented) return;
+
+    if (disallowNegative && e.key === "-") {
+      e.preventDefault();
+      return;
+    }
+
+    if (disallowExponent && (e.key === "e" || e.key === "E")) {
+      e.preventDefault();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    inputProps?.onPaste?.(e);
+    if (e.defaultPrevented) return;
+
+    const text = e.clipboardData.getData("text");
+
+    if (disallowNegative && text.includes("-")) {
+      e.preventDefault();
+      return;
+    }
+
+    if (disallowExponent && /e/i.test(text)) {
+      e.preventDefault();
+    }
+  };
 
   return (
-    <div className={ui.container} data-field-path={fieldPathAttr ?? String(name)}>
+    <div className={ui.container} data-field-path={path}>
       {label ? (
-        <label className={ui.label}>
+        <label htmlFor={inputId} className={ui.label}>
           {label}
           {required ? <span className="ml-1">*</span> : null}
         </label>
       ) : null}
 
       <input
+        id={inputId}
         {...inputProps}
         type="number"
         inputMode={inputProps?.inputMode ?? "decimal"}
         aria-invalid={invalid}
-        className={cn(ui.control, invalid && invalidClassName)}
+        aria-describedby={`${path}-hint ${path}-error`}
+        className={cn(ui.control, invalid && invalidClassName, inputProps?.className)}
         value={value ?? ""}
         onBlur={field.onBlur}
         name={field.name}
         ref={field.ref}
+        onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
         onChange={(e) => {
           const raw = e.target.value;
 
@@ -83,16 +111,24 @@ export function NumberField<TFieldValues extends FieldValues>({
           }
 
           const n = Number(raw);
-          field.onChange(Number.isFinite(n) ? n : undefined);
+
+          if (!Number.isFinite(n)) {
+            field.onChange(undefined);
+            return;
+          }
+
+          field.onChange(n);
         }}
       />
 
       {error ? (
-        <p role="alert" className={ui.error}>
+        <p id={`${path}-error`} role="alert" className={ui.error}>
           {error}
         </p>
       ) : hint ? (
-        <p className={ui.hint}>{hint}</p>
+        <p id={`${path}-hint`} className={ui.hint}>
+          {hint}
+        </p>
       ) : null}
     </div>
   );

@@ -1,4 +1,5 @@
 // src/lib/utils/quotes/logisticsQuoteValidator.ts
+// src/lib/utils/quotes/logisticsQuoteValidator.ts
 import {
   EBrokerType,
   ECustomerIdentity,
@@ -22,16 +23,18 @@ import { NORTH_AMERICAN_COUNTRY_CODES } from "@/config/countries";
 import { trim, lowerTrim, upperTrim } from "@/lib/utils/stringUtils";
 import type { IFileAsset } from "@/types/shared.types";
 
+const MAX_ATTACHMENTS = 10;
+
 function isObj(v: unknown): v is Record<string, any> {
   return Boolean(v && typeof v === "object" && !Array.isArray(v));
 }
 
-function isFinitePos(n: any) {
+function isFinitePos(n: unknown) {
   const x = Number(n);
   return Number.isFinite(x) && x > 0;
 }
 
-function assert(cond: any, msg: string): asserts cond {
+function assert(cond: unknown, msg: string): asserts cond {
   if (!cond) throw new Error(msg);
 }
 
@@ -40,7 +43,7 @@ function isNorthAmerica(code?: string) {
   return (NORTH_AMERICAN_COUNTRY_CODES as readonly string[]).includes(code.toUpperCase());
 }
 
-function validateAddress(a: any, label: string) {
+function validateAddress(a: unknown, label: string) {
   assert(isObj(a), `${label} is required`);
 
   const street1 = trim(a.street1);
@@ -55,27 +58,43 @@ function validateAddress(a: any, label: string) {
   assert(postalCode, `${label}.postalCode is required`);
   assert(countryCode && countryCode.length === 2, `${label}.countryCode must be ISO-2 (2 letters)`);
 
-  // Normalize back into object so downstream gets a clean shape (optional)
-  (a as LogisticsAddress).street1 = street1!;
+  (a as LogisticsAddress).street1 = street1;
   if (a.street2 != null) a.street2 = trim(a.street2);
-  (a as LogisticsAddress).city = city!;
-  (a as LogisticsAddress).region = region!;
-  (a as LogisticsAddress).postalCode = postalCode!;
-  (a as LogisticsAddress).countryCode = countryCode!;
+  (a as LogisticsAddress).city = city;
+  (a as LogisticsAddress).region = region;
+  (a as LogisticsAddress).postalCode = postalCode;
+  (a as LogisticsAddress).countryCode = countryCode;
 }
 
-function validateWeight(w: any, label: string) {
+function validateWeight(w: unknown, label: string) {
   assert(isObj(w), `${label} is required`);
   assert(isFinitePos(w.value), `${label}.value must be a positive number`);
 
   const unit = String(w.unit || "");
-  assert(Object.values(EWeightUnit).includes(unit as any), `${label}.unit must be KG or LB`);
+  assert(
+    Object.values(EWeightUnit).includes(unit as EWeightUnit),
+    `${label}.unit must be KG or LB`,
+  );
 
   (w as LogisticsWeight).value = Number(w.value);
-  (w as LogisticsWeight).unit = unit as any;
+  (w as LogisticsWeight).unit = unit as EWeightUnit;
 }
 
-function validateDims(d: any, label: string) {
+function validateWeightUnitOnly(w: unknown, label: string) {
+  assert(isObj(w), `${label} is required`);
+
+  const unit = String(w.unit || "");
+  assert(
+    Object.values(EWeightUnit).includes(unit as EWeightUnit),
+    `${label}.unit must be KG or LB`,
+  );
+
+  const currentValue = Number(w.value);
+  (w as LogisticsWeight).value = Number.isFinite(currentValue) ? currentValue : 0;
+  (w as LogisticsWeight).unit = unit as EWeightUnit;
+}
+
+function validateDims(d: unknown, label: string) {
   assert(isObj(d), `${label} is required`);
   assert(isFinitePos(d.length), `${label}.length must be a positive number`);
   assert(isFinitePos(d.width), `${label}.width must be a positive number`);
@@ -86,27 +105,28 @@ function validateDims(d: any, label: string) {
   (d as LogisticsDimensions).height = Number(d.height);
 }
 
-function validateDate(v: any, label: string) {
+function validateDate(v: unknown, label: string) {
   const d = v instanceof Date ? v : new Date(String(v));
   assert(!Number.isNaN(d.getTime()), `${label} must be a valid date`);
   return d;
 }
 
-function validateIdentification(id: any) {
+function validateIdentification(id: unknown) {
   assert(isObj(id), "identification is required");
 
   const identity = String(id.identity || "");
   assert(
-    Object.values(ECustomerIdentity).includes(identity as any),
+    Object.values(ECustomerIdentity).includes(identity as ECustomerIdentity),
     "identification.identity is invalid",
   );
 
   if (identity === ECustomerIdentity.BROKER) {
     const bt = String(id.brokerType || "");
     assert(
-      Object.values(EBrokerType).includes(bt as any),
+      Object.values(EBrokerType).includes(bt as EBrokerType),
       "identification.brokerType is required and invalid",
     );
+    id.brokerType = bt;
   } else {
     assert(
       id.brokerType == null,
@@ -117,7 +137,7 @@ function validateIdentification(id: any) {
   id.identity = identity;
 }
 
-function validateContact(c: any) {
+function validateContact(c: unknown) {
   assert(isObj(c), "contact is required");
 
   const firstName = trim(c.firstName);
@@ -140,7 +160,7 @@ function validateContact(c: any) {
   if (c.preferredContactMethod != null) {
     const pcm = String(c.preferredContactMethod);
     assert(
-      Object.values(EPreferredContactMethod).includes(pcm as any),
+      Object.values(EPreferredContactMethod).includes(pcm as EPreferredContactMethod),
       "contact.preferredContactMethod is invalid",
     );
     c.preferredContactMethod = pcm;
@@ -156,9 +176,13 @@ function validateContact(c: any) {
   }
 }
 
-function validateAttachments(arr: any) {
+function validateAttachments(arr: unknown) {
   if (arr == null) return [];
   assert(Array.isArray(arr), "attachments must be an array");
+  assert(
+    arr.length <= MAX_ATTACHMENTS,
+    `attachments must contain at most ${MAX_ATTACHMENTS} files`,
+  );
 
   const out: IFileAsset[] = [];
   for (let i = 0; i < arr.length; i++) {
@@ -213,15 +237,15 @@ const FTL_ADDON_COMPAT: Record<EFTLEquipmentType, readonly EFTLAddon[]> = {
 
 export function validateLogisticsQuoteRequest(input: {
   serviceDetails: QuoteServiceDetails;
-  identification: any;
-  contact: any;
-  finalNotes?: any;
-  attachments?: any;
-  marketingEmailConsent?: any;
+  identification: unknown;
+  contact: unknown;
+  finalNotes?: unknown;
+  attachments?: unknown;
+  marketingEmailConsent?: unknown;
 }): {
   serviceDetails: QuoteServiceDetails;
-  identification: any;
-  contact: any;
+  identification: unknown;
+  contact: unknown;
   finalNotes?: string;
   attachments: IFileAsset[];
   marketingEmailConsent?: boolean;
@@ -233,16 +257,15 @@ export function validateLogisticsQuoteRequest(input: {
 
   const ps = String(service.primaryService || "");
   assert(
-    Object.values(ELogisticsPrimaryService).includes(ps as any),
+    Object.values(ELogisticsPrimaryService).includes(ps as ELogisticsPrimaryService),
     "serviceDetails.primaryService is invalid",
   );
 
-  // Service-specific validation + normalization
   switch (ps as ELogisticsPrimaryService) {
     case ELogisticsPrimaryService.FTL: {
       const equipment = String(service.equipment || "");
       assert(
-        Object.values(EFTLEquipmentType).includes(equipment as any),
+        Object.values(EFTLEquipmentType).includes(equipment as EFTLEquipmentType),
         "serviceDetails.equipment is invalid",
       );
 
@@ -259,25 +282,31 @@ export function validateLogisticsQuoteRequest(input: {
 
       if (service.estimatedPalletCount != null) {
         assert(
-          Number(service.estimatedPalletCount) >= 1,
+          isFinitePos(service.estimatedPalletCount),
           "serviceDetails.estimatedPalletCount must be >= 1",
         );
         service.estimatedPalletCount = Number(service.estimatedPalletCount);
       }
 
-      if (service.dimensions != null) validateDims(service.dimensions, "serviceDetails.dimensions");
+      if (service.dimensions != null) {
+        validateDims(service.dimensions, "serviceDetails.dimensions");
+      }
 
-      if (service.readyDateFlexible != null)
+      if (service.readyDateFlexible != null) {
         service.readyDateFlexible = Boolean(service.readyDateFlexible);
+      }
 
-      if (service.addons != null) {
+      if (service.addons == null) {
+        service.addons = [];
+      } else {
         assert(Array.isArray(service.addons), "serviceDetails.addons must be an array");
         for (const a of service.addons) {
           assert(
-            Object.values(EFTLAddon).includes(a),
+            Object.values(EFTLAddon).includes(a as EFTLAddon),
             "serviceDetails.addons contains invalid value",
           );
         }
+
         const allowed = new Set(FTL_ADDON_COMPAT[equipment as EFTLEquipmentType] || []);
         for (const a of service.addons as EFTLAddon[]) {
           assert(allowed.has(a), `FTL add-on ${a} is not compatible with equipment ${equipment}`);
@@ -303,28 +332,45 @@ export function validateLogisticsQuoteRequest(input: {
 
       assert(
         Array.isArray(service.palletLines) && service.palletLines.length > 0,
-        "palletLines must be a non-empty array",
+        "serviceDetails.palletLines must be a non-empty array",
       );
+
       for (let i = 0; i < service.palletLines.length; i++) {
         const pl = service.palletLines[i];
-        assert(isObj(pl), `palletLines[${i}] must be an object`);
-        assert(Number(pl.quantity) >= 1, `palletLines[${i}].quantity must be >= 1`);
+        assert(isObj(pl), `serviceDetails.palletLines[${i}] must be an object`);
+        assert(isFinitePos(pl.quantity), `serviceDetails.palletLines[${i}].quantity must be >= 1`);
         pl.quantity = Number(pl.quantity);
 
-        validateDims(pl.dimensions, `palletLines[${i}].dimensions`);
+        validateDims(pl.dimensions, `serviceDetails.palletLines[${i}].dimensions`);
 
-        if (pl.totalWeight != null) validateWeight(pl.totalWeight, `palletLines[${i}].totalWeight`);
+        assert(
+          isFinitePos(pl.weightValue),
+          `serviceDetails.palletLines[${i}].weightValue must be a positive number`,
+        );
+        pl.weightValue = Number(pl.weightValue);
       }
 
-      if (service.approximateTotalWeight != null) {
-        validateWeight(service.approximateTotalWeight, "serviceDetails.approximateTotalWeight");
-      }
+      // For LTL, unit is user-provided and required.
+      // value is derived from palletLines[*].weightValue and overwritten here.
+      validateWeightUnitOnly(
+        service.approximateTotalWeight,
+        "serviceDetails.approximateTotalWeight",
+      );
 
-      if (service.addons != null) {
+      const total = service.palletLines.reduce(
+        (sum: number, pl: any) => sum + Number(pl.weightValue),
+        0,
+      );
+
+      service.approximateTotalWeight.value = total;
+
+      if (service.addons == null) {
+        service.addons = [];
+      } else {
         assert(Array.isArray(service.addons), "serviceDetails.addons must be an array");
         for (const a of service.addons) {
           assert(
-            Object.values(ELTLAddon).includes(a),
+            Object.values(ELTLAddon).includes(a as ELTLAddon),
             "serviceDetails.addons contains invalid value",
           );
         }
@@ -337,7 +383,7 @@ export function validateLogisticsQuoteRequest(input: {
     case ELogisticsPrimaryService.INTERNATIONAL: {
       const mode = String(service.mode || "");
       assert(
-        Object.values(EInternationalMode).includes(mode as any),
+        Object.values(EInternationalMode).includes(mode as EInternationalMode),
         "serviceDetails.mode is invalid",
       );
 
@@ -353,7 +399,7 @@ export function validateLogisticsQuoteRequest(input: {
       if (service.shipmentSize != null) {
         const ss = String(service.shipmentSize);
         assert(
-          Object.values(EInternationalShipmentSize).includes(ss as any),
+          Object.values(EInternationalShipmentSize).includes(ss as EInternationalShipmentSize),
           "serviceDetails.shipmentSize is invalid",
         );
         service.shipmentSize = ss;
@@ -375,7 +421,7 @@ export function validateLogisticsQuoteRequest(input: {
 
       const vt = String(service.estimatedVolume.volumeType || "");
       assert(
-        Object.values(EWarehousingVolumeType).includes(vt as any),
+        Object.values(EWarehousingVolumeType).includes(vt as EWarehousingVolumeType),
         "estimatedVolume.volumeType is invalid",
       );
 
@@ -389,7 +435,7 @@ export function validateLogisticsQuoteRequest(input: {
 
       const dur = String(service.expectedDuration || "");
       assert(
-        Object.values(EWarehousingDuration).includes(dur as any),
+        Object.values(EWarehousingDuration).includes(dur as EWarehousingDuration),
         "serviceDetails.expectedDuration is invalid",
       );
 
@@ -402,17 +448,17 @@ export function validateLogisticsQuoteRequest(input: {
       throw new Error("Unsupported primaryService");
   }
 
-  // Identification/contact/final notes/attachments
   validateIdentification(input.identification);
   validateContact(input.contact);
 
   const finalNotes = input.finalNotes != null ? trim(String(input.finalNotes)) : undefined;
-  if (finalNotes && finalNotes.length > 6000)
+  if (finalNotes && finalNotes.length > 6000) {
     throw new Error("finalNotes exceeds maximum length (6000)");
+  }
 
   const attachments = validateAttachments(input.attachments);
 
-  let marketingEmailConsent: boolean | undefined = undefined;
+  let marketingEmailConsent: boolean | undefined;
   if (input.marketingEmailConsent != null) {
     marketingEmailConsent = Boolean(input.marketingEmailConsent);
   }
