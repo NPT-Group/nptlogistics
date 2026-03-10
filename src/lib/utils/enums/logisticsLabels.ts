@@ -65,7 +65,7 @@ export const EQUIPMENT_LABEL: Record<EFTLEquipmentType, string> = {
   [EFTLEquipmentType.DRY_VAN]: "Dry van",
   [EFTLEquipmentType.REEFER]: "Reefer",
   [EFTLEquipmentType.FLATBED]: "Flatbed",
-  [EFTLEquipmentType.RGN_LOWBOY]: "RGN / lowboy",
+  [EFTLEquipmentType.RGN_LOWBOY]: "RGN / Lowboy",
   [EFTLEquipmentType.CONESTOGA]: "Conestoga",
 };
 

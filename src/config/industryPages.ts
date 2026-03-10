@@ -140,7 +140,7 @@ const INDUSTRY_PAGE_DATA: Record<IndustryKey, IndustryPageModel> = {
       title: "Automotive Logistics | Inbound & Outbound Freight | NPT Logistics",
       description:
         "Exotic and specialty vehicle transport supported by disciplined car-hauler execution, plus vehicle-unit and inbound component freight across North America.",
-      ogImage: "/_optimized/services/specialized&time-sensitive/exoticCarhauling2.webp",
+      ogImage: "/_optimized/services/specialized&time-sensitive/exoticCarhaulingImg2.webp",
     },
     hero: {
       kicker: "Industry Logistics Programs",
@@ -1060,7 +1060,7 @@ const INDUSTRY_PAGE_DATA: Record<IndustryKey, IndustryPageModel> = {
         },
         {
           scenario: "Heavy equipment standard corridors",
-          recommendation: "Truckload and Flatbed/RGN",
+          recommendation: "Truckload and Flatbed / Step Deck (Oversize) / RGN (Oversize)",
           rationale: "Aligns equipment fit and securement discipline to large-format cargo profiles.",
         },
         {
@@ -1072,7 +1072,7 @@ const INDUSTRY_PAGE_DATA: Record<IndustryKey, IndustryPageModel> = {
       links: [
         { label: "Truckload", href: "/services/truckload" },
         { label: "Expedited & Specialized", href: "/services/expedited-specialized" },
-        { label: "Flatbed & RGN", href: "/services/truckload#section-flatbed" },
+        { label: "Flatbed / Step Deck (Oversize) & RGN (Oversize)", href: "/services/truckload#section-flatbed" },
         { label: "Value-Added", href: "/services/value-added" },
       ],
     },
@@ -1249,7 +1249,7 @@ const INDUSTRY_PAGE_DATA: Record<IndustryKey, IndustryPageModel> = {
       modeFit: [
         {
           scenario: "Coil and plate heavy-load lanes",
-          recommendation: "Flatbed/RGN with engineered securement",
+          recommendation: "Flatbed / Step Deck (Oversize) / RGN (Oversize) with engineered securement",
           rationale: "Aligns deck and securement strategy to high-density load behavior and stability limits.",
         },
         {
@@ -1265,7 +1265,7 @@ const INDUSTRY_PAGE_DATA: Record<IndustryKey, IndustryPageModel> = {
       ],
       links: [
         { label: "Truckload", href: "/services/truckload" },
-        { label: "Flatbed & RGN", href: "/services/truckload#section-flatbed" },
+        { label: "Flatbed / Step Deck (Oversize) & RGN (Oversize)", href: "/services/truckload#section-flatbed" },
         { label: "Expedited & Specialized", href: "/services/expedited-specialized" },
         { label: "Value-Added", href: "/services/value-added" },
       ],

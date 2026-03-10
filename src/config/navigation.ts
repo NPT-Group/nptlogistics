@@ -50,8 +50,8 @@ export const NAV = {
             icon: "truck",
             children: [
               { label: "Dry Van", href: "/services/truckload#section-dry-van" },
-              { label: "Flatbed", href: "/services/truckload#section-flatbed" },
-              { label: "RGN / Oversize", href: "/services/truckload#section-rgn-oversize" },
+              { label: "Flatbed / Step Deck (Oversize)", href: "/services/truckload#section-flatbed" },
+              { label: "RGN (Oversize)", href: "/services/truckload#section-rgn-oversize" },
               {
                 label: "Roll-Tite / Conestoga",
                 href: "/services/truckload#section-roll-tite-conestoga",
@@ -141,7 +141,7 @@ export const NAV = {
                 href: "/services/value-added#section-dedicated-contract",
               },
               {
-                label: "Project-Specific / Oversize",
+                label: "Project-Specific (Oversize)",
                 href: "/services/value-added#section-project-oversize-programs",
               },
             ],

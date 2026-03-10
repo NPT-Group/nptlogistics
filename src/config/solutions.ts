@@ -94,7 +94,7 @@ export const SOLUTIONS_DATA = {
   },
   "Specialized & Time-Sensitive": {
     description: "Expert handling for urgent and specialized freight requirements.",
-    image: "/_optimized/solutions/solutions-specialized.webp",
+    image: "/_optimized/solutions/card-specialized-vehicleImg.webp",
     layout: "four",
     theme: "dark",
     cards: [
@@ -215,7 +215,7 @@ export const SOLUTIONS_DATA = {
       },
       {
         analyticsId: "project_oversize_programs",
-        label: "Project-Specific / Oversize Programs",
+        label: "Project-Specific (Oversize) Programs",
         href: "/services/value-added#section-project-oversize-programs",
         description: "Specialized handling for large-scale and oversize projects.",
         icon: "truck",
