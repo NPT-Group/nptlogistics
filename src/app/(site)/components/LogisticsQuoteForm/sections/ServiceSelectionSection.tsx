@@ -84,12 +84,12 @@ export function ServiceSelectionSection() {
       aria-describedby="serviceDetails.primaryService-error"
     >
       <div className="mb-3">
-        <h2 className="text-[13px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-muted-light)]">
+        <h2 className="text-sm font-semibold text-[color:var(--color-text-light)]">
           Select a service
         </h2>
 
-        <p className="mt-1 text-sm text-[color:var(--color-text-light)]">
-          Pick the primary service for this load. We’ll adapt the form to only show relevant fields.
+        <p className="mt-1 text-sm text-[color:var(--color-muted-light)]">
+          Pick the primary service. We’ll show only the fields that apply.
         </p>
 
         {serviceError ? (

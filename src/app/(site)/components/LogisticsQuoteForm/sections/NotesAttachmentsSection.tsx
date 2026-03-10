@@ -27,9 +27,7 @@ export function NotesAttachmentsSection() {
     <section className="space-y-5">
       <div className="space-y-5">
         <section className="space-y-2">
-          <h4 className="text-[13px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-muted-light)]">
-            Notes
-          </h4>
+          <h4 className="text-sm font-semibold text-[color:var(--color-text-light)]">Notes</h4>
 
           <TextAreaField<LogisticsQuoteSubmitValues>
             control={control}
