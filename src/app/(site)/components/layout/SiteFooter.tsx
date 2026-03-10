@@ -195,6 +195,16 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/locations" className={footerLink}>
+                    Freight by location
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/lanes" className={footerLink}>
+                    Freight lanes
+                  </Link>
+                </li>
+                <li>
                   <Link href="/employee-portal" className={footerLink}>
                     Employee Portal
                   </Link>

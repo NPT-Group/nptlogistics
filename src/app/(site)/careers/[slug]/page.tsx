@@ -10,9 +10,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return nptMetadata({
       title: job?.title ?? "Job",
       description: job?.summary ?? "View this role and apply online.",
+      canonicalPath: `/careers/${slug}`,
     });
   } catch {
-    return nptMetadata({ title: "Job" });
+    return nptMetadata({ title: "Job", canonicalPath: `/careers/${slug}` });
   }
 }
 

@@ -2969,9 +2969,13 @@ export function buildServiceMetadata(model: ServicePageModel): Metadata {
   return {
     title: model.meta.title,
     description: model.meta.description,
+    alternates: {
+      canonical: `/services/${model.slug}`,
+    },
     openGraph: {
       title: model.meta.title,
       description: model.meta.description,
+      url: `/services/${model.slug}`,
       images: model.meta.ogImage ? [model.meta.ogImage] : undefined,
       type: "website",
     },

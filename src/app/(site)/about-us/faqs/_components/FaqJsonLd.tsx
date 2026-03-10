@@ -1,6 +1,7 @@
 import { FAQ_CATEGORIES } from "@/config/faqs";
+import { SITE_NAME, SITE_URL, toAbsoluteUrl } from "@/lib/seo/site";
 
-const BASE = "https://nptlogistics.com";
+const BASE = SITE_URL;
 
 function buildFaqPageSchema() {
   const mainEntity = FAQ_CATEGORIES.flatMap((cat) =>
@@ -21,7 +22,8 @@ function buildFaqPageSchema() {
     url: `${BASE}/about-us/faqs`,
     isPartOf: {
       "@type": "WebSite" as const,
-      name: "NPT Logistics",
+      "@id": `${BASE}#website`,
+      name: SITE_NAME,
       url: BASE,
     },
     mainEntity,
@@ -36,8 +38,8 @@ function buildBreadcrumbSchema() {
     "@type": "BreadcrumbList" as const,
     itemListElement: [
       { "@type": "ListItem" as const, position: 1, name: "Home", item: `${BASE}/` },
-      { "@type": "ListItem" as const, position: 2, name: "About Us", item: `${BASE}/about-us` },
-      { "@type": "ListItem" as const, position: 3, name: "FAQs & Shipping Guides", item: `${BASE}/about-us/faqs` },
+      { "@type": "ListItem" as const, position: 2, name: "About Us", item: toAbsoluteUrl("/about-us") },
+      { "@type": "ListItem" as const, position: 3, name: "FAQs & Shipping Guides", item: toAbsoluteUrl("/about-us/faqs") },
     ],
   };
 }

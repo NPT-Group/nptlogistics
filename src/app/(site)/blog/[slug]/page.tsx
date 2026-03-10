@@ -5,6 +5,7 @@ import { nptMetadata } from "@/lib/utils/blog/metadata";
 import { getPublicBlogPostBySlug } from "@/lib/utils/blog/ssrBlogFetchers";
 import { ssrApiFetch } from "@/lib/utils/ssrFetch";
 import BlogPostClient from "./BlogPostClient";
+import { BlogPostJsonLd } from "./BlogPostJsonLd";
 
 export async function generateMetadata({
   params,
@@ -18,9 +19,11 @@ export async function generateMetadata({
     return nptMetadata({
       title: post?.title ?? "Blog",
       description: post?.excerpt ?? null,
+      canonicalPath: `/blog/${slug}`,
+      ogImage: post?.bannerImage?.url ?? null,
     });
   } catch {
-    return nptMetadata({ title: "Blog" });
+    return nptMetadata({ title: "Blog", canonicalPath: `/blog/${slug}` });
   }
 }
 
@@ -74,12 +77,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const [commentsRes, relatedRes] = await Promise.all([commentsPromise, relatedPromise]);
 
   return (
-    <BlogPostClient
-      slug={slug}
-      initialPost={post}
-      initialComments={commentsRes.data.items}
-      initialCommentsMeta={commentsRes.data.meta}
-      initialRelated={relatedRes.data.items}
-    />
+    <>
+      <BlogPostJsonLd post={post} slug={slug} />
+      <BlogPostClient
+        slug={slug}
+        initialPost={post}
+        initialComments={commentsRes.data.items}
+        initialCommentsMeta={commentsRes.data.meta}
+        initialRelated={relatedRes.data.items}
+      />
+    </>
   );
 }

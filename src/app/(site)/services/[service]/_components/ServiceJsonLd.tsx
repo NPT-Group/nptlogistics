@@ -1,5 +1,6 @@
 // src/app/(site)/services/[service]/_components/ServiceJsonLd.tsx
 import type { ServicePageModel } from "@/config/services";
+import { SITE_NAME, SITE_URL, toAbsoluteUrl } from "@/lib/seo/site";
 
 export function ServiceJsonLd({ model }: { model: ServicePageModel }) {
   const sectionOffers =
@@ -18,23 +19,39 @@ export function ServiceJsonLd({ model }: { model: ServicePageModel }) {
 
   const itemListElement = sectionOffers.length > 0 ? sectionOffers : singleOffers;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: model.hero.kicker,
-    description: model.meta.description,
-    areaServed: ["Canada", "United States", "Mexico"],
-    provider: {
-      "@type": "Organization",
-      name: "NPT Logistics",
+  const serviceUrl = toAbsoluteUrl(`/services/${model.slug}`);
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "@id": `${serviceUrl}#service`,
+      name: model.hero.kicker,
+      description: model.meta.description,
+      url: serviceUrl,
+      areaServed: ["Canada", "United States", "Mexico"],
+      provider: {
+        "@type": "Organization",
+        "@id": `${SITE_URL}#organization`,
+        name: SITE_NAME,
+        url: SITE_URL,
+      },
+      serviceType: model.key,
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: `${model.hero.kicker} options`,
+        itemListElement,
+      },
     },
-    serviceType: model.key,
-    hasOfferCatalog: {
-      "@type": "OfferCatalog",
-      name: `${model.hero.kicker} options`,
-      itemListElement,
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: toAbsoluteUrl("/") },
+        { "@type": "ListItem", position: 2, name: "Services", item: toAbsoluteUrl("/services") },
+        { "@type": "ListItem", position: 3, name: model.hero.kicker, item: serviceUrl },
+      ],
     },
-  };
+  ];
 
   return (
     <script

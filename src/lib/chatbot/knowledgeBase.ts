@@ -36,7 +36,7 @@ export type FAQItem = {
 
 export const CONTACT_INFO = {
   email: "sales@nptlogistics.com",
-  phone: "+1 (111) 111-1111",
+  phone: "+1 (519) 968-3632",
 };
 
 export const COMPANY_FACTS = {

@@ -5,19 +5,23 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { AnalyticsClient } from "@/app/(site)/components/analytics/AnalyticsClient";
+import {
+  COMPANY_CONTACT,
+  SITE_DEFAULT_DESCRIPTION,
+  SITE_DEFAULT_OG_IMAGE,
+  SITE_NAME,
+  SITE_URL,
+  toAbsoluteUrl,
+} from "@/lib/seo/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nptlogistics.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "NPT Logistics | Reliable Freight Solutions Across North America",
     template: "%s | NPT Logistics",
   },
-  description:
-    "NPT Logistics provides reliable freight transportation across North America, specializing in truckload, LTL, intermodal, and cross-border shipping.",
+  description: SITE_DEFAULT_DESCRIPTION,
   applicationName: "NPT Logistics",
-  alternates: {
-    canonical: "/",
-  },
   icons: {
     icon: [
       { url: "/_optimized/brand/NPTlogo2.webp", type: "image/png" },
@@ -68,20 +72,18 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "NPT Logistics",
-    title: "NPT Logistics",
-    description:
-      "Reliable freight solutions across North America. Truckload, LTL, intermodal, and cross-border shipping built on compliance and execution.",
-    url: "https://nptlogistics.com",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DEFAULT_DESCRIPTION,
+    url: SITE_URL,
     locale: "en_US",
-    images: [{ url: "/_optimized/brand/nptLogo-glow.webp", width: 1200, height: 630, alt: "NPT Logistics" }],
+    images: [{ url: SITE_DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: SITE_NAME }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NPT Logistics",
-    description:
-      "Reliable freight solutions across North America. Built on compliance, visibility, and execution.",
-    images: ["/_optimized/brand/nptLogo-glow.webp"],
+    title: SITE_NAME,
+    description: SITE_DEFAULT_DESCRIPTION,
+    images: [SITE_DEFAULT_OG_IMAGE],
   },
 };
 
@@ -108,6 +110,41 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <body className="min-h-dvh bg-[color:var(--color-surface-0)] text-[color:var(--color-text)]">
         <SessionWrapper>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify([
+                {
+                  "@context": "https://schema.org",
+                  "@type": "WebSite",
+                  "@id": `${SITE_URL}#website`,
+                  name: SITE_NAME,
+                  url: SITE_URL,
+                },
+                {
+                  "@context": "https://schema.org",
+                  "@type": "Organization",
+                  "@id": `${SITE_URL}#organization`,
+                  name: SITE_NAME,
+                  url: SITE_URL,
+                  logo: toAbsoluteUrl("/_optimized/brand/NPTlogo2.webp"),
+                  email: COMPANY_CONTACT.email,
+                  telephone: COMPANY_CONTACT.phoneE164,
+                  contactPoint: [
+                    {
+                      "@type": "ContactPoint",
+                      contactType: "sales",
+                      email: COMPANY_CONTACT.email,
+                      telephone: COMPANY_CONTACT.phoneE164,
+                      areaServed: ["Canada", "United States", "Mexico"],
+                      availableLanguage: ["en"],
+                    },
+                  ],
+                  areaServed: ["Canada", "United States", "Mexico"],
+                },
+              ]),
+            }}
+          />
           <Suspense fallback={null}>
             <AnalyticsClient />
           </Suspense>
