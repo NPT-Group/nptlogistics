@@ -1,5 +1,5 @@
 // src/components/forms/ui/types.ts
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 
 export type FieldUi = {
   container?: string;

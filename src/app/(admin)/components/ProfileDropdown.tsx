@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { ChevronDown } from "lucide-react";
 import ProfileAvatar from "./ProfileAvatar";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 
 export default function ProfileDropdown() {
   const { data: session, status } = useSession();

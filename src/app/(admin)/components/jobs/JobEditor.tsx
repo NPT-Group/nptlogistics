@@ -5,7 +5,7 @@ import * as React from "react";
 import dynamic from "next/dynamic";
 import type { PartialBlock } from "@blocknote/core";
 
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider";
 import { ConfirmModal, type ConfirmTone } from "@/app/(admin)/components/ui/ConfirmModal";
 import { SoftButton } from "@/app/(admin)/components/ui/Buttons";

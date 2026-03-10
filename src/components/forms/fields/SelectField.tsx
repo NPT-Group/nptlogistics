@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { ChevronDown, Check } from "lucide-react";
 import { useController, type Control, type FieldValues, type Path } from "react-hook-form";
 
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import type { FieldUi } from "../ui/types";
 
 export type SelectOption<T extends string = string> = {

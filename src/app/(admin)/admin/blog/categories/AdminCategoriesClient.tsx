@@ -8,7 +8,7 @@ import {
   adminDeleteCategory,
   adminUpdateCategory,
 } from "@/lib/utils/blog/adminBlogApi";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider";
 import { ConfirmModal, type ConfirmTone } from "@/app/(admin)/components/ui/ConfirmModal";
 import { Search, Plus, Pencil, Save, X, Trash2, MoreHorizontal, Hash } from "lucide-react";

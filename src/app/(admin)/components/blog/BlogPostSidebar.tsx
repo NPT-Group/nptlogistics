@@ -4,7 +4,7 @@
 import * as React from "react";
 import type { IBlogCategory } from "@/types/blogPost.types";
 import type { IFileAsset } from "@/types/shared.types";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider";
 import { Checkbox } from "@/app/(admin)/components/ui/Checkbox";
 import { SoftButton } from "@/app/(admin)/components/ui/Buttons";

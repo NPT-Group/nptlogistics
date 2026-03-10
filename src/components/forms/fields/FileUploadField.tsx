@@ -5,7 +5,7 @@ import * as React from "react";
 import { useController, type Control, type FieldValues, type Path } from "react-hook-form";
 import { Paperclip, Trash2, X } from "lucide-react";
 
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import type { FieldUi } from "../ui/types";
 
 import type { IFileAsset } from "@/types/shared.types";

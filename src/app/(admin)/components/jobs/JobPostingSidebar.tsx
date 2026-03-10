@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider";
 import { Checkbox } from "@/app/(admin)/components/ui/Checkbox";
 import {

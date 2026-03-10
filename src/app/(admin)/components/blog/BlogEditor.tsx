@@ -14,7 +14,7 @@ import { uploadToS3PresignedPublic } from "@/lib/utils/s3Helper/client";
 
 import BlogPostSidebar from "@/app/(admin)/components/blog/BlogPostSidebar";
 import { adminCreateCategory, adminFetchCategories } from "@/lib/utils/blog/adminBlogApi";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/cn";
 import { useAdminTheme } from "@/app/(admin)/components/theme/AdminThemeProvider";
 
 import { ConfirmModal, type ConfirmTone } from "@/app/(admin)/components/ui/ConfirmModal";
