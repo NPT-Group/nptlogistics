@@ -115,7 +115,6 @@ const TurnstileWidget = React.forwardRef<TurnstileWidgetHandle, Props>(function 
     ref,
     () => ({
       reset() {
-        onTokenRef.current("");
         setMsg("");
         setStatus("ready");
 
