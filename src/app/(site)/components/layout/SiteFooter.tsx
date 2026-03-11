@@ -34,9 +34,9 @@ function getSolutionsFooterLinks(): FooterLink[] {
   });
 
   const curatedOrder: FooterLink[] = [
-    { label: "Truckload (TL)", href: "/services/truckload" },
+    { label: "Truckload (FTL)", href: "/services/truckload" },
     { label: "Less-Than-Truckload (LTL)", href: "/services/ltl" },
-    { label: "Intermodal", href: "/services/intermodal" },
+    // { label: "Intermodal", href: "/services/intermodal" }, // COMMENTED OUT - uncomment to restore
     { label: "Expedited & Specialized (ES)", href: "/services/expedited-specialized" },
     { label: "Hazardous Materials (HAZMAT)", href: "/services/hazmat" },
     { label: "Temperature-Controlled", href: "/services/temperature-controlled" },

@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     "Freight transportation",
     "Truckload shipping",
     "LTL freight",
-    "Intermodal freight",
+    // "Intermodal freight", // COMMENTED OUT - uncomment to restore
     "Cross-border logistics",
     "North America freight",
     "Flatbed trucking",

@@ -6,7 +6,7 @@ import { SERVICES } from "@/config/services";
 export const metadata: Metadata = {
   title: "Freight Services",
   description:
-    "Explore NPT Logistics freight services across North America, including truckload, LTL, intermodal, cross-border, hazmat, and temperature-controlled shipping.",
+    "Explore NPT Logistics freight services across North America, including truckload, LTL, cross-border, hazmat, and temperature-controlled shipping.",
   alternates: {
     canonical: "/services",
   },

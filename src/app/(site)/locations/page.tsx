@@ -40,7 +40,7 @@ export default function LocationsHubPage() {
               North America freight hubs and market coverage
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[color:var(--color-muted)] sm:text-[15px]">
-              Explore key markets where NPT executes truckload, LTL, intermodal, and cross-border
+              Explore key markets where NPT executes truckload, LTL, and cross-border
               freight programs.
             </p>
           </div>

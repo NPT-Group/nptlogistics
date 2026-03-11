@@ -38,7 +38,7 @@ export function ServiceHero({ model }: { model: ServicePageModel }) {
   const isValueAdded = model.key === "value-added";
   const isExpeditedSpecialized = model.key === "expedited-specialized";
   const isLtl = model.key === "ltl";
-  const isIntermodal = model.key === "intermodal";
+  // const isIntermodal = model.key === "intermodal"; // COMMENTED OUT - uncomment to restore
   const isHazmat = model.key === "hazmat";
   const isTempControlled = model.key === "temperature-controlled";
   const isSingleService = Boolean(model.singleLayout && (!model.sections || model.sections.length === 0));
@@ -134,8 +134,7 @@ export function ServiceHero({ model }: { model: ServicePageModel }) {
                     ? "border border-fuchsia-300/50 bg-[linear-gradient(180deg,rgba(236,72,153,0.9),rgba(124,58,237,0.9))] text-white shadow-[0_14px_28px_rgba(124,58,237,0.34)] hover:bg-[linear-gradient(180deg,rgba(236,72,153,0.98),rgba(124,58,237,0.98))]"
                   : isLtl
                     ? "border border-red-300/52 bg-[linear-gradient(180deg,rgba(220,38,38,0.9),rgba(185,28,28,0.9))] text-white shadow-[0_14px_28px_rgba(185,28,28,0.34)] hover:bg-[linear-gradient(180deg,rgba(220,38,38,0.98),rgba(185,28,28,0.98))]"
-                  : isIntermodal
-                    ? "border border-blue-300/50 bg-[linear-gradient(180deg,rgba(37,99,235,0.9),rgba(30,64,175,0.9))] text-white shadow-[0_14px_28px_rgba(30,64,175,0.34)] hover:bg-[linear-gradient(180deg,rgba(37,99,235,0.98),rgba(30,64,175,0.98))]"
+                  // : isIntermodal ? "..." // COMMENTED OUT - uncomment to restore
                   : isHazmat
                     ? "border border-rose-300/52 bg-[linear-gradient(180deg,rgba(190,18,60,0.9),rgba(153,27,27,0.9))] text-white shadow-[0_14px_28px_rgba(153,27,27,0.35)] hover:bg-[linear-gradient(180deg,rgba(190,18,60,0.98),rgba(153,27,27,0.98))]"
                   : isTempControlled
@@ -167,8 +166,7 @@ export function ServiceHero({ model }: { model: ServicePageModel }) {
                     ? "border border-fuchsia-300/42 bg-[rgba(2,6,23,0.22)] text-fuchsia-100 hover:bg-[rgba(236,72,153,0.16)]"
                   : isLtl
                     ? "border border-red-300/42 bg-[rgba(2,6,23,0.2)] text-red-100 hover:bg-[rgba(220,38,38,0.16)]"
-                  : isIntermodal
-                    ? "border border-blue-300/40 bg-[rgba(2,6,23,0.2)] text-blue-100 hover:bg-[rgba(37,99,235,0.16)]"
+                  // : isIntermodal ? "..." // COMMENTED OUT - uncomment to restore
                   : isHazmat
                     ? "border border-rose-300/40 bg-[rgba(2,6,23,0.22)] text-rose-100 hover:bg-[rgba(190,18,60,0.16)]"
                   : isTempControlled

@@ -3,7 +3,7 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://nptlogistic
 export const SITE_NAME = "NPT Logistics";
 
 export const SITE_DEFAULT_DESCRIPTION =
-  "NPT Logistics provides reliable freight transportation across North America, specializing in truckload, LTL, intermodal, cross-border, and temperature-controlled shipping.";
+  "NPT Logistics provides reliable freight transportation across North America, specializing in truckload, LTL, cross-border, and temperature-controlled shipping.";
 
 export const SITE_DEFAULT_OG_IMAGE = "/_optimized/brand/nptLogo-glow.webp";
 

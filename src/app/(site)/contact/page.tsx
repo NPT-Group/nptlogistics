@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Contact NPT Logistics",
     description:
-      "Speak with NPT Logistics about truckload, LTL, intermodal, cross-border, and temperature-controlled freight.",
+      "Speak with NPT Logistics about truckload, LTL, cross-border, and temperature-controlled freight.",
     url: `${SITE_URL}/contact`,
   },
   twitter: {

@@ -116,12 +116,13 @@ export default class MessageParser {
 
     if (tokens.includes("truckload") || tokens.includes("tl") || tokens.includes("ftl")) {
       return this.actionProvider.suggestNavPage(
-        "Truckload (TL)",
+        "Truckload (FTL)",
         "/services/truckload",
         "Full truckload shipping for time-critical freight.",
       );
     }
 
+    /* COMMENTED OUT - uncomment to restore intermodal
     if (hasAnyToken(tokens, ["intermodal", "rail", "train"])) {
       return this.actionProvider.suggestNavPage(
         "Intermodal",
@@ -129,6 +130,7 @@ export default class MessageParser {
         "Rail + truck for balanced cost and capacity.",
       );
     }
+    */
 
     if (hasAnyToken(tokens, ["expedite", "expedited", "rush", "hot", "shot"])) {
       return this.actionProvider.suggestNavPage(

@@ -17,7 +17,7 @@ export default function ServicesWidget({ actionProvider }: any) {
         className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
         type="button"
       >
-        Truckload (TL)
+        Truckload (FTL)
       </button>
 
       <button

@@ -37,11 +37,13 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
       href: "/services/ltl",
       reason: "Use when shipment volume does not justify dedicated trailer space.",
     },
+    /* COMMENTED OUT - uncomment to restore intermodal
     {
       label: "Intermodal",
       href: "/services/intermodal",
       reason: "Best fit for predictable lanes where cost stability matters.",
     },
+    */
     {
       label: "Cross-border Solutions",
       href: "/services/cross-border",
@@ -65,9 +67,31 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
       reason: "For project freight moving across national compliance regimes.",
     },
   ],
+  "step-deck": [
+    {
+      label: "Flatbed",
+      href: "/services/truckload#section-flatbed",
+      reason: "When load fits on standard flatbed within legal height limits.",
+    },
+    {
+      label: "RGN (Oversize)",
+      href: "/services/truckload#section-rgn-oversize",
+      reason: "When dimensions or permits exceed step deck thresholds.",
+    },
+    {
+      label: "Roll-Tite / Conestoga",
+      href: "/services/truckload#section-roll-tite-conestoga",
+      reason: "When you need weather protection without losing side-load access.",
+    },
+    {
+      label: "Cross-border Solutions",
+      href: "/services/cross-border",
+      reason: "For project freight moving across national compliance regimes.",
+    },
+  ],
   "rgn-oversize": [
     {
-      label: "Flatbed / Step Deck (Oversize)",
+      label: "Flatbed",
       href: "/services/truckload#section-flatbed",
       reason: "For open-deck freight that does not require heavy-haul configuration.",
     },
@@ -84,7 +108,7 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
   ],
   "roll-tite-conestoga": [
     {
-      label: "Flatbed / Step Deck (Oversize)",
+      label: "Flatbed",
       href: "/services/truckload#section-flatbed",
       reason: "For open-deck freight where weather exposure is acceptable.",
     },
@@ -107,7 +131,7 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
         "For cross-region urgent moves when timeline compression outweighs landed-cost priority.",
     },
     {
-      label: "Truckload (TL)",
+      label: "Truckload (FTL)",
       href: "/services/truckload",
       reason: "For full-load continuity once recovery demand transitions into steady lane flow.",
     },
@@ -131,7 +155,7 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
         "For automotive parts and unfinished manufacturing components that need enclosed, schedule-disciplined lane execution.",
     },
     {
-      label: "Truckload (TL)",
+      label: "Truckload (FTL)",
       href: "/services/truckload",
       reason:
         "For general vehicle-unit program support where lane consistency, appointment control, and scalable capacity matter.",
@@ -144,15 +168,17 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
       reason: "For southbound and northbound lanes requiring multi-party border handoffs.",
     },
     {
-      label: "Truckload (TL)",
+      label: "Truckload (FTL)",
       href: "/services/truckload",
       reason: "For domestic inland execution after border clearance.",
     },
+    /* COMMENTED OUT - uncomment to restore intermodal
     {
       label: "Intermodal",
       href: "/services/intermodal",
       reason: "For steady lanes where cost stability can outperform full truckload.",
     },
+    */
   ],
   "mexico-cross-border": [
     {
@@ -166,7 +192,7 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
       reason: "For global inbound programs feeding Mexico or U.S. border distribution.",
     },
     {
-      label: "Truckload (TL)",
+      label: "Truckload (FTL)",
       href: "/services/truckload",
       reason: "For inland plant, warehouse, and distribution handoff execution.",
     },
@@ -183,7 +209,7 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
       reason: "For post-arrival cross-border distribution between CA and US facilities.",
     },
     {
-      label: "Truckload (TL)",
+      label: "Truckload (FTL)",
       href: "/services/truckload",
       reason: "For inland drayage and final over-the-road delivery after port handling.",
     },
@@ -217,7 +243,7 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
       reason: "When recurring flows need committed capacity and service-level accountability.",
     },
     {
-      label: "Truckload (TL)",
+      label: "Truckload (FTL)",
       href: "/services/truckload",
       reason: "For scalable linehaul from distribution nodes into major lane networks.",
     },
@@ -233,11 +259,13 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
       href: "/services/value-added#section-dedicated-contract",
       reason: "For lanes where committed resources improve service continuity.",
     },
+    /* COMMENTED OUT - uncomment to restore intermodal
     {
       label: "Intermodal",
       href: "/services/intermodal",
       reason: "For predictable corridors where mode optimization can improve cost stability.",
     },
+    */
   ],
   "dedicated-contract": [
     {
@@ -251,7 +279,7 @@ const CONTEXTUAL_RELATED_BY_TYPE: Record<
       reason: "For integrated storage-to-delivery programs under one operating cadence.",
     },
     {
-      label: "Truckload (TL)",
+      label: "Truckload (FTL)",
       href: "/services/truckload",
       reason: "For recurring lanes requiring disciplined over-the-road execution.",
     },
@@ -284,6 +312,11 @@ const CONVERSION_SIGNALS_BY_TYPE: Record<SubServiceSection["key"], string[]> = {
   flatbed: [
     "Securement planning before dispatch release",
     "Site access and loading window coordination",
+    "Escalation path for weather and route exceptions",
+  ],
+  "step-deck": [
+    "Deck fit and height clearance confirmed before tender",
+    "Site access and loading method coordination",
     "Escalation path for weather and route exceptions",
   ],
   "rgn-oversize": [
@@ -415,7 +448,7 @@ const SHIPPER_FAQS_BY_TYPE: Record<
     ],
   },
   flatbed: {
-    title: "Flatbed / Step Deck (Oversize) shipper FAQs",
+    title: "Flatbed shipper FAQs",
     items: [
       {
         q: "When should flatbed be selected?",
@@ -428,6 +461,23 @@ const SHIPPER_FAQS_BY_TYPE: Record<
       {
         q: "Can flatbed run cross-border?",
         a: "Yes. We coordinate mode-specific handling and compliance requirements for cross-border project and industrial freight.",
+      },
+    ],
+  },
+  "step-deck": {
+    title: "Step Deck shipper FAQs",
+    items: [
+      {
+        q: "When should step deck be selected over flatbed?",
+        a: "Use step deck when load height exceeds flatbed legal limits or when the drop-deck configuration improves route feasibility.",
+      },
+      {
+        q: "How do you confirm deck fit for step deck?",
+        a: "We verify dimensions, weight distribution, and center-of-gravity against the step deck configuration before dispatch.",
+      },
+      {
+        q: "Can step deck run cross-border?",
+        a: "Yes. We coordinate mode-specific handling and compliance for cross-border project and industrial freight.",
       },
     ],
   },
@@ -549,6 +599,12 @@ const PILL_ACCENTS_BY_TYPE: Record<SubServiceSection["key"], string[]> = {
     "left-[15%] top-[31%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
     "right-[11%] bottom-[2.5%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
   ],
+  "step-deck": [
+    "left-[10%] top-[3.9%] h-9 w-36 border border-slate-300/50 bg-transparent",
+    "right-[10%] top-[27%] h-8 w-32 border border-transparent bg-[rgba(59,130,246,0.11)]",
+    "left-[15%] top-[31%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
+    "right-[11%] bottom-[2.5%] h-7 w-28 border border-transparent bg-[rgba(15,23,42,0.06)]",
+  ],
   "rgn-oversize": [
     "left-[10%] top-[3.9%] h-9 w-36 border border-slate-300/50 bg-transparent",
     "right-[10%] top-[27.9%] h-8 w-32 border border-transparent bg-[rgba(185,28,28,0.11)]",
@@ -655,6 +711,19 @@ const SECTION_THEME: Record<
     gridOpacity: 0.38,
     panelBg: "bg-[rgba(255,255,255,0.8)]",
     imageWash: "bg-[linear-gradient(120deg,rgba(217,119,6,0.15),rgba(2,6,23,0.10))]",
+  },
+  "step-deck": {
+    accent: "#2563eb",
+    glow: "rgba(37,99,235,0.1)",
+    sectionBase: "bg-[linear-gradient(180deg,rgba(249,250,252,0.99),rgba(244,247,251,0.97))]",
+    sectionVeil:
+      "bg-[radial-gradient(980px_480px_at_48%_-12%,rgba(37,99,235,0.043),transparent_68%)]",
+    auraA: "bg-[radial-gradient(940px_560px_at_18%_8%,rgba(37,99,235,0.08),transparent_62%)]",
+    auraB: "bg-[radial-gradient(900px_520px_at_88%_86%,rgba(2,132,199,0.04),transparent_67%)]",
+    gridStroke: "rgba(30,64,175,0.02)",
+    gridOpacity: 0.38,
+    panelBg: "bg-[rgba(255,255,255,0.8)]",
+    imageWash: "bg-[linear-gradient(120deg,rgba(37,99,235,0.15),rgba(2,6,23,0.10))]",
   },
   "rgn-oversize": {
     accent: "#b91c1c",

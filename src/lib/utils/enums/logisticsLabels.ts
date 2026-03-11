@@ -64,7 +64,7 @@ export const LTL_ADDON_LABEL: Record<ELTLAddon, string> = {
 export const EQUIPMENT_LABEL: Record<EFTLEquipmentType, string> = {
   [EFTLEquipmentType.DRY_VAN]: "Dry van",
   [EFTLEquipmentType.REEFER]: "Temperature Controlled",
-  [EFTLEquipmentType.FLATBED]: "Flatbed / Step Deck",
+  [EFTLEquipmentType.FLATBED]: "Flatbed",
   [EFTLEquipmentType.RGN_LOWBOY]: "RGN / Lowboy",
   [EFTLEquipmentType.CONESTOGA]: "Conestoga",
 };

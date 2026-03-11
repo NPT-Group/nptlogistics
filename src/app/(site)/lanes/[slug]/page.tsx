@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowRight, CheckCircle2, MapPin, Package } from "lucide-react";
 import { Container } from "../../components/layout/Container";
-import { getSeoLaneBySlug, getSeoLanePriority, getSeoLaneSlugs } from "@/config/seoLanes";
+import { getSeoLaneBySlug, getSeoLaneSlugs } from "@/config/seoLanes";
 import { SITE_NAME, toAbsoluteUrl } from "@/lib/seo/site";
 
 type Params = { slug: string };
@@ -89,7 +90,6 @@ export default async function LanePage({ params }: { params: Params | Promise<Pa
   const { slug } = await Promise.resolve(params);
   const lane = getSeoLaneBySlug(slug);
   if (!lane) notFound();
-  const priority = getSeoLanePriority(lane.slug);
 
   return (
     <main className="bg-[color:var(--color-surface-0)]">
@@ -109,15 +109,25 @@ export default async function LanePage({ params }: { params: Params | Promise<Pa
         </div>
         <Container className="site-page-container relative max-w-6xl">
           <div className="py-6 sm:py-8">
-            <span className="inline-flex rounded-full border border-[color:var(--color-brand-100)] bg-[color:var(--color-brand-50)] px-3 py-1 text-[10px] font-semibold tracking-[0.12em] uppercase text-[color:var(--color-brand-700)]">
-              {priority} corridor
-            </span>
-            <h1 className="mt-3 max-w-4xl text-[1.9rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.3rem]">
+            <div className="mb-2.5 h-[2px] w-12 bg-[color:var(--color-brand-500)] sm:w-14" />
+            <p className="text-[10.5px] font-semibold tracking-[0.14em] uppercase text-[color:var(--color-brand-500)]">
+              Freight lane
+            </p>
+            <h1 className="mt-2.5 max-w-4xl text-[1.9rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.3rem]">
               {lane.title}
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[color:var(--color-muted)] sm:text-[15px]">
               {lane.intro}
             </p>
+            <div className="mt-6">
+              <Link
+                href="/quote"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[color:var(--color-brand-600)] px-6 text-sm font-semibold text-white shadow-[0_8px_22px_rgba(220,38,38,0.25)] transition hover:bg-[color:var(--color-brand-700)]"
+              >
+                Request a quote for this lane
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </Container>
       </section>
@@ -129,55 +139,73 @@ export default async function LanePage({ params }: { params: Params | Promise<Pa
           <div className="absolute inset-0 bg-[linear-gradient(180deg,#f8fafc_0%,#eef2f7_45%,#e2e8f0_100%)]" />
         </div>
         <Container className="site-page-container relative max-w-6xl">
-          <section className="rounded-2xl border border-[color:var(--color-border-light)] bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.06)]">
-            <h2 className="text-base font-semibold text-[color:var(--color-text-light)]">Best fit for this lane</h2>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[color:var(--color-muted-light)]">
+          <section className="overflow-hidden rounded-2xl border border-[color:var(--color-border-light)] bg-white shadow-[0_10px_26px_rgba(15,23,42,0.06)]">
+            <div className="border-b border-[color:var(--color-border-light)] bg-[linear-gradient(180deg,rgba(248,250,252,0.9),white)] px-5 py-4 sm:px-6">
+              <h2 className="text-base font-semibold text-[color:var(--color-text-light)]">
+                What we deliver on this lane
+              </h2>
+              <p className="mt-1 text-[13px] text-[color:var(--color-muted-light)]">
+                Mode-fit planning, compliance, and visibility from pickup to delivery
+              </p>
+            </div>
+            <ul className="divide-y divide-[color:var(--color-border-light)] px-5 py-3 sm:px-6">
               {lane.bestFor.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[color:var(--color-brand-600)]" />
+                  <span className="text-sm text-[color:var(--color-text-light)]">{item}</span>
+                </li>
               ))}
             </ul>
+            <div className="border-t border-[color:var(--color-border-light)] bg-[color:var(--color-surface-0-light)]/50 px-5 py-3 text-center sm:px-6">
+              <p className="text-[12px] text-[color:var(--color-muted-light)]">
+                Our team typically responds within 24 hours
+              </p>
+            </div>
           </section>
 
           <section className="mt-8 grid gap-6 md:grid-cols-2">
-            <div>
-              <h2 className="text-base font-semibold text-[color:var(--color-text-light)]">Related services</h2>
-              <div className="mt-3 flex flex-col gap-2">
+            <div className="rounded-2xl border border-[color:var(--color-border-light)] bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.06)]">
+              <div className="flex items-center gap-2">
+                <Package className="h-5 w-5 text-[color:var(--color-brand-600)]" />
+                <h2 className="text-base font-semibold text-[color:var(--color-text-light)]">
+                  Related services
+                </h2>
+              </div>
+              <div className="mt-4 flex flex-col gap-2">
                 {lane.relatedServices.map((service) => (
                   <Link
                     key={service.href}
                     href={service.href}
-                    className="rounded-xl border border-[color:var(--color-border-light)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--color-text-light)] transition hover:border-[color:var(--color-text-light)]"
+                    className="group flex items-center justify-between rounded-xl border border-[color:var(--color-border-light)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--color-text-light)] transition hover:border-[color:var(--color-text-light)] hover:shadow-[0_4px_12px_rgba(15,23,42,0.06)]"
                   >
                     {service.label}
+                    <ArrowRight className="h-4 w-4 shrink-0 opacity-60 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
                   </Link>
                 ))}
               </div>
             </div>
 
-            <div>
-              <h2 className="text-base font-semibold text-[color:var(--color-text-light)]">Related locations</h2>
-              <div className="mt-3 flex flex-col gap-2">
+            <div className="rounded-2xl border border-[color:var(--color-border-light)] bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.06)]">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-[color:var(--color-brand-600)]" />
+                <h2 className="text-base font-semibold text-[color:var(--color-text-light)]">
+                  Related locations
+                </h2>
+              </div>
+              <div className="mt-4 flex flex-col gap-2">
                 {lane.relatedLocations.map((location) => (
                   <Link
                     key={location.href}
                     href={location.href}
-                    className="rounded-xl border border-[color:var(--color-border-light)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--color-text-light)] transition hover:border-[color:var(--color-text-light)]"
+                    className="group flex items-center justify-between rounded-xl border border-[color:var(--color-border-light)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--color-text-light)] transition hover:border-[color:var(--color-text-light)] hover:shadow-[0_4px_12px_rgba(15,23,42,0.06)]"
                   >
                     {location.label}
+                    <ArrowRight className="h-4 w-4 shrink-0 opacity-60 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
                   </Link>
                 ))}
               </div>
             </div>
           </section>
-
-          <div className="mt-8">
-            <Link
-              href="/quote"
-              className="inline-flex h-10 items-center justify-center rounded-md bg-[color:var(--color-brand-600)] px-5 text-sm font-semibold text-white hover:bg-[color:var(--color-brand-700)]"
-            >
-              Request a quote for this lane
-            </Link>
-          </div>
         </Container>
       </section>
     </main>

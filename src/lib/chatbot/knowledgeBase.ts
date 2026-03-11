@@ -91,9 +91,9 @@ export const START_REPLIES: QuickReply[] = [
 ];
 
 export const SOLUTIONS_REPLIES: QuickReply[] = [
-  { label: "Truckload (TL)", intent: "TL" },
+  { label: "Truckload (FTL)", intent: "TL" },
   { label: "Less-than-truckload (LTL)", intent: "LTL" },
-  { label: "Intermodal", intent: "INTERMODAL" },
+  // { label: "Intermodal", intent: "INTERMODAL" }, // COMMENTED OUT - uncomment to restore
   { label: "Expedited & Specialized", intent: "EXPEDITED" },
   { label: "Hazmat", intent: "HAZMAT" },
   { label: "Temperature-controlled", intent: "TEMP_CONTROLLED" },

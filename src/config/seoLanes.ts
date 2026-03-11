@@ -14,15 +14,23 @@ export type SeoPriority = "P1" | "P2" | "P3";
 
 const SEO_LANE_PRIORITY: Record<string, SeoPriority> = {
   "toronto-on-to-dallas-tx": "P1",
+  "dallas-tx-to-toronto-on": "P1",
   "milton-on-to-dallas-tx": "P1",
+  "dallas-tx-to-milton-on": "P1",
   "milton-on-to-houston-tx": "P1",
+  "houston-tx-to-milton-on": "P1",
   "toronto-on-to-chicago-il": "P1",
   "chicago-il-to-toronto-on": "P1",
+  "montreal-qc-to-chicago-il": "P1",
+  "chicago-il-to-montreal-qc": "P1",
   "laredo-tx-to-monterrey-nl": "P1",
-  "houston-tx-to-monterrey-nl": "P1",
   "monterrey-nl-to-laredo-tx": "P1",
-  "dallas-tx-to-toronto-on": "P1",
+  "houston-tx-to-monterrey-nl": "P1",
+  "monterrey-nl-to-houston-tx": "P1",
   "dallas-tx-to-monterrey-nl": "P1",
+  "monterrey-nl-to-dallas-tx": "P1",
+  "dallas-tx-to-houston-tx": "P2",
+  "houston-tx-to-dallas-tx": "P2",
 };
 
 export const SEO_LANES: SeoLanePage[] = [
@@ -221,16 +229,16 @@ export const SEO_LANES: SeoLanePage[] = [
     destinationLabel: "Dallas, TX",
     title: "Freight Shipping from Livermore, CA to Dallas, TX",
     metaDescription:
-      "California to Texas freight shipping with truckload, intermodal, and specialized service support.",
+      "California to Texas freight shipping with truckload and specialized service support.",
     intro:
       "NPT supports Livermore to Dallas freight lanes with mode-fit recommendations and execution controls for long-haul flows.",
     bestFor: [
       "West-coast to Texas truckload lanes",
-      "Intermodal options for cost-sensitive freight",
+      "Truckload options for cost-sensitive freight",
       "Specialized freight requiring route planning",
     ],
     relatedServices: [
-      { label: "Intermodal service", href: "/services/intermodal" },
+      // { label: "Intermodal service", href: "/services/intermodal" }, // COMMENTED OUT - uncomment to restore
       { label: "Truckload service", href: "/services/truckload" },
     ],
     relatedLocations: [
@@ -418,7 +426,7 @@ export const SEO_LANES: SeoLanePage[] = [
     ],
     relatedServices: [
       { label: "Cross-border shipping", href: "/services/cross-border" },
-      { label: "Intermodal service", href: "/services/intermodal" },
+      // { label: "Intermodal service", href: "/services/intermodal" }, // COMMENTED OUT - uncomment to restore
     ],
     relatedLocations: [
       { label: "Laredo freight services", href: "/locations/laredo-tx" },
@@ -446,6 +454,30 @@ export const SEO_LANES: SeoLanePage[] = [
     relatedLocations: [
       { label: "Houston freight services", href: "/locations/houston-tx" },
       { label: "Milton freight services", href: "/locations/milton-on" },
+    ],
+  },
+  {
+    slug: "houston-tx-to-dallas-tx",
+    originLabel: "Houston, TX",
+    destinationLabel: "Dallas, TX",
+    title: "Freight Shipping from Houston, TX to Dallas, TX",
+    metaDescription:
+      "Truckload and LTL freight shipping from Houston to Dallas on the I-45 corridor for Texas distribution and manufacturing lanes.",
+    intro:
+      "NPT supports Houston to Dallas freight with reliable lane execution on one of North America's busiest intra-state corridors.",
+    bestFor: [
+      "Texas distribution and manufacturing freight",
+      "Truckload and LTL on the I-45 corridor",
+      "Temperature-controlled and expedited options",
+    ],
+    relatedServices: [
+      { label: "Truckload service", href: "/services/truckload" },
+      { label: "LTL service", href: "/services/ltl" },
+      { label: "Temperature-controlled service", href: "/services/temperature-controlled" },
+    ],
+    relatedLocations: [
+      { label: "Houston freight services", href: "/locations/houston-tx" },
+      { label: "Dallas freight services", href: "/locations/dallas-tx" },
     ],
   },
   {
@@ -492,6 +524,30 @@ export const SEO_LANES: SeoLanePage[] = [
     relatedLocations: [
       { label: "Dallas freight services", href: "/locations/dallas-tx" },
       { label: "Milton freight services", href: "/locations/milton-on" },
+    ],
+  },
+  {
+    slug: "dallas-tx-to-houston-tx",
+    originLabel: "Dallas, TX",
+    destinationLabel: "Houston, TX",
+    title: "Freight Shipping from Dallas, TX to Houston, TX",
+    metaDescription:
+      "Truckload and LTL freight shipping from Dallas to Houston on the I-45 corridor for Texas distribution and manufacturing lanes.",
+    intro:
+      "NPT supports Dallas to Houston freight with dependable lane execution on one of North America's busiest intra-state corridors.",
+    bestFor: [
+      "Texas distribution and manufacturing freight",
+      "Truckload and LTL on the I-45 corridor",
+      "Temperature-controlled and expedited options",
+    ],
+    relatedServices: [
+      { label: "Truckload service", href: "/services/truckload" },
+      { label: "LTL service", href: "/services/ltl" },
+      { label: "Temperature-controlled service", href: "/services/temperature-controlled" },
+    ],
+    relatedLocations: [
+      { label: "Dallas freight services", href: "/locations/dallas-tx" },
+      { label: "Houston freight services", href: "/locations/houston-tx" },
     ],
   },
   {
@@ -569,16 +625,16 @@ export const SEO_LANES: SeoLanePage[] = [
     destinationLabel: "Houston, TX",
     title: "Freight Shipping from Livermore, CA to Houston, TX",
     metaDescription:
-      "California to Texas freight shipping from Livermore to Houston with truckload and intermodal options.",
+      "California to Texas freight shipping from Livermore to Houston with truckload options.",
     intro:
       "NPT supports Livermore to Houston freight with mode-fit planning, long-haul execution discipline, and milestone visibility.",
     bestFor: [
       "West coast to Texas truckload lanes",
-      "Intermodal alternatives for cost-efficiency",
+      "Truckload alternatives for cost-efficiency",
       "Industrial and project freight movement",
     ],
     relatedServices: [
-      { label: "Intermodal service", href: "/services/intermodal" },
+      // { label: "Intermodal service", href: "/services/intermodal" }, // COMMENTED OUT - uncomment to restore
       { label: "Truckload service", href: "/services/truckload" },
     ],
     relatedLocations: [
@@ -592,17 +648,17 @@ export const SEO_LANES: SeoLanePage[] = [
     destinationLabel: "Toronto, ON",
     title: "Freight Shipping from Livermore, CA to Toronto, ON",
     metaDescription:
-      "Cross-border freight shipping from Livermore to Toronto with truckload and intermodal support.",
+      "Cross-border freight shipping from Livermore to Toronto with truckload support.",
     intro:
       "NPT executes Livermore to Toronto freight through coordinated long-haul cross-border planning and proactive exception control.",
     bestFor: [
       "California to Ontario truckload freight",
-      "Cross-border intermodal and multimodal planning",
+      "Cross-border truckload and multimodal planning",
       "Specialized freight requiring route discipline",
     ],
     relatedServices: [
       { label: "Cross-border shipping", href: "/services/cross-border" },
-      { label: "Intermodal service", href: "/services/intermodal" },
+      // { label: "Intermodal service", href: "/services/intermodal" }, // COMMENTED OUT - uncomment to restore
     ],
     relatedLocations: [
       { label: "Livermore freight services", href: "/locations/livermore-ca" },
@@ -657,6 +713,150 @@ export const SEO_LANES: SeoLanePage[] = [
     ],
   },
   {
+    slug: "toronto-on-to-detroit-mi",
+    originLabel: "Toronto, ON",
+    destinationLabel: "Detroit, MI",
+    title: "Cross-Border Freight from Toronto, ON to Detroit, MI",
+    metaDescription:
+      "Cross-border freight shipping from Toronto to Detroit with truckload and LTL execution across high-frequency Ontario-Michigan lanes.",
+    intro:
+      "NPT supports Toronto to Detroit freight with customs-ready workflows and reliable handoffs across one of the busiest U.S.-Canada gateway corridors.",
+    bestFor: [
+      "Ontario to Michigan truckload freight",
+      "Cross-border LTL with appointment-sensitive delivery windows",
+      "Automotive and manufacturing freight",
+    ],
+    relatedServices: [
+      { label: "Cross-border shipping", href: "/services/cross-border" },
+      { label: "Truckload service", href: "/services/truckload" },
+      { label: "LTL service", href: "/services/ltl" },
+    ],
+    relatedLocations: [
+      { label: "Toronto freight services", href: "/locations/toronto-on" },
+      { label: "Detroit freight services", href: "/locations/detroit-mi" },
+    ],
+  },
+  {
+    slug: "detroit-mi-to-toronto-on",
+    originLabel: "Detroit, MI",
+    destinationLabel: "Toronto, ON",
+    title: "Cross-Border Freight from Detroit, MI to Toronto, ON",
+    metaDescription:
+      "Cross-border freight shipping from Detroit to Toronto with truckload and LTL support for Ontario-bound freight programs.",
+    intro:
+      "NPT manages Detroit to Toronto freight with border-aware planning and consistent milestone control from pickup through delivery.",
+    bestFor: [
+      "Michigan to Ontario truckload freight",
+      "Cross-border LTL shipments with timed receiving",
+      "Automotive and industrial freight replenishment",
+    ],
+    relatedServices: [
+      { label: "Cross-border shipping", href: "/services/cross-border" },
+      { label: "LTL service", href: "/services/ltl" },
+      { label: "Truckload service", href: "/services/truckload" },
+    ],
+    relatedLocations: [
+      { label: "Detroit freight services", href: "/locations/detroit-mi" },
+      { label: "Toronto freight services", href: "/locations/toronto-on" },
+    ],
+  },
+  {
+    slug: "toronto-on-to-buffalo-ny",
+    originLabel: "Toronto, ON",
+    destinationLabel: "Buffalo, NY",
+    title: "Cross-Border Freight from Toronto, ON to Buffalo, NY",
+    metaDescription:
+      "Cross-border freight shipping from Toronto to Buffalo with truckload and LTL support for short-haul U.S.-Canada freight moves.",
+    intro:
+      "NPT supports Toronto to Buffalo freight with customs coordination and dependable short-haul execution across a high-velocity border lane.",
+    bestFor: [
+      "Ontario to New York truckload freight",
+      "Cross-border LTL and partial shipments",
+      "Time-sensitive regional distribution freight",
+    ],
+    relatedServices: [
+      { label: "Cross-border shipping", href: "/services/cross-border" },
+      { label: "LTL service", href: "/services/ltl" },
+      { label: "Truckload service", href: "/services/truckload" },
+    ],
+    relatedLocations: [
+      { label: "Toronto freight services", href: "/locations/toronto-on" },
+      { label: "Buffalo freight services", href: "/locations/buffalo-ny" },
+    ],
+  },
+  {
+    slug: "buffalo-ny-to-toronto-on",
+    originLabel: "Buffalo, NY",
+    destinationLabel: "Toronto, ON",
+    title: "Cross-Border Freight from Buffalo, NY to Toronto, ON",
+    metaDescription:
+      "Cross-border freight shipping from Buffalo to Toronto with customs-ready truckload and LTL support.",
+    intro:
+      "NPT executes Buffalo to Toronto freight with fast customs processing support and lane-level visibility.",
+    bestFor: [
+      "New York to Ontario truckload freight",
+      "Cross-border LTL with delivery appointments",
+      "Retail and manufacturing replenishment",
+    ],
+    relatedServices: [
+      { label: "Cross-border shipping", href: "/services/cross-border" },
+      { label: "LTL service", href: "/services/ltl" },
+      { label: "Truckload service", href: "/services/truckload" },
+    ],
+    relatedLocations: [
+      { label: "Buffalo freight services", href: "/locations/buffalo-ny" },
+      { label: "Toronto freight services", href: "/locations/toronto-on" },
+    ],
+  },
+  {
+    slug: "milton-on-to-port-huron-mi",
+    originLabel: "Milton, ON",
+    destinationLabel: "Port Huron, MI",
+    title: "Cross-Border Freight from Milton, ON to Port Huron, MI",
+    metaDescription:
+      "Cross-border freight shipping from Milton to Port Huron with truckload and LTL execution for Ontario-Michigan gateway freight.",
+    intro:
+      "NPT supports Milton to Port Huron freight with customs-aware planning and consistent cross-border handoffs.",
+    bestFor: [
+      "Ontario to Michigan truckload freight",
+      "Cross-border LTL with scheduled receiving",
+      "Industrial and project freight",
+    ],
+    relatedServices: [
+      { label: "Cross-border shipping", href: "/services/cross-border" },
+      { label: "Truckload service", href: "/services/truckload" },
+      { label: "LTL service", href: "/services/ltl" },
+    ],
+    relatedLocations: [
+      { label: "Milton freight services", href: "/locations/milton-on" },
+      { label: "Port Huron freight services", href: "/locations/port-huron-mi" },
+    ],
+  },
+  {
+    slug: "port-huron-mi-to-milton-on",
+    originLabel: "Port Huron, MI",
+    destinationLabel: "Milton, ON",
+    title: "Cross-Border Freight from Port Huron, MI to Milton, ON",
+    metaDescription:
+      "Cross-border freight shipping from Port Huron to Milton with truckload and LTL support for Ontario inbound freight.",
+    intro:
+      "NPT manages Port Huron to Milton freight with border-gateway discipline and proactive milestone communication.",
+    bestFor: [
+      "Michigan to Ontario truckload freight",
+      "Cross-border LTL shipments",
+      "Regional replenishment and scheduled dock freight",
+    ],
+    relatedServices: [
+      { label: "Cross-border shipping", href: "/services/cross-border" },
+      { label: "LTL service", href: "/services/ltl" },
+      { label: "Truckload service", href: "/services/truckload" },
+    ],
+    relatedLocations: [
+      { label: "Port Huron freight services", href: "/locations/port-huron-mi" },
+      { label: "Milton freight services", href: "/locations/milton-on" },
+    ],
+  },
+  {
     slug: "monterrey-nl-to-laredo-tx",
     originLabel: "Monterrey, NL",
     destinationLabel: "Laredo, TX",
@@ -700,6 +900,30 @@ export const SEO_LANES: SeoLanePage[] = [
     relatedLocations: [
       { label: "Monterrey freight services", href: "/locations/monterrey-nl" },
       { label: "Houston freight services", href: "/locations/houston-tx" },
+    ],
+  },
+  {
+    slug: "monterrey-nl-to-dallas-tx",
+    originLabel: "Monterrey, NL",
+    destinationLabel: "Dallas, TX",
+    title: "Cross-Border Freight from Monterrey, NL to Dallas, TX",
+    metaDescription:
+      "Cross-border freight shipping from Monterrey to Dallas with customs-ready truckload and LTL support.",
+    intro:
+      "NPT executes Monterrey to Dallas freight with border-aware planning and route-level execution controls.",
+    bestFor: [
+      "Mexico to Texas truckload freight",
+      "Cross-border LTL consolidation",
+      "Nearshoring-related manufacturing and retail freight",
+    ],
+    relatedServices: [
+      { label: "Cross-border shipping", href: "/services/cross-border" },
+      { label: "Truckload service", href: "/services/truckload" },
+      { label: "LTL service", href: "/services/ltl" },
+    ],
+    relatedLocations: [
+      { label: "Monterrey freight services", href: "/locations/monterrey-nl" },
+      { label: "Dallas freight services", href: "/locations/dallas-tx" },
     ],
   },
   {

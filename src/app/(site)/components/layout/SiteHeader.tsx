@@ -1,17 +1,23 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { LogoImage } from "@/components/media/LogoImage";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import { DesktopNav } from "./header/DesktopNav";
 import { MobileNav } from "./header/MobileNav";
+import { MobileSearchBubble } from "./header/MobileSearchBubble";
 
 const focusRing =
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-nav-ring)] focus-visible:ring-offset-0";
 
 export function SiteHeader() {
+  const [mobileSearchOpen, setMobileSearchOpen] = React.useState(false);
+  const mobileSearchTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+
   return (
     <header
       className={cn(
@@ -134,10 +140,41 @@ export function SiteHeader() {
             </div>
 
             {/* Mobile only */}
+            <button
+              ref={mobileSearchTriggerRef}
+              type="button"
+              onClick={() => {
+                setMobileSearchOpen((prev) => {
+                  const next = !prev;
+                  trackCtaClick({
+                    ctaId: next ? "nav_mobile_search_open" : "nav_mobile_search_close",
+                    location: "site_header:mobile_search_trigger",
+                    destination: "mobile_search_bubble",
+                    label: next ? "Open mobile search" : "Close mobile search",
+                  });
+                  return next;
+                });
+              }}
+              className={cn(
+                "inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full lg:hidden",
+                "text-[color:var(--color-nav-text)] hover:bg-white/10",
+                focusRing,
+              )}
+              aria-label="Search site"
+              aria-expanded={mobileSearchOpen}
+            >
+              <Search className="h-5 w-5" aria-hidden />
+            </button>
             <MobileNav />
           </div>
         </div>
       </Container>
+
+      <MobileSearchBubble
+        open={mobileSearchOpen}
+        onOpenChange={setMobileSearchOpen}
+        triggerRef={mobileSearchTriggerRef}
+      />
     </header>
   );
 }

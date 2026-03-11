@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { Container } from "../../components/layout/Container";
-import {
-  getSeoLocationBySlug,
-  getSeoLocationPriority,
-  getSeoLocationSlugs,
-} from "@/config/seoLocations";
+import { getSeoLocationBySlug, getSeoLocationSlugs } from "@/config/seoLocations";
 import { SITE_NAME, toAbsoluteUrl } from "@/lib/seo/site";
 
 type Params = { slug: string };
@@ -95,7 +92,6 @@ export default async function LocationPage({ params }: { params: Params | Promis
   const { slug } = await Promise.resolve(params);
   const location = getSeoLocationBySlug(slug);
   if (!location) notFound();
-  const priority = getSeoLocationPriority(location.slug);
 
   return (
     <main className="bg-[color:var(--color-surface-0)]">
@@ -117,15 +113,25 @@ export default async function LocationPage({ params }: { params: Params | Promis
         </div>
         <Container className="site-page-container relative max-w-6xl">
           <div className="py-6 sm:py-8">
-            <span className="inline-flex rounded-full border border-[color:var(--color-brand-100)] bg-[color:var(--color-brand-50)] px-3 py-1 text-[10px] font-semibold tracking-[0.12em] uppercase text-[color:var(--color-brand-700)]">
-              {priority} market
-            </span>
-            <h1 className="mt-3 max-w-4xl text-[1.9rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.3rem]">
+            <div className="mb-2.5 h-[2px] w-12 bg-[color:var(--color-brand-500)] sm:w-14" />
+            <p className="text-[10.5px] font-semibold tracking-[0.14em] uppercase text-[color:var(--color-brand-500)]">
+              Freight hub
+            </p>
+            <h1 className="mt-2.5 max-w-4xl text-[1.9rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.3rem]">
               {location.title}
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[color:var(--color-muted)] sm:text-[15px]">
               {location.intro}
             </p>
+            <div className="mt-6">
+              <Link
+                href="/quote"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[color:var(--color-brand-600)] px-6 text-sm font-semibold text-white shadow-[0_8px_22px_rgba(220,38,38,0.25)] transition hover:bg-[color:var(--color-brand-700)]"
+              >
+                Request a freight quote
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </Container>
       </section>
@@ -146,14 +152,6 @@ export default async function LocationPage({ params }: { params: Params | Promis
                 <li key={item}>{item}</li>
               ))}
             </ul>
-            <div className="mt-5">
-              <Link
-                href="/quote"
-                className="inline-flex h-10 items-center justify-center rounded-md bg-[color:var(--color-brand-600)] px-5 text-sm font-semibold text-white hover:bg-[color:var(--color-brand-700)]"
-              >
-                Request a freight quote
-              </Link>
-            </div>
           </section>
 
           <section className="mt-8">

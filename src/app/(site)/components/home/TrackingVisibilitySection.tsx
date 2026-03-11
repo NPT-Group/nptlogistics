@@ -91,7 +91,8 @@ const BULLETS: Bullet[] = [
   },
   {
     title: "Single-thread communication",
-    description: "One accountable team coordinating dispatch, updates, and delivery outcomes.",
+    description:
+      "one accountable team that coordinates tracking and updates, so you never have to wonder where your shipment is.",
   },
 ];
 
@@ -177,7 +178,7 @@ export function TrackingVisibilitySection() {
             <div className={TRACKING_VISIBILITY_TOKENS.kickerClass}>Tracking &amp; Visibility</div>
 
             <h2 className={TRACKING_VISIBILITY_TOKENS.headingClass}>
-              Visibility That Drives Better Decisions
+              Efficiency Through Real-Time Insight
             </h2>
 
             <p className={TRACKING_VISIBILITY_TOKENS.bodyClass}>

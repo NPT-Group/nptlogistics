@@ -29,7 +29,7 @@ export const TRUST_PROOF_SECTION = {
   kicker: "Trust & Proof",
   title: "Proof in Every Mile. Trusted on Every Load",
   description:
-    "Teams choose NPT when consistency matters: proactive communication, disciplined execution, and accountability from pickup to final delivery.",
+    "NPT ensures effective, dependable, and proactive communication and accountability from pick-up to final delivery. Additionally, provide sustainable supply chain solutions that link businesses with customers across the globe.",
 } as const;
 
 export const TRUST_PROOF_ITEMS: TestimonialItem[] = [
@@ -40,7 +40,7 @@ export const TRUST_PROOF_ITEMS: TestimonialItem[] = [
     title: "Watch NPT in Action",
     description: "A quick look at how our team executes with speed, control, and consistency.",
     youtubeUrl: "https://www.youtube.com/watch?v=mQv-1GA-HYo",
-    channelUrl: "https://www.youtube.com/@SSPGroupofCompanies", 
+    channelUrl: "https://www.youtube.com/@SSPGroupofCompanies",
   },
   {
     type: "testimonial",

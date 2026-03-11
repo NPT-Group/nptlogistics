@@ -24,7 +24,7 @@ export type CardTheme = "navy" | "red" | "slate" | "blue" | "ltl";
  * Optional — component fallback keeps your current look.
  */
 export type SolutionsTheme = "default" | "dark";
-export type SolutionsLayout = "auto" | "three" | "four";
+export type SolutionsLayout = "auto" | "two" | "three" | "four";
 
 export type ServiceCard = {
   /** Stable identifier for analytics and reporting (never change once live). */
@@ -57,12 +57,12 @@ export const SOLUTIONS_DATA = {
   "Core Freight Modes": {
     description: "Standard shipping methods for everyday freight needs.",
     image: "/_optimized/solutions/npt-core-freight-hero.webp",
-    layout: "three",
+    layout: "two",
     theme: "default",
     cards: [
       {
         analyticsId: "truckload_tl",
-        label: "Truckload (TL)",
+        label: "Truckload (FTL)",
         href: "/services/truckload",
         description: "Dedicated capacity for your entire shipment with faster transit times.",
         icon: "truck",
@@ -80,6 +80,7 @@ export const SOLUTIONS_DATA = {
         image: "/_optimized/solutions/card-ltl.webp",
         cardTheme: "ltl",
       },
+      /* COMMENTED OUT - uncomment to restore intermodal
       {
         analyticsId: "intermodal",
         label: "Intermodal",
@@ -90,6 +91,7 @@ export const SOLUTIONS_DATA = {
         image: "/_optimized/solutions/card-intermodal.webp",
         cardTheme: "navy",
       },
+      */
     ],
   },
   "Specialized & Time-Sensitive": {

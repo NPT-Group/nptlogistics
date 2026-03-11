@@ -3,20 +3,27 @@
 import React from "react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { usePathname, useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 import { trackCtaClick } from "@/lib/analytics/cta";
 import { NAV } from "@/config/navigation";
 import { DesktopRichDropdown, SolutionsMegaMenu } from "./NavMenuParts";
+import { DesktopSearchBubble } from "./DesktopSearchBubble";
+import { cn } from "@/lib/cn";
+import { focusRingNav } from "./constants";
 
 const NAV_OPEN_DELAY_MS = 180;
 const NAV_CLOSE_DELAY_MS = 560;
 
 export function DesktopNav() {
   const [value, setValue] = React.useState<string>("");
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const searchTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   const closeTimer = React.useRef<number | null>(null);
   const openTimer = React.useRef<number | null>(null);
   const pathname = usePathname();
   const router = useRouter();
   const openMenu = React.useCallback((v: string) => {
+    setIsSearchOpen(false);
     if (openTimer.current) window.clearTimeout(openTimer.current);
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
     openTimer.current = window.setTimeout(() => {
@@ -46,6 +53,20 @@ export function DesktopNav() {
     closeTimer.current = null;
     setValue("");
   }, []);
+
+  const openSearch = React.useCallback(() => {
+    closeMenu();
+    setIsSearchOpen((prev) => {
+      const next = !prev;
+      trackCtaClick({
+        ctaId: next ? "nav_desktop_search_open" : "nav_desktop_search_close",
+        location: "nav_desktop:search_trigger",
+        destination: "header_search_bubble",
+        label: next ? "Open search" : "Close search",
+      });
+      return next;
+    });
+  }, [closeMenu]);
 
   React.useEffect(() => {
     closeMenu();
@@ -120,6 +141,17 @@ export function DesktopNav() {
     router.push("/careers#overview");
   }, [closeMenu, pathname, router]);
 
+  const navigateToCompany = React.useCallback(() => {
+    closeMenu();
+    trackCtaClick({
+      ctaId: "nav_desktop_company_overview",
+      location: "nav_desktop:company_trigger",
+      destination: "/about-us",
+      label: "Company",
+    });
+    router.push("/about-us");
+  }, [closeMenu, router]);
+
   React.useEffect(() => {
     return () => {
       if (openTimer.current) window.clearTimeout(openTimer.current);
@@ -175,6 +207,7 @@ export function DesktopNav() {
             scheduleClose={scheduleClose}
             cancelClose={cancelClose}
             closeMenu={closeMenu}
+            onPrimaryAction={navigateToCompany}
           />
 
           <DesktopRichDropdown
@@ -187,8 +220,28 @@ export function DesktopNav() {
             closeMenu={closeMenu}
             onPrimaryAction={navigateToCareers}
           />
+
+          <button
+            ref={searchTriggerRef}
+            type="button"
+            onClick={openSearch}
+            aria-label="Search site"
+            className={cn(
+              "inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-md transition",
+              "text-[color:var(--color-nav-text)] hover:bg-[color:var(--color-nav-hover)]",
+              focusRingNav,
+            )}
+          >
+            <Search className="h-4 w-4" aria-hidden />
+          </button>
         </NavigationMenu.List>
       </NavigationMenu.Root>
+
+      <DesktopSearchBubble
+        open={isSearchOpen}
+        onOpenChange={setIsSearchOpen}
+        triggerRef={searchTriggerRef}
+      />
     </div>
   );
 }

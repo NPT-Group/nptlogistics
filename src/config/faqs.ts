@@ -29,7 +29,7 @@ export const FAQ_CATEGORIES: readonly FaqCategory[] = [
       {
         question: "What freight modes does NPT Logistics offer?",
         answer:
-          "We offer full truckload (TL), less-than-truckload (LTL), intermodal, expedited and specialized, temperature-controlled, hazmat, and cross-border and global services. Each mode is designed for specific lane, timeline, and compliance needs—we help you match the right mode to your shipment.",
+          "We offer full truckload (FTL), less-than-truckload (LTL), expedited and specialized, temperature-controlled, hazmat, and cross-border and global services. Each mode is designed for specific lane, timeline, and compliance needs—we help you match the right mode to your shipment.",
       },
       {
         question: "How do I get a quote?",
@@ -124,11 +124,11 @@ export const SHIPPING_GUIDES: readonly ShippingGuide[] = [
     id: "mode-selection",
     title: "Choosing the Right Freight Mode",
     description:
-      "Enterprise shippers optimize cost and service by matching mode to lane, volume, and timeline. This guide outlines when to use truckload, LTL, intermodal, and specialized options.",
+      "Enterprise shippers optimize cost and service by matching mode to lane, volume, and timeline. This guide outlines when to use truckload, LTL, and specialized options.",
     points: [
-      "Use full truckload (TL) when you have enough volume to fill a trailer and need minimal handling and faster transit.",
+      "Use full truckload (FTL) when you have enough volume to fill a trailer and need minimal handling and faster transit.",
       "Use LTL when shipment size is below truckload; you pay for space used and benefit from consolidated networks.",
-      "Use intermodal (rail + truck) for long-haul lanes where cost stability and capacity matter more than speed.",
+      "Use truckload for long-haul lanes where cost stability and capacity matter.",
       "Use expedited or specialized when deadlines are critical or freight requires dedicated equipment and handling.",
       "Match mode to your KPIs: cost per unit, on-time delivery, damage rates, and compliance requirements.",
     ],
