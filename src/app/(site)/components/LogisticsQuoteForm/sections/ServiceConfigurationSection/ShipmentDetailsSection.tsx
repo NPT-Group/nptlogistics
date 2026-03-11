@@ -31,22 +31,27 @@ export function ShipmentDetailsBlock({
   children,
   className,
 }: {
-  title: string;
+  title?: string;
   description?: string;
   children: ReactNode;
   className?: string;
 }) {
+  const hasHeader = Boolean(title || description);
+
   return (
     <section
       className={cn(
-        "space-y-4 rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5",
+        "rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5",
+        hasHeader && "space-y-4",
         className,
       )}
     >
-      <div className="space-y-1">
-        <h4 className="text-sm font-semibold text-neutral-900">{title}</h4>
-        {description ? <p className="text-sm text-neutral-600">{description}</p> : null}
-      </div>
+      {hasHeader ? (
+        <div className="space-y-1">
+          {title ? <h4 className="text-sm font-semibold text-neutral-900">{title}</h4> : null}
+          {description ? <p className="text-sm text-neutral-600">{description}</p> : null}
+        </div>
+      ) : null}
 
       {children}
     </section>

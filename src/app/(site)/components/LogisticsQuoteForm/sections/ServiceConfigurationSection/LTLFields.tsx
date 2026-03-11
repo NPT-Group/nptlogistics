@@ -91,10 +91,7 @@ export function LTLFields() {
         </div>
       </ShipmentDetailsBlock>
 
-      <ShipmentDetailsBlock
-        title="Pallet details"
-        description="Add each pallet type, quantity, dimensions, and weight."
-      >
+      <ShipmentDetailsBlock>
         <LtlPalletLinesSection />
       </ShipmentDetailsBlock>
 
