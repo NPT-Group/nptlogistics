@@ -14,6 +14,7 @@ import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { getSiteUrlFromRequest } from "@/lib/utils/urlHelper";
 import { sendQuoteCustomerConfirmationEmail } from "@/lib/mail/quotes/sendQuoteCustomerConfirmationEmail";
 import { LogisticsQuoteModel } from "@/mongoose/models/LogisticsQuote";
+import { generateUniqueQuoteId } from "@/lib/utils/quotes/generateQuoteId";
 
 type SubmitQuoteBody = {
   // Turnstile
@@ -71,10 +72,12 @@ export const POST = async (req: NextRequest) => {
     await connectDB();
 
     // 5) Pre-generate quote id so final S3 path is stable
-    const quoteId = new mongoose.Types.ObjectId().toString();
+    const quoteMongoId = new mongoose.Types.ObjectId().toString();
+    const quoteId = await generateUniqueQuoteId();
 
     const quote = new LogisticsQuoteModel({
-      _id: quoteId,
+      _id: quoteMongoId,
+      quoteId,
 
       serviceDetails: validated.serviceDetails,
       identification: validated.identification,
@@ -131,7 +134,7 @@ export const POST = async (req: NextRequest) => {
     const obj = quote.toObject({ virtuals: true, getters: true });
 
     return successResponse(201, "Quote submitted", {
-      quote: { ...obj, id: obj?._id?.toString?.() ?? quoteId },
+      quote: { ...obj, id: obj?._id?.toString?.() ?? quoteMongoId },
       attachmentsFinalizedCount: finalized.movedCount,
     });
   } catch (err) {

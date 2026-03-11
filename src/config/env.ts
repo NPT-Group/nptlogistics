@@ -30,20 +30,22 @@ export const DISABLE_AUTH = process.env.DISABLE_AUTH === "true";
 export const AZURE_AD_CLIENT_ID = process.env.AZURE_AD_CLIENT_ID!;
 export const AZURE_AD_CLIENT_SECRET = process.env.AZURE_AD_CLIENT_SECRET!;
 export const AZURE_AD_TENANT_ID = process.env.AZURE_AD_TENANT_ID!;
-export const NPT_HR_EMAIL = process.env.NPT_HR_EMAIL!;
 
 // Cloudflare
 export const NEXT_PUBLIC_TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!;
 export const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY!;
-export const TURNSTILE_DEV_BYPASS_TOKEN = process.env.TURNSTILE_DEV_BYPASS_TOKEN;
+export const TURNSTILE_DEV_BYPASS_TOKEN = process.env.TURNSTILE_DEV_BYPASS_TOKEN!;
+
+// Google Analytics
+export const NEXT_PUBLIC_GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!;
+
+// NPT Emails (Public so they can be used in UI if needed)
+export const NEXT_PUBLIC_NPT_LOGISTICS_EMAIL = process.env.NEXT_PUBLIC_NPT_LOGISTICS_EMAIL!;
+export const NEXT_PUBLIC_NPT_DISPATCH_EMAIL = process.env.NEXT_PUBLIC_NPT_DISPATCH_EMAIL!;
+export const NEXT_PUBLIC_NPT_SAFETY_EMAIL = process.env.NEXT_PUBLIC_NPT_SAFETY_EMAIL!;
+export const NEXT_PUBLIC_NPT_CS_EMAIL = process.env.NEXT_PUBLIC_NPT_CS_EMAIL!;
+export const NEXT_PUBLIC_NPT_HR_EMAIL = process.env.NEXT_PUBLIC_NPT_HR_EMAIL!;
 
 // Application Environment
 export const isProd = process.env.NODE_ENV === "production";
 export const PORT = process.env.PORT! ?? 3000;
-
-// Public HR email
-export const NEXT_PUBLIC_NPT_HR_EMAIL =
-  process.env.NEXT_PUBLIC_NPT_HR_EMAIL! || "hr@nptlogistics.com";
-
-// NPT quotes receiving email
-export const NPT_QUOTES_EMAIL = process.env.NPT_QUOTES_EMAIL! || "";

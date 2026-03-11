@@ -42,13 +42,21 @@ export const siteTextareaUi: FieldUi = {
 export const siteCheckUi: FieldUi = {
   container: "space-y-1",
   label: "text-sm font-medium leading-5 text-[color:var(--color-text-light)]",
+
   controlRow: [
     "rounded-xl border border-neutral-200 bg-white px-3 py-3",
     "transition",
     "hover:border-neutral-300 hover:bg-neutral-50/80",
-    "focus-within:border-black focus-within:ring-2 focus-within:ring-black/10",
+    "focus-within:border-neutral-300 focus-within:ring-2 focus-within:ring-black/10",
   ].join(" "),
-  controlBox: ["peer sr-only"].join(" "),
+
+  controlBox: "peer sr-only",
+
+  controlChecked: [
+    "border-[color:var(--color-brand-600)]",
+    "bg-[color:var(--color-brand-600)]",
+  ].join(" "),
+
   hint: "mt-1 text-xs text-[color:var(--color-subtle-light)]",
   error: "mt-1 text-xs text-red-600",
 };
@@ -57,7 +65,19 @@ export const siteCheckUi: FieldUi = {
 export const siteFileButtonUi: FieldUi = {
   container: "space-y-1",
   label: "text-sm font-semibold text-[color:var(--color-text-light)]",
-  control: "",
+
+  control: [
+    "border-neutral-200",
+    "bg-white",
+    "text-[color:var(--color-text-light)]",
+    "hover:border-neutral-300",
+    "focus-within:ring-2",
+    "focus-within:ring-black/10",
+    "focus-within:border-neutral-300",
+  ].join(" "),
+
+  icon: "text-red-600",
+
   hint: "text-xs text-[color:var(--color-subtle-light)]",
   error: "text-xs text-red-600",
 };

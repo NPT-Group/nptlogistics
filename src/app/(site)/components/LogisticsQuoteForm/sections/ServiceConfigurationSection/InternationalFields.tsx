@@ -55,9 +55,9 @@ export function InternationalFields() {
 
           <TextField
             control={control}
-            name={"serviceDetails.readyDate" as any}
-            fieldPathAttr="serviceDetails.readyDate"
-            label="Ready date"
+            name={"serviceDetails.pickupDate" as any}
+            fieldPathAttr="serviceDetails.pickupDate"
+            label="Pickup date"
             required
             ui={siteTextUi}
             inputProps={{ type: "date" }}

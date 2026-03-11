@@ -40,28 +40,15 @@ export function SubmitSection({ turnstileRef }: SubmitSectionProps) {
         hint="Optional. You can unsubscribe anytime using the link in our emails."
       />
 
-      <div className="relative w-full overflow-hidden rounded-2xl border border-neutral-200 bg-white p-3">
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-2xl bg-[linear-gradient(180deg,rgba(0,0,0,0.03),transparent_55%)]"
-        />
-
-        <span
-          aria-hidden="true"
-          className={cn(
-            "pointer-events-none absolute inset-0 rounded-2xl opacity-100",
-            "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.6)]",
-          )}
-        />
-
-        <div className="relative flex items-start gap-2 sm:gap-3">
+      <div className="rounded-2xl border border-neutral-200 bg-white p-3">
+        <div className="flex items-start gap-3">
           <span
             className={cn(
-              "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border sm:h-10 sm:w-10",
-              "border-neutral-200 bg-neutral-50 text-neutral-700",
+              "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+              "border border-neutral-200 bg-white text-neutral-500",
             )}
           >
-            <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+            <AlertCircle className="h-4 w-4" />
           </span>
 
           <div className="min-w-0">
@@ -78,8 +65,8 @@ export function SubmitSection({ turnstileRef }: SubmitSectionProps) {
               href="/privacy"
               target="_blank"
               className={cn(
-                "mt-2 inline-flex items-center text-sm font-medium underline underline-offset-4 transition",
-                "text-black hover:text-neutral-700",
+                "mt-3 inline-flex items-center text-sm font-medium underline underline-offset-4 transition",
+                "text-[color:var(--color-text-light)] hover:text-neutral-700",
               )}
             >
               Read our Privacy Policy

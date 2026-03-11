@@ -92,11 +92,12 @@ export function CheckboxField<TFieldValues extends FieldValues>(
         <span
           aria-hidden="true"
           className={cn(
-            "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition",
-            "border-neutral-300 bg-white text-white",
-            "peer-checked:border-black peer-checked:bg-black",
+            "relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-200",
+            checked
+              ? cn("border-black bg-black text-white", ui.controlChecked)
+              : "border-neutral-300 bg-white text-transparent",
             "peer-hover:border-neutral-400",
-            "peer-focus-visible:border-black",
+            "peer-focus-visible:border-neutral-400",
             "peer-focus-visible:ring-2 peer-focus-visible:ring-black/10",
             "peer-disabled:opacity-60",
             invalid &&
@@ -105,7 +106,7 @@ export function CheckboxField<TFieldValues extends FieldValues>(
         >
           <Check
             className={cn(
-              "h-3.5 w-3.5 transition",
+              "h-3.5 w-3.5 transition-all duration-200 ease-out",
               checked ? "scale-100 opacity-100" : "scale-75 opacity-0",
             )}
             strokeWidth={3}

@@ -19,24 +19,23 @@ function QuoteHero() {
       id="quote-hero"
       className="relative scroll-mt-16 overflow-hidden bg-[color:var(--color-surface-0)] py-8 sm:py-10"
     >
-      {/* Background grid + gradient to mirror FAQ hero */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 opacity-[0.04] [background-image:linear-gradient(to_right,rgba(255,255,255,0.9)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.9)_1px,transparent_1px)] [background-size:80px_80px]" />
+        <div className="absolute inset-0 [background-image:linear-gradient(to_right,rgba(255,255,255,0.9)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.9)_1px,transparent_1px)] [background-size:80px_80px] opacity-[0.04]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_800px_400px_at_70%_30%,rgba(220,38,38,0.12),transparent_55%)]" />
         <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[rgba(2,6,23,0.6)] to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#070a12] to-transparent" />
       </div>
 
       <Container className="site-page-container relative">
-        <div className="py-6 sm:py-8 lg:py-10 text-center">
+        <div className="py-6 text-center sm:py-8 lg:py-10">
           <div className="mx-auto mb-2.5 h-[2px] w-12 bg-[color:var(--color-brand-500)] sm:w-14" />
-          <p className="text-[10.5px] font-semibold tracking-[0.14em] uppercase text-[color:var(--color-brand-500)]">
+          <p className="text-[10.5px] font-semibold tracking-[0.14em] text-[color:var(--color-brand-500)] uppercase">
             Quotes &amp; Planning
           </p>
-          <h1 className="mt-2.5 mx-auto max-w-3xl text-[1.9rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.2rem] lg:text-[2.45rem]">
+          <h1 className="mx-auto mt-2.5 max-w-3xl text-[1.9rem] leading-tight font-semibold tracking-tight text-white sm:text-[2.2rem] lg:text-[2.45rem]">
             Share your shipment. We’ll handle the precision.
           </h1>
-          <p className="mt-3 mx-auto max-w-2xl text-[13px] leading-[1.65] text-[color:var(--color-muted)] sm:text-[14px]">
+          <p className="mx-auto mt-3 max-w-2xl text-[13px] leading-[1.65] text-[color:var(--color-muted)] sm:text-[14px]">
             Tell us where your freight is moving, what needs to move, and the service window. Our
             team reviews every request, aligns the right capacity, and comes back with a tailored
             quote—not a generic rate sheet.
@@ -67,9 +66,26 @@ const assuranceItems = [
 
 export function QuoteAssurance() {
   return (
-    <section className="py-8 sm:py-10">
-      <Container className="site-page-container">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <section className="relative overflow-hidden bg-[#070b14] py-14 sm:py-16">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 [background-image:linear-gradient(to_right,rgba(255,255,255,0.85)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.85)_1px,transparent_1px)] [background-size:72px_72px] opacity-[0.035]" />
+        <div className="absolute inset-0 bg-[radial-gradient(700px_320px_at_18%_18%,rgba(220,38,38,0.16),transparent_58%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(820px_360px_at_82%_100%,rgba(59,130,246,0.10),transparent_62%)]" />
+        <div className="absolute inset-x-0 top-0 h-px bg-white/10" />
+      </div>
+
+      <Container className="site-page-container relative">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto mb-3 h-[2px] w-12 bg-[color:var(--color-brand-500)]" />
+          <p className="text-[10.5px] font-semibold tracking-[0.14em] text-[color:var(--color-brand-500)] uppercase">
+            Why shippers trust NPT
+          </p>
+          <h2 className="mt-3 text-[1.55rem] font-semibold tracking-tight text-white sm:text-[1.9rem]">
+            Built for confidence at every step
+          </h2>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-3">
           {assuranceItems.map((item) => {
             const Icon = item.icon;
 
@@ -77,39 +93,34 @@ export function QuoteAssurance() {
               <div
                 key={item.title}
                 className={cn(
-                  "group relative overflow-hidden rounded-[24px] border p-5 sm:p-6",
-                  "border-[color:var(--color-border-light)] bg-white/88 backdrop-blur-sm",
-                  "shadow-[0_10px_30px_rgba(15,23,42,0.05)] transition duration-300",
-                  "hover:-translate-y-[1px] hover:shadow-[0_14px_36px_rgba(15,23,42,0.08)]",
+                  "group relative overflow-hidden rounded-[24px] p-[1px]",
+                  "bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.05))]",
+                  "shadow-[0_18px_50px_rgba(0,0,0,0.28)] transition duration-300",
+                  "hover:-translate-y-[2px] hover:shadow-[0_22px_60px_rgba(0,0,0,0.34)]",
                 )}
               >
-                {/* integrated accent instead of disconnected top border */}
-                <div
-                  aria-hidden
-                  className="absolute top-0 left-0 h-16 w-16 rounded-br-[22px]"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(220,38,38,0.10) 0%, rgba(220,38,38,0.04) 55%, transparent 100%)",
-                  }}
-                />
-
-                <div className="relative flex items-start gap-4">
+                <div className="relative h-full rounded-[23px] border border-white/6 bg-[linear-gradient(180deg,rgba(10,14,24,0.88),rgba(7,11,20,0.96))] p-5 sm:p-6">
                   <div
-                    className={cn(
-                      "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl",
-                      "border border-[color:var(--color-brand-100)] bg-white",
-                      "shadow-[0_4px_12px_rgba(15,23,42,0.05)]",
-                    )}
-                  >
-                    <Icon className="h-5.5 w-5.5 text-[color:var(--color-brand-600)]" />
-                  </div>
+                    aria-hidden
+                    className="absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.12),transparent_55%)]"
+                  />
 
-                  <div className="min-w-0">
-                    <h3 className="text-[1.05rem] font-semibold tracking-tight text-[color:var(--color-text-light)]">
+                  <div className="relative">
+                    <div
+                      className={cn(
+                        "inline-flex h-11 w-11 items-center justify-center rounded-2xl",
+                        "border border-white/10 bg-white/[0.045] backdrop-blur-sm",
+                        "shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
+                      )}
+                    >
+                      <Icon className="h-5 w-5 text-[color:var(--color-brand-500)]" />
+                    </div>
+
+                    <h3 className="mt-5 text-[1.02rem] font-semibold tracking-tight text-white">
                       {item.title}
                     </h3>
 
-                    <p className="mt-2 max-w-[24ch] text-sm leading-6 text-[color:var(--color-muted-light)]">
+                    <p className="mt-2 max-w-[30ch] text-sm leading-6 text-white/64">
                       {item.description}
                     </p>
                   </div>

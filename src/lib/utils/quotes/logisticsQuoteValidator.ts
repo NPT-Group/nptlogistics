@@ -1,5 +1,4 @@
 // src/lib/utils/quotes/logisticsQuoteValidator.ts
-// src/lib/utils/quotes/logisticsQuoteValidator.ts
 import {
   EBrokerType,
   ECustomerIdentity,
@@ -10,6 +9,7 @@ import {
   EFTLAddon,
   EFTLEquipmentType,
   ELTLAddon,
+  ELTLEquipmentType,
   EWarehousingDuration,
   EWeightUnit,
   type LogisticsAddress,
@@ -204,17 +204,19 @@ function validateAttachments(arr: unknown) {
   return out;
 }
 
-/** Equipment -> allowed add-ons */
+/** FTL Equipment -> allowed add-ons */
 const FTL_ADDON_COMPAT: Record<EFTLEquipmentType, readonly EFTLAddon[]> = {
   [EFTLEquipmentType.DRY_VAN]: [
     EFTLAddon.EXPEDITED,
     EFTLAddon.TEAM_DRIVERS,
     EFTLAddon.HAZARDOUS_MATERIALS,
+    EFTLAddon.APPOINTMENT_REQUIRED,
   ],
   [EFTLEquipmentType.REEFER]: [
     EFTLAddon.EXPEDITED,
     EFTLAddon.TEAM_DRIVERS,
     EFTLAddon.HAZARDOUS_MATERIALS,
+    EFTLAddon.APPOINTMENT_REQUIRED,
   ],
   [EFTLEquipmentType.FLATBED]: [
     EFTLAddon.OVERSIZED_OVERWEIGHT,
@@ -222,16 +224,67 @@ const FTL_ADDON_COMPAT: Record<EFTLEquipmentType, readonly EFTLAddon[]> = {
     EFTLAddon.EXPEDITED,
     EFTLAddon.TEAM_DRIVERS,
     EFTLAddon.HAZARDOUS_MATERIALS,
+    EFTLAddon.APPOINTMENT_REQUIRED,
+  ],
+  [EFTLEquipmentType.STEP_DECK]: [
+    EFTLAddon.OVERSIZED_OVERWEIGHT,
+    EFTLAddon.ESCORT_VEHICLES_REQUIRED,
+    EFTLAddon.EXPEDITED,
+    EFTLAddon.TEAM_DRIVERS,
+    EFTLAddon.HAZARDOUS_MATERIALS,
+    EFTLAddon.APPOINTMENT_REQUIRED,
   ],
   [EFTLEquipmentType.RGN_LOWBOY]: [
     EFTLAddon.OVERSIZED_OVERWEIGHT,
     EFTLAddon.ESCORT_VEHICLES_REQUIRED,
     EFTLAddon.EXPEDITED,
+    EFTLAddon.APPOINTMENT_REQUIRED,
   ],
   [EFTLEquipmentType.CONESTOGA]: [
     EFTLAddon.EXPEDITED,
     EFTLAddon.TEAM_DRIVERS,
     EFTLAddon.HAZARDOUS_MATERIALS,
+    EFTLAddon.APPOINTMENT_REQUIRED,
+  ],
+};
+
+/** LTL Equipment -> allowed add-ons */
+const LTL_ADDON_COMPAT: Record<ELTLEquipmentType, readonly ELTLAddon[]> = {
+  [ELTLEquipmentType.DRY_VAN]: [
+    ELTLAddon.LIFTGATE_REQUIRED,
+    ELTLAddon.RESIDENTIAL_DELIVERY,
+    ELTLAddon.APPOINTMENT_REQUIRED,
+    ELTLAddon.EXPEDITED,
+    ELTLAddon.TEAM_DRIVERS,
+    ELTLAddon.HAZARDOUS_MATERIALS,
+  ],
+  [ELTLEquipmentType.FLATBED]: [
+    ELTLAddon.LIFTGATE_REQUIRED,
+    ELTLAddon.RESIDENTIAL_DELIVERY,
+    ELTLAddon.APPOINTMENT_REQUIRED,
+    ELTLAddon.OVERSIZED_OVERWEIGHT,
+    ELTLAddon.ESCORT_VEHICLES_REQUIRED,
+    ELTLAddon.EXPEDITED,
+    ELTLAddon.TEAM_DRIVERS,
+    ELTLAddon.HAZARDOUS_MATERIALS,
+  ],
+  [ELTLEquipmentType.STEP_DECK]: [
+    ELTLAddon.LIFTGATE_REQUIRED,
+    ELTLAddon.RESIDENTIAL_DELIVERY,
+    ELTLAddon.APPOINTMENT_REQUIRED,
+    ELTLAddon.OVERSIZED_OVERWEIGHT,
+    ELTLAddon.ESCORT_VEHICLES_REQUIRED,
+    ELTLAddon.EXPEDITED,
+    ELTLAddon.TEAM_DRIVERS,
+    ELTLAddon.HAZARDOUS_MATERIALS,
+  ],
+  [ELTLEquipmentType.CONESTOGA]: [
+    ELTLAddon.LIFTGATE_REQUIRED,
+    ELTLAddon.RESIDENTIAL_DELIVERY,
+    ELTLAddon.APPOINTMENT_REQUIRED,
+    ELTLAddon.EXPEDITED,
+    ELTLAddon.TEAM_DRIVERS,
+    ELTLAddon.HAZARDOUS_MATERIALS,
   ],
 };
 
@@ -274,7 +327,7 @@ export function validateLogisticsQuoteRequest(input: {
       assert(isNorthAmerica(service.origin.countryCode), "FTL origin must be CA/US/MX");
       assert(isNorthAmerica(service.destination.countryCode), "FTL destination must be CA/US/MX");
 
-      service.readyDate = validateDate(service.readyDate, "serviceDetails.readyDate");
+      service.pickupDate = validateDate(service.pickupDate, "serviceDetails.pickupDate");
       service.commodityDescription = trim(service.commodityDescription);
       assert(service.commodityDescription, "serviceDetails.commodityDescription is required");
 
@@ -292,8 +345,8 @@ export function validateLogisticsQuoteRequest(input: {
         validateDims(service.dimensions, "serviceDetails.dimensions");
       }
 
-      if (service.readyDateFlexible != null) {
-        service.readyDateFlexible = Boolean(service.readyDateFlexible);
+      if (service.pickupDateFlexible != null) {
+        service.pickupDateFlexible = Boolean(service.pickupDateFlexible);
       }
 
       if (service.addons == null) {
@@ -319,12 +372,18 @@ export function validateLogisticsQuoteRequest(input: {
     }
 
     case ELogisticsPrimaryService.LTL: {
+      const equipment = String(service.equipment || "");
+      assert(
+        Object.values(ELTLEquipmentType).includes(equipment as ELTLEquipmentType),
+        "serviceDetails.equipment is invalid",
+      );
+
       validateAddress(service.origin, "serviceDetails.origin");
       validateAddress(service.destination, "serviceDetails.destination");
       assert(isNorthAmerica(service.origin.countryCode), "LTL origin must be CA/US/MX");
       assert(isNorthAmerica(service.destination.countryCode), "LTL destination must be CA/US/MX");
 
-      service.readyDate = validateDate(service.readyDate, "serviceDetails.readyDate");
+      service.pickupDate = validateDate(service.pickupDate, "serviceDetails.pickupDate");
       service.commodityDescription = trim(service.commodityDescription);
       assert(service.commodityDescription, "serviceDetails.commodityDescription is required");
 
@@ -350,8 +409,6 @@ export function validateLogisticsQuoteRequest(input: {
         pl.weightValue = Number(pl.weightValue);
       }
 
-      // For LTL, unit is user-provided and required.
-      // value is derived from palletLines[*].weightValue and overwritten here.
       validateWeightUnitOnly(
         service.approximateTotalWeight,
         "serviceDetails.approximateTotalWeight",
@@ -374,9 +431,15 @@ export function validateLogisticsQuoteRequest(input: {
             "serviceDetails.addons contains invalid value",
           );
         }
+
+        const allowed = new Set(LTL_ADDON_COMPAT[equipment as ELTLEquipmentType] || []);
+        for (const a of service.addons as ELTLAddon[]) {
+          assert(allowed.has(a), `LTL add-on ${a} is not compatible with equipment ${equipment}`);
+        }
       }
 
       service.primaryService = ps;
+      service.equipment = equipment;
       break;
     }
 
@@ -390,7 +453,7 @@ export function validateLogisticsQuoteRequest(input: {
       validateAddress(service.origin, "serviceDetails.origin");
       validateAddress(service.destination, "serviceDetails.destination");
 
-      service.readyDate = validateDate(service.readyDate, "serviceDetails.readyDate");
+      service.pickupDate = validateDate(service.pickupDate, "serviceDetails.pickupDate");
       service.commodityDescription = trim(service.commodityDescription);
       assert(service.commodityDescription, "serviceDetails.commodityDescription is required");
 

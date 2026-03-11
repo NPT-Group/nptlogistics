@@ -269,10 +269,12 @@ export function FileUploadField<TFieldValues extends FieldValues>(
   ].join(" ");
 
   const actionButtonBase =
-    "inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-900 shadow-sm transition hover:cursor-pointer hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-black/10 disabled:pointer-events-none disabled:opacity-60";
+    "inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-900 transition hover:cursor-pointer hover:bg-neutral-50 hover:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-black/10 disabled:pointer-events-none disabled:opacity-60";
 
   const iconOnlyButtonBase =
-    "inline-flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200 bg-white text-neutral-900 shadow-sm transition hover:cursor-pointer hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-black/10 disabled:pointer-events-none disabled:opacity-60";
+    "inline-flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200 bg-white text-neutral-900 transition hover:cursor-pointer hover:bg-neutral-50 hover:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-black/10 disabled:pointer-events-none disabled:opacity-60";
+
+  const defaultIconClassName = "text-black";
 
   return (
     <div className={ui.container} data-field-path={path}>
@@ -293,13 +295,14 @@ export function FileUploadField<TFieldValues extends FieldValues>(
             className={cn(
               pickerButtonBase,
               pickerButtonTone,
+              ui.control,
               "cursor-pointer",
               styles?.pickerButtonClassName,
               isUploading && "pointer-events-none opacity-60",
               isMultiple && currentMulti.length >= maxFiles && "pointer-events-none opacity-50",
             )}
           >
-            <Paperclip className="h-4 w-4" />
+            <Paperclip className={cn("h-4 w-4", defaultIconClassName, ui.icon)} />
             <input
               type="file"
               className="sr-only"
@@ -334,7 +337,7 @@ export function FileUploadField<TFieldValues extends FieldValues>(
               className={cn(actionButtonBase, styles?.removeButtonClassName)}
               disabled={isUploading}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className={cn("h-4 w-4", defaultIconClassName, ui.icon)} />
               {removeLabel}
             </button>
           ) : null}
@@ -352,7 +355,7 @@ export function FileUploadField<TFieldValues extends FieldValues>(
                   className={cn(actionButtonBase, styles?.removeAllButtonClassName)}
                   disabled={isUploading}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className={cn("h-4 w-4", defaultIconClassName, ui.icon)} />
                   {removeAllLabel}
                 </button>
               ) : null}
@@ -386,7 +389,7 @@ export function FileUploadField<TFieldValues extends FieldValues>(
                   aria-label={removeLabel}
                   title={removeLabel}
                 >
-                  <X className="h-4 w-4" />
+                  <X className={cn("h-4 w-4", defaultIconClassName, ui.icon)} />
                 </button>
               ) : null}
             </div>
@@ -410,7 +413,7 @@ export function FileUploadField<TFieldValues extends FieldValues>(
                 )}
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
-                  <Paperclip className="h-4 w-4" />
+                  <Paperclip className={cn("h-4 w-4", defaultIconClassName, ui.icon)} />
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -437,7 +440,7 @@ export function FileUploadField<TFieldValues extends FieldValues>(
                     aria-label={removeLabel}
                     title={removeLabel}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className={cn("h-4 w-4", defaultIconClassName, ui.icon)} />
                   </button>
                 ) : null}
               </li>

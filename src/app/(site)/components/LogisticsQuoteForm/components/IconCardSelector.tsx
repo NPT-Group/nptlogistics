@@ -63,19 +63,22 @@ export function IconCardSelector<T extends string>({
         aria-pressed={active}
         aria-describedby={errorId}
         className={cn(
-          "group relative flex h-full w-full flex-col overflow-hidden border text-left transition",
+          "group relative flex h-full w-full flex-col overflow-hidden border text-left transition-all duration-200",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10",
           "hover:cursor-pointer",
 
           active
-            ? "border-[color:var(--color-text-light)] bg-white"
-            : "border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/70",
+            ? cn(
+                "rounded-2xl border border-neutral-200 bg-neutral-50/60",
+                "shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]",
+              )
+            : cn("border-neutral-200 bg-white", "hover:border-neutral-300 hover:bg-neutral-50/80"),
 
           invalid && !active && "border-red-300",
 
           isPrimary &&
             cn(
-              "rounded-xl p-4",
+              "rounded-2xl p-4",
               isCenter
                 ? "flex flex-col items-center justify-center text-center"
                 : "flex items-start gap-3",
@@ -83,7 +86,7 @@ export function IconCardSelector<T extends string>({
 
           variant === "secondary" &&
             cn(
-              "rounded-xl px-3.5 py-3.5",
+              "rounded-2xl px-3.5 py-3.5",
               isCenter
                 ? "flex flex-col items-center justify-center text-center"
                 : "flex items-start gap-3",
@@ -95,9 +98,8 @@ export function IconCardSelector<T extends string>({
         <span
           aria-hidden="true"
           className={cn(
-            "pointer-events-none absolute inset-0 opacity-0 transition-opacity",
-            isDetailed ? "rounded-2xl" : "rounded-xl",
-            active && "opacity-100 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)]",
+            "pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-200",
+            active && "opacity-100 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.55)]",
           )}
         />
 
@@ -115,14 +117,38 @@ export function IconCardSelector<T extends string>({
               >
                 <div
                   className={cn(
-                    "inline-flex shrink-0 items-center justify-center border transition",
-                    hasSupportingText ? "mt-0.5 h-10 w-10 rounded-xl" : "h-9 w-9 rounded-xl",
+                    "inline-flex shrink-0 items-center justify-center overflow-hidden rounded-xl border transition-all duration-200",
+                    hasSupportingText ? "mt-0.5 h-10 w-10" : "h-9 w-9",
                     active
-                      ? "border-[color:var(--color-text-light)] bg-white text-[color:var(--color-text-light)]"
-                      : "border-neutral-200 bg-white text-[color:var(--color-text-light)] group-hover:border-neutral-300",
+                      ? "border-[color:var(--color-brand-600)]"
+                      : "border-neutral-200 bg-white group-hover:border-neutral-300",
                   )}
+                  style={
+                    active
+                      ? {
+                          background:
+                            "linear-gradient(180deg, rgba(239,68,68,1) 0%, rgba(220,38,38,1) 100%)",
+                        }
+                      : undefined
+                  }
                 >
-                  <Icon className={cn(hasSupportingText ? "h-4.5 w-4.5" : "h-4 w-4")} />
+                  <Icon
+                    className={cn(
+                      "absolute transition-all duration-200 ease-out",
+                      hasSupportingText ? "h-4.5 w-4.5" : "h-4 w-4",
+                      active
+                        ? "scale-75 text-[color:var(--color-text-light)] opacity-0"
+                        : "scale-100 text-[color:var(--color-text-light)] opacity-100",
+                    )}
+                  />
+
+                  <Icon
+                    className={cn(
+                      "absolute transition-all duration-200 ease-out",
+                      hasSupportingText ? "h-4.5 w-4.5" : "h-4 w-4",
+                      active ? "scale-100 text-white opacity-100" : "scale-75 text-white opacity-0",
+                    )}
+                  />
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -132,7 +158,7 @@ export function IconCardSelector<T extends string>({
                     </div>
 
                     {active ? (
-                      <span className="rounded-full border border-neutral-200 bg-white px-2 py-0.5 text-[10px] font-medium tracking-[0.12em] text-neutral-600 uppercase">
+                      <span className="rounded-full border border-red-100 bg-red-50 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-red-700 uppercase">
                         {selectedLabel}
                       </span>
                     ) : null}
@@ -151,14 +177,38 @@ export function IconCardSelector<T extends string>({
           <>
             <div
               className={cn(
-                "relative mb-2 flex items-center justify-center border transition",
-                isPrimary ? "size-10 rounded-full" : "size-9 rounded-full",
+                "relative mb-2 flex items-center justify-center overflow-hidden rounded-full border transition-all duration-200",
+                isPrimary ? "size-10" : "size-9",
                 active
-                  ? "border-[color:var(--color-text-light)] bg-white text-[color:var(--color-text-light)]"
-                  : "border-neutral-200 bg-white text-[color:var(--color-text-light)] group-hover:border-neutral-300",
+                  ? "border-[color:var(--color-brand-600)]"
+                  : "border-neutral-200 bg-white group-hover:border-neutral-300",
               )}
+              style={
+                active
+                  ? {
+                      background:
+                        "linear-gradient(180deg, rgba(239,68,68,1) 0%, rgba(220,38,38,1) 100%)",
+                    }
+                  : undefined
+              }
             >
-              <Icon className={cn(isPrimary ? "h-5 w-5" : "h-4 w-4")} />
+              <Icon
+                className={cn(
+                  "absolute transition-all duration-200 ease-out",
+                  isPrimary ? "h-5 w-5" : "h-4 w-4",
+                  active
+                    ? "scale-75 text-[color:var(--color-text-light)] opacity-0"
+                    : "scale-100 text-[color:var(--color-text-light)] opacity-100",
+                )}
+              />
+
+              <Icon
+                className={cn(
+                  "absolute transition-all duration-200 ease-out",
+                  isPrimary ? "h-5 w-5" : "h-4 w-4",
+                  active ? "scale-100 text-white opacity-100" : "scale-75 text-white opacity-0",
+                )}
+              />
             </div>
 
             <div className={cn("relative min-w-0", isCenter ? "text-center" : "text-left")}>
@@ -183,9 +233,9 @@ export function IconCardSelector<T extends string>({
         {active && !isDetailed ? (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute top-3 right-3 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[color:var(--color-text-light)] bg-white"
+            className="pointer-events-none absolute top-3 right-3 flex h-4 w-4 items-center justify-center rounded-full border border-red-200 bg-white/95"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-text-light)]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand-600)]" />
           </span>
         ) : null}
 
@@ -224,5 +274,7 @@ export function IconCardSelector<T extends string>({
     );
   });
 
-  return <div className={cn("grid items-stretch gap-3", columnsClassName, className)}>{content}</div>;
+  return (
+    <div className={cn("grid items-stretch gap-3", columnsClassName, className)}>{content}</div>
+  );
 }

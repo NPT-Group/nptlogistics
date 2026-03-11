@@ -1,9 +1,8 @@
-// src/lib/mail/quotes/sendQuoteNotificationEmail.ts
-// src/lib/mail/quotes/sendQuoteNotificationEmail.ts
+// src/lib/mail/quotes/sendQuoteInternalNotificationEmail.ts
 import { sendMailAppOnly, type GraphAttachment } from "@/lib/mail/mailer";
 import { escapeHtml } from "@/lib/mail/utils";
 import { buildDefaultEmailTemplate } from "@/lib/mail/templates/defaultTemplate";
-import { NPT_QUOTES_EMAIL } from "@/config/env";
+import { NEXT_PUBLIC_NPT_LOGISTICS_EMAIL } from "@/config/env";
 
 import type { IFileAsset } from "@/types/shared.types";
 import {
@@ -24,7 +23,8 @@ import {
 import { filenameForAsset } from "@/lib/utils/files/mime";
 import {
   BROKER_TYPE_LABEL,
-  EQUIPMENT_LABEL,
+  FTL_EQUIPMENT_LABEL,
+  LTL_EQUIPMENT_LABEL,
   FTL_ADDON_LABEL,
   IDENTITY_LABEL,
   LTL_ADDON_LABEL,
@@ -36,6 +36,7 @@ import {
   labelFromMap,
   labelsFromMap,
 } from "@/lib/utils/enums/logisticsLabels";
+import { getCountryNameFromCode } from "@/config/countries";
 
 /* ───────────────────────── Small formatting helpers ───────────────────────── */
 
@@ -49,18 +50,20 @@ function fmtDate(v?: string | Date) {
   if (!v) return "—";
   const d = typeof v === "string" ? new Date(v) : v;
   if (Number.isNaN(d.getTime())) return escapeHtml(String(v));
-  return escapeHtml(d.toISOString().slice(0, 10)); // YYYY-MM-DD
+  return escapeHtml(d.toISOString().slice(0, 10));
 }
 
 function fmtAddress(a?: LogisticsAddress) {
   if (!a) return "—";
-  const parts = [
-    a.street1,
-    a.street2,
-    `${a.city}, ${a.region} ${a.postalCode}`.trim(),
-    a.countryCode,
-  ].filter(Boolean);
-  return escapeHtml(parts.join(" • "));
+
+  const locality = [a.city, a.region, a.postalCode].filter(Boolean).join(", ");
+  const countryName = escapeHtml(getCountryNameFromCode(a.countryCode));
+
+  const parts = [a.street1, a.street2, locality, countryName]
+    .filter(Boolean)
+    .map((part) => escapeHtml(String(part)));
+
+  return parts.join(" • ");
 }
 
 function fmtCompanyAddress(v?: unknown) {
@@ -181,10 +184,10 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
       return `
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (FTL)</p>
         <ul style="margin:0 0 16px 18px; padding:0;">
-          <li style="margin:0 0 8px 0;">Equipment: <strong>${escapeHtml(labelFromMap(s.equipment, EQUIPMENT_LABEL))}</strong></li>
+          <li style="margin:0 0 8px 0;">Equipment: <strong>${escapeHtml(labelFromMap(s.equipment, FTL_EQUIPMENT_LABEL))}</strong></li>
           <li style="margin:0 0 8px 0;">Origin: ${fmtAddress(s.origin)}</li>
           <li style="margin:0 0 8px 0;">Destination: ${fmtAddress(s.destination)}</li>
-          <li style="margin:0 0 8px 0;">Ready Date: ${fmtDate(s.readyDate)} (Flexible: ${yn(s.readyDateFlexible)})</li>
+          <li style="margin:0 0 8px 0;">Pickup Date: ${fmtDate(s.pickupDate)} (Flexible: ${yn(s.pickupDateFlexible)})</li>
           <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
           <li style="margin:0 0 8px 0;">Approx. Total Weight: ${fmtWeight(s.approximateTotalWeight)}</li>
           <li style="margin:0 0 8px 0;">Estimated Pallet Count: ${escapeHtml(String(s.estimatedPalletCount ?? "—"))}</li>
@@ -210,9 +213,10 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
       return `
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (LTL)</p>
         <ul style="margin:0 0 12px 18px; padding:0;">
+          <li style="margin:0 0 8px 0;">Equipment: <strong>${escapeHtml(labelFromMap(s.equipment, LTL_EQUIPMENT_LABEL))}</strong></li>
           <li style="margin:0 0 8px 0;">Origin: ${fmtAddress(s.origin)}</li>
           <li style="margin:0 0 8px 0;">Destination: ${fmtAddress(s.destination)}</li>
-          <li style="margin:0 0 8px 0;">Ready Date: ${fmtDate(s.readyDate)}</li>
+          <li style="margin:0 0 8px 0;">Pickup Date: ${fmtDate(s.pickupDate)}</li>
           <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
           <li style="margin:0 0 8px 0;">Stackable: ${yn(s.stackable)}</li>
           <li style="margin:0 0 8px 0;">Approx. Total Weight: ${fmtWeight(s.approximateTotalWeight)}</li>
@@ -243,7 +247,7 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
           </li>
           <li style="margin:0 0 8px 0;">Origin: ${fmtAddress(s.origin)}</li>
           <li style="margin:0 0 8px 0;">Destination: ${fmtAddress(s.destination)}</li>
-          <li style="margin:0 0 8px 0;">Ready Date: ${fmtDate(s.readyDate)}</li>
+          <li style="margin:0 0 8px 0;">Pickup Date: ${fmtDate(s.pickupDate)}</li>
           <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
           <li style="margin:0 0 8px 0;">Estimated Weight: ${fmtWeight(s.estimatedWeight)}</li>
           <li style="margin:0;">Shipment Size: ${shipmentSizeLabel}</li>
@@ -335,14 +339,12 @@ export type SendQuoteNotificationEmailParams = {
 export async function sendQuoteInternalNotificationEmail(
   params: SendQuoteNotificationEmailParams,
 ): Promise<void> {
-  const toAddr = params.to || NPT_QUOTES_EMAIL;
+  const toAddr = params.to || NEXT_PUBLIC_NPT_LOGISTICS_EMAIL;
 
   const q = params.quote;
   const service = q.serviceDetails;
 
-  const safeId = escapeHtml(
-    String((q as { _id?: unknown; id?: unknown })?._id || (q as { id?: unknown })?.id || "—"),
-  );
+  const safeId = escapeHtml(String(q.quoteId || "—"));
   const safePrimary = escapeHtml(String(service?.primaryService || "QUOTE"));
   const safeSource = params.sourceLabel ? escapeHtml(params.sourceLabel) : "";
 
@@ -423,7 +425,7 @@ export async function sendQuoteInternalNotificationEmail(
     <div style="margin:0 0 16px 0; padding:12px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px;">
       <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Quote</p>
       <p style="margin:0; font-size:13px; color:#6b7280;">
-        Quote ID:
+        Reference ID:
         <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;">${safeId}</span>
         • Primary Service: <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;">${safePrimary}</span>
       </p>
@@ -451,11 +453,11 @@ export async function sendQuoteInternalNotificationEmail(
     heading: "New quote received",
     subtitle: safePrimary,
     bodyHtml,
-    footerContactEmail: NPT_QUOTES_EMAIL,
+    footerContactEmail: NEXT_PUBLIC_NPT_LOGISTICS_EMAIL,
   });
 
   await sendMailAppOnly({
-    from: NPT_QUOTES_EMAIL,
+    from: NEXT_PUBLIC_NPT_LOGISTICS_EMAIL,
     to: [toAddr],
     subject,
     html,

@@ -1,11 +1,14 @@
+// src/app/(site)/components/LogisticsQuoteForm/helpers.ts
 import {
   ELogisticsPrimaryService,
   type EFTLEquipmentType,
   type EFTLAddon,
+  type ELTLEquipmentType,
+  type ELTLAddon,
 } from "@/types/logisticsQuote.types";
 
 import { makeServiceDetailsDefaults } from "./defaults";
-import { FTL_ADDON_COMPAT } from "./schema";
+import { FTL_ADDON_COMPAT, LTL_ADDON_COMPAT } from "./schema";
 import type { LogisticsQuoteSubmitValues } from "./schema";
 import { NAV_OFFSET } from "@/constants/ui";
 
@@ -27,9 +30,18 @@ export function resetFtlAddonsOnEquipmentChange() {
   return [] as EFTLAddon[];
 }
 
+export function resetLtlAddonsOnEquipmentChange() {
+  return [] as ELTLAddon[];
+}
+
 export function getAllowedFtlAddons(equipment?: EFTLEquipmentType) {
   if (!equipment) return [] as readonly EFTLAddon[];
   return FTL_ADDON_COMPAT[equipment] || [];
+}
+
+export function getAllowedLtlAddons(equipment?: ELTLEquipmentType) {
+  if (!equipment) return [] as readonly ELTLAddon[];
+  return LTL_ADDON_COMPAT[equipment] || [];
 }
 
 /* ───────────────────────── Shared config for this form ───────────────────────── */
@@ -143,7 +155,7 @@ export function normalizeBeforeSubmit(
         normalizeAddress(sd.origin);
         normalizeAddress(sd.destination);
         sd.equipment = trim(sd.equipment);
-        sd.readyDate = trim(sd.readyDate);
+        sd.pickupDate = trim(sd.pickupDate);
         sd.commodityDescription = trim(sd.commodityDescription);
         normalizeWeight(sd.approximateTotalWeight);
         if (sd.dimensions) normalizeDimensions(sd.dimensions);
@@ -154,7 +166,8 @@ export function normalizeBeforeSubmit(
       case ELogisticsPrimaryService.LTL: {
         normalizeAddress(sd.origin);
         normalizeAddress(sd.destination);
-        sd.readyDate = trim(sd.readyDate);
+        sd.equipment = trim(sd.equipment);
+        sd.pickupDate = trim(sd.pickupDate);
         sd.commodityDescription = trim(sd.commodityDescription);
 
         if (Array.isArray(sd.palletLines)) {
@@ -174,7 +187,7 @@ export function normalizeBeforeSubmit(
         normalizeAddress(sd.origin);
         normalizeAddress(sd.destination);
         sd.mode = trim(sd.mode);
-        sd.readyDate = trim(sd.readyDate);
+        sd.pickupDate = trim(sd.pickupDate);
         sd.commodityDescription = trim(sd.commodityDescription);
         normalizeWeight(sd.estimatedWeight);
         if (sd.shipmentSize != null) sd.shipmentSize = trim(sd.shipmentSize);

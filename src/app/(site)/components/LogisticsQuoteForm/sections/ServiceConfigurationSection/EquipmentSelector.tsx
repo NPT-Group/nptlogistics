@@ -11,35 +11,67 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
-import { EFTLEquipmentType, ELogisticsPrimaryService } from "@/types/logisticsQuote.types";
+import {
+  EFTLEquipmentType,
+  ELTLEquipmentType,
+  ELogisticsPrimaryService,
+} from "@/types/logisticsQuote.types";
 import type { LogisticsQuoteSubmitValues } from "../../schema";
-import { EQUIPMENT_LABEL } from "@/lib/utils/enums/logisticsLabels";
+import { FTL_EQUIPMENT_LABEL, LTL_EQUIPMENT_LABEL } from "@/lib/utils/enums/logisticsLabels";
 import { IconCardSelector, type IconCardOption } from "../../components/IconCardSelector";
 
-const EQUIPMENT_CARDS: readonly IconCardOption<EFTLEquipmentType>[] = [
+const FTL_EQUIPMENT_CARDS: readonly IconCardOption<EFTLEquipmentType>[] = [
   {
     value: EFTLEquipmentType.DRY_VAN,
-    label: EQUIPMENT_LABEL[EFTLEquipmentType.DRY_VAN],
+    label: FTL_EQUIPMENT_LABEL[EFTLEquipmentType.DRY_VAN],
     icon: Truck,
   },
   {
     value: EFTLEquipmentType.REEFER,
-    label: EQUIPMENT_LABEL[EFTLEquipmentType.REEFER],
+    label: FTL_EQUIPMENT_LABEL[EFTLEquipmentType.REEFER],
     icon: Snowflake,
   },
   {
     value: EFTLEquipmentType.FLATBED,
-    label: EQUIPMENT_LABEL[EFTLEquipmentType.FLATBED],
+    label: FTL_EQUIPMENT_LABEL[EFTLEquipmentType.FLATBED],
+    icon: RectangleHorizontal,
+  },
+  {
+    value: EFTLEquipmentType.STEP_DECK,
+    label: FTL_EQUIPMENT_LABEL[EFTLEquipmentType.STEP_DECK],
     icon: RectangleHorizontal,
   },
   {
     value: EFTLEquipmentType.RGN_LOWBOY,
-    label: EQUIPMENT_LABEL[EFTLEquipmentType.RGN_LOWBOY],
+    label: FTL_EQUIPMENT_LABEL[EFTLEquipmentType.RGN_LOWBOY],
     icon: Construction,
   },
   {
     value: EFTLEquipmentType.CONESTOGA,
-    label: EQUIPMENT_LABEL[EFTLEquipmentType.CONESTOGA],
+    label: FTL_EQUIPMENT_LABEL[EFTLEquipmentType.CONESTOGA],
+    icon: Tent,
+  },
+];
+
+const LTL_EQUIPMENT_CARDS: readonly IconCardOption<ELTLEquipmentType>[] = [
+  {
+    value: ELTLEquipmentType.DRY_VAN,
+    label: LTL_EQUIPMENT_LABEL[ELTLEquipmentType.DRY_VAN],
+    icon: Truck,
+  },
+  {
+    value: ELTLEquipmentType.FLATBED,
+    label: LTL_EQUIPMENT_LABEL[ELTLEquipmentType.FLATBED],
+    icon: RectangleHorizontal,
+  },
+  {
+    value: ELTLEquipmentType.STEP_DECK,
+    label: LTL_EQUIPMENT_LABEL[ELTLEquipmentType.STEP_DECK],
+    icon: RectangleHorizontal,
+  },
+  {
+    value: ELTLEquipmentType.CONESTOGA,
+    label: LTL_EQUIPMENT_LABEL[ELTLEquipmentType.CONESTOGA],
     icon: Tent,
   },
 ];
@@ -53,14 +85,19 @@ export function EquipmentSelector() {
   const selected = useWatch({
     control,
     name: "serviceDetails.equipment",
-  }) as EFTLEquipmentType | undefined;
+  });
 
   const error = (formState.errors.serviceDetails as any)?.equipment?.message as string | undefined;
 
-  if (primaryService !== ELogisticsPrimaryService.FTL) return null;
+  if (
+    primaryService !== ELogisticsPrimaryService.FTL &&
+    primaryService !== ELogisticsPrimaryService.LTL
+  ) {
+    return null;
+  }
 
-  function choose(next: EFTLEquipmentType) {
-    const prev = getValues("serviceDetails.equipment" as any) as EFTLEquipmentType | undefined;
+  function choose(next: EFTLEquipmentType | ELTLEquipmentType) {
+    const prev = getValues("serviceDetails.equipment" as any);
     if (prev === next) return;
 
     setValue("serviceDetails.equipment" as any, next as any, {
@@ -71,6 +108,9 @@ export function EquipmentSelector() {
 
     clearErrors("serviceDetails.equipment" as any);
   }
+
+  const options =
+    primaryService === ELogisticsPrimaryService.FTL ? FTL_EQUIPMENT_CARDS : LTL_EQUIPMENT_CARDS;
 
   return (
     <section
@@ -83,7 +123,7 @@ export function EquipmentSelector() {
           Equipment type
         </h3>
         <p className="mt-1 text-sm text-[color:var(--color-muted-light)]">
-          Select the truck equipment required.
+          Select the equipment required for this shipment.
         </p>
 
         {error ? (
@@ -98,10 +138,10 @@ export function EquipmentSelector() {
         ) : null}
       </div>
 
-      <IconCardSelector<EFTLEquipmentType>
-        options={EQUIPMENT_CARDS}
-        value={selected}
-        onChange={choose}
+      <IconCardSelector<any>
+        options={options as any}
+        value={selected as any}
+        onChange={choose as any}
         invalid={Boolean(error)}
         errorId="serviceDetails.equipment-error"
         name="serviceDetails.equipment"

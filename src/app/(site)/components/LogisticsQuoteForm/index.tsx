@@ -14,11 +14,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 
-import {
-  ELogisticsPrimaryService,
-  type EFTLEquipmentType,
-  type EFTLAddon,
-} from "@/types/logisticsQuote.types";
+import { ELogisticsPrimaryService } from "@/types/logisticsQuote.types";
 
 import { logisticsQuoteSubmitSchema, type LogisticsQuoteSubmitValues } from "./schema";
 import { LOGISTICS_QUOTE_SUBMIT_DEFAULTS } from "./defaults";
@@ -26,6 +22,7 @@ import {
   focusFirstError,
   toApiSubmitBody,
   resetFtlAddonsOnEquipmentChange,
+  resetLtlAddonsOnEquipmentChange,
   LOGISTICS_FORM_ERROR_FOCUS_OPTIONS,
 } from "./helpers";
 
@@ -54,16 +51,20 @@ function ServiceResetEffects({
   const equipment = useWatch({
     control,
     name: "serviceDetails.equipment",
-  }) as EFTLEquipmentType | undefined;
+  });
 
-  const prevEquipmentRef = React.useRef<EFTLEquipmentType | undefined>(undefined);
+  const prevEquipmentRef = React.useRef<string | undefined>(undefined);
 
   React.useEffect(() => {
-    if (primaryService !== ELogisticsPrimaryService.FTL) {
+    if (
+      primaryService !== ELogisticsPrimaryService.FTL &&
+      primaryService !== ELogisticsPrimaryService.LTL
+    ) {
       prevEquipmentRef.current = undefined;
       return;
     }
-    if (!equipment) {
+
+    if (!equipment || typeof equipment !== "string") {
       prevEquipmentRef.current = undefined;
       return;
     }
@@ -76,8 +77,12 @@ function ServiceResetEffects({
     }
 
     if (equipment !== prev) {
-      const nextAddons = resetFtlAddonsOnEquipmentChange() as EFTLAddon[];
-      setValue("serviceDetails.addons", nextAddons as any, {
+      const nextAddons =
+        primaryService === ELogisticsPrimaryService.FTL
+          ? resetFtlAddonsOnEquipmentChange()
+          : resetLtlAddonsOnEquipmentChange();
+
+      setValue("serviceDetails.addons" as never, nextAddons as never, {
         shouldDirty: true,
         shouldTouch: true,
         shouldValidate: true,
@@ -91,7 +96,7 @@ function ServiceResetEffects({
 }
 
 type SubmitFeedback =
-  | { type: "success"; message: string }
+  | { type: "success"; message: string; referenceId?: string }
   | { type: "error"; message: string }
   | null;
 
@@ -134,7 +139,17 @@ function FeedbackBanner({
           <p className="text-sm font-semibold">
             {isSuccess ? "Quote request submitted" : "Unable to submit quote request"}
           </p>
+
           <p className="mt-1 text-sm leading-relaxed">{feedback.message}</p>
+
+          {isSuccess && feedback.referenceId ? (
+            <p className="mt-3 text-sm">
+              Reference ID:{" "}
+              <span className="rounded-md bg-white px-2 py-1 font-mono font-semibold tracking-wide text-emerald-900 ring-1 ring-emerald-200">
+                {feedback.referenceId}
+              </span>
+            </p>
+          ) : null}
         </div>
       </div>
     </div>
@@ -215,10 +230,18 @@ export default function LogisticsQuoteForm() {
       reset(LOGISTICS_QUOTE_SUBMIT_DEFAULTS);
       turnstileRef.current?.reset();
 
+      const referenceId =
+        typeof json?.data?.quote?.quoteId === "string"
+          ? json.data.quote.quoteId
+          : typeof json?.quote?.quoteId === "string"
+            ? json.quote.quoteId
+            : undefined;
+
       setSubmitFeedback({
         type: "success",
         message:
-          "Thank you. Your quote request has been received successfully. Our team will review the details and contact you as soon as possible.",
+          "Thank you. Your quote request has been received. Please keep the reference ID below for any follow-up. Our team will review the details and contact you as soon as possible.",
+        referenceId,
       });
 
       window.requestAnimationFrame(() => {

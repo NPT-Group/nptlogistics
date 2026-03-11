@@ -14,6 +14,14 @@ registerServiceDetailsDiscriminators();
 
 export const logisticsQuoteSchema = new Schema<ILogisticsQuote>(
   {
+    quoteId: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      index: true,
+    },
+
     serviceDetails: { type: quoteServiceDetailsBaseSchema, required: true },
 
     identification: { type: quoteIdentificationSchema, required: true },

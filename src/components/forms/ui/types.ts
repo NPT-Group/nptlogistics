@@ -12,11 +12,17 @@ export type FieldUi = {
    */
   control?: string;
 
-  /** For checkbox/radio rows, optional wrapper */
+  /** For checkbox/radio rows */
   controlRow?: string;
 
-  /** For checkbox/radio itself (optional) */
+  /** Checkbox input (usually sr-only) */
   controlBox?: string;
+
+  /** Checkbox visual checked state */
+  controlChecked?: string;
+
+  /** Optional icon color/styling */
+  icon?: string;
 
   hint?: string;
   error?: string;
@@ -31,6 +37,8 @@ export function mergeUi(base: FieldUi, overrides?: FieldUi): FieldUi {
     control: cn(base.control, overrides.control),
     controlRow: cn(base.controlRow, overrides.controlRow),
     controlBox: cn(base.controlBox, overrides.controlBox),
+    controlChecked: cn(base.controlChecked, overrides.controlChecked),
+    icon: cn(base.icon, overrides.icon),
     hint: cn(base.hint, overrides.hint),
     error: cn(base.error, overrides.error),
   };

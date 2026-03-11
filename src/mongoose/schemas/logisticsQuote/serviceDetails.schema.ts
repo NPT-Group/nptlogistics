@@ -5,6 +5,7 @@ import {
   ELogisticsPrimaryService,
   EFTLEquipmentType,
   EFTLAddon,
+  ELTLEquipmentType,
   ELTLAddon,
   EInternationalMode,
   EInternationalShipmentSize,
@@ -62,11 +63,7 @@ export const quoteServiceDetailsBaseSchema = new Schema<QuoteServiceDetails>(
 );
 
 /* ------------------------------ FTL ------------------------------ */
-/**
- * NOTE:
- * - Do NOT re-declare `primaryService` in discriminator schemas.
- * - Discriminator key is owned by base schema.
- */
+
 export const quoteFTLDetailsSchema = new Schema<Omit<QuoteFTLDetails, "primaryService">>(
   {
     equipment: { type: String, required: true, enum: Object.values(EFTLEquipmentType) },
@@ -74,7 +71,7 @@ export const quoteFTLDetailsSchema = new Schema<Omit<QuoteFTLDetails, "primarySe
     origin: { type: logisticsAddressSchema, required: true },
     destination: { type: logisticsAddressSchema, required: true },
 
-    readyDate: { type: Date, required: true },
+    pickupDate: { type: Date, required: true },
     commodityDescription: { type: String, required: true, trim: true, maxlength: 2000 },
 
     approximateTotalWeight: { type: logisticsWeightSchema, required: true },
@@ -82,7 +79,7 @@ export const quoteFTLDetailsSchema = new Schema<Omit<QuoteFTLDetails, "primarySe
     estimatedPalletCount: { type: Number, required: false, min: 1 },
     dimensions: { type: logisticsDimensionsSchema, required: false },
 
-    readyDateFlexible: { type: Boolean, required: false, default: false },
+    pickupDateFlexible: { type: Boolean, required: false, default: false },
 
     addons: { type: [String], required: false, default: [], enum: Object.values(EFTLAddon) },
   },
@@ -90,7 +87,6 @@ export const quoteFTLDetailsSchema = new Schema<Omit<QuoteFTLDetails, "primarySe
 );
 
 quoteFTLDetailsSchema.pre("validate", function () {
-  // At runtime, `primaryService` exists (from base discriminator), so this check works fine.
   if (!requireNorthAmericaAddresses(this as any)) {
     throw new Error(
       "FTL origin/destination countryCode must be one of NORTH_AMERICAN_COUNTRY_CODES (CA/US/MX).",
@@ -111,10 +107,12 @@ const quoteLTLPalletLineSchema = new Schema(
 
 export const quoteLTLDetailsSchema = new Schema<Omit<QuoteLTLDetails, "primaryService">>(
   {
+    equipment: { type: String, required: true, enum: Object.values(ELTLEquipmentType) },
+
     origin: { type: logisticsAddressSchema, required: true },
     destination: { type: logisticsAddressSchema, required: true },
 
-    readyDate: { type: Date, required: true },
+    pickupDate: { type: Date, required: true },
     commodityDescription: { type: String, required: true, trim: true, maxlength: 2000 },
 
     stackable: { type: Boolean, required: true },
@@ -174,7 +172,7 @@ export const quoteInternationalDetailsSchema = new Schema<
     origin: { type: logisticsAddressSchema, required: true },
     destination: { type: logisticsAddressSchema, required: true },
 
-    readyDate: { type: Date, required: true },
+    pickupDate: { type: Date, required: true },
     commodityDescription: { type: String, required: true, trim: true, maxlength: 2000 },
 
     estimatedWeight: { type: logisticsWeightSchema, required: true },
@@ -214,8 +212,6 @@ quoteWarehousingDetailsSchema.pre("validate", function () {
 /* --------------------------- Register service discriminators --------------------------- */
 
 export function registerServiceDetailsDiscriminators() {
-  // idempotent-ish protection: Mongoose throws if you re-discriminator same name.
-  // Call once at model init time.
   const base: any = quoteServiceDetailsBaseSchema;
 
   if (!base.discriminators?.[ELogisticsPrimaryService.FTL]) {

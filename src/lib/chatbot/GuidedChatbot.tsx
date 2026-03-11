@@ -106,16 +106,15 @@ export default function GuidedChatbot() {
 
   return (
     <div
-      className={[
-        "fixed right-5 bottom-5 z-50",
-        open ? "min-h-[420px] min-w-[360px]" : "",
-      ].join(" ")}
+      className={["fixed right-5 bottom-5 z-50", open ? "min-h-[420px] min-w-[360px]" : ""].join(
+        " ",
+      )}
     >
       {/* Chat panel (always mounted so conversation persists; animate open/close) */}
       <div
         ref={panelRef}
         className={[
-          "absolute bottom-0 right-0 w-[360px] max-w-[92vw] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl",
+          "absolute right-0 bottom-0 w-[360px] max-w-[92vw] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl",
           "origin-bottom-right transition-all duration-300 ease-out",
           open
             ? "pointer-events-auto visible translate-y-0 scale-100 opacity-100"
@@ -137,7 +136,7 @@ export default function GuidedChatbot() {
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="rounded-md p-2 text-gray-600 hover:bg-gray-100"
+            className="rounded-md p-2 text-gray-600 hover:cursor-pointer hover:bg-gray-100"
             aria-label="Close chat"
           >
             <X size={18} />
@@ -212,7 +211,7 @@ export default function GuidedChatbot() {
             onClick={openChat}
             aria-label="Open chat"
             className={[
-              "group relative inline-flex h-14 w-14 items-center justify-center rounded-full",
+              "group relative inline-flex h-14 w-14 cursor-pointer items-center justify-center rounded-full",
               "shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
             ].join(" ")}

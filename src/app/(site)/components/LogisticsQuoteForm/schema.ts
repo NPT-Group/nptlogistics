@@ -11,6 +11,7 @@ import {
   EFTLAddon,
   EFTLEquipmentType,
   ELTLAddon,
+  ELTLEquipmentType,
   EWarehousingDuration,
   EWarehousingVolumeType,
   EWeightUnit,
@@ -22,7 +23,7 @@ import type { IFileAsset } from "@/types/shared.types";
 /* ──────────────────────────────────────────────────────────────────────────────
   SUBMIT BODY schema (matches API expectation)
   Body shape:
-    { turnstileToken, serviceDetails?, identification, contact, finalNotes?, attachments?, marketingEmailConsent  sourceLabel? }
+    { turnstileToken, serviceDetails?, identification, contact, finalNotes?, attachments?, marketingEmailConsent, sourceLabel? }
 ────────────────────────────────────────────────────────────────────────────── */
 
 const requiredString = (label: string) => z.string().trim().min(1, `${label} is required`);
@@ -187,11 +188,13 @@ export const FTL_ADDON_COMPAT: Record<EFTLEquipmentType, readonly EFTLAddon[]> =
     EFTLAddon.EXPEDITED,
     EFTLAddon.TEAM_DRIVERS,
     EFTLAddon.HAZARDOUS_MATERIALS,
+    EFTLAddon.APPOINTMENT_REQUIRED,
   ],
   [EFTLEquipmentType.REEFER]: [
     EFTLAddon.EXPEDITED,
     EFTLAddon.TEAM_DRIVERS,
     EFTLAddon.HAZARDOUS_MATERIALS,
+    EFTLAddon.APPOINTMENT_REQUIRED,
   ],
   [EFTLEquipmentType.FLATBED]: [
     EFTLAddon.OVERSIZED_OVERWEIGHT,
@@ -199,21 +202,82 @@ export const FTL_ADDON_COMPAT: Record<EFTLEquipmentType, readonly EFTLAddon[]> =
     EFTLAddon.EXPEDITED,
     EFTLAddon.TEAM_DRIVERS,
     EFTLAddon.HAZARDOUS_MATERIALS,
+    EFTLAddon.APPOINTMENT_REQUIRED,
+  ],
+  [EFTLEquipmentType.STEP_DECK]: [
+    EFTLAddon.OVERSIZED_OVERWEIGHT,
+    EFTLAddon.ESCORT_VEHICLES_REQUIRED,
+    EFTLAddon.EXPEDITED,
+    EFTLAddon.TEAM_DRIVERS,
+    EFTLAddon.HAZARDOUS_MATERIALS,
+    EFTLAddon.APPOINTMENT_REQUIRED,
   ],
   [EFTLEquipmentType.RGN_LOWBOY]: [
     EFTLAddon.OVERSIZED_OVERWEIGHT,
     EFTLAddon.ESCORT_VEHICLES_REQUIRED,
     EFTLAddon.EXPEDITED,
+    EFTLAddon.APPOINTMENT_REQUIRED,
   ],
   [EFTLEquipmentType.CONESTOGA]: [
     EFTLAddon.EXPEDITED,
     EFTLAddon.TEAM_DRIVERS,
     EFTLAddon.HAZARDOUS_MATERIALS,
+    EFTLAddon.APPOINTMENT_REQUIRED,
+  ],
+};
+
+export const LTL_ADDON_COMPAT: Record<ELTLEquipmentType, readonly ELTLAddon[]> = {
+  [ELTLEquipmentType.DRY_VAN]: [
+    ELTLAddon.LIFTGATE_REQUIRED,
+    ELTLAddon.RESIDENTIAL_DELIVERY,
+    ELTLAddon.APPOINTMENT_REQUIRED,
+    ELTLAddon.EXPEDITED,
+    ELTLAddon.TEAM_DRIVERS,
+    ELTLAddon.HAZARDOUS_MATERIALS,
+  ],
+  [ELTLEquipmentType.FLATBED]: [
+    ELTLAddon.LIFTGATE_REQUIRED,
+    ELTLAddon.RESIDENTIAL_DELIVERY,
+    ELTLAddon.APPOINTMENT_REQUIRED,
+    ELTLAddon.OVERSIZED_OVERWEIGHT,
+    ELTLAddon.ESCORT_VEHICLES_REQUIRED,
+    ELTLAddon.EXPEDITED,
+    ELTLAddon.TEAM_DRIVERS,
+    ELTLAddon.HAZARDOUS_MATERIALS,
+  ],
+  [ELTLEquipmentType.STEP_DECK]: [
+    ELTLAddon.LIFTGATE_REQUIRED,
+    ELTLAddon.RESIDENTIAL_DELIVERY,
+    ELTLAddon.APPOINTMENT_REQUIRED,
+    ELTLAddon.OVERSIZED_OVERWEIGHT,
+    ELTLAddon.ESCORT_VEHICLES_REQUIRED,
+    ELTLAddon.EXPEDITED,
+    ELTLAddon.TEAM_DRIVERS,
+    ELTLAddon.HAZARDOUS_MATERIALS,
+  ],
+  [ELTLEquipmentType.CONESTOGA]: [
+    ELTLAddon.LIFTGATE_REQUIRED,
+    ELTLAddon.RESIDENTIAL_DELIVERY,
+    ELTLAddon.APPOINTMENT_REQUIRED,
+    ELTLAddon.EXPEDITED,
+    ELTLAddon.TEAM_DRIVERS,
+    ELTLAddon.HAZARDOUS_MATERIALS,
   ],
 };
 
 const ftlEquipmentField = z
   .union([z.nativeEnum(EFTLEquipmentType), z.undefined()])
+  .superRefine((value, ctx) => {
+    if (!value) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please select an equipment type",
+      });
+    }
+  });
+
+const ltlEquipmentField = z
+  .union([z.nativeEnum(ELTLEquipmentType), z.undefined()])
   .superRefine((value, ctx) => {
     if (!value) {
       ctx.addIssue({
@@ -245,7 +309,7 @@ export const ftlDetailsSchema = z
     origin: logisticsAddressSchema,
     destination: logisticsAddressSchema,
 
-    readyDate: isoDateField("Ready date"),
+    pickupDate: isoDateField("Pickup date"),
     commodityDescription: requiredString("Commodity description"),
 
     approximateTotalWeight: logisticsWeightSchema,
@@ -253,7 +317,7 @@ export const ftlDetailsSchema = z
     estimatedPalletCount: integerMin1("Estimated pallet count").optional(),
     dimensions: logisticsDimensionsSchema.optional(),
 
-    readyDateFlexible: z.coerce.boolean().optional(),
+    pickupDateFlexible: z.coerce.boolean().optional(),
 
     addons: z.array(z.nativeEnum(EFTLAddon)).optional(),
   })
@@ -299,10 +363,12 @@ export const ltlDetailsSchema = z
   .object({
     primaryService: z.literal(ELogisticsPrimaryService.LTL),
 
+    equipment: ltlEquipmentField,
+
     origin: logisticsAddressSchema,
     destination: logisticsAddressSchema,
 
-    readyDate: isoDateField("Ready date"),
+    pickupDate: isoDateField("Pickup date"),
     commodityDescription: requiredString("Commodity description"),
 
     stackable: z.coerce.boolean(),
@@ -329,6 +395,20 @@ export const ltlDetailsSchema = z
         message: "Destination country must be Canada, United States, or Mexico",
       });
     }
+
+    if (val.addons?.length && val.equipment) {
+      const allowed = new Set(LTL_ADDON_COMPAT[val.equipment] || []);
+      for (const addon of val.addons) {
+        if (!allowed.has(addon)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["addons"],
+            message: "One or more selected add-ons are not available for the chosen equipment type",
+          });
+          break;
+        }
+      }
+    }
   });
 
 export const intlDetailsSchema = z.object({
@@ -339,7 +419,7 @@ export const intlDetailsSchema = z.object({
   origin: logisticsAddressSchema,
   destination: logisticsAddressSchema,
 
-  readyDate: isoDateField("Ready date"),
+  pickupDate: isoDateField("Pickup date"),
   commodityDescription: requiredString("Commodity description"),
 
   estimatedWeight: logisticsWeightSchema,

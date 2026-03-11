@@ -2,7 +2,7 @@
 import { sendMailAppOnly } from "@/lib/mail/mailer";
 import { escapeHtml } from "@/lib/mail/utils";
 import { buildDefaultEmailTemplate } from "@/lib/mail/templates/defaultTemplate";
-import { NPT_QUOTES_EMAIL } from "@/config/env";
+import { NEXT_PUBLIC_NPT_LOGISTICS_EMAIL } from "@/config/env";
 
 import type { ILogisticsQuote } from "@/types/logisticsQuote.types";
 
@@ -37,7 +37,7 @@ export async function sendQuoteCustomerConfirmationEmail(
   const safeName = escapeHtml(firstName || "there");
 
   const safePrimary = escapeHtml(String(service.primaryService || "Quote"));
-  const safeId = escapeHtml(String(q.id || q._id || "—"));
+  const safeId = escapeHtml(String(q.quoteId || "—"));
 
   const subject = `We received your quote request – ${safePrimary}`;
 
@@ -67,8 +67,8 @@ export async function sendQuoteCustomerConfirmationEmail(
 
     <p style="margin:0 0 24px 0;">
       — NPT Logistics<br/>
-      <a href="mailto:${escapeHtml(NPT_QUOTES_EMAIL)}" style="color:#2563eb; text-decoration:none;">${escapeHtml(
-        NPT_QUOTES_EMAIL,
+      <a href="mailto:${escapeHtml(NEXT_PUBLIC_NPT_LOGISTICS_EMAIL)}" style="color:#2563eb; text-decoration:none;">${escapeHtml(
+        NEXT_PUBLIC_NPT_LOGISTICS_EMAIL,
       )}</a>
     </p>
   `;
@@ -78,11 +78,11 @@ export async function sendQuoteCustomerConfirmationEmail(
     heading: "We’ve got it!",
     subtitle: `Reference ID: ${safeId}`,
     bodyHtml,
-    footerContactEmail: NPT_QUOTES_EMAIL,
+    footerContactEmail: NEXT_PUBLIC_NPT_LOGISTICS_EMAIL,
   });
 
   await sendMailAppOnly({
-    from: NPT_QUOTES_EMAIL,
+    from: NEXT_PUBLIC_NPT_LOGISTICS_EMAIL,
     to: [String(toAddr)],
     subject,
     html,

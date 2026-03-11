@@ -2,7 +2,7 @@
 import { sendMailAppOnly } from "@/lib/mail/mailer";
 import { escapeHtml } from "@/lib/mail/utils";
 import { buildDefaultEmailTemplate } from "@/lib/mail/templates/defaultTemplate";
-import { NPT_HR_EMAIL } from "@/config/env";
+import { NEXT_PUBLIC_NPT_HR_EMAIL } from "@/config/env";
 
 export type SendJobApplicantConfirmationEmailParams = {
   to: string;
@@ -53,11 +53,11 @@ export async function sendJobApplicantConfirmationEmail(
     heading: "We received your application",
     subtitle: escapedJobTitle ? `Position: ${escapedJobTitle}` : "NPT Careers",
     bodyHtml,
-    footerContactEmail: NPT_HR_EMAIL,
+    footerContactEmail: NEXT_PUBLIC_NPT_HR_EMAIL,
   });
 
   await sendMailAppOnly({
-    from: NPT_HR_EMAIL,
+    from: NEXT_PUBLIC_NPT_HR_EMAIL,
     to: [to],
     subject,
     html,

@@ -96,9 +96,9 @@ export function FTLFields() {
         <div className="grid gap-4 md:grid-cols-2">
           <TextField
             control={control}
-            name={"serviceDetails.readyDate" as any}
-            fieldPathAttr="serviceDetails.readyDate"
-            label="Ready date"
+            name={"serviceDetails.pickupDate" as any}
+            fieldPathAttr="serviceDetails.pickupDate"
+            label="Pickup date"
             required
             ui={siteTextUi}
             inputProps={{ type: "date" }}
@@ -107,9 +107,9 @@ export function FTLFields() {
           <div className="md:pt-[1.625rem]">
             <CheckboxField
               control={control}
-              name={"serviceDetails.readyDateFlexible" as any}
-              fieldPathAttr="serviceDetails.readyDateFlexible"
-              label="Ready date is flexible"
+              name={"serviceDetails.pickupDateFlexible" as any}
+              fieldPathAttr="serviceDetails.pickupDateFlexible"
+              label="Pickup date is flexible"
               ui={siteCheckUi}
             />
           </div>

@@ -41,21 +41,22 @@ export function makeServiceDetailsDefaults(
         equipment: undefined,
         origin: { ...EMPTY_ADDRESS },
         destination: { ...EMPTY_ADDRESS },
-        readyDate: "",
+        pickupDate: "",
         commodityDescription: "",
         approximateTotalWeight: { ...EMPTY_WEIGHT },
         estimatedPalletCount: undefined,
         dimensions: undefined,
-        readyDateFlexible: false,
+        pickupDateFlexible: false,
         addons: [],
       };
 
     case ELogisticsPrimaryService.LTL:
       return {
         primaryService,
+        equipment: undefined,
         origin: { ...EMPTY_ADDRESS },
         destination: { ...EMPTY_ADDRESS },
-        readyDate: "",
+        pickupDate: "",
         commodityDescription: "",
         stackable: false,
         palletLines: [
@@ -75,7 +76,7 @@ export function makeServiceDetailsDefaults(
         mode: undefined,
         origin: { ...EMPTY_ADDRESS },
         destination: { ...EMPTY_ADDRESS },
-        readyDate: "",
+        pickupDate: "",
         commodityDescription: "",
         estimatedWeight: { ...EMPTY_WEIGHT },
         shipmentSize: undefined,

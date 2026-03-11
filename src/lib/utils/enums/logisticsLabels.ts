@@ -3,6 +3,7 @@ import {
   EFTLAddon,
   ELTLAddon,
   EFTLEquipmentType,
+  ELTLEquipmentType,
   EBrokerType,
   ECustomerIdentity,
   EInternationalMode,
@@ -49,6 +50,7 @@ export const FTL_ADDON_LABEL: Record<EFTLAddon, string> = {
   [EFTLAddon.EXPEDITED]: "Expedited",
   [EFTLAddon.TEAM_DRIVERS]: "Team drivers",
   [EFTLAddon.HAZARDOUS_MATERIALS]: "Hazardous materials (HAZMAT)",
+  [EFTLAddon.APPOINTMENT_REQUIRED]: "Appointment required",
   [EFTLAddon.OVERSIZED_OVERWEIGHT]: "Oversized / overweight",
   [EFTLAddon.ESCORT_VEHICLES_REQUIRED]: "Escort vehicles required",
 };
@@ -58,15 +60,26 @@ export const LTL_ADDON_LABEL: Record<ELTLAddon, string> = {
   [ELTLAddon.RESIDENTIAL_DELIVERY]: "Residential delivery",
   [ELTLAddon.APPOINTMENT_REQUIRED]: "Appointment required",
   [ELTLAddon.HAZARDOUS_MATERIALS]: "Hazardous materials (HAZMAT)",
-  [ELTLAddon.EXPEDITED_HANDLING]: "Expedited handling",
+  [ELTLAddon.EXPEDITED]: "Expedited",
+  [ELTLAddon.TEAM_DRIVERS]: "Team drivers",
+  [ELTLAddon.OVERSIZED_OVERWEIGHT]: "Oversized / overweight",
+  [ELTLAddon.ESCORT_VEHICLES_REQUIRED]: "Escort vehicles required",
 };
 
-export const EQUIPMENT_LABEL: Record<EFTLEquipmentType, string> = {
+export const FTL_EQUIPMENT_LABEL: Record<EFTLEquipmentType, string> = {
   [EFTLEquipmentType.DRY_VAN]: "Dry van",
-  [EFTLEquipmentType.REEFER]: "Temperature Controlled",
-  [EFTLEquipmentType.FLATBED]: "Flatbed / Step Deck",
+  [EFTLEquipmentType.REEFER]: "Temperature controlled",
+  [EFTLEquipmentType.FLATBED]: "Flatbed",
+  [EFTLEquipmentType.STEP_DECK]: "Step deck",
   [EFTLEquipmentType.RGN_LOWBOY]: "RGN / Lowboy",
   [EFTLEquipmentType.CONESTOGA]: "Conestoga",
+};
+
+export const LTL_EQUIPMENT_LABEL: Record<ELTLEquipmentType, string> = {
+  [ELTLEquipmentType.DRY_VAN]: "Dry van",
+  [ELTLEquipmentType.STEP_DECK]: "Step deck",
+  [ELTLEquipmentType.FLATBED]: "Flatbed",
+  [ELTLEquipmentType.CONESTOGA]: "Conestoga",
 };
 
 export const BROKER_TYPE_LABEL: Record<EBrokerType, string> = {

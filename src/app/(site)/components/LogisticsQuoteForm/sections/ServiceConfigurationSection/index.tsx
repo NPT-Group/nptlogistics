@@ -67,6 +67,7 @@ export function ServiceConfigurationSection() {
           transition={{ duration: 0.2 }}
           className="space-y-6"
         >
+          <EquipmentSelector />
           <AddonsSection />
           <Divider />
           <ShipmentDetailsSection>

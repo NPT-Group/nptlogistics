@@ -1,5 +1,4 @@
 // src/types/logisticsQuote.types.ts
-
 import type { ObjectId } from "mongoose";
 import type { IFileAsset, ICountry } from "@/types/shared.types";
 
@@ -47,6 +46,17 @@ BUSINESS RULE SUMMARY
 8. Backend normalization:
    - Incoming payloads may be normalized/trimmed in validation layer.
    - Derived fields such as LTL approximateTotalWeight.value and crossBorder are backend-owned.
+
+9. Naming:
+   - "readyDate" has been renamed to "pickupDate".
+   - "readyDateFlexible" has been renamed to "pickupDateFlexible".
+
+10. FTL equipment model:
+   - FTL equipment now treats FLATBED and STEP_DECK as separate values.
+
+11. LTL equipment model:
+   - LTL now has explicit equipment selection.
+   - LTL add-ons must be validated against the selected LTL equipment.
 ────────────────────────────────────────────────────────────────────────────── */
 
 /* ───────────────────────────── Enums ───────────────────────────── */
@@ -78,6 +88,7 @@ export enum EFTLEquipmentType {
   DRY_VAN = "DRY_VAN",
   REEFER = "REEFER",
   FLATBED = "FLATBED",
+  STEP_DECK = "STEP_DECK",
   RGN_LOWBOY = "RGN_LOWBOY",
   CONESTOGA = "CONESTOGA",
 }
@@ -86,8 +97,16 @@ export enum EFTLAddon {
   EXPEDITED = "EXPEDITED",
   TEAM_DRIVERS = "TEAM_DRIVERS",
   HAZARDOUS_MATERIALS = "HAZARDOUS_MATERIALS",
+  APPOINTMENT_REQUIRED = "APPOINTMENT_REQUIRED",
   OVERSIZED_OVERWEIGHT = "OVERSIZED_OVERWEIGHT",
   ESCORT_VEHICLES_REQUIRED = "ESCORT_VEHICLES_REQUIRED",
+}
+
+export enum ELTLEquipmentType {
+  DRY_VAN = "DRY_VAN",
+  STEP_DECK = "STEP_DECK",
+  FLATBED = "FLATBED",
+  CONESTOGA = "CONESTOGA",
 }
 
 export enum ELTLAddon {
@@ -95,7 +114,10 @@ export enum ELTLAddon {
   RESIDENTIAL_DELIVERY = "RESIDENTIAL_DELIVERY",
   APPOINTMENT_REQUIRED = "APPOINTMENT_REQUIRED",
   HAZARDOUS_MATERIALS = "HAZARDOUS_MATERIALS",
-  EXPEDITED_HANDLING = "EXPEDITED_HANDLING",
+  EXPEDITED = "EXPEDITED",
+  TEAM_DRIVERS = "TEAM_DRIVERS",
+  OVERSIZED_OVERWEIGHT = "OVERSIZED_OVERWEIGHT",
+  ESCORT_VEHICLES_REQUIRED = "ESCORT_VEHICLES_REQUIRED",
 }
 
 export enum EInternationalMode {
@@ -176,7 +198,7 @@ export type QuoteFTLDetails = {
   origin: LogisticsAddress;
   destination: LogisticsAddress;
 
-  readyDate: Date | string;
+  pickupDate: Date | string;
   commodityDescription: string;
 
   approximateTotalWeight: LogisticsWeight;
@@ -184,16 +206,17 @@ export type QuoteFTLDetails = {
   estimatedPalletCount?: number;
   dimensions?: LogisticsDimensions;
 
-  readyDateFlexible?: boolean;
+  pickupDateFlexible?: boolean;
 
   /**
    * Equipment compatibility must be validated:
    *
-   * DRY_VAN → EXPEDITED, TEAM_DRIVERS, HAZMAT
-   * REEFER → EXPEDITED, TEAM_DRIVERS, HAZMAT
-   * FLATBED → OVERSIZED, ESCORT, EXPEDITED, TEAM_DRIVERS, HAZMAT
-   * RGN → OVERSIZED, ESCORT, EXPEDITED
-   * CONESTOGA → EXPEDITED, TEAM_DRIVERS, HAZMAT
+   * DRY_VAN → EXPEDITED, TEAM_DRIVERS, HAZMAT, APPOINTMENT_REQUIRED
+   * REEFER → EXPEDITED, TEAM_DRIVERS, HAZMAT, APPOINTMENT_REQUIRED
+   * FLATBED → OVERSIZED, ESCORT, EXPEDITED, TEAM_DRIVERS, HAZMAT, APPOINTMENT_REQUIRED
+   * STEP_DECK → OVERSIZED, ESCORT, EXPEDITED, TEAM_DRIVERS, HAZMAT, APPOINTMENT_REQUIRED
+   * RGN → OVERSIZED, ESCORT, EXPEDITED, APPOINTMENT_REQUIRED
+   * CONESTOGA → EXPEDITED, TEAM_DRIVERS, HAZMAT, APPOINTMENT_REQUIRED
    */
   addons?: EFTLAddon[];
 };
@@ -210,12 +233,17 @@ export type QuoteLTLDetails = {
   primaryService: ELogisticsPrimaryService.LTL;
 
   /**
+   * LTL now requires explicit equipment selection.
+   */
+  equipment: ELTLEquipmentType;
+
+  /**
    * MUST be North American countries only.
    */
   origin: LogisticsAddress;
   destination: LogisticsAddress;
 
-  readyDate: Date | string;
+  pickupDate: Date | string;
   commodityDescription: string;
 
   stackable: boolean;
@@ -224,6 +252,23 @@ export type QuoteLTLDetails = {
 
   approximateTotalWeight: LogisticsWeight;
 
+  /**
+   * Equipment compatibility must be validated:
+   *
+   * DRY_VAN → LIFTGATE_REQUIRED, RESIDENTIAL_DELIVERY, APPOINTMENT_REQUIRED,
+   *            EXPEDITED, TEAM_DRIVERS, HAZARDOUS_MATERIALS
+   *
+   * FLATBED → LIFTGATE_REQUIRED, RESIDENTIAL_DELIVERY, APPOINTMENT_REQUIRED,
+   *            OVERSIZED_OVERWEIGHT, ESCORT_VEHICLES_REQUIRED,
+   *            EXPEDITED, TEAM_DRIVERS, HAZARDOUS_MATERIALS
+   *
+   * STEP_DECK → LIFTGATE_REQUIRED, RESIDENTIAL_DELIVERY, APPOINTMENT_REQUIRED,
+   *             OVERSIZED_OVERWEIGHT, ESCORT_VEHICLES_REQUIRED,
+   *             EXPEDITED, TEAM_DRIVERS, HAZARDOUS_MATERIALS
+   *
+   * CONESTOGA → LIFTGATE_REQUIRED, RESIDENTIAL_DELIVERY, APPOINTMENT_REQUIRED,
+   *             EXPEDITED, TEAM_DRIVERS, HAZARDOUS_MATERIALS
+   */
   addons?: ELTLAddon[];
 };
 
@@ -240,7 +285,7 @@ export type QuoteInternationalDetails = {
   origin: LogisticsAddress;
   destination: LogisticsAddress;
 
-  readyDate: Date | string;
+  pickupDate: Date | string;
   commodityDescription: string;
 
   estimatedWeight: LogisticsWeight;
@@ -314,6 +359,13 @@ export type QuoteContact = {
 
 export interface ILogisticsQuote {
   _id: ObjectId | string;
+
+  /**
+   * Friendly customer-facing reference ID.
+   * Backend-generated and unique.
+   * Example: NPT-260311-7G4K2
+   */
+  quoteId: string;
 
   serviceDetails: QuoteServiceDetails;
 
