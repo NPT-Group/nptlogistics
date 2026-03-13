@@ -9,6 +9,7 @@ import {
   Construction,
   Tent,
   AlertTriangle,
+  Layers,
 } from "lucide-react";
 
 import {
@@ -67,7 +68,7 @@ const LTL_EQUIPMENT_CARDS: readonly IconCardOption<ELTLEquipmentType>[] = [
   {
     value: ELTLEquipmentType.STEP_DECK,
     label: LTL_EQUIPMENT_LABEL[ELTLEquipmentType.STEP_DECK],
-    icon: RectangleHorizontal,
+    icon: Layers,
   },
   {
     value: ELTLEquipmentType.CONESTOGA,

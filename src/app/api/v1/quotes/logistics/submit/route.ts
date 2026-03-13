@@ -17,17 +17,14 @@ import { LogisticsQuoteModel } from "@/mongoose/models/LogisticsQuote";
 import { generateUniqueEntityId } from "@/lib/utils/db/generateUniqueEntityId";
 
 type SubmitQuoteBody = {
-  // Turnstile
   turnstileToken: string;
 
-  // Quote payload
   serviceDetails: any;
   identification: any;
   contact: any;
 
   finalNotes?: any;
   attachments?: any;
-
   marketingEmailConsent?: any;
 
   /** Optional: affects email subject (e.g. "Website", "LP-A", etc.) */
@@ -45,10 +42,8 @@ export const POST = async (req: NextRequest) => {
   let rollback: (() => Promise<void>) | null = null;
 
   try {
-    // 1) Parse JSON (cheap)
     const body = await parseJsonBody<SubmitQuoteBody>(req);
 
-    // 2) Turnstile validation (NO DB, NO S3)
     const ip = getRequestIp(req.headers);
     const turnstile = await verifyTurnstileToken({
       token: body?.turnstileToken,
@@ -58,7 +53,6 @@ export const POST = async (req: NextRequest) => {
 
     if (!turnstile.ok) return errorResponse(400, "Turnstile validation failed");
 
-    // 3) Validate quote business rules (NO DB, NO S3)
     const validated = validateLogisticsQuoteRequest({
       serviceDetails: body?.serviceDetails,
       identification: body?.identification,
@@ -68,10 +62,8 @@ export const POST = async (req: NextRequest) => {
       marketingEmailConsent: body?.marketingEmailConsent,
     });
 
-    // 4) Connect DB only after request is valid
     await connectDB();
 
-    // 5) Pre-generate quote id so final S3 path is stable
     const quoteMongoId = new mongoose.Types.ObjectId().toString();
     const quoteId = await generateUniqueEntityId({
       model: LogisticsQuoteModel,
@@ -94,7 +86,6 @@ export const POST = async (req: NextRequest) => {
       crossBorder: deriveCrossBorder(validated.serviceDetails),
     });
 
-    // 6) Finalize attachments (all-or-nothing) with rollback plan
     const attachmentsFolder = makeEntityFinalPrefix(
       ES3Namespace.QUOTES,
       quoteId,
@@ -109,24 +100,20 @@ export const POST = async (req: NextRequest) => {
     rollback = finalized.rollback;
     quote.attachments = finalized.assets as any;
 
-    // 7) Mongoose validate + save (can still throw due to strict schemas)
     await quote.validate();
     await quote.save();
 
-    // 8) Email notifications (non-blocking)
     try {
       const siteUrl = getSiteUrlFromRequest(req);
       const sourceLabel = body?.sourceLabel || siteUrl;
 
-      const quoteObj = quote.toObject({ virtuals: true, getters: true }) as any as ILogisticsQuote;
+      const quoteObj = quote.toObject({ virtuals: true, getters: true }) as ILogisticsQuote;
 
-      // Internal (company)
       await sendQuoteInternalNotificationEmail({
         quote: quoteObj,
         sourceLabel,
       });
 
-      // Customer confirmation
       await sendQuoteCustomerConfirmationEmail({
         quote: quoteObj,
         sourceLabel,
@@ -142,7 +129,6 @@ export const POST = async (req: NextRequest) => {
       attachmentsFinalizedCount: finalized.movedCount,
     });
   } catch (err) {
-    // If anything fails AFTER finalization started, revert temp keys so client retries work
     if (rollback) await rollback();
     return errorResponse(err);
   }

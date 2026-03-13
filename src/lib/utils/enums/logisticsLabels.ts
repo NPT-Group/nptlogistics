@@ -7,11 +7,14 @@ import {
   EBrokerType,
   ECustomerIdentity,
   EInternationalMode,
-  EInternationalShipmentSize,
+  EOceanLoadType,
+  EOceanContainerType,
   EWarehousingDuration,
   EPreferredContactMethod,
   EWarehousingVolumeType,
   ELogisticsPrimaryService,
+  EWeightUnit,
+  EDimensionUnit,
 } from "@/types/logisticsQuote.types";
 
 /** Fallback: "OVERSIZED_OVERWEIGHT" -> "Oversized overweight" */
@@ -46,6 +49,20 @@ export const PRIMARY_SERVICE_LABEL: Record<ELogisticsPrimaryService, string> = {
   [ELogisticsPrimaryService.WAREHOUSING]: "Warehousing",
 };
 
+/* ───────────────────────── Units ───────────────────────── */
+
+export const WEIGHT_UNIT_LABEL: Record<EWeightUnit, string> = {
+  [EWeightUnit.LB]: "lb",
+  [EWeightUnit.KG]: "kg",
+};
+
+export const DIMENSION_UNIT_LABEL: Record<EDimensionUnit, string> = {
+  [EDimensionUnit.IN]: "in",
+  [EDimensionUnit.CM]: "cm",
+};
+
+/* ───────────────────────── Addons ───────────────────────── */
+
 export const FTL_ADDON_LABEL: Record<EFTLAddon, string> = {
   [EFTLAddon.EXPEDITED]: "Expedited",
   [EFTLAddon.TEAM_DRIVERS]: "Team drivers",
@@ -66,6 +83,8 @@ export const LTL_ADDON_LABEL: Record<ELTLAddon, string> = {
   [ELTLAddon.ESCORT_VEHICLES_REQUIRED]: "Escort vehicles required",
 };
 
+/* ───────────────────────── Equipment ───────────────────────── */
+
 export const FTL_EQUIPMENT_LABEL: Record<EFTLEquipmentType, string> = {
   [EFTLEquipmentType.DRY_VAN]: "Dry van",
   [EFTLEquipmentType.REEFER]: "Temperature controlled",
@@ -81,6 +100,8 @@ export const LTL_EQUIPMENT_LABEL: Record<ELTLEquipmentType, string> = {
   [ELTLEquipmentType.FLATBED]: "Flatbed",
   [ELTLEquipmentType.CONESTOGA]: "Conestoga",
 };
+
+/* ───────────────────────── Identity / Contact ───────────────────────── */
 
 export const BROKER_TYPE_LABEL: Record<EBrokerType, string> = {
   [EBrokerType.FREIGHT_BROKER]: "Freight broker",
@@ -98,16 +119,25 @@ export const PREF_CONTACT_LABEL: Record<EPreferredContactMethod, string> = {
   [EPreferredContactMethod.PHONE]: "Phone",
 };
 
+/* ───────────────────────── International ───────────────────────── */
+
 export const INTL_MODE_LABEL: Record<EInternationalMode, string> = {
   [EInternationalMode.AIR]: "Air",
   [EInternationalMode.OCEAN]: "Ocean",
 };
 
-export const INTL_SIZE_LABEL: Record<EInternationalShipmentSize, string> = {
-  [EInternationalShipmentSize.SMALL]: "Small",
-  [EInternationalShipmentSize.MEDIUM]: "Medium",
-  [EInternationalShipmentSize.LARGE]: "Large",
+export const OCEAN_LOAD_TYPE_LABEL: Record<EOceanLoadType, string> = {
+  [EOceanLoadType.FCL]: "Full container load (FCL)",
+  [EOceanLoadType.LCL]: "Less than container load (LCL)",
 };
+
+export const OCEAN_CONTAINER_TYPE_LABEL: Record<EOceanContainerType, string> = {
+  [EOceanContainerType.DRY_20]: "20 ft container",
+  [EOceanContainerType.DRY_40]: "40 ft container",
+  [EOceanContainerType.DRY_40_HC]: "40 ft high cube container",
+};
+
+/* ───────────────────────── Warehousing ───────────────────────── */
 
 export const WAREHOUSING_DURATION_LABEL: Record<EWarehousingDuration, string> = {
   [EWarehousingDuration.SHORT_TERM]: "Short-term",

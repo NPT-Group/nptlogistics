@@ -7,18 +7,21 @@ import { NEXT_PUBLIC_NPT_LOGISTICS_EMAIL } from "@/config/env";
 import type { IFileAsset } from "@/types/shared.types";
 import {
   ELogisticsPrimaryService,
+  EInternationalMode,
+  EOceanLoadType,
   type ILogisticsQuote,
   type QuoteServiceDetails,
   type LogisticsAddress,
-  type LogisticsWeight,
   type LogisticsDimensions,
   type WarehousingVolume,
   type QuoteFTLDetails,
   type QuoteLTLDetails,
   type QuoteInternationalDetails,
   type QuoteWarehousingDetails,
-  type QuoteLTLPalletLine,
+  type CargoLine,
+  type OceanContainerLine,
   type EWeightUnit,
+  type EDimensionUnit,
 } from "@/types/logisticsQuote.types";
 import { filenameForAsset } from "@/lib/utils/files/mime";
 import {
@@ -29,10 +32,14 @@ import {
   IDENTITY_LABEL,
   LTL_ADDON_LABEL,
   PREF_CONTACT_LABEL,
+  PRIMARY_SERVICE_LABEL,
   INTL_MODE_LABEL,
-  INTL_SIZE_LABEL,
+  OCEAN_LOAD_TYPE_LABEL,
+  OCEAN_CONTAINER_TYPE_LABEL,
   WAREHOUSING_DURATION_LABEL,
   WAREHOUSING_VOLUME_TYPE_LABEL,
+  WEIGHT_UNIT_LABEL,
+  DIMENSION_UNIT_LABEL,
   labelFromMap,
   labelsFromMap,
 } from "@/lib/utils/enums/logisticsLabels";
@@ -72,21 +79,15 @@ function fmtCompanyAddress(v?: unknown) {
   return s ? escapeHtml(s) : "—";
 }
 
-function fmtWeight(w?: LogisticsWeight) {
-  if (!w) return "—";
-  const value = typeof w.value === "number" ? w.value : Number(w.value);
-  const safeVal = Number.isFinite(value) ? String(value) : escapeHtml(String(w.value));
-  return `${escapeHtml(safeVal)} ${escapeHtml(w.unit)}`;
-}
-
 function fmtScalarWeight(value?: number, unit?: EWeightUnit) {
   if (value === null || value === undefined) return "—";
   const numeric = Number(value);
   const safeVal = Number.isFinite(numeric) ? String(numeric) : escapeHtml(String(value));
-  return unit ? `${escapeHtml(safeVal)} ${escapeHtml(unit)}` : escapeHtml(safeVal);
+  const unitLabel = unit ? labelFromMap(unit, WEIGHT_UNIT_LABEL) : undefined;
+  return unitLabel ? `${escapeHtml(safeVal)} ${escapeHtml(unitLabel)}` : escapeHtml(safeVal);
 }
 
-function fmtDims(d?: LogisticsDimensions) {
+function fmtDims(d?: LogisticsDimensions, unit?: EDimensionUnit) {
   if (!d) return "—";
   const l = Number(d.length);
   const w = Number(d.width);
@@ -94,7 +95,17 @@ function fmtDims(d?: LogisticsDimensions) {
   const safe = [l, w, h].every((n) => Number.isFinite(n))
     ? `${l} × ${w} × ${h}`
     : `${d.length} × ${d.width} × ${d.height}`;
-  return escapeHtml(safe);
+  const unitLabel = unit ? labelFromMap(unit, DIMENSION_UNIT_LABEL) : "";
+  return escapeHtml(`${safe}${unitLabel ? ` ${unitLabel}` : ""}`);
+}
+
+function fmtLineDims(length?: number, width?: number, height?: number, unit?: EDimensionUnit) {
+  const vals = [Number(length), Number(width), Number(height)];
+  const safe = vals.every((n) => Number.isFinite(n))
+    ? `${vals[0]} × ${vals[1]} × ${vals[2]}`
+    : `${length ?? "—"} × ${width ?? "—"} × ${height ?? "—"}`;
+  const unitLabel = unit ? labelFromMap(unit, DIMENSION_UNIT_LABEL) : "";
+  return escapeHtml(`${safe}${unitLabel ? ` ${unitLabel}` : ""}`);
 }
 
 function fmtWarehousingVolume(vol?: WarehousingVolume) {
@@ -102,6 +113,36 @@ function fmtWarehousingVolume(vol?: WarehousingVolume) {
   const label = labelFromMap(vol.volumeType, WAREHOUSING_VOLUME_TYPE_LABEL);
   const value = typeof vol.value === "number" ? String(vol.value) : escapeHtml(String(vol.value));
   return `${escapeHtml(label)}: ${escapeHtml(value)}`;
+}
+
+function getServiceSubjectLabel(service: QuoteServiceDetails | undefined): string {
+  if (!service) return "Quote";
+
+  if (service.primaryService !== ELogisticsPrimaryService.INTERNATIONAL) {
+    return labelFromMap(service.primaryService, PRIMARY_SERVICE_LABEL);
+  }
+
+  if (service.mode === EInternationalMode.AIR) {
+    return `${labelFromMap(ELogisticsPrimaryService.INTERNATIONAL, PRIMARY_SERVICE_LABEL)} ${labelFromMap(
+      service.mode,
+      INTL_MODE_LABEL,
+    )}`;
+  }
+
+  if (service.mode === EInternationalMode.OCEAN) {
+    const oceanLabel = labelFromMap(service.mode, INTL_MODE_LABEL);
+
+    if ("oceanLoadType" in service && service.oceanLoadType) {
+      return `${labelFromMap(ELogisticsPrimaryService.INTERNATIONAL, PRIMARY_SERVICE_LABEL)} ${oceanLabel} ${labelFromMap(
+        service.oceanLoadType,
+        OCEAN_LOAD_TYPE_LABEL,
+      )}`;
+    }
+
+    return `${labelFromMap(ELogisticsPrimaryService.INTERNATIONAL, PRIMARY_SERVICE_LABEL)} ${oceanLabel}`;
+  }
+
+  return labelFromMap(ELogisticsPrimaryService.INTERNATIONAL, PRIMARY_SERVICE_LABEL);
 }
 
 /* ───────────────────────── Attachments helper (S3 -> Graph) ───────────────────────── */
@@ -138,36 +179,86 @@ async function assetToAttachment(
 
 /* ───────────────────────── Service-specific rendering ───────────────────────── */
 
-function renderLtlPalletLinesTable(
-  palletLines: QuoteLTLPalletLine[],
-  shipmentUnit?: EWeightUnit,
+function renderCargoLinesTable(
+  cargoLines: CargoLine[],
+  weightUnit?: EWeightUnit,
+  dimensionUnit?: EDimensionUnit,
+  title = "Cargo Lines",
 ): string {
-  if (!palletLines.length) {
-    return `<p style="margin:0 0 16px 0; color:#6b7280;">No pallet lines provided.</p>`;
+  if (!cargoLines.length) {
+    return `
+      <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">${escapeHtml(title)}</p>
+      <p style="margin:0 0 16px 0; color:#6b7280;">No cargo lines provided.</p>
+    `;
   }
 
   return `
+    <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">${escapeHtml(title)}</p>
     <table role="presentation" cellspacing="0" cellpadding="0" width="100%"
            style="border-collapse:separate; border-spacing:0; border:1px solid #e5e7eb; border-radius:10px; overflow:hidden; margin:0 0 16px 0;">
       <thead>
         <tr>
           <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Qty</th>
+          <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Weight / Unit</th>
           <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Dimensions (L×W×H)</th>
-          <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Line Weight</th>
+          <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Line Total Weight</th>
         </tr>
       </thead>
       <tbody>
-        ${palletLines
-          .map((pl) => {
-            const qty = escapeHtml(String(pl.quantity ?? "—"));
-            const dims = fmtDims(pl.dimensions);
-            const lineWeight = fmtScalarWeight(pl.weightValue, shipmentUnit);
+        ${cargoLines
+          .map((line) => {
+            const qty = Number(line.quantity);
+            const unitWeight = Number(line.weightPerUnit);
+            const lineTotal =
+              Number.isFinite(qty) && Number.isFinite(unitWeight) ? qty * unitWeight : undefined;
 
             return `
               <tr>
-                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${qty}</td>
-                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${dims}</td>
-                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${lineWeight}</td>
+                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${escapeHtml(String(line.quantity ?? "—"))}</td>
+                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${fmtScalarWeight(line.weightPerUnit, weightUnit)}</td>
+                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${fmtLineDims(
+                  line.length,
+                  line.width,
+                  line.height,
+                  dimensionUnit,
+                )}</td>
+                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${fmtScalarWeight(lineTotal, weightUnit)}</td>
+              </tr>
+            `;
+          })
+          .join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderOceanContainerLinesTable(containerLines: OceanContainerLine[]): string {
+  if (!containerLines.length) {
+    return `
+      <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Container Lines</p>
+      <p style="margin:0 0 16px 0; color:#6b7280;">No container lines provided.</p>
+    `;
+  }
+
+  return `
+    <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Container Lines</p>
+    <table role="presentation" cellspacing="0" cellpadding="0" width="100%"
+           style="border-collapse:separate; border-spacing:0; border:1px solid #e5e7eb; border-radius:10px; overflow:hidden; margin:0 0 16px 0;">
+      <thead>
+        <tr>
+          <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Qty</th>
+          <th align="left" style="padding:10px 12px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:12px; color:#6b7280;">Container Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${containerLines
+          .map((line) => {
+            return `
+              <tr>
+                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${escapeHtml(String(line.quantity ?? "—"))}</td>
+                <td style="padding:10px 12px; border-bottom:1px solid #f3f4f6;">${escapeHtml(
+                  labelFromMap(line.containerType, OCEAN_CONTAINER_TYPE_LABEL),
+                )}</td>
               </tr>
             `;
           })
@@ -189,9 +280,9 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
           <li style="margin:0 0 8px 0;">Destination: ${fmtAddress(s.destination)}</li>
           <li style="margin:0 0 8px 0;">Pickup Date: ${fmtDate(s.pickupDate)} (Flexible: ${yn(s.pickupDateFlexible)})</li>
           <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
-          <li style="margin:0 0 8px 0;">Approx. Total Weight: ${fmtWeight(s.approximateTotalWeight)}</li>
+          <li style="margin:0 0 8px 0;">Approx. Total Weight: ${fmtScalarWeight(s.approximateTotalWeight, s.weightUnit)}</li>
           <li style="margin:0 0 8px 0;">Estimated Pallet Count: ${escapeHtml(String(s.estimatedPalletCount ?? "—"))}</li>
-          <li style="margin:0 0 8px 0;">Dimensions (L×W×H): ${fmtDims(s.dimensions)}</li>
+          <li style="margin:0 0 8px 0;">Dimensions (L×W×H): ${fmtDims(s.dimensions, s.dimensionUnit)}</li>
           <li style="margin:0;">
             Add-ons: ${(() => {
               const labels = labelsFromMap(s.addons, FTL_ADDON_LABEL);
@@ -204,11 +295,7 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
 
     case ELogisticsPrimaryService.LTL: {
       const s: QuoteLTLDetails = service;
-      const palletLines = Array.isArray(s.palletLines) ? s.palletLines : [];
-      const palletLinesHtml = renderLtlPalletLinesTable(
-        palletLines,
-        s.approximateTotalWeight?.unit,
-      );
+      const cargoLines = Array.isArray(s.cargoLines) ? s.cargoLines : [];
 
       return `
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (LTL)</p>
@@ -218,8 +305,10 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
           <li style="margin:0 0 8px 0;">Destination: ${fmtAddress(s.destination)}</li>
           <li style="margin:0 0 8px 0;">Pickup Date: ${fmtDate(s.pickupDate)}</li>
           <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
+          <li style="margin:0 0 8px 0;">Weight Unit: ${escapeHtml(labelFromMap(s.weightUnit, WEIGHT_UNIT_LABEL))}</li>
+          <li style="margin:0 0 8px 0;">Dimension Unit: ${escapeHtml(labelFromMap(s.dimensionUnit, DIMENSION_UNIT_LABEL))}</li>
           <li style="margin:0 0 8px 0;">Stackable: ${yn(s.stackable)}</li>
-          <li style="margin:0 0 8px 0;">Approx. Total Weight: ${fmtWeight(s.approximateTotalWeight)}</li>
+          <li style="margin:0 0 8px 0;">Approx. Total Weight: ${fmtScalarWeight(s.approximateTotalWeight, s.weightUnit)}</li>
           <li style="margin:0;">
             Add-ons: ${(() => {
               const labels = labelsFromMap(s.addons, LTL_ADDON_LABEL);
@@ -228,30 +317,75 @@ function renderServiceSummary(service: QuoteServiceDetails): string {
           </li>
         </ul>
 
-        <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Pallet Lines</p>
-        ${palletLinesHtml}
+        ${renderCargoLinesTable(cargoLines, s.weightUnit, s.dimensionUnit, "Pallet Lines")}
       `;
     }
 
     case ELogisticsPrimaryService.INTERNATIONAL: {
       const s: QuoteInternationalDetails = service;
-      const shipmentSizeLabel = s.shipmentSize
-        ? escapeHtml(labelFromMap(s.shipmentSize, INTL_SIZE_LABEL))
-        : "—";
+
+      if (s.mode === EInternationalMode.AIR) {
+        const cargoLines = Array.isArray(s.cargoLines) ? s.cargoLines : [];
+
+        return `
+          <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (International Air)</p>
+          <ul style="margin:0 0 12px 18px; padding:0;">
+            <li style="margin:0 0 8px 0;">Mode: <strong>${escapeHtml(labelFromMap(s.mode, INTL_MODE_LABEL))}</strong></li>
+            <li style="margin:0 0 8px 0;">Origin: ${fmtAddress(s.origin)}</li>
+            <li style="margin:0 0 8px 0;">Destination: ${fmtAddress(s.destination)}</li>
+            <li style="margin:0 0 8px 0;">Pickup Date: ${fmtDate(s.pickupDate)}</li>
+            <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
+            <li style="margin:0 0 8px 0;">Weight Unit: ${escapeHtml(labelFromMap(s.weightUnit, WEIGHT_UNIT_LABEL))}</li>
+            <li style="margin:0 0 8px 0;">Dimension Unit: ${escapeHtml(labelFromMap(s.dimensionUnit, DIMENSION_UNIT_LABEL))}</li>
+            <li style="margin:0 0 8px 0;">Approx. Total Weight: ${fmtScalarWeight(s.approximateTotalWeight, s.weightUnit)}</li>
+          </ul>
+
+          ${renderCargoLinesTable(cargoLines, s.weightUnit, s.dimensionUnit, "Cargo Lines")}
+        `;
+      }
+
+      if (s.mode === EInternationalMode.OCEAN && s.oceanLoadType === EOceanLoadType.LCL) {
+        const cargoLines = Array.isArray(s.cargoLines) ? s.cargoLines : [];
+
+        return `
+          <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (International Ocean LCL)</p>
+          <ul style="margin:0 0 12px 18px; padding:0;">
+            <li style="margin:0 0 8px 0;">Mode: <strong>${escapeHtml(labelFromMap(s.mode, INTL_MODE_LABEL))}</strong></li>
+            <li style="margin:0 0 8px 0;">Ocean Load Type: <strong>${escapeHtml(labelFromMap(s.oceanLoadType, OCEAN_LOAD_TYPE_LABEL))}</strong></li>
+            <li style="margin:0 0 8px 0;">Origin: ${fmtAddress(s.origin)}</li>
+            <li style="margin:0 0 8px 0;">Destination: ${fmtAddress(s.destination)}</li>
+            <li style="margin:0 0 8px 0;">Pickup Date: ${fmtDate(s.pickupDate)}</li>
+            <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
+            <li style="margin:0 0 8px 0;">Weight Unit: ${escapeHtml(labelFromMap(s.weightUnit, WEIGHT_UNIT_LABEL))}</li>
+            <li style="margin:0 0 8px 0;">Dimension Unit: ${escapeHtml(labelFromMap(s.dimensionUnit, DIMENSION_UNIT_LABEL))}</li>
+            <li style="margin:0 0 8px 0;">Approx. Total Weight: ${fmtScalarWeight(s.approximateTotalWeight, s.weightUnit)}</li>
+          </ul>
+
+          ${renderCargoLinesTable(cargoLines, s.weightUnit, s.dimensionUnit, "Cargo Lines")}
+        `;
+      }
+
+      if (s.mode === EInternationalMode.OCEAN && s.oceanLoadType === EOceanLoadType.FCL) {
+        const containerLines = Array.isArray(s.containerLines) ? s.containerLines : [];
+
+        return `
+          <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (International Ocean FCL)</p>
+          <ul style="margin:0 0 12px 18px; padding:0;">
+            <li style="margin:0 0 8px 0;">Mode: <strong>${escapeHtml(labelFromMap(s.mode, INTL_MODE_LABEL))}</strong></li>
+            <li style="margin:0 0 8px 0;">Ocean Load Type: <strong>${escapeHtml(labelFromMap(s.oceanLoadType, OCEAN_LOAD_TYPE_LABEL))}</strong></li>
+            <li style="margin:0 0 8px 0;">Origin: ${fmtAddress(s.origin)}</li>
+            <li style="margin:0 0 8px 0;">Destination: ${fmtAddress(s.destination)}</li>
+            <li style="margin:0 0 8px 0;">Pickup Date: ${fmtDate(s.pickupDate)}</li>
+            <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
+          </ul>
+
+          ${renderOceanContainerLinesTable(containerLines)}
+        `;
+      }
 
       return `
         <p style="margin:0 0 8px 0; font-weight:600; color:#111827;">Service Details (International)</p>
-        <ul style="margin:0 0 16px 18px; padding:0;">
-          <li style="margin:0 0 8px 0;">
-            Mode: <strong>${escapeHtml(labelFromMap(s.mode, INTL_MODE_LABEL))}</strong>
-          </li>
-          <li style="margin:0 0 8px 0;">Origin: ${fmtAddress(s.origin)}</li>
-          <li style="margin:0 0 8px 0;">Destination: ${fmtAddress(s.destination)}</li>
-          <li style="margin:0 0 8px 0;">Pickup Date: ${fmtDate(s.pickupDate)}</li>
-          <li style="margin:0 0 8px 0;">Commodity: ${escapeHtml(String(s.commodityDescription || "—"))}</li>
-          <li style="margin:0 0 8px 0;">Estimated Weight: ${fmtWeight(s.estimatedWeight)}</li>
-          <li style="margin:0;">Shipment Size: ${shipmentSizeLabel}</li>
-        </ul>
+        <p style="margin:0 0 16px 0; color:#6b7280;">Unknown international quote structure.</p>
       `;
     }
 
@@ -282,9 +416,11 @@ function renderContactAndIdentification(q: ILogisticsQuote): string {
   const id = q.identification || {};
 
   const safeName = escapeHtml(`${c.firstName || ""} ${c.lastName || ""}`.trim() || "—");
-  const safeEmail = c.email ? escapeHtml(String(c.email)) : "—";
+  const rawEmail = c.email ? String(c.email) : "";
+  const safeEmail = rawEmail ? escapeHtml(rawEmail) : "—";
   const safeCompany = c.company ? escapeHtml(String(c.company)) : "—";
-  const safePhone = c.phone ? escapeHtml(String(c.phone)) : "";
+  const rawPhone = c.phone ? String(c.phone) : "";
+  const safePhone = rawPhone ? escapeHtml(rawPhone) : "";
 
   const identity = "identity" in id ? escapeHtml(labelFromMap(id.identity, IDENTITY_LABEL)) : "—";
   const brokerType =
@@ -309,14 +445,14 @@ function renderContactAndIdentification(q: ILogisticsQuote): string {
       <li style="margin:0 0 8px 0;">
         Email:
         ${
-          safeEmail !== "—"
-            ? `<a href="mailto:${safeEmail}" style="color:#2563eb; text-decoration:none;">${safeEmail}</a>`
+          rawEmail
+            ? `<a href="mailto:${escapeHtml(rawEmail)}" style="color:#2563eb; text-decoration:none;">${safeEmail}</a>`
             : "—"
         }
       </li>
       ${
-        safePhone
-          ? `<li style="margin:0 0 8px 0;">Phone: <a href="tel:${safePhone}" style="color:#2563eb; text-decoration:none;">${safePhone}</a></li>`
+        rawPhone
+          ? `<li style="margin:0 0 8px 0;">Phone: <a href="tel:${escapeHtml(rawPhone)}" style="color:#2563eb; text-decoration:none;">${safePhone}</a></li>`
           : `<li style="margin:0 0 8px 0;">Phone: —</li>`
       }
       <li style="margin:0 0 8px 0;">Preferred Contact: ${preferred}</li>
@@ -345,7 +481,8 @@ export async function sendQuoteInternalNotificationEmail(
   const service = q.serviceDetails;
 
   const safeId = escapeHtml(String(q.quoteId || "—"));
-  const safePrimary = escapeHtml(String(service?.primaryService || "QUOTE"));
+  const primaryLabel = getServiceSubjectLabel(service);
+  const safePrimary = escapeHtml(primaryLabel);
   const safeSource = params.sourceLabel ? escapeHtml(params.sourceLabel) : "";
 
   const subject = `New Quote Received – ${safePrimary}${safeSource ? ` (${safeSource})` : ""}`;
@@ -427,7 +564,8 @@ export async function sendQuoteInternalNotificationEmail(
       <p style="margin:0; font-size:13px; color:#6b7280;">
         Reference ID:
         <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;">${safeId}</span>
-        • Primary Service: <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;">${safePrimary}</span>
+        • Primary Service:
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;">${safePrimary}</span>
       </p>
       <p style="margin:6px 0 0 0; font-size:13px; color:#6b7280;">
         Created: ${fmtDate(q.createdAt)} • Updated: ${fmtDate(q.updatedAt)}

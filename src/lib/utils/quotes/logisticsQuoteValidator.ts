@@ -2,21 +2,24 @@
 import {
   EBrokerType,
   ECustomerIdentity,
+  EDimensionUnit,
   EInternationalMode,
-  EInternationalShipmentSize,
   ELogisticsPrimaryService,
+  EOceanContainerType,
+  EOceanLoadType,
   EPreferredContactMethod,
   EFTLAddon,
   EFTLEquipmentType,
   ELTLAddon,
   ELTLEquipmentType,
   EWarehousingDuration,
+  EWarehousingVolumeType,
   EWeightUnit,
+  type CargoLine,
   type LogisticsAddress,
   type LogisticsDimensions,
-  type LogisticsWeight,
+  type OceanContainerLine,
   type QuoteServiceDetails,
-  EWarehousingVolumeType,
 } from "@/types/logisticsQuote.types";
 
 import { NORTH_AMERICAN_COUNTRY_CODES } from "@/config/countries";
@@ -66,32 +69,27 @@ function validateAddress(a: unknown, label: string) {
   (a as LogisticsAddress).countryCode = countryCode;
 }
 
-function validateWeight(w: unknown, label: string) {
-  assert(isObj(w), `${label} is required`);
-  assert(isFinitePos(w.value), `${label}.value must be a positive number`);
-
-  const unit = String(w.unit || "");
+function validateWeightUnit(unit: unknown, label: string): EWeightUnit {
+  const normalized = String(unit || "");
   assert(
-    Object.values(EWeightUnit).includes(unit as EWeightUnit),
-    `${label}.unit must be KG or LB`,
+    Object.values(EWeightUnit).includes(normalized as EWeightUnit),
+    `${label} must be KG or LB`,
   );
-
-  (w as LogisticsWeight).value = Number(w.value);
-  (w as LogisticsWeight).unit = unit as EWeightUnit;
+  return normalized as EWeightUnit;
 }
 
-function validateWeightUnitOnly(w: unknown, label: string) {
-  assert(isObj(w), `${label} is required`);
-
-  const unit = String(w.unit || "");
+function validateDimensionUnit(unit: unknown, label: string): EDimensionUnit {
+  const normalized = String(unit || "");
   assert(
-    Object.values(EWeightUnit).includes(unit as EWeightUnit),
-    `${label}.unit must be KG or LB`,
+    Object.values(EDimensionUnit).includes(normalized as EDimensionUnit),
+    `${label} must be IN or CM`,
   );
+  return normalized as EDimensionUnit;
+}
 
-  const currentValue = Number(w.value);
-  (w as LogisticsWeight).value = Number.isFinite(currentValue) ? currentValue : 0;
-  (w as LogisticsWeight).unit = unit as EWeightUnit;
+function validatePositiveNumber(value: unknown, label: string): number {
+  assert(isFinitePos(value), `${label} must be a positive number`);
+  return Number(value);
 }
 
 function validateDims(d: unknown, label: string) {
@@ -109,6 +107,60 @@ function validateDate(v: unknown, label: string) {
   const d = v instanceof Date ? v : new Date(String(v));
   assert(!Number.isNaN(d.getTime()), `${label} must be a valid date`);
   return d;
+}
+
+function validateCargoLines(lines: unknown, label: string): CargoLine[] {
+  assert(Array.isArray(lines) && lines.length > 0, `${label} must be a non-empty array`);
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    assert(isObj(line), `${label}[${i}] must be an object`);
+
+    assert(isFinitePos(line.quantity), `${label}[${i}].quantity must be >= 1`);
+    assert(isFinitePos(line.length), `${label}[${i}].length must be a positive number`);
+    assert(isFinitePos(line.width), `${label}[${i}].width must be a positive number`);
+    assert(isFinitePos(line.height), `${label}[${i}].height must be a positive number`);
+    assert(
+      isFinitePos(line.weightPerUnit),
+      `${label}[${i}].weightPerUnit must be a positive number`,
+    );
+
+    (line as CargoLine).quantity = Number(line.quantity);
+    (line as CargoLine).length = Number(line.length);
+    (line as CargoLine).width = Number(line.width);
+    (line as CargoLine).height = Number(line.height);
+    (line as CargoLine).weightPerUnit = Number(line.weightPerUnit);
+  }
+
+  return lines as CargoLine[];
+}
+
+function computeApproximateTotalWeight(lines: CargoLine[]): number {
+  return lines.reduce((sum, line) => {
+    return sum + Number(line.quantity) * Number(line.weightPerUnit);
+  }, 0);
+}
+
+function validateContainerLines(lines: unknown, label: string): OceanContainerLine[] {
+  assert(Array.isArray(lines) && lines.length > 0, `${label} must be a non-empty array`);
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    assert(isObj(line), `${label}[${i}] must be an object`);
+
+    assert(isFinitePos(line.quantity), `${label}[${i}].quantity must be >= 1`);
+
+    const containerType = String(line.containerType || "");
+    assert(
+      Object.values(EOceanContainerType).includes(containerType as EOceanContainerType),
+      `${label}[${i}].containerType is invalid`,
+    );
+
+    (line as OceanContainerLine).quantity = Number(line.quantity);
+    (line as OceanContainerLine).containerType = containerType as EOceanContainerType;
+  }
+
+  return lines as OceanContainerLine[];
 }
 
 function validateIdentification(id: unknown) {
@@ -331,7 +383,11 @@ export function validateLogisticsQuoteRequest(input: {
       service.commodityDescription = trim(service.commodityDescription);
       assert(service.commodityDescription, "serviceDetails.commodityDescription is required");
 
-      validateWeight(service.approximateTotalWeight, "serviceDetails.approximateTotalWeight");
+      service.approximateTotalWeight = validatePositiveNumber(
+        service.approximateTotalWeight,
+        "serviceDetails.approximateTotalWeight",
+      );
+      service.weightUnit = validateWeightUnit(service.weightUnit, "serviceDetails.weightUnit");
 
       if (service.estimatedPalletCount != null) {
         assert(
@@ -343,6 +399,14 @@ export function validateLogisticsQuoteRequest(input: {
 
       if (service.dimensions != null) {
         validateDims(service.dimensions, "serviceDetails.dimensions");
+        service.dimensionUnit = validateDimensionUnit(
+          service.dimensionUnit,
+          "serviceDetails.dimensionUnit",
+        );
+      } else if (service.dimensionUnit != null) {
+        throw new Error(
+          "serviceDetails.dimensionUnit must not be set without serviceDetails.dimensions",
+        );
       }
 
       if (service.pickupDateFlexible != null) {
@@ -387,39 +451,16 @@ export function validateLogisticsQuoteRequest(input: {
       service.commodityDescription = trim(service.commodityDescription);
       assert(service.commodityDescription, "serviceDetails.commodityDescription is required");
 
+      service.weightUnit = validateWeightUnit(service.weightUnit, "serviceDetails.weightUnit");
+      service.dimensionUnit = validateDimensionUnit(
+        service.dimensionUnit,
+        "serviceDetails.dimensionUnit",
+      );
+
       service.stackable = Boolean(service.stackable);
 
-      assert(
-        Array.isArray(service.palletLines) && service.palletLines.length > 0,
-        "serviceDetails.palletLines must be a non-empty array",
-      );
-
-      for (let i = 0; i < service.palletLines.length; i++) {
-        const pl = service.palletLines[i];
-        assert(isObj(pl), `serviceDetails.palletLines[${i}] must be an object`);
-        assert(isFinitePos(pl.quantity), `serviceDetails.palletLines[${i}].quantity must be >= 1`);
-        pl.quantity = Number(pl.quantity);
-
-        validateDims(pl.dimensions, `serviceDetails.palletLines[${i}].dimensions`);
-
-        assert(
-          isFinitePos(pl.weightValue),
-          `serviceDetails.palletLines[${i}].weightValue must be a positive number`,
-        );
-        pl.weightValue = Number(pl.weightValue);
-      }
-
-      validateWeightUnitOnly(
-        service.approximateTotalWeight,
-        "serviceDetails.approximateTotalWeight",
-      );
-
-      const total = service.palletLines.reduce(
-        (sum: number, pl: any) => sum + Number(pl.weightValue),
-        0,
-      );
-
-      service.approximateTotalWeight.value = total;
+      service.cargoLines = validateCargoLines(service.cargoLines, "serviceDetails.cargoLines");
+      service.approximateTotalWeight = computeApproximateTotalWeight(service.cargoLines);
 
       if (service.addons == null) {
         service.addons = [];
@@ -457,19 +498,72 @@ export function validateLogisticsQuoteRequest(input: {
       service.commodityDescription = trim(service.commodityDescription);
       assert(service.commodityDescription, "serviceDetails.commodityDescription is required");
 
-      validateWeight(service.estimatedWeight, "serviceDetails.estimatedWeight");
-
-      if (service.shipmentSize != null) {
-        const ss = String(service.shipmentSize);
-        assert(
-          Object.values(EInternationalShipmentSize).includes(ss as EInternationalShipmentSize),
-          "serviceDetails.shipmentSize is invalid",
-        );
-        service.shipmentSize = ss;
-      }
-
       service.primaryService = ps;
       service.mode = mode;
+
+      if (mode === EInternationalMode.AIR) {
+        service.weightUnit = validateWeightUnit(service.weightUnit, "serviceDetails.weightUnit");
+        service.dimensionUnit = validateDimensionUnit(
+          service.dimensionUnit,
+          "serviceDetails.dimensionUnit",
+        );
+
+        service.cargoLines = validateCargoLines(service.cargoLines, "serviceDetails.cargoLines");
+        service.approximateTotalWeight = computeApproximateTotalWeight(service.cargoLines);
+
+        if (service.oceanLoadType != null) {
+          throw new Error("serviceDetails.oceanLoadType is not allowed for AIR");
+        }
+        if (service.containerLines != null) {
+          throw new Error("serviceDetails.containerLines is not allowed for AIR");
+        }
+      }
+
+      if (mode === EInternationalMode.OCEAN) {
+        const oceanLoadType = String(service.oceanLoadType || "");
+        assert(
+          Object.values(EOceanLoadType).includes(oceanLoadType as EOceanLoadType),
+          "serviceDetails.oceanLoadType is invalid",
+        );
+
+        service.oceanLoadType = oceanLoadType;
+
+        if (oceanLoadType === EOceanLoadType.LCL) {
+          service.weightUnit = validateWeightUnit(service.weightUnit, "serviceDetails.weightUnit");
+          service.dimensionUnit = validateDimensionUnit(
+            service.dimensionUnit,
+            "serviceDetails.dimensionUnit",
+          );
+
+          service.cargoLines = validateCargoLines(service.cargoLines, "serviceDetails.cargoLines");
+          service.approximateTotalWeight = computeApproximateTotalWeight(service.cargoLines);
+
+          if (service.containerLines != null) {
+            throw new Error("serviceDetails.containerLines is not allowed for OCEAN LCL");
+          }
+        }
+
+        if (oceanLoadType === EOceanLoadType.FCL) {
+          service.containerLines = validateContainerLines(
+            service.containerLines,
+            "serviceDetails.containerLines",
+          );
+
+          if (service.weightUnit != null) {
+            throw new Error("serviceDetails.weightUnit is not allowed for OCEAN FCL");
+          }
+          if (service.dimensionUnit != null) {
+            throw new Error("serviceDetails.dimensionUnit is not allowed for OCEAN FCL");
+          }
+          if (service.cargoLines != null) {
+            throw new Error("serviceDetails.cargoLines is not allowed for OCEAN FCL");
+          }
+          if (service.approximateTotalWeight != null) {
+            throw new Error("serviceDetails.approximateTotalWeight is not allowed for OCEAN FCL");
+          }
+        }
+      }
+
       break;
     }
 

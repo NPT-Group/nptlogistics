@@ -5,38 +5,39 @@ import { buildDefaultEmailTemplate } from "@/lib/mail/templates/defaultTemplate"
 import { NEXT_PUBLIC_NPT_LOGISTICS_EMAIL } from "@/config/env";
 
 import type { ILogisticsQuote } from "@/types/logisticsQuote.types";
+import { PRIMARY_SERVICE_LABEL, labelFromMap } from "@/lib/utils/enums/logisticsLabels";
 
 function fmtDate(v?: string | Date) {
   if (!v) return "—";
   const d = typeof v === "string" ? new Date(v) : v;
   if (Number.isNaN(d.getTime())) return escapeHtml(String(v));
-  return escapeHtml(d.toISOString().slice(0, 10)); // YYYY-MM-DD
+  return escapeHtml(d.toISOString().slice(0, 10));
 }
 
 export type SendQuoteCustomerConfirmationEmailParams = {
   quote: ILogisticsQuote;
-
-  /** optional: override recipient (otherwise quote.contact.email) */
   to?: string;
-
-  /** optional: include website / campaign label */
   sourceLabel?: string;
 };
 
 export async function sendQuoteCustomerConfirmationEmail(
   params: SendQuoteCustomerConfirmationEmailParams,
 ): Promise<void> {
-  const q: any = params.quote;
-  const contact: any = q.contact || {};
-  const service: any = q.serviceDetails || {};
+  const q = params.quote;
+  const contact = q.contact || {};
+  const service = q.serviceDetails || {};
 
   const toAddr = params.to || contact.email;
-  if (!toAddr) return; // no customer email -> silently skip
+  if (!toAddr) return;
 
   const firstName = contact.firstName ? String(contact.firstName) : "";
   const safeName = escapeHtml(firstName || "there");
 
-  const safePrimary = escapeHtml(String(service.primaryService || "Quote"));
+  const primaryLabel = service.primaryService
+    ? labelFromMap(service.primaryService, PRIMARY_SERVICE_LABEL)
+    : "Quote";
+
+  const safePrimary = escapeHtml(primaryLabel);
   const safeId = escapeHtml(String(q.quoteId || "—"));
 
   const subject = `We received your quote request – ${safePrimary}`;
@@ -53,7 +54,8 @@ export async function sendQuoteCustomerConfirmationEmail(
       <p style="margin:0; font-size:13px; color:#6b7280;">
         Reference ID:
         <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;">${safeId}</span>
-        • Service: <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;">${safePrimary}</span>
+        • Service:
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;">${safePrimary}</span>
       </p>
       <p style="margin:6px 0 0 0; font-size:13px; color:#6b7280;">
         Submitted: ${fmtDate(q.createdAt)}

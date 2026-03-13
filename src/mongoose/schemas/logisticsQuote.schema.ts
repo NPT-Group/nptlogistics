@@ -55,3 +55,4 @@ export const logisticsQuoteSchema = new Schema<ILogisticsQuote>(
 logisticsQuoteSchema.index({ "serviceDetails.primaryService": 1, createdAt: -1 });
 logisticsQuoteSchema.index({ "contact.email": 1, createdAt: -1 });
 logisticsQuoteSchema.index({ "contact.company": 1 });
+logisticsQuoteSchema.index({ crossBorder: 1, createdAt: -1 });

@@ -12,51 +12,75 @@ BUSINESS RULE SUMMARY
    - FTL, LTL, Warehousing → ONLY NORTH_AMERICAN_COUNTRY_CODES.
    - International → ANY ISO country code allowed.
 
-3. Weight:
-   - Shipment-level weight always uses LogisticsWeight = { value, unit }.
-   - unit must always be KG or LB.
-   - FTL → approximateTotalWeight is required.
-   - International → estimatedWeight is required.
-   - LTL:
-     - approximateTotalWeight is required.
-     - approximateTotalWeight.unit is the source of truth for the whole shipment.
-     - approximateTotalWeight.value is DERIVED in backend by summing all pallet line weights.
-     - Each pallet line stores only a scalar numeric weight (no per-pallet weight unit object).
+3. Units:
+   - Weight and dimension units are selected ONCE per applicable shipment section.
+   - LTL, International Air, and International Ocean LCL use shared section-level:
+     - weightUnit
+     - dimensionUnit
+   - Repeating line items do NOT store per-line unit objects.
 
-4. Dimensions:
-   - Stored as numeric L/W/H only.
-   - NO dimension unit stored (internal normalization).
+4. Weight:
+   - FTL stores:
+     - approximateTotalWeight
+     - weightUnit
+   - LTL stores:
+     - cargoLines[].weightPerUnit
+     - approximateTotalWeight (backend-derived)
+     - weightUnit
+   - International Air stores:
+     - cargoLines[].weightPerUnit
+     - approximateTotalWeight (backend-derived)
+     - weightUnit
+   - Ocean LCL stores:
+     - cargoLines[].weightPerUnit
+     - approximateTotalWeight (backend-derived)
+     - weightUnit
+   - Ocean FCL does not require cargo-line dimensions/weights for core quoting flow.
 
-5. Cross-border:
+5. Dimensions:
+   - Stored as numeric length/width/height on each cargo line.
+   - Unit is stored once at section level using EDimensionUnit.
+   - FTL optional top-level dimensions remain available for whole-shipment reference.
+
+6. Cross-border:
    - Derived in backend:
      crossBorder = origin.countryCode !== destination.countryCode
    - Applies only where origin/destination exists.
 
-6. Equipment-addon compatibility:
+7. Equipment-addon compatibility:
    - Must be validated in service layer / schema validation.
 
-7. LTL pallet-line modeling:
-   - Each pallet line stores:
+8. LTL / Air / Ocean LCL line modeling:
+   - Shared CargoLine stores:
      - quantity
-     - dimensions
-     - weightValue
-   - weightValue is a positive number using the same unit as LTL approximateTotalWeight.unit.
-   - Per-pallet weight does NOT use LogisticsWeight.
+     - length
+     - width
+     - height
+     - weightPerUnit
+   - No packageType stored.
+   - UI may still label these differently by service
+     (e.g. "Pallet lines" for LTL, "Cargo lines" for Air/LCL).
 
-8. Backend normalization:
+9. Backend normalization:
    - Incoming payloads may be normalized/trimmed in validation layer.
-   - Derived fields such as LTL approximateTotalWeight.value and crossBorder are backend-owned.
+   - Derived fields such as approximateTotalWeight and crossBorder are backend-owned.
 
-9. Naming:
+10. Naming:
    - "readyDate" has been renamed to "pickupDate".
    - "readyDateFlexible" has been renamed to "pickupDateFlexible".
 
-10. FTL equipment model:
-   - FTL equipment now treats FLATBED and STEP_DECK as separate values.
+11. FTL equipment model:
+   - FTL equipment treats FLATBED and STEP_DECK as separate values.
 
-11. LTL equipment model:
-   - LTL now has explicit equipment selection.
-   - LTL add-ons must be validated against the selected LTL equipment.
+12. LTL equipment model:
+   - LTL requires explicit equipment selection.
+   - LTL add-ons must be validated against selected LTL equipment.
+
+13. International model:
+   - International is further discriminated by:
+     - AIR
+     - OCEAN + FCL
+     - OCEAN + LCL
 ────────────────────────────────────────────────────────────────────────────── */
 
 /* ───────────────────────────── Enums ───────────────────────────── */
@@ -71,6 +95,11 @@ export enum ELogisticsPrimaryService {
 export enum EWeightUnit {
   KG = "KG",
   LB = "LB",
+}
+
+export enum EDimensionUnit {
+  IN = "IN",
+  CM = "CM",
 }
 
 export enum ECustomerIdentity {
@@ -125,10 +154,15 @@ export enum EInternationalMode {
   OCEAN = "OCEAN",
 }
 
-export enum EInternationalShipmentSize {
-  SMALL = "SMALL",
-  MEDIUM = "MEDIUM",
-  LARGE = "LARGE",
+export enum EOceanLoadType {
+  FCL = "FCL",
+  LCL = "LCL",
+}
+
+export enum EOceanContainerType {
+  DRY_20 = "DRY_20",
+  DRY_40 = "DRY_40",
+  DRY_40_HC = "DRY_40_HC",
 }
 
 export enum EWarehousingDuration {
@@ -166,8 +200,9 @@ export type LogisticsAddress = {
 };
 
 /**
- * Dimensions WITHOUT unit.
- * Internal team determines measurement unit.
+ * Whole-shipment dimensions WITHOUT unit.
+ * Use only where top-level shipment dimensions are needed.
+ * Unit is stored separately in dimensionUnit when applicable.
  */
 export type LogisticsDimensions = {
   length: number;
@@ -176,11 +211,22 @@ export type LogisticsDimensions = {
 };
 
 /**
- * Weight ALWAYS requires unit.
+ * Shared repeating line item for LTL, International Air, and Ocean LCL.
+ * Units come from parent section:
+ * - weightUnit
+ * - dimensionUnit
  */
-export type LogisticsWeight = {
-  value: number;
-  unit: EWeightUnit;
+export type CargoLine = {
+  quantity: number; // >= 1
+  length: number; // >= 1
+  width: number; // >= 1
+  height: number; // >= 1
+  weightPerUnit: number; // >= 1
+};
+
+export type OceanContainerLine = {
+  quantity: number; // >= 1
+  containerType: EOceanContainerType;
 };
 
 /* ───────────────────────────── FTL ───────────────────────────── */
@@ -201,10 +247,17 @@ export type QuoteFTLDetails = {
   pickupDate: Date | string;
   commodityDescription: string;
 
-  approximateTotalWeight: LogisticsWeight;
+  approximateTotalWeight: number;
+  weightUnit: EWeightUnit;
 
   estimatedPalletCount?: number;
+
+  /**
+   * Optional whole-shipment dimensions.
+   * If provided, interpreted using dimensionUnit.
+   */
   dimensions?: LogisticsDimensions;
+  dimensionUnit?: EDimensionUnit;
 
   pickupDateFlexible?: boolean;
 
@@ -223,17 +276,11 @@ export type QuoteFTLDetails = {
 
 /* ───────────────────────────── LTL ───────────────────────────── */
 
-export type QuoteLTLPalletLine = {
-  quantity: number; // >= 1
-  dimensions: LogisticsDimensions;
-  weightValue: number; // >= 1, uses QuoteLTLDetails.approximateTotalWeight.unit
-};
-
 export type QuoteLTLDetails = {
   primaryService: ELogisticsPrimaryService.LTL;
 
   /**
-   * LTL now requires explicit equipment selection.
+   * LTL requires explicit equipment selection.
    */
   equipment: ELTLEquipmentType;
 
@@ -246,11 +293,21 @@ export type QuoteLTLDetails = {
   pickupDate: Date | string;
   commodityDescription: string;
 
+  weightUnit: EWeightUnit;
+  dimensionUnit: EDimensionUnit;
+
   stackable: boolean;
 
-  palletLines: QuoteLTLPalletLine[];
+  /**
+   * UI may label these as "Pallet lines".
+   */
+  cargoLines: CargoLine[];
 
-  approximateTotalWeight: LogisticsWeight;
+  /**
+   * Backend-derived from:
+   * sum(quantity * weightPerUnit)
+   */
+  approximateTotalWeight: number;
 
   /**
    * Equipment compatibility must be validated:
@@ -274,10 +331,9 @@ export type QuoteLTLDetails = {
 
 /* ───────────────────────────── International ───────────────────────────── */
 
-export type QuoteInternationalDetails = {
+export type QuoteInternationalAirDetails = {
   primaryService: ELogisticsPrimaryService.INTERNATIONAL;
-
-  mode: EInternationalMode;
+  mode: EInternationalMode.AIR;
 
   /**
    * Any ISO country allowed.
@@ -288,10 +344,74 @@ export type QuoteInternationalDetails = {
   pickupDate: Date | string;
   commodityDescription: string;
 
-  estimatedWeight: LogisticsWeight;
+  weightUnit: EWeightUnit;
+  dimensionUnit: EDimensionUnit;
 
-  shipmentSize?: EInternationalShipmentSize;
+  /**
+   * UI label: "Cargo lines"
+   */
+  cargoLines: CargoLine[];
+
+  /**
+   * Backend-derived from:
+   * sum(quantity * weightPerUnit)
+   */
+  approximateTotalWeight: number;
 };
+
+export type QuoteInternationalOceanLCLDetails = {
+  primaryService: ELogisticsPrimaryService.INTERNATIONAL;
+  mode: EInternationalMode.OCEAN;
+  oceanLoadType: EOceanLoadType.LCL;
+
+  /**
+   * Any ISO country allowed.
+   */
+  origin: LogisticsAddress;
+  destination: LogisticsAddress;
+
+  pickupDate: Date | string;
+  commodityDescription: string;
+
+  weightUnit: EWeightUnit;
+  dimensionUnit: EDimensionUnit;
+
+  /**
+   * UI label: "Cargo lines"
+   */
+  cargoLines: CargoLine[];
+
+  /**
+   * Backend-derived from:
+   * sum(quantity * weightPerUnit)
+   */
+  approximateTotalWeight: number;
+};
+
+export type QuoteInternationalOceanFCLDetails = {
+  primaryService: ELogisticsPrimaryService.INTERNATIONAL;
+  mode: EInternationalMode.OCEAN;
+  oceanLoadType: EOceanLoadType.FCL;
+
+  /**
+   * Any ISO country allowed.
+   */
+  origin: LogisticsAddress;
+  destination: LogisticsAddress;
+
+  pickupDate: Date | string;
+  commodityDescription: string;
+
+  /**
+   * UI label: "Container lines"
+   */
+  containerLines: OceanContainerLine[];
+};
+
+export type QuoteInternationalDetails =
+  | QuoteInternationalAirDetails
+  | QuoteInternationalOceanLCLDetails
+  | QuoteInternationalOceanFCLDetails;
 
 /* ───────────────────────────── Warehousing ───────────────────────────── */
 
