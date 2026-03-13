@@ -21,6 +21,7 @@ import { DEFAULT_PRESIGN_EXPIRY_SECONDS } from "@/constants/aws";
 import type { IFileAsset } from "@/types/shared.types";
 
 import { isTempKey, keyJoin, trimSlashes } from "./shared";
+import { AppError, EEApiErrorType } from "@/types/api.types";
 
 /* ───────────────────────── S3 client (server-only) ───────────────────────── */
 
@@ -39,6 +40,32 @@ export const publicUrlForKey = (key: string) =>
   `https://${APP_AWS_BUCKET_NAME}.s3.${APP_AWS_REGION}.amazonaws.com/${trimSlashes(key)}`;
 
 /* ───────────────────────── Core ops (server-only) ───────────────────────── */
+
+function isS3MissingKeyError(err: unknown): boolean {
+  const e = err as any;
+
+  return (
+    e?.name === "NoSuchKey" ||
+    e?.Code === "NoSuchKey" ||
+    e?.code === "NoSuchKey" ||
+    e?.message === "The specified key does not exist." ||
+    e?.message?.includes?.("The specified key does not exist")
+  );
+}
+
+function toAssetValidationError(err: unknown, key?: string): never {
+  if (isS3MissingKeyError(err)) {
+    throw new AppError(
+      400,
+      key
+        ? `Referenced file does not exist in storage: ${key}`
+        : "One or more referenced files do not exist in storage",
+      EEApiErrorType.VALIDATION_ERROR,
+    );
+  }
+
+  throw err;
+}
 
 /** Put a small binary directly (server-side). Prefer presigned uploads for browsers. */
 export async function uploadBinaryToS3({
@@ -109,16 +136,20 @@ export async function moveS3Object({
 }): Promise<{ url: string; key: string }> {
   const Bucket = APP_AWS_BUCKET_NAME;
 
-  await s3.send(
-    new CopyObjectCommand({
-      Bucket,
-      CopySource: `${Bucket}/${fromKey}`,
-      Key: toKey,
-    }),
-  );
-  await s3.send(new DeleteObjectCommand({ Bucket, Key: fromKey }));
+  try {
+    await s3.send(
+      new CopyObjectCommand({
+        Bucket,
+        CopySource: `${Bucket}/${fromKey}`,
+        Key: toKey,
+      }),
+    );
+    await s3.send(new DeleteObjectCommand({ Bucket, Key: fromKey }));
 
-  return { url: publicUrlForKey(toKey), key: toKey };
+    return { url: publicUrlForKey(toKey), key: toKey };
+  } catch (err) {
+    toAssetValidationError(err, fromKey);
+  }
 }
 
 /** HEAD request to see if an object exists. */
@@ -333,6 +364,16 @@ export async function finalizeAssetVectorAllOrNothing(args: {
       // Build final key (keep same filename)
       const filename = tempKey.split("/").pop() || "file";
       const finalKey = keyJoin(args.finalFolder, filename);
+
+      // Check if file exists
+      const exists = await s3ObjectExists(tempKey);
+      if (!exists) {
+        throw new AppError(
+          400,
+          `Referenced file does not exist in storage: ${tempKey}`,
+          EEApiErrorType.VALIDATION_ERROR,
+        );
+      }
 
       // Move
       const moved = await moveS3Object({ fromKey: tempKey, toKey: finalKey });

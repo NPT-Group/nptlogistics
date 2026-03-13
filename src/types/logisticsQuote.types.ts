@@ -390,4 +390,6 @@ export interface ILogisticsQuote {
 
 /* ───────────────────────────── Draft Helper ───────────────────────────── */
 
-export type LogisticsQuoteDraft = Partial<Omit<ILogisticsQuote, "_id" | "createdAt" | "updatedAt">>;
+export type LogisticsQuoteDraft = Partial<
+  Omit<ILogisticsQuote, "_id" | "quoteId" | "createdAt" | "updatedAt">
+>;

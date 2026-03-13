@@ -27,6 +27,7 @@ const RESUME_MIME_TYPES: readonly EFileMimeType[] = [
 ];
 
 const QUOTE_ALLOWED_MIME_TYPES: readonly EFileMimeType[] = Object.values(EFileMimeType);
+const CONTACT_INQUIRY_ALLOWED_MIME_TYPES: readonly EFileMimeType[] = Object.values(EFileMimeType);
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,12 +55,13 @@ export async function POST(req: NextRequest) {
 
     const normalizedMime = (mimeType as string).toLowerCase() as EFileMimeType;
 
-    // Allowed mime types per folder (+ namespace override for quotes)
+    // Allowed mime types per folder (+ namespace override for quotes/contact inquiries)
     let allowedMime: readonly EFileMimeType[] = [];
 
-    // Quotes: accept ANY EFileMimeType (all known/whitelisted types) regardless of folder
     if (namespace === ES3Namespace.QUOTES) {
       allowedMime = QUOTE_ALLOWED_MIME_TYPES;
+    } else if (namespace === ES3Namespace.CONTACT_INQUIRIES) {
+      allowedMime = CONTACT_INQUIRY_ALLOWED_MIME_TYPES;
     } else {
       if (folder === ES3Folder.MEDIA_IMAGES) {
         allowedMime = IMAGE_MIME_TYPES;
@@ -87,7 +89,6 @@ export async function POST(req: NextRequest) {
     const extFromMime = MIME_TO_EXT_MAP[normalizedMime];
     if (!extFromMime) return errorResponse(400, `Unsupported mimeType: ${mimeType}`);
 
-    // Size check (global guard; you can tune per folder later)
     if (filesize && filesize > DEFAULT_FILE_SIZE_LIMIT_MB * 1024 * 1024) {
       return errorResponse(400, `File exceeds ${DEFAULT_FILE_SIZE_LIMIT_MB}MB limit`);
     }

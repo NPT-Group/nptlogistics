@@ -14,7 +14,7 @@ import { ES3Namespace, ES3Folder } from "@/types/aws.types";
 import { getSiteUrlFromRequest } from "@/lib/utils/urlHelper";
 import { sendQuoteCustomerConfirmationEmail } from "@/lib/mail/quotes/sendQuoteCustomerConfirmationEmail";
 import { LogisticsQuoteModel } from "@/mongoose/models/LogisticsQuote";
-import { generateUniqueQuoteId } from "@/lib/utils/quotes/generateQuoteId";
+import { generateUniqueEntityId } from "@/lib/utils/db/generateUniqueEntityId";
 
 type SubmitQuoteBody = {
   // Turnstile
@@ -73,7 +73,11 @@ export const POST = async (req: NextRequest) => {
 
     // 5) Pre-generate quote id so final S3 path is stable
     const quoteMongoId = new mongoose.Types.ObjectId().toString();
-    const quoteId = await generateUniqueQuoteId();
+    const quoteId = await generateUniqueEntityId({
+      model: LogisticsQuoteModel,
+      fieldName: "quoteId",
+      prefix: "NPT",
+    });
 
     const quote = new LogisticsQuoteModel({
       _id: quoteMongoId,

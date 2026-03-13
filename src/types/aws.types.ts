@@ -6,6 +6,7 @@ export enum ES3Namespace {
   BLOG_POSTS = "blog-posts",
   JOBS = "jobs",
   QUOTES = "quotes",
+  CONTACT_INQUIRIES = "contact-inquiries",
 }
 
 /**

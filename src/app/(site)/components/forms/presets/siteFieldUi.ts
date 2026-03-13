@@ -82,5 +82,12 @@ export const siteFileButtonUi: FieldUi = {
   error: "text-xs text-red-600",
 };
 
+export const sitePillGroupUi: FieldUi = {
+  container: "space-y-1",
+  label: "text-sm font-semibold text-[color:var(--color-text-light)]",
+  hint: "text-xs text-[color:var(--color-subtle-light)]",
+  error: "text-xs text-red-600",
+};
+
 export const siteInvalidControlClassName = CONTROL_INVALID;
 export const siteInvalidGroupClassName = GROUP_INVALID;

@@ -4,7 +4,7 @@ import { ShieldCheck, Clock3, Globe2 } from "lucide-react";
 
 import { Container } from "../components/layout/Container";
 import { Section } from "../components/layout/Section";
-import LogisticsQuoteForm from "../components/LogisticsQuoteForm";
+import LogisticsQuoteForm from "../components/forms/LogisticsQuoteForm";
 import { cn } from "@/lib/cn";
 
 export const metadata: Metadata = {

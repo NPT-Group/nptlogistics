@@ -1,4 +1,4 @@
-// src/mongoose/schemas/logisticsQuote.schema.ts
+// src/mongoose/schemas//logisticsQuote.schema.ts
 import { Schema } from "mongoose";
 import type { ILogisticsQuote } from "@/types/logisticsQuote.types";
 

@@ -515,7 +515,6 @@ export function SelectField<TFieldValues extends FieldValues, TValue extends str
           className={cn(
             "max-h-72 overflow-auto p-1.5",
             "[color-scheme:light]",
-            "[scrollbar-gutter:stable]",
             "scrollbar-thin",
             "scrollbar-track-transparent",
             "scrollbar-thumb-neutral-300",

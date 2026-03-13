@@ -33,7 +33,7 @@
     "**/*.d.ts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "src/app/(site)/components/LogisticsQuoteForm/sections/ServiceConfigurationSection"
+    "src/app/(site)/components/forms/LogisticsQuoteForm/sections/ServiceConfigurationSection"
   ],
   "exclude": ["node_modules"]
 }
