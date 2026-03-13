@@ -1,9 +1,18 @@
 // src/app/(site)/components/forms/LogisticsQuoteForm/defaults.ts
+// src/app/(site)/components/forms/LogisticsQuoteForm/defaults.ts
 import {
+  ECustomerIdentity,
+  EDimensionUnit,
+  EInternationalMode,
   ELogisticsPrimaryService,
+  EOceanLoadType,
+  EPreferredContactMethod,
   EWarehousingDuration,
   EWarehousingVolumeType,
+  EWeightUnit,
+  type CargoLine,
   type LogisticsAddress,
+  type OceanContainerLine,
 } from "@/types/logisticsQuote.types";
 
 import type { LogisticsQuoteSubmitValues } from "./schema";
@@ -20,15 +29,23 @@ export const EMPTY_ADDRESS: LogisticsAddress = {
   countryCode: "",
 };
 
-export const EMPTY_WEIGHT = {
-  value: 0,
-  unit: undefined,
-};
-
 export const EMPTY_DIMS = {
   length: 0,
   width: 0,
   height: 0,
+} as const;
+
+export const EMPTY_CARGO_LINE: CargoLine = {
+  quantity: 0,
+  length: 0,
+  width: 0,
+  height: 0,
+  weightPerUnit: 0,
+};
+
+export const EMPTY_CONTAINER_LINE: OceanContainerLine = {
+  quantity: 0,
+  containerType: undefined as never,
 };
 
 export function makeServiceDetailsDefaults(
@@ -38,14 +55,16 @@ export function makeServiceDetailsDefaults(
     case ELogisticsPrimaryService.FTL:
       return {
         primaryService,
-        equipment: undefined,
+        equipment: undefined as never,
         origin: { ...EMPTY_ADDRESS },
         destination: { ...EMPTY_ADDRESS },
         pickupDate: "",
         commodityDescription: "",
-        approximateTotalWeight: { ...EMPTY_WEIGHT },
+        approximateTotalWeight: 0,
+        weightUnit: EWeightUnit.LB,
         estimatedPalletCount: undefined,
         dimensions: undefined,
+        dimensionUnit: undefined,
         pickupDateFlexible: false,
         addons: [],
       };
@@ -53,33 +72,31 @@ export function makeServiceDetailsDefaults(
     case ELogisticsPrimaryService.LTL:
       return {
         primaryService,
-        equipment: undefined,
+        equipment: undefined as never,
         origin: { ...EMPTY_ADDRESS },
         destination: { ...EMPTY_ADDRESS },
         pickupDate: "",
         commodityDescription: "",
+        weightUnit: EWeightUnit.LB,
+        dimensionUnit: EDimensionUnit.IN,
         stackable: false,
-        palletLines: [
-          {
-            quantity: 0,
-            dimensions: { ...EMPTY_DIMS },
-            weightValue: 0,
-          },
-        ],
-        approximateTotalWeight: { ...EMPTY_WEIGHT },
+        cargoLines: [{ ...EMPTY_CARGO_LINE }],
+        approximateTotalWeight: 0,
         addons: [],
       };
 
     case ELogisticsPrimaryService.INTERNATIONAL:
       return {
         primaryService,
-        mode: undefined,
+        mode: EInternationalMode.AIR,
         origin: { ...EMPTY_ADDRESS },
         destination: { ...EMPTY_ADDRESS },
         pickupDate: "",
         commodityDescription: "",
-        estimatedWeight: { ...EMPTY_WEIGHT },
-        shipmentSize: undefined,
+        weightUnit: EWeightUnit.KG,
+        dimensionUnit: EDimensionUnit.CM,
+        cargoLines: [{ ...EMPTY_CARGO_LINE }],
+        approximateTotalWeight: 0,
       };
 
     case ELogisticsPrimaryService.WAREHOUSING:
@@ -100,6 +117,70 @@ export function makeServiceDetailsDefaults(
   }
 }
 
+export function makeInternationalAirDefaults(): Extract<
+  ServiceDetailsValues,
+  {
+    primaryService: ELogisticsPrimaryService.INTERNATIONAL;
+    mode: EInternationalMode.AIR;
+  }
+> {
+  return {
+    primaryService: ELogisticsPrimaryService.INTERNATIONAL,
+    mode: EInternationalMode.AIR,
+    origin: { ...EMPTY_ADDRESS },
+    destination: { ...EMPTY_ADDRESS },
+    pickupDate: "",
+    commodityDescription: "",
+    weightUnit: EWeightUnit.KG,
+    dimensionUnit: EDimensionUnit.CM,
+    cargoLines: [{ ...EMPTY_CARGO_LINE }],
+    approximateTotalWeight: 0,
+  };
+}
+
+export function makeInternationalOceanLclDefaults(): Extract<
+  ServiceDetailsValues,
+  {
+    primaryService: ELogisticsPrimaryService.INTERNATIONAL;
+    mode: EInternationalMode.OCEAN;
+    oceanLoadType: EOceanLoadType.LCL;
+  }
+> {
+  return {
+    primaryService: ELogisticsPrimaryService.INTERNATIONAL,
+    mode: EInternationalMode.OCEAN,
+    oceanLoadType: EOceanLoadType.LCL,
+    origin: { ...EMPTY_ADDRESS },
+    destination: { ...EMPTY_ADDRESS },
+    pickupDate: "",
+    commodityDescription: "",
+    weightUnit: EWeightUnit.KG,
+    dimensionUnit: EDimensionUnit.CM,
+    cargoLines: [{ ...EMPTY_CARGO_LINE }],
+    approximateTotalWeight: 0,
+  };
+}
+
+export function makeInternationalOceanFclDefaults(): Extract<
+  ServiceDetailsValues,
+  {
+    primaryService: ELogisticsPrimaryService.INTERNATIONAL;
+    mode: EInternationalMode.OCEAN;
+    oceanLoadType: EOceanLoadType.FCL;
+  }
+> {
+  return {
+    primaryService: ELogisticsPrimaryService.INTERNATIONAL,
+    mode: EInternationalMode.OCEAN,
+    oceanLoadType: EOceanLoadType.FCL,
+    origin: { ...EMPTY_ADDRESS },
+    destination: { ...EMPTY_ADDRESS },
+    pickupDate: "",
+    commodityDescription: "",
+    containerLines: [{ ...EMPTY_CONTAINER_LINE }],
+  };
+}
+
 /**
  * RHF defaults for submit-body schema.
  * - serviceDetails starts undefined (no selection yet)
@@ -111,7 +192,8 @@ export const LOGISTICS_QUOTE_SUBMIT_DEFAULTS: LogisticsQuoteSubmitValues = {
   serviceDetails: undefined,
 
   identification: {
-    identity: "",
+    identity: ECustomerIdentity.SHIPPER,
+    brokerType: undefined,
   },
 
   contact: {
@@ -120,7 +202,7 @@ export const LOGISTICS_QUOTE_SUBMIT_DEFAULTS: LogisticsQuoteSubmitValues = {
     email: "",
     company: "",
     phone: "",
-    preferredContactMethod: undefined,
+    preferredContactMethod: EPreferredContactMethod.EMAIL,
     companyAddress: "",
   },
 

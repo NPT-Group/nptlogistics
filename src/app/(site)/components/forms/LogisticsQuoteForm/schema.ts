@@ -1,12 +1,15 @@
 // src/app/(site)/components/forms/LogisticsQuoteForm/schema.ts
+// src/app/(site)/components/forms/LogisticsQuoteForm/schema.ts
 import { z } from "zod";
 
 import {
   EBrokerType,
   ECustomerIdentity,
+  EDimensionUnit,
   EInternationalMode,
-  EInternationalShipmentSize,
   ELogisticsPrimaryService,
+  EOceanContainerType,
+  EOceanLoadType,
   EPreferredContactMethod,
   EFTLAddon,
   EFTLEquipmentType,
@@ -23,7 +26,16 @@ import type { IFileAsset } from "@/types/shared.types";
 /* ──────────────────────────────────────────────────────────────────────────────
   SUBMIT BODY schema (matches API expectation)
   Body shape:
-    { turnstileToken, serviceDetails?, identification, contact, finalNotes?, attachments?, marketingEmailConsent, sourceLabel? }
+    {
+      turnstileToken,
+      serviceDetails?,
+      identification,
+      contact,
+      finalNotes?,
+      attachments?,
+      marketingEmailConsent?,
+      sourceLabel?
+    }
 ────────────────────────────────────────────────────────────────────────────── */
 
 const requiredString = (label: string) => z.string().trim().min(1, `${label} is required`);
@@ -87,7 +99,6 @@ const numberFromInput = (label: string) =>
         if (issue.input === undefined) {
           return `${label} is required`;
         }
-
         return `${label} must be a valid number`;
       },
     }),
@@ -126,15 +137,16 @@ const isoDateField = (label: string) =>
 
 const enumField = <T extends Record<string, string | number>>(enumObj: T, message: string) =>
   z.nativeEnum(enumObj, {
-    error: (issue) => {
-      if (issue.input === undefined || issue.input === "") {
-        return message;
-      }
-      return message;
-    },
+    error: () => message,
   });
 
-/** Shared: Address */
+function isNorthAmerica(code?: string) {
+  if (!code) return false;
+  return (NORTH_AMERICAN_COUNTRY_CODES as readonly string[]).includes(code.toUpperCase());
+}
+
+/* ───────────────────────────── Shared ───────────────────────────── */
+
 export const logisticsAddressSchema = z.object({
   street1: requiredString("Street address"),
   street2: optionalTrimmedString(),
@@ -144,31 +156,33 @@ export const logisticsAddressSchema = z.object({
   countryCode: iso2CountryCode,
 });
 
-/** Shared: Weight */
-const weightUnitField = z
-  .union([z.nativeEnum(EWeightUnit), z.undefined()])
-  .superRefine((value, ctx) => {
-    if (!value) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Please select a weight unit",
-      });
-    }
-  });
-
-export const logisticsWeightSchema = z.object({
-  value: positiveNumber("Weight"),
-  unit: weightUnitField,
-});
-
-/** Shared: Dimensions (no unit stored) */
 export const logisticsDimensionsSchema = z.object({
   length: positiveNumber("Length"),
   width: positiveNumber("Width"),
   height: positiveNumber("Height"),
 });
 
-/** Attachments */
+const weightUnitField = enumField(EWeightUnit, "Please select a weight unit");
+const dimensionUnitField = enumField(EDimensionUnit, "Please select a dimension unit");
+
+export const cargoLineSchema = z.object({
+  quantity: integerMin1("Quantity"),
+  length: positiveNumber("Length"),
+  width: positiveNumber("Width"),
+  height: positiveNumber("Height"),
+  weightPerUnit: positiveNumber("Weight per unit"),
+});
+
+export const oceanContainerLineSchema = z.object({
+  quantity: integerMin1("Quantity"),
+  containerType: enumField(EOceanContainerType, "Please select a container type"),
+});
+
+export const warehousingVolumeSchema = z.object({
+  volumeType: enumField(EWarehousingVolumeType, "Please select a volume type"),
+  value: positiveNumber("Estimated volume"),
+});
+
 export const fileAssetSchema: z.ZodType<IFileAsset> = z.object({
   url: requiredString("File URL"),
   s3Key: requiredString("File key"),
@@ -177,12 +191,8 @@ export const fileAssetSchema: z.ZodType<IFileAsset> = z.object({
   originalName: z.string().optional(),
 });
 
-function isNorthAmerica(code?: string) {
-  if (!code) return false;
-  return (NORTH_AMERICAN_COUNTRY_CODES as readonly string[]).includes(code.toUpperCase());
-}
+/* ───────────────────────── Equipment → allowed add-ons ────────────────────── */
 
-/** Equipment -> allowed add-ons (must match backend) */
 export const FTL_ADDON_COMPAT: Record<EFTLEquipmentType, readonly EFTLAddon[]> = {
   [EFTLEquipmentType.DRY_VAN]: [
     EFTLAddon.EXPEDITED,
@@ -265,46 +275,13 @@ export const LTL_ADDON_COMPAT: Record<ELTLEquipmentType, readonly ELTLAddon[]> =
   ],
 };
 
-const ftlEquipmentField = z
-  .union([z.nativeEnum(EFTLEquipmentType), z.undefined()])
-  .superRefine((value, ctx) => {
-    if (!value) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Please select an equipment type",
-      });
-    }
-  });
-
-const ltlEquipmentField = z
-  .union([z.nativeEnum(ELTLEquipmentType), z.undefined()])
-  .superRefine((value, ctx) => {
-    if (!value) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Please select an equipment type",
-      });
-    }
-  });
-
-const internationalModeField = z
-  .union([z.nativeEnum(EInternationalMode), z.undefined()])
-  .superRefine((value, ctx) => {
-    if (!value) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Please select a shipping mode",
-      });
-    }
-  });
-
 /* ───────────────────────────── Service Details ───────────────────────────── */
 
 export const ftlDetailsSchema = z
   .object({
     primaryService: z.literal(ELogisticsPrimaryService.FTL),
 
-    equipment: ftlEquipmentField,
+    equipment: enumField(EFTLEquipmentType, "Please select an equipment type"),
 
     origin: logisticsAddressSchema,
     destination: logisticsAddressSchema,
@@ -312,10 +289,13 @@ export const ftlDetailsSchema = z
     pickupDate: isoDateField("Pickup date"),
     commodityDescription: requiredString("Commodity description"),
 
-    approximateTotalWeight: logisticsWeightSchema,
+    approximateTotalWeight: positiveNumber("Approximate total weight"),
+    weightUnit: weightUnitField,
 
     estimatedPalletCount: integerMin1("Estimated pallet count").optional(),
+
     dimensions: logisticsDimensionsSchema.optional(),
+    dimensionUnit: dimensionUnitField.optional(),
 
     pickupDateFlexible: z.coerce.boolean().optional(),
 
@@ -338,7 +318,23 @@ export const ftlDetailsSchema = z
       });
     }
 
-    if (val.addons?.length && val.equipment) {
+    if (val.dimensions && !val.dimensionUnit) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["dimensionUnit"],
+        message: "Please select a dimension unit when dimensions are provided",
+      });
+    }
+
+    if (!val.dimensions && val.dimensionUnit) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["dimensions"],
+        message: "Dimensions are required when a dimension unit is selected",
+      });
+    }
+
+    if (val.addons?.length) {
       const allowed = new Set(FTL_ADDON_COMPAT[val.equipment] || []);
       for (const addon of val.addons) {
         if (!allowed.has(addon)) {
@@ -353,17 +349,11 @@ export const ftlDetailsSchema = z
     }
   });
 
-export const ltlPalletLineSchema = z.object({
-  quantity: integerMin1("Quantity"),
-  dimensions: logisticsDimensionsSchema,
-  weightValue: positiveNumber("Weight"),
-});
-
 export const ltlDetailsSchema = z
   .object({
     primaryService: z.literal(ELogisticsPrimaryService.LTL),
 
-    equipment: ltlEquipmentField,
+    equipment: enumField(ELTLEquipmentType, "Please select an equipment type"),
 
     origin: logisticsAddressSchema,
     destination: logisticsAddressSchema,
@@ -371,11 +361,14 @@ export const ltlDetailsSchema = z
     pickupDate: isoDateField("Pickup date"),
     commodityDescription: requiredString("Commodity description"),
 
+    weightUnit: weightUnitField,
+    dimensionUnit: dimensionUnitField,
+
     stackable: z.coerce.boolean(),
 
-    palletLines: z.array(ltlPalletLineSchema).min(1, "Add at least one pallet"),
+    cargoLines: z.array(cargoLineSchema).min(1, "Add at least one cargo line"),
 
-    approximateTotalWeight: logisticsWeightSchema,
+    approximateTotalWeight: positiveNumber("Approximate total weight"),
 
     addons: z.array(z.nativeEnum(ELTLAddon)).optional(),
   })
@@ -396,7 +389,7 @@ export const ltlDetailsSchema = z
       });
     }
 
-    if (val.addons?.length && val.equipment) {
+    if (val.addons?.length) {
       const allowed = new Set(LTL_ADDON_COMPAT[val.equipment] || []);
       for (const addon of val.addons) {
         if (!allowed.has(addon)) {
@@ -411,10 +404,10 @@ export const ltlDetailsSchema = z
     }
   });
 
-export const intlDetailsSchema = z.object({
+export const intlAirDetailsSchema = z.object({
   primaryService: z.literal(ELogisticsPrimaryService.INTERNATIONAL),
 
-  mode: internationalModeField,
+  mode: z.literal(EInternationalMode.AIR),
 
   origin: logisticsAddressSchema,
   destination: logisticsAddressSchema,
@@ -422,15 +415,54 @@ export const intlDetailsSchema = z.object({
   pickupDate: isoDateField("Pickup date"),
   commodityDescription: requiredString("Commodity description"),
 
-  estimatedWeight: logisticsWeightSchema,
+  weightUnit: weightUnitField,
+  dimensionUnit: dimensionUnitField,
 
-  shipmentSize: z.union([z.nativeEnum(EInternationalShipmentSize), z.undefined()]).optional(),
+  cargoLines: z.array(cargoLineSchema).min(1, "Add at least one cargo line"),
+
+  approximateTotalWeight: positiveNumber("Approximate total weight"),
 });
 
-export const warehousingVolumeSchema = z.object({
-  volumeType: enumField(EWarehousingVolumeType, "Please select a volume type"),
-  value: positiveNumber("Estimated volume"),
+export const intlOceanLclDetailsSchema = z.object({
+  primaryService: z.literal(ELogisticsPrimaryService.INTERNATIONAL),
+
+  mode: z.literal(EInternationalMode.OCEAN),
+  oceanLoadType: z.literal(EOceanLoadType.LCL),
+
+  origin: logisticsAddressSchema,
+  destination: logisticsAddressSchema,
+
+  pickupDate: isoDateField("Pickup date"),
+  commodityDescription: requiredString("Commodity description"),
+
+  weightUnit: weightUnitField,
+  dimensionUnit: dimensionUnitField,
+
+  cargoLines: z.array(cargoLineSchema).min(1, "Add at least one cargo line"),
+
+  approximateTotalWeight: positiveNumber("Approximate total weight"),
 });
+
+export const intlOceanFclDetailsSchema = z.object({
+  primaryService: z.literal(ELogisticsPrimaryService.INTERNATIONAL),
+
+  mode: z.literal(EInternationalMode.OCEAN),
+  oceanLoadType: z.literal(EOceanLoadType.FCL),
+
+  origin: logisticsAddressSchema,
+  destination: logisticsAddressSchema,
+
+  pickupDate: isoDateField("Pickup date"),
+  commodityDescription: requiredString("Commodity description"),
+
+  containerLines: z.array(oceanContainerLineSchema).min(1, "Add at least one container line"),
+});
+
+export const intlDetailsSchema = z.union([
+  intlAirDetailsSchema,
+  intlOceanLclDetailsSchema,
+  intlOceanFclDetailsSchema,
+]);
 
 export const warehousingDetailsSchema = z
   .object({
@@ -452,46 +484,27 @@ export const warehousingDetailsSchema = z
     }
   });
 
-export const serviceDetailsSchema = z.discriminatedUnion("primaryService", [
+export const serviceDetailsSchema = z.union([
   ftlDetailsSchema,
   ltlDetailsSchema,
-  intlDetailsSchema,
+  intlAirDetailsSchema,
+  intlOceanLclDetailsSchema,
+  intlOceanFclDetailsSchema,
   warehousingDetailsSchema,
 ]);
 
-/* ───────────────────────────── Identification + Contact ───────────────────────────── */
+/* ───────────────────────── Identification + Contact ───────────────────────── */
 
-export const identificationSchema = z
-  .object({
-    identity: z.union([z.nativeEnum(ECustomerIdentity), z.literal(""), z.undefined()]),
-    brokerType: z.union([z.nativeEnum(EBrokerType), z.undefined()]).optional(),
-  })
-  .superRefine((val, ctx) => {
-    if (!val.identity) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["identity"],
-        message: "Please select who you are",
-      });
-      return;
-    }
-
-    if (val.identity === ECustomerIdentity.BROKER && !val.brokerType) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["brokerType"],
-        message: "Please select a broker type",
-      });
-    }
-
-    if (val.identity !== ECustomerIdentity.BROKER && val.brokerType !== undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["brokerType"],
-        message: "Broker type is only allowed when customer type is Broker",
-      });
-    }
-  });
+export const identificationSchema = z.union([
+  z.object({
+    identity: z.literal(ECustomerIdentity.SHIPPER),
+    brokerType: z.undefined().optional(),
+  }),
+  z.object({
+    identity: z.literal(ECustomerIdentity.BROKER),
+    brokerType: enumField(EBrokerType, "Please select a broker type"),
+  }),
+]);
 
 export const contactSchema = z
   .object({

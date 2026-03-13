@@ -1,4 +1,5 @@
 // src/app/(site)/components/forms/LogisticsQuoteForm/index.tsx
+// src/app/(site)/components/forms/LogisticsQuoteForm/index.tsx
 "use client";
 
 import * as React from "react";
@@ -13,7 +14,7 @@ import {
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { ELogisticsPrimaryService } from "@/types/logisticsQuote.types";
+import { EInternationalMode, ELogisticsPrimaryService } from "@/types/logisticsQuote.types";
 
 import { logisticsQuoteSubmitSchema, type LogisticsQuoteSubmitValues } from "./schema";
 import { LOGISTICS_QUOTE_SUBMIT_DEFAULTS } from "./defaults";
@@ -139,19 +140,48 @@ export default function LogisticsQuoteForm() {
     setFeedback(null);
 
     try {
-      if (values.serviceDetails?.primaryService === ELogisticsPrimaryService.LTL) {
-        const lines = values.serviceDetails.palletLines ?? [];
+      const normalizedValues = structuredClone(values) as LogisticsQuoteSubmitValues;
 
-        const total = lines.reduce((sum, line) => {
-          const q = Number(line?.quantity ?? 0);
-          const w = Number(line?.weightValue ?? 0);
-          return sum + q * w;
+      if (normalizedValues.serviceDetails?.primaryService === ELogisticsPrimaryService.LTL) {
+        const total = (normalizedValues.serviceDetails.cargoLines ?? []).reduce((sum, line) => {
+          const quantity = Number(line?.quantity ?? 0);
+          const weightPerUnit = Number(line?.weightPerUnit ?? 0);
+          return sum + quantity * weightPerUnit;
         }, 0);
 
-        values.serviceDetails.approximateTotalWeight.value = total;
+        normalizedValues.serviceDetails.approximateTotalWeight = total;
       }
 
-      const body = toApiSubmitBody(values);
+      if (
+        normalizedValues.serviceDetails?.primaryService ===
+          ELogisticsPrimaryService.INTERNATIONAL &&
+        normalizedValues.serviceDetails.mode === EInternationalMode.AIR
+      ) {
+        const total = (normalizedValues.serviceDetails.cargoLines ?? []).reduce((sum, line) => {
+          const quantity = Number(line?.quantity ?? 0);
+          const weightPerUnit = Number(line?.weightPerUnit ?? 0);
+          return sum + quantity * weightPerUnit;
+        }, 0);
+
+        normalizedValues.serviceDetails.approximateTotalWeight = total;
+      }
+
+      if (
+        normalizedValues.serviceDetails?.primaryService ===
+          ELogisticsPrimaryService.INTERNATIONAL &&
+        normalizedValues.serviceDetails.mode === EInternationalMode.OCEAN &&
+        normalizedValues.serviceDetails.oceanLoadType === "LCL"
+      ) {
+        const total = (normalizedValues.serviceDetails.cargoLines ?? []).reduce((sum, line) => {
+          const quantity = Number(line?.quantity ?? 0);
+          const weightPerUnit = Number(line?.weightPerUnit ?? 0);
+          return sum + quantity * weightPerUnit;
+        }, 0);
+
+        normalizedValues.serviceDetails.approximateTotalWeight = total;
+      }
+
+      const body = toApiSubmitBody(normalizedValues);
 
       const res = await fetch("/api/v1/quotes/logistics/submit", {
         method: "POST",
@@ -207,6 +237,8 @@ export default function LogisticsQuoteForm() {
             ? err.message
             : "Something went wrong while submitting your quote request. Please try again.",
       });
+
+      turnstileRef.current?.reset();
 
       window.requestAnimationFrame(() => {
         scrollToTopArea();

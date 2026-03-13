@@ -1,13 +1,21 @@
 // src/app/(site)/components/forms/LogisticsQuoteForm/helpers.ts
+// src/app/(site)/components/forms/LogisticsQuoteForm/helpers.ts
 import {
+  EInternationalMode,
   ELogisticsPrimaryService,
-  type EFTLEquipmentType,
+  EOceanLoadType,
   type EFTLAddon,
-  type ELTLEquipmentType,
+  type EFTLEquipmentType,
   type ELTLAddon,
+  type ELTLEquipmentType,
 } from "@/types/logisticsQuote.types";
 
-import { makeServiceDetailsDefaults } from "./defaults";
+import {
+  makeInternationalAirDefaults,
+  makeInternationalOceanFclDefaults,
+  makeInternationalOceanLclDefaults,
+  makeServiceDetailsDefaults,
+} from "./defaults";
 import { FTL_ADDON_COMPAT, LTL_ADDON_COMPAT } from "./schema";
 import type { LogisticsQuoteSubmitValues } from "./schema";
 import { NAV_OFFSET } from "@/constants/ui";
@@ -24,6 +32,32 @@ export {
 
 export function buildServiceDetailsOnPrimaryServiceChange(ps: ELogisticsPrimaryService) {
   return makeServiceDetailsDefaults(ps);
+}
+
+export function buildInternationalDetailsOnModeChange(mode: EInternationalMode) {
+  switch (mode) {
+    case EInternationalMode.AIR:
+      return makeInternationalAirDefaults();
+    case EInternationalMode.OCEAN:
+      return makeInternationalOceanLclDefaults();
+    default: {
+      const _x: never = mode;
+      throw new Error(`Unsupported international mode: ${_x}`);
+    }
+  }
+}
+
+export function buildInternationalDetailsOnOceanLoadTypeChange(loadType: EOceanLoadType) {
+  switch (loadType) {
+    case EOceanLoadType.LCL:
+      return makeInternationalOceanLclDefaults();
+    case EOceanLoadType.FCL:
+      return makeInternationalOceanFclDefaults();
+    default: {
+      const _x: never = loadType;
+      throw new Error(`Unsupported ocean load type: ${_x}`);
+    }
+  }
 }
 
 export function resetFtlAddonsOnEquipmentChange() {
@@ -80,42 +114,66 @@ function normalizePhone<T>(v: T): T {
   return `${hasPlus ? "+" : ""}${digits}` as T;
 }
 
-function normalizeAddress(a: any) {
-  if (!a) return;
+function normalizeAddress(a: unknown) {
+  if (!a || typeof a !== "object") return;
 
-  a.street1 = trim(a.street1);
-  if (a.street2 != null) a.street2 = trim(a.street2);
-  a.city = trim(a.city);
-  a.region = trim(a.region);
-  a.postalCode = trim(a.postalCode);
+  const addr = a as Record<string, unknown>;
+  addr.street1 = trim(addr.street1);
+  if (addr.street2 != null) addr.street2 = trim(addr.street2);
+  addr.city = trim(addr.city);
+  addr.region = trim(addr.region);
+  addr.postalCode = trim(addr.postalCode);
 
-  if (a.countryCode != null) {
-    a.countryCode = upperTrim(a.countryCode);
+  if (addr.countryCode != null) {
+    addr.countryCode = upperTrim(addr.countryCode);
   }
 }
 
-function normalizeWeight(w: any) {
-  if (!w) return;
-  if (w.unit != null) w.unit = trim(w.unit);
+function normalizeDimensions(d: unknown) {
+  if (!d || typeof d !== "object") return;
 }
 
-function normalizeDimensions(d: any) {
-  if (!d) return;
+function normalizeCargoLines(lines: unknown) {
+  if (!Array.isArray(lines)) return lines;
+
+  return lines.map((line) => {
+    if (!line || typeof line !== "object") return line;
+    const next = { ...(line as Record<string, unknown>) };
+    return next;
+  });
+}
+
+function normalizeContainerLines(lines: unknown) {
+  if (!Array.isArray(lines)) return lines;
+
+  return lines.map((line) => {
+    if (!line || typeof line !== "object") return line;
+    const next = { ...(line as Record<string, unknown>) };
+
+    if (next.containerType != null) {
+      next.containerType = trim(next.containerType);
+    }
+
+    return next;
+  });
 }
 
 export function normalizeBeforeSubmit(
   values: LogisticsQuoteSubmitValues,
 ): LogisticsQuoteSubmitValues {
-  const v: any = structuredClone(values);
+  const v = structuredClone(values) as LogisticsQuoteSubmitValues & {
+    [key: string]: unknown;
+  };
 
   v.turnstileToken = trim(v.turnstileToken);
   if (v.sourceLabel != null) v.sourceLabel = trim(v.sourceLabel);
 
   if (v.identification) {
-    if (v.identification.identity != null) {
+    if ("identity" in v.identification && v.identification.identity != null) {
       v.identification.identity = trim(v.identification.identity);
     }
-    if (v.identification.brokerType != null) {
+
+    if ("brokerType" in v.identification && v.identification.brokerType != null) {
       v.identification.brokerType = trim(v.identification.brokerType);
     }
   }
@@ -139,7 +197,7 @@ export function normalizeBeforeSubmit(
   if (v.finalNotes != null) v.finalNotes = trim(v.finalNotes);
 
   if (Array.isArray(v.attachments)) {
-    v.attachments = v.attachments.map((file: any) => ({
+    v.attachments = v.attachments.map((file) => ({
       ...file,
       url: trim(file.url),
       s3Key: trim(file.s3Key),
@@ -157,9 +215,10 @@ export function normalizeBeforeSubmit(
         sd.equipment = trim(sd.equipment);
         sd.pickupDate = trim(sd.pickupDate);
         sd.commodityDescription = trim(sd.commodityDescription);
-        normalizeWeight(sd.approximateTotalWeight);
+        if (sd.weightUnit != null) sd.weightUnit = trim(sd.weightUnit);
+        if (sd.dimensionUnit != null) sd.dimensionUnit = trim(sd.dimensionUnit);
         if (sd.dimensions) normalizeDimensions(sd.dimensions);
-        if (Array.isArray(sd.addons)) sd.addons = sd.addons.map((x: any) => trim(x));
+        if (Array.isArray(sd.addons)) sd.addons = sd.addons.map((x) => trim(x));
         break;
       }
 
@@ -169,17 +228,14 @@ export function normalizeBeforeSubmit(
         sd.equipment = trim(sd.equipment);
         sd.pickupDate = trim(sd.pickupDate);
         sd.commodityDescription = trim(sd.commodityDescription);
+        sd.weightUnit = trim(sd.weightUnit);
+        sd.dimensionUnit = trim(sd.dimensionUnit);
 
-        if (Array.isArray(sd.palletLines)) {
-          sd.palletLines = sd.palletLines.map((line: any) => {
-            const next = { ...line };
-            normalizeDimensions(next.dimensions);
-            return next;
-          });
+        if (Array.isArray(sd.cargoLines)) {
+          sd.cargoLines = normalizeCargoLines(sd.cargoLines) as typeof sd.cargoLines;
         }
 
-        normalizeWeight(sd.approximateTotalWeight);
-        if (Array.isArray(sd.addons)) sd.addons = sd.addons.map((x: any) => trim(x));
+        if (Array.isArray(sd.addons)) sd.addons = sd.addons.map((x) => trim(x));
         break;
       }
 
@@ -189,8 +245,39 @@ export function normalizeBeforeSubmit(
         sd.mode = trim(sd.mode);
         sd.pickupDate = trim(sd.pickupDate);
         sd.commodityDescription = trim(sd.commodityDescription);
-        normalizeWeight(sd.estimatedWeight);
-        if (sd.shipmentSize != null) sd.shipmentSize = trim(sd.shipmentSize);
+
+        if (sd.mode === EInternationalMode.AIR) {
+          sd.weightUnit = trim(sd.weightUnit);
+          sd.dimensionUnit = trim(sd.dimensionUnit);
+
+          if (Array.isArray(sd.cargoLines)) {
+            sd.cargoLines = normalizeCargoLines(sd.cargoLines) as typeof sd.cargoLines;
+          }
+        }
+
+        if (sd.mode === EInternationalMode.OCEAN) {
+          if ("oceanLoadType" in sd && sd.oceanLoadType != null) {
+            sd.oceanLoadType = trim(sd.oceanLoadType);
+          }
+
+          if (sd.oceanLoadType === EOceanLoadType.LCL) {
+            sd.weightUnit = trim(sd.weightUnit);
+            sd.dimensionUnit = trim(sd.dimensionUnit);
+
+            if (Array.isArray(sd.cargoLines)) {
+              sd.cargoLines = normalizeCargoLines(sd.cargoLines) as typeof sd.cargoLines;
+            }
+          }
+
+          if (sd.oceanLoadType === EOceanLoadType.FCL) {
+            if (Array.isArray(sd.containerLines)) {
+              sd.containerLines = normalizeContainerLines(
+                sd.containerLines,
+              ) as typeof sd.containerLines;
+            }
+          }
+        }
+
         break;
       }
 
@@ -208,7 +295,7 @@ export function normalizeBeforeSubmit(
     }
   }
 
-  return v as LogisticsQuoteSubmitValues;
+  return v;
 }
 
 /**

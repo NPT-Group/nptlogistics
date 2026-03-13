@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import type { LogisticsQuoteSubmitValues } from "../../schema";
-import { EWeightUnit } from "@/types/logisticsQuote.types";
+import { EDimensionUnit, EWeightUnit } from "@/types/logisticsQuote.types";
 
 import { TextField } from "@/components/forms/fields/TextField";
 import { NumberField } from "@/components/forms/fields/NumberField";
@@ -14,27 +14,32 @@ import { SelectField } from "@/components/forms/fields/SelectField";
 
 import { siteTextUi, siteCheckUi } from "@/app/(site)/components/forms/presets/siteFieldUi";
 import { AddressFields } from "../../components/AddressFields";
-import { LtlPalletLinesSection } from "./LtlPalletLinesSection";
+import { CargoLinesFields } from "../../components/CargoLinesFields";
 import { ShipmentDetailsBlock } from "./ShipmentDetailsSection";
 
 export function LTLFields() {
   const { control, setValue, clearErrors } = useFormContext<LogisticsQuoteSubmitValues>();
 
-  const palletLines = useWatch({
+  const cargoLines = useWatch({
     control,
-    name: "serviceDetails.palletLines" as any,
-  }) as any[];
+    name: "serviceDetails.cargoLines" as any,
+  }) as
+    | Array<{
+        quantity?: number;
+        weightPerUnit?: number;
+      }>
+    | undefined;
 
-  const safeLines = Array.isArray(palletLines) ? palletLines : [];
+  const safeLines = Array.isArray(cargoLines) ? cargoLines : [];
 
   const totalWeight = safeLines.reduce((sum, line) => {
     const q = Number(line?.quantity ?? 0);
-    const w = Number(line?.weightValue ?? 0);
+    const w = Number(line?.weightPerUnit ?? 0);
     return sum + q * w;
   }, 0);
 
   useEffect(() => {
-    const fieldName = "serviceDetails.approximateTotalWeight.value" as any;
+    const fieldName = "serviceDetails.approximateTotalWeight" as any;
 
     setValue(fieldName, totalWeight, {
       shouldDirty: false,
@@ -88,38 +93,11 @@ export function LTLFields() {
             ui={siteTextUi}
             inputProps={{ type: "date" }}
           />
-        </div>
-      </ShipmentDetailsBlock>
-
-      <ShipmentDetailsBlock>
-        <LtlPalletLinesSection />
-      </ShipmentDetailsBlock>
-
-      <ShipmentDetailsBlock
-        title="Handling"
-        description="Help us understand how the shipment should be quoted and loaded."
-      >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)]">
-          <NumberField
-            control={control}
-            name={"serviceDetails.approximateTotalWeight.value" as any}
-            fieldPathAttr="serviceDetails.approximateTotalWeight.value"
-            label="Approx. total weight"
-            required
-            ui={siteTextUi}
-            inputProps={{
-              disabled: true,
-              placeholder: "Calculated automatically",
-              className:
-                "bg-neutral-100 text-neutral-500 border-neutral-200 cursor-not-allowed hover:border-neutral-200",
-            }}
-            hint="Calculated automatically from pallet quantities and pallet weights."
-          />
 
           <SelectField<LogisticsQuoteSubmitValues, EWeightUnit>
             control={control}
-            name={"serviceDetails.approximateTotalWeight.unit" as any}
-            fieldPathAttr="serviceDetails.approximateTotalWeight.unit"
+            name={"serviceDetails.weightUnit" as any}
+            fieldPathAttr="serviceDetails.weightUnit"
             label="Weight unit"
             required
             ui={siteTextUi}
@@ -130,6 +108,56 @@ export function LTLFields() {
             ]}
           />
 
+          <SelectField<LogisticsQuoteSubmitValues, EDimensionUnit>
+            control={control}
+            name={"serviceDetails.dimensionUnit" as any}
+            fieldPathAttr="serviceDetails.dimensionUnit"
+            label="Dimension unit"
+            required
+            ui={siteTextUi}
+            placeholder="Select unit..."
+            options={[
+              { label: "IN", value: EDimensionUnit.IN },
+              { label: "CM", value: EDimensionUnit.CM },
+            ]}
+          />
+        </div>
+      </ShipmentDetailsBlock>
+
+      <ShipmentDetailsBlock>
+        <CargoLinesFields
+          name="serviceDetails.cargoLines"
+          fieldPathAttr="serviceDetails.cargoLines"
+          title="Pallet lines"
+          description="Add each pallet line with quantity, dimensions, and weight per unit. All pallet weights and dimensions use the shipment units selected above."
+          itemLabel="Pallet"
+          addLabel="Add pallet"
+          weightUnitPath="serviceDetails.weightUnit"
+          dimensionUnitPath="serviceDetails.dimensionUnit"
+        />
+      </ShipmentDetailsBlock>
+
+      <ShipmentDetailsBlock
+        title="Handling"
+        description="Help us understand how the shipment should be quoted and loaded."
+      >
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <NumberField
+            control={control}
+            name={"serviceDetails.approximateTotalWeight" as any}
+            fieldPathAttr="serviceDetails.approximateTotalWeight"
+            label="Approx. total weight"
+            required
+            ui={siteTextUi}
+            inputProps={{
+              disabled: true,
+              placeholder: "Calculated automatically",
+              className:
+                "bg-neutral-100 text-neutral-500 border-neutral-200 cursor-not-allowed hover:border-neutral-200",
+            }}
+            hint="Calculated automatically from pallet quantities and weights."
+          />
+
           <CheckboxField
             control={control}
             name={"serviceDetails.stackable" as any}
@@ -138,8 +166,6 @@ export function LTLFields() {
             hint="Check if pallets can be safely stacked."
             ui={siteCheckUi}
           />
-
-          <div className="grid gap-4"></div>
         </div>
       </ShipmentDetailsBlock>
     </div>
