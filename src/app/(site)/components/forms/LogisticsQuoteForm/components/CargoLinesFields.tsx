@@ -1,6 +1,7 @@
 // src/app/(site)/components/forms/LogisticsQuoteForm/components/CargoLinesFields.tsx
 "use client";
 
+import { useEffect } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { Plus, Trash2, Boxes } from "lucide-react";
 
@@ -13,20 +14,18 @@ import { siteTextUi } from "@/app/(site)/components/forms/presets/siteFieldUi";
 import { cn } from "@/lib/cn";
 
 type Props = {
-  name:
-    | "serviceDetails.cargoLines"
-    | `serviceDetails.${string}.cargoLines`;
+  name: "serviceDetails.cargoLines" | `serviceDetails.${string}.cargoLines`;
   fieldPathAttr?: string;
   title: string;
   description: string;
   itemLabel: string;
   addLabel: string;
   emptyItem?: {
-    quantity: number;
-    length: number;
-    width: number;
-    height: number;
-    weightPerUnit: number;
+    quantity?: number;
+    length?: number;
+    width?: number;
+    height?: number;
+    weightPerUnit?: number;
   };
   weightUnitPath: "serviceDetails.weightUnit";
   dimensionUnitPath: "serviceDetails.dimensionUnit";
@@ -42,19 +41,30 @@ export function CargoLinesFields({
   weightUnitPath,
   dimensionUnitPath,
   emptyItem = {
-    quantity: 0,
-    length: 0,
-    width: 0,
-    height: 0,
-    weightPerUnit: 0,
+    quantity: undefined,
+    length: undefined,
+    width: undefined,
+    height: undefined,
+    weightPerUnit: undefined,
   },
 }: Props) {
-  const { control } = useFormContext<LogisticsQuoteSubmitValues>();
+  const { control, getValues } = useFormContext<LogisticsQuoteSubmitValues>();
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: name as any,
   });
+
+  useEffect(() => {
+    const currentValue = getValues(name as any);
+    const hasStoredRows = Array.isArray(currentValue) && currentValue.length > 0;
+
+    if (fields.length === 0 && !hasStoredRows) {
+      append({ ...emptyItem } as any, {
+        shouldFocus: false,
+      });
+    }
+  }, [fields.length, append, emptyItem, getValues, name]);
 
   const weightUnit = useWatch({
     control,
@@ -66,7 +76,9 @@ export function CargoLinesFields({
     name: dimensionUnitPath as any,
   }) as EDimensionUnit | undefined;
 
-  const weightLabel = weightUnit ? WEIGHT_UNIT_LABEL[weightUnit] : WEIGHT_UNIT_LABEL[EWeightUnit.LB];
+  const weightLabel = weightUnit
+    ? WEIGHT_UNIT_LABEL[weightUnit]
+    : WEIGHT_UNIT_LABEL[EWeightUnit.LB];
   const dimensionLabel = dimensionUnit
     ? DIMENSION_UNIT_LABEL[dimensionUnit]
     : DIMENSION_UNIT_LABEL[EDimensionUnit.IN];
@@ -135,7 +147,7 @@ export function CargoLinesFields({
                   ui={siteTextUi}
                   disallowNegative
                   disallowExponent
-                  inputProps={{ min: 0, step: 1 }}
+                  inputProps={{ min: 1, step: 1 }}
                 />
 
                 <NumberField

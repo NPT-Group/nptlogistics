@@ -105,7 +105,7 @@ function SelectorField<T extends string>({
 }
 
 export function IdentificationSection() {
-  const { control, setValue } = useFormContext<LogisticsQuoteSubmitValues>();
+  const { control, setValue, clearErrors } = useFormContext<LogisticsQuoteSubmitValues>();
 
   const { field: identityField, fieldState: identityState } = useController({
     control,
@@ -123,6 +123,7 @@ export function IdentificationSection() {
 
   function handleIdentityChange(next: ECustomerIdentity) {
     identityField.onChange(next);
+    identityField.onBlur();
 
     if (next !== ECustomerIdentity.BROKER) {
       setValue("identification.brokerType", undefined, {
@@ -130,11 +131,14 @@ export function IdentificationSection() {
         shouldTouch: false,
         shouldValidate: true,
       });
+
+      clearErrors("identification.brokerType");
     }
   }
 
   function handleBrokerTypeChange(next: EBrokerType) {
     brokerTypeField.onChange(next);
+    brokerTypeField.onBlur();
   }
 
   return (

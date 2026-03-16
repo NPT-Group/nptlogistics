@@ -1,6 +1,7 @@
 // src/app/(site)/components/forms/LogisticsQuoteForm/components/ContainerLinesFields.tsx
 "use client";
 
+import { useEffect } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Plus, Trash2, Container } from "lucide-react";
 
@@ -30,12 +31,27 @@ export function ContainerLinesFields({
   itemLabel = "Container",
   addLabel = "Add container",
 }: Props) {
-  const { control } = useFormContext<LogisticsQuoteSubmitValues>();
+  const { control, getValues } = useFormContext<LogisticsQuoteSubmitValues>();
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: name as any,
   });
+
+  useEffect(() => {
+    const currentValue = getValues(name as any);
+    const hasStoredRows = Array.isArray(currentValue) && currentValue.length > 0;
+
+    if (fields.length === 0 && !hasStoredRows) {
+      append(
+        {
+          quantity: undefined,
+          containerType: undefined,
+        } as any,
+        { shouldFocus: false },
+      );
+    }
+  }, [fields.length, append, getValues, name]);
 
   return (
     <section className="space-y-4" data-field-path={fieldPathAttr ?? name}>
@@ -56,7 +72,7 @@ export function ContainerLinesFields({
           type="button"
           onClick={() =>
             append({
-              quantity: 0,
+              quantity: undefined,
               containerType: undefined,
             } as any)
           }
@@ -106,7 +122,7 @@ export function ContainerLinesFields({
                   ui={siteTextUi}
                   disallowNegative
                   disallowExponent
-                  inputProps={{ min: 0, step: 1 }}
+                  inputProps={{ min: 1, step: 1 }}
                 />
 
                 <SelectField<LogisticsQuoteSubmitValues, EOceanContainerType>

@@ -41,7 +41,7 @@ export function LTLFields() {
   useEffect(() => {
     const fieldName = "serviceDetails.approximateTotalWeight" as any;
 
-    setValue(fieldName, totalWeight, {
+    setValue(fieldName, totalWeight > 0 ? totalWeight : undefined, {
       shouldDirty: false,
       shouldTouch: false,
       shouldValidate: false,
@@ -122,6 +122,16 @@ export function LTLFields() {
             ]}
           />
         </div>
+
+        <div className="mt-4">
+          <CheckboxField
+            control={control}
+            name={"serviceDetails.stackable" as any}
+            fieldPathAttr="serviceDetails.stackable"
+            label="Stackable"
+            ui={siteCheckUi}
+          />
+        </div>
       </ShipmentDetailsBlock>
 
       <ShipmentDetailsBlock>
@@ -135,13 +145,8 @@ export function LTLFields() {
           weightUnitPath="serviceDetails.weightUnit"
           dimensionUnitPath="serviceDetails.dimensionUnit"
         />
-      </ShipmentDetailsBlock>
 
-      <ShipmentDetailsBlock
-        title="Handling"
-        description="Help us understand how the shipment should be quoted and loaded."
-      >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="mt-4 max-w-md">
           <NumberField
             control={control}
             name={"serviceDetails.approximateTotalWeight" as any}
@@ -156,15 +161,6 @@ export function LTLFields() {
                 "bg-neutral-100 text-neutral-500 border-neutral-200 cursor-not-allowed hover:border-neutral-200",
             }}
             hint="Calculated automatically from pallet quantities and weights."
-          />
-
-          <CheckboxField
-            control={control}
-            name={"serviceDetails.stackable" as any}
-            fieldPathAttr="serviceDetails.stackable"
-            label="Stackable"
-            hint="Check if pallets can be safely stacked."
-            ui={siteCheckUi}
           />
         </div>
       </ShipmentDetailsBlock>

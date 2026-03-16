@@ -14,7 +14,11 @@ import {
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { EInternationalMode, ELogisticsPrimaryService } from "@/types/logisticsQuote.types";
+import {
+  EInternationalMode,
+  ELogisticsPrimaryService,
+  EOceanLoadType,
+} from "@/types/logisticsQuote.types";
 
 import { logisticsQuoteSubmitSchema, type LogisticsQuoteSubmitValues } from "./schema";
 import { LOGISTICS_QUOTE_SUBMIT_DEFAULTS } from "./defaults";
@@ -170,7 +174,7 @@ export default function LogisticsQuoteForm() {
         normalizedValues.serviceDetails?.primaryService ===
           ELogisticsPrimaryService.INTERNATIONAL &&
         normalizedValues.serviceDetails.mode === EInternationalMode.OCEAN &&
-        normalizedValues.serviceDetails.oceanLoadType === "LCL"
+        normalizedValues.serviceDetails.oceanLoadType === EOceanLoadType.LCL
       ) {
         const total = (normalizedValues.serviceDetails.cargoLines ?? []).reduce((sum, line) => {
           const quantity = Number(line?.quantity ?? 0);
@@ -239,6 +243,11 @@ export default function LogisticsQuoteForm() {
       });
 
       turnstileRef.current?.reset();
+      setValue("turnstileToken", "", {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
 
       window.requestAnimationFrame(() => {
         scrollToTopArea();

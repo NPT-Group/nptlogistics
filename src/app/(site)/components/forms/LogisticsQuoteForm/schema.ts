@@ -1,20 +1,19 @@
 // src/app/(site)/components/forms/LogisticsQuoteForm/schema.ts
-// src/app/(site)/components/forms/LogisticsQuoteForm/schema.ts
 import { z } from "zod";
 
 import {
   EBrokerType,
   ECustomerIdentity,
   EDimensionUnit,
+  EFTLAddon,
+  EFTLEquipmentType,
   EInternationalMode,
   ELogisticsPrimaryService,
   EOceanContainerType,
   EOceanLoadType,
-  EPreferredContactMethod,
-  EFTLAddon,
-  EFTLEquipmentType,
   ELTLAddon,
   ELTLEquipmentType,
+  EPreferredContactMethod,
   EWarehousingDuration,
   EWarehousingVolumeType,
   EWeightUnit,
@@ -24,18 +23,8 @@ import { NORTH_AMERICAN_COUNTRY_CODES } from "@/config/countries";
 import type { IFileAsset } from "@/types/shared.types";
 
 /* ──────────────────────────────────────────────────────────────────────────────
-  SUBMIT BODY schema (matches API expectation)
-  Body shape:
-    {
-      turnstileToken,
-      serviceDetails?,
-      identification,
-      contact,
-      finalNotes?,
-      attachments?,
-      marketingEmailConsent?,
-      sourceLabel?
-    }
+  SUBMIT BODY schema (form-facing)
+  RHF uses input types, so defaults can safely use "" / undefined for empty fields.
 ────────────────────────────────────────────────────────────────────────────── */
 
 const requiredString = (label: string) => z.string().trim().min(1, `${label} is required`);
@@ -109,6 +98,33 @@ const positiveNumber = (label: string) =>
     message: `${label} must be greater than 0`,
   });
 
+const optionalPositiveNumber = (label: string) =>
+  z.preprocess(
+    (value) => {
+      if (value === "" || value === null || value === undefined) {
+        return undefined;
+      }
+
+      if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (trimmed === "") return undefined;
+
+        const parsed = Number(trimmed);
+        return Number.isFinite(parsed) ? parsed : value;
+      }
+
+      return value;
+    },
+    z
+      .number({
+        error: () => `${label} must be a valid number`,
+      })
+      .refine((n) => n > 0, {
+        message: `${label} must be greater than 0`,
+      })
+      .optional(),
+  );
+
 const integerMin1 = (label: string) =>
   numberFromInput(label)
     .refine((n) => Number.isInteger(n), {
@@ -140,13 +156,46 @@ const enumField = <T extends Record<string, string | number>>(enumObj: T, messag
     error: () => message,
   });
 
+const requiredEnumField = <T extends Record<string, string | number>>(
+  enumObj: T,
+  message: string,
+) =>
+  z.preprocess(
+    (value) => {
+      if (value === "") return undefined;
+      return value;
+    },
+    z.union([z.nativeEnum(enumObj), z.undefined()]).superRefine((value, ctx) => {
+      if (!value) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message,
+        });
+      }
+    }),
+  );
+
 function isNorthAmerica(code?: string) {
   if (!code) return false;
   return (NORTH_AMERICAN_COUNTRY_CODES as readonly string[]).includes(code.toUpperCase());
 }
 
-/* ───────────────────────────── Shared ───────────────────────────── */
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
+function optionalObjectIfBlank<TSchema extends z.ZodTypeAny>(schema: TSchema) {
+  return z.preprocess((value) => {
+    if (value == null) return undefined;
+    if (!isPlainObject(value)) return value;
+
+    const allBlank = Object.values(value).every((v) => v === "" || v === null || v === undefined);
+
+    return allBlank ? undefined : value;
+  }, schema.optional());
+}
+
+/** Shared: Address */
 export const logisticsAddressSchema = z.object({
   street1: requiredString("Street address"),
   street2: optionalTrimmedString(),
@@ -156,14 +205,12 @@ export const logisticsAddressSchema = z.object({
   countryCode: iso2CountryCode,
 });
 
+/** Shared: Dimensions (no unit stored) */
 export const logisticsDimensionsSchema = z.object({
   length: positiveNumber("Length"),
   width: positiveNumber("Width"),
   height: positiveNumber("Height"),
 });
-
-const weightUnitField = enumField(EWeightUnit, "Please select a weight unit");
-const dimensionUnitField = enumField(EDimensionUnit, "Please select a dimension unit");
 
 export const cargoLineSchema = z.object({
   quantity: integerMin1("Quantity"),
@@ -175,24 +222,19 @@ export const cargoLineSchema = z.object({
 
 export const oceanContainerLineSchema = z.object({
   quantity: integerMin1("Quantity"),
-  containerType: enumField(EOceanContainerType, "Please select a container type"),
+  containerType: requiredEnumField(EOceanContainerType, "Please select a container type"),
 });
 
-export const warehousingVolumeSchema = z.object({
-  volumeType: enumField(EWarehousingVolumeType, "Please select a volume type"),
-  value: positiveNumber("Estimated volume"),
-});
-
-export const fileAssetSchema: z.ZodType<IFileAsset> = z.object({
+/** Attachments */
+export const fileAssetSchema = z.object({
   url: requiredString("File URL"),
   s3Key: requiredString("File key"),
   mimeType: z.string().trim().min(1, "File type is required"),
   sizeBytes: z.number().optional(),
   originalName: z.string().optional(),
-});
+}) satisfies z.ZodType<IFileAsset>;
 
-/* ───────────────────────── Equipment → allowed add-ons ────────────────────── */
-
+/** Equipment -> allowed add-ons (must match backend rules) */
 export const FTL_ADDON_COMPAT: Record<EFTLEquipmentType, readonly EFTLAddon[]> = {
   [EFTLEquipmentType.DRY_VAN]: [
     EFTLAddon.EXPEDITED,
@@ -275,13 +317,22 @@ export const LTL_ADDON_COMPAT: Record<ELTLEquipmentType, readonly ELTLAddon[]> =
   ],
 };
 
+const weightUnitField = requiredEnumField(EWeightUnit, "Please select a weight unit");
+const dimensionUnitField = requiredEnumField(EDimensionUnit, "Please select a dimension unit");
+const ftlEquipmentField = requiredEnumField(EFTLEquipmentType, "Please select an equipment type");
+const ltlEquipmentField = requiredEnumField(ELTLEquipmentType, "Please select an equipment type");
+const internationalModeField = requiredEnumField(
+  EInternationalMode,
+  "Please select a shipping mode",
+);
+
 /* ───────────────────────────── Service Details ───────────────────────────── */
 
 export const ftlDetailsSchema = z
   .object({
     primaryService: z.literal(ELogisticsPrimaryService.FTL),
 
-    equipment: enumField(EFTLEquipmentType, "Please select an equipment type"),
+    equipment: ftlEquipmentField,
 
     origin: logisticsAddressSchema,
     destination: logisticsAddressSchema,
@@ -292,10 +343,13 @@ export const ftlDetailsSchema = z
     approximateTotalWeight: positiveNumber("Approximate total weight"),
     weightUnit: weightUnitField,
 
-    estimatedPalletCount: integerMin1("Estimated pallet count").optional(),
+    estimatedPalletCount: optionalPositiveNumber("Estimated pallet count").refine(
+      (v) => v === undefined || Number.isInteger(v),
+      { message: "Estimated pallet count must be a whole number" },
+    ),
 
-    dimensions: logisticsDimensionsSchema.optional(),
-    dimensionUnit: dimensionUnitField.optional(),
+    dimensions: optionalObjectIfBlank(logisticsDimensionsSchema),
+    dimensionUnit: z.union([z.nativeEnum(EDimensionUnit), z.undefined()]).optional(),
 
     pickupDateFlexible: z.coerce.boolean().optional(),
 
@@ -322,19 +376,11 @@ export const ftlDetailsSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["dimensionUnit"],
-        message: "Please select a dimension unit when dimensions are provided",
+        message: "Please select a dimension unit",
       });
     }
 
-    if (!val.dimensions && val.dimensionUnit) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["dimensions"],
-        message: "Dimensions are required when a dimension unit is selected",
-      });
-    }
-
-    if (val.addons?.length) {
+    if (val.addons?.length && val.equipment) {
       const allowed = new Set(FTL_ADDON_COMPAT[val.equipment] || []);
       for (const addon of val.addons) {
         if (!allowed.has(addon)) {
@@ -353,7 +399,7 @@ export const ltlDetailsSchema = z
   .object({
     primaryService: z.literal(ELogisticsPrimaryService.LTL),
 
-    equipment: enumField(ELTLEquipmentType, "Please select an equipment type"),
+    equipment: ltlEquipmentField,
 
     origin: logisticsAddressSchema,
     destination: logisticsAddressSchema,
@@ -366,9 +412,9 @@ export const ltlDetailsSchema = z
 
     stackable: z.coerce.boolean(),
 
-    cargoLines: z.array(cargoLineSchema).min(1, "Add at least one cargo line"),
+    cargoLines: z.array(cargoLineSchema).min(1, "Add at least one pallet line"),
 
-    approximateTotalWeight: positiveNumber("Approximate total weight"),
+    approximateTotalWeight: optionalPositiveNumber("Approximate total weight"),
 
     addons: z.array(z.nativeEnum(ELTLAddon)).optional(),
   })
@@ -389,7 +435,7 @@ export const ltlDetailsSchema = z
       });
     }
 
-    if (val.addons?.length) {
+    if (val.addons?.length && val.equipment) {
       const allowed = new Set(LTL_ADDON_COMPAT[val.equipment] || []);
       for (const addon of val.addons) {
         if (!allowed.has(addon)) {
@@ -404,65 +450,167 @@ export const ltlDetailsSchema = z
     }
   });
 
-export const intlAirDetailsSchema = z.object({
-  primaryService: z.literal(ELogisticsPrimaryService.INTERNATIONAL),
+export const intlDetailsSchema = z
+  .object({
+    primaryService: z.literal(ELogisticsPrimaryService.INTERNATIONAL),
 
-  mode: z.literal(EInternationalMode.AIR),
+    mode: internationalModeField,
+    oceanLoadType: z.preprocess(
+      (value) => (value === "" ? undefined : value),
+      z.union([z.nativeEnum(EOceanLoadType), z.undefined()]).optional(),
+    ),
 
-  origin: logisticsAddressSchema,
-  destination: logisticsAddressSchema,
+    origin: logisticsAddressSchema,
+    destination: logisticsAddressSchema,
 
-  pickupDate: isoDateField("Pickup date"),
-  commodityDescription: requiredString("Commodity description"),
+    pickupDate: isoDateField("Pickup date"),
+    commodityDescription: requiredString("Commodity description"),
 
-  weightUnit: weightUnitField,
-  dimensionUnit: dimensionUnitField,
+    weightUnit: z.preprocess(
+      (value) => (value === "" ? undefined : value),
+      z.union([z.nativeEnum(EWeightUnit), z.undefined()]).optional(),
+    ),
+    dimensionUnit: z.preprocess(
+      (value) => (value === "" ? undefined : value),
+      z.union([z.nativeEnum(EDimensionUnit), z.undefined()]).optional(),
+    ),
 
-  cargoLines: z.array(cargoLineSchema).min(1, "Add at least one cargo line"),
+    cargoLines: z.array(cargoLineSchema).optional(),
+    approximateTotalWeight: optionalPositiveNumber("Approximate total weight"),
 
-  approximateTotalWeight: positiveNumber("Approximate total weight"),
+    containerLines: z.array(oceanContainerLineSchema).optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (!val.mode) {
+      return;
+    }
+
+    if (val.mode === EInternationalMode.AIR) {
+      if (!val.weightUnit) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["weightUnit"],
+          message: "Please select a weight unit",
+        });
+      }
+
+      if (!val.dimensionUnit) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["dimensionUnit"],
+          message: "Please select a dimension unit",
+        });
+      }
+
+      if (!val.cargoLines || val.cargoLines.length < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["cargoLines"],
+          message: "Add at least one cargo line",
+        });
+      }
+
+      if (val.oceanLoadType !== undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["oceanLoadType"],
+          message: "Ocean load type is only allowed for ocean shipments",
+        });
+      }
+
+      if (val.containerLines !== undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["containerLines"],
+          message: "Container lines are only allowed for ocean FCL shipments",
+        });
+      }
+    }
+
+    if (val.mode === EInternationalMode.OCEAN) {
+      if (!val.oceanLoadType) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["oceanLoadType"],
+          message: "Please select an ocean load type",
+        });
+        return;
+      }
+
+      if (val.oceanLoadType === EOceanLoadType.LCL) {
+        if (!val.weightUnit) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["weightUnit"],
+            message: "Please select a weight unit",
+          });
+        }
+
+        if (!val.dimensionUnit) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["dimensionUnit"],
+            message: "Please select a dimension unit",
+          });
+        }
+
+        if (!val.cargoLines || val.cargoLines.length < 1) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["cargoLines"],
+            message: "Add at least one cargo line",
+          });
+        }
+
+        if (val.containerLines !== undefined) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["containerLines"],
+            message: "Container lines are only allowed for ocean FCL shipments",
+          });
+        }
+      }
+
+      if (val.oceanLoadType === EOceanLoadType.FCL) {
+        if (!val.containerLines || val.containerLines.length < 1) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["containerLines"],
+            message: "Add at least one container line",
+          });
+        }
+
+        if (val.weightUnit !== undefined) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["weightUnit"],
+            message: "Weight unit is not used for ocean FCL",
+          });
+        }
+
+        if (val.dimensionUnit !== undefined) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["dimensionUnit"],
+            message: "Dimension unit is not used for ocean FCL",
+          });
+        }
+
+        if (val.cargoLines !== undefined) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["cargoLines"],
+            message: "Cargo lines are only allowed for air and ocean LCL",
+          });
+        }
+      }
+    }
+  });
+
+export const warehousingVolumeSchema = z.object({
+  volumeType: enumField(EWarehousingVolumeType, "Please select a volume type"),
+  value: positiveNumber("Estimated volume"),
 });
-
-export const intlOceanLclDetailsSchema = z.object({
-  primaryService: z.literal(ELogisticsPrimaryService.INTERNATIONAL),
-
-  mode: z.literal(EInternationalMode.OCEAN),
-  oceanLoadType: z.literal(EOceanLoadType.LCL),
-
-  origin: logisticsAddressSchema,
-  destination: logisticsAddressSchema,
-
-  pickupDate: isoDateField("Pickup date"),
-  commodityDescription: requiredString("Commodity description"),
-
-  weightUnit: weightUnitField,
-  dimensionUnit: dimensionUnitField,
-
-  cargoLines: z.array(cargoLineSchema).min(1, "Add at least one cargo line"),
-
-  approximateTotalWeight: positiveNumber("Approximate total weight"),
-});
-
-export const intlOceanFclDetailsSchema = z.object({
-  primaryService: z.literal(ELogisticsPrimaryService.INTERNATIONAL),
-
-  mode: z.literal(EInternationalMode.OCEAN),
-  oceanLoadType: z.literal(EOceanLoadType.FCL),
-
-  origin: logisticsAddressSchema,
-  destination: logisticsAddressSchema,
-
-  pickupDate: isoDateField("Pickup date"),
-  commodityDescription: requiredString("Commodity description"),
-
-  containerLines: z.array(oceanContainerLineSchema).min(1, "Add at least one container line"),
-});
-
-export const intlDetailsSchema = z.union([
-  intlAirDetailsSchema,
-  intlOceanLclDetailsSchema,
-  intlOceanFclDetailsSchema,
-]);
 
 export const warehousingDetailsSchema = z
   .object({
@@ -484,27 +632,46 @@ export const warehousingDetailsSchema = z
     }
   });
 
-export const serviceDetailsSchema = z.union([
+export const serviceDetailsSchema = z.discriminatedUnion("primaryService", [
   ftlDetailsSchema,
   ltlDetailsSchema,
-  intlAirDetailsSchema,
-  intlOceanLclDetailsSchema,
-  intlOceanFclDetailsSchema,
+  intlDetailsSchema,
   warehousingDetailsSchema,
 ]);
 
-/* ───────────────────────── Identification + Contact ───────────────────────── */
+/* ───────────────────────────── Identification + Contact ───────────────────────────── */
 
-export const identificationSchema = z.union([
-  z.object({
-    identity: z.literal(ECustomerIdentity.SHIPPER),
-    brokerType: z.undefined().optional(),
-  }),
-  z.object({
-    identity: z.literal(ECustomerIdentity.BROKER),
-    brokerType: enumField(EBrokerType, "Please select a broker type"),
-  }),
-]);
+export const identificationSchema = z
+  .object({
+    identity: z.union([z.nativeEnum(ECustomerIdentity), z.literal(""), z.undefined()]),
+    brokerType: z.union([z.nativeEnum(EBrokerType), z.undefined()]).optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (!val.identity) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["identity"],
+        message: "Please select who you are",
+      });
+      return;
+    }
+
+    if (val.identity === ECustomerIdentity.BROKER && !val.brokerType) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["brokerType"],
+        message: "Please select a broker type",
+      });
+    }
+
+    if (val.identity !== ECustomerIdentity.BROKER && val.brokerType !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["brokerType"],
+        message: "Broker type is only allowed when customer type is Broker",
+      });
+    }
+  });
 
 export const contactSchema = z
   .object({
@@ -564,4 +731,13 @@ export const logisticsQuoteSubmitSchema = z
     }
   });
 
-export type LogisticsQuoteSubmitValues = z.infer<typeof logisticsQuoteSubmitSchema>;
+/**
+ * Form values should use INPUT types so RHF defaults can safely be:
+ * - ""
+ * - undefined
+ * - partial pre-selection states
+ */
+export type LogisticsQuoteSubmitValues = z.input<typeof logisticsQuoteSubmitSchema>;
+
+/** Parsed/normalized submit body */
+export type LogisticsQuoteSubmitParsedValues = z.output<typeof logisticsQuoteSubmitSchema>;

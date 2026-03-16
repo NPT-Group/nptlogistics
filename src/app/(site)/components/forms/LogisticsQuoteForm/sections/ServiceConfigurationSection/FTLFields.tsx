@@ -1,10 +1,11 @@
 // src/app/(site)/components/forms/LogisticsQuoteForm/sections/ServiceConfigurationSection/FTLFields.tsx
 "use client";
 
-import { useFormContext } from "react-hook-form";
+import * as React from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import type { LogisticsQuoteSubmitValues } from "../../schema";
-import { EWeightUnit } from "@/types/logisticsQuote.types";
+import { EDimensionUnit, EWeightUnit } from "@/types/logisticsQuote.types";
 
 import { TextField } from "@/components/forms/fields/TextField";
 import { NumberField } from "@/components/forms/fields/NumberField";
@@ -16,7 +17,81 @@ import { AddressFields } from "../../components/AddressFields";
 import { ShipmentDetailsBlock } from "./ShipmentDetailsSection";
 
 export function FTLFields() {
-  const { control } = useFormContext<LogisticsQuoteSubmitValues>();
+  const { control, setValue, clearErrors } = useFormContext<LogisticsQuoteSubmitValues>();
+
+  const dimensions = useWatch({
+    control,
+    name: "serviceDetails.dimensions" as any,
+  }) as
+    | {
+        length?: number | undefined;
+        width?: number | undefined;
+        height?: number | undefined;
+      }
+    | undefined;
+
+  const dimensionUnit = useWatch({
+    control,
+    name: "serviceDetails.dimensionUnit" as any,
+  }) as EDimensionUnit | undefined;
+
+  const dimensionsEnabled = Boolean(dimensions || dimensionUnit);
+
+  const handleDimensionsToggle = React.useCallback(
+    (next: boolean) => {
+      if (next) {
+        setValue(
+          "serviceDetails.dimensions" as any,
+          {
+            length: undefined,
+            width: undefined,
+            height: undefined,
+          },
+          {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: false,
+          },
+        );
+
+        setValue("serviceDetails.dimensionUnit" as any, undefined, {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: false,
+        });
+
+        clearErrors([
+          "serviceDetails.dimensions",
+          "serviceDetails.dimensions.length",
+          "serviceDetails.dimensions.width",
+          "serviceDetails.dimensions.height",
+          "serviceDetails.dimensionUnit",
+        ] as any);
+        return;
+      }
+
+      setValue("serviceDetails.dimensions" as any, undefined, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: false,
+      });
+
+      setValue("serviceDetails.dimensionUnit" as any, undefined, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: false,
+      });
+
+      clearErrors([
+        "serviceDetails.dimensions",
+        "serviceDetails.dimensions.length",
+        "serviceDetails.dimensions.width",
+        "serviceDetails.dimensions.height",
+        "serviceDetails.dimensionUnit",
+      ] as any);
+    },
+    [setValue, clearErrors],
+  );
 
   return (
     <div className="space-y-4">
@@ -50,10 +125,20 @@ export function FTLFields() {
             inputProps={{ placeholder: "e.g., steel coils, packaged goods..." }}
           />
 
+          <TextField
+            control={control}
+            name={"serviceDetails.pickupDate" as any}
+            fieldPathAttr="serviceDetails.pickupDate"
+            label="Pickup date"
+            required
+            ui={siteTextUi}
+            inputProps={{ type: "date" }}
+          />
+
           <NumberField
             control={control}
-            name={"serviceDetails.approximateTotalWeight.value" as any}
-            fieldPathAttr="serviceDetails.approximateTotalWeight.value"
+            name={"serviceDetails.approximateTotalWeight" as any}
+            fieldPathAttr="serviceDetails.approximateTotalWeight"
             label="Approx. total weight"
             required
             ui={siteTextUi}
@@ -64,8 +149,8 @@ export function FTLFields() {
 
           <SelectField<LogisticsQuoteSubmitValues, EWeightUnit>
             control={control}
-            name={"serviceDetails.approximateTotalWeight.unit" as any}
-            fieldPathAttr="serviceDetails.approximateTotalWeight.unit"
+            name={"serviceDetails.weightUnit" as any}
+            fieldPathAttr="serviceDetails.weightUnit"
             label="Weight unit"
             required
             ui={siteTextUi}
@@ -84,24 +169,7 @@ export function FTLFields() {
             ui={siteTextUi}
             disallowNegative
             disallowExponent
-            inputProps={{ placeholder: "Optional" }}
-          />
-        </div>
-      </ShipmentDetailsBlock>
-
-      <ShipmentDetailsBlock
-        title="Scheduling"
-        description="Tell us when the shipment is ready for pickup."
-      >
-        <div className="grid gap-4 md:grid-cols-2">
-          <TextField
-            control={control}
-            name={"serviceDetails.pickupDate" as any}
-            fieldPathAttr="serviceDetails.pickupDate"
-            label="Pickup date"
-            required
-            ui={siteTextUi}
-            inputProps={{ type: "date" }}
+            inputProps={{ placeholder: "Optional", min: 1, step: 1 }}
           />
 
           <div className="md:pt-[1.625rem]">
@@ -120,36 +188,68 @@ export function FTLFields() {
         title="Shipment dimensions"
         description="Optional. Add overall shipment dimensions if available."
       >
-        <div className="grid gap-4 md:grid-cols-3">
-          <NumberField
-            control={control}
-            name={"serviceDetails.dimensions.length" as any}
-            fieldPathAttr="serviceDetails.dimensions.length"
-            label="Length"
-            disallowNegative
-            disallowExponent
-            ui={siteTextUi}
+        <div className="space-y-4">
+          <CheckboxField
+            checked={dimensionsEnabled}
+            onCheckedChange={handleDimensionsToggle}
+            label="Include shipment dimensions"
+            hint="Enable this if you want to provide overall shipment dimensions for quoting."
+            ui={siteCheckUi}
           />
 
-          <NumberField
-            control={control}
-            name={"serviceDetails.dimensions.width" as any}
-            fieldPathAttr="serviceDetails.dimensions.width"
-            label="Width"
-            disallowNegative
-            disallowExponent
-            ui={siteTextUi}
-          />
+          {dimensionsEnabled ? (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <NumberField
+                control={control}
+                name={"serviceDetails.dimensions.length" as any}
+                fieldPathAttr="serviceDetails.dimensions.length"
+                label="Length"
+                required
+                disallowNegative
+                disallowExponent
+                ui={siteTextUi}
+                inputProps={{ min: 0, step: "any" }}
+              />
 
-          <NumberField
-            control={control}
-            name={"serviceDetails.dimensions.height" as any}
-            fieldPathAttr="serviceDetails.dimensions.height"
-            label="Height"
-            disallowNegative
-            disallowExponent
-            ui={siteTextUi}
-          />
+              <NumberField
+                control={control}
+                name={"serviceDetails.dimensions.width" as any}
+                fieldPathAttr="serviceDetails.dimensions.width"
+                label="Width"
+                required
+                disallowNegative
+                disallowExponent
+                ui={siteTextUi}
+                inputProps={{ min: 0, step: "any" }}
+              />
+
+              <NumberField
+                control={control}
+                name={"serviceDetails.dimensions.height" as any}
+                fieldPathAttr="serviceDetails.dimensions.height"
+                label="Height"
+                required
+                disallowNegative
+                disallowExponent
+                ui={siteTextUi}
+                inputProps={{ min: 0, step: "any" }}
+              />
+
+              <SelectField<LogisticsQuoteSubmitValues, EDimensionUnit>
+                control={control}
+                name={"serviceDetails.dimensionUnit" as any}
+                fieldPathAttr="serviceDetails.dimensionUnit"
+                label="Dimension unit"
+                required
+                ui={siteTextUi}
+                placeholder="Select unit..."
+                options={[
+                  { label: "IN", value: EDimensionUnit.IN },
+                  { label: "CM", value: EDimensionUnit.CM },
+                ]}
+              />
+            </div>
+          ) : null}
         </div>
       </ShipmentDetailsBlock>
     </div>

@@ -92,7 +92,7 @@ export function SubmitSection({ turnstileRef }: SubmitSectionProps) {
                 shouldValidate: true,
               });
             }}
-            onError={() => {
+            onError={(_message) => {
               setValue("turnstileToken", "", {
                 shouldDirty: true,
                 shouldTouch: true,

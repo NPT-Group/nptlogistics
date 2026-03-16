@@ -1,5 +1,4 @@
 // src/app/(site)/components/forms/LogisticsQuoteForm/helpers.ts
-// src/app/(site)/components/forms/LogisticsQuoteForm/helpers.ts
 import {
   EInternationalMode,
   ELogisticsPrimaryService,
@@ -10,14 +9,14 @@ import {
   type ELTLEquipmentType,
 } from "@/types/logisticsQuote.types";
 
+import { makeServiceDetailsDefaults } from "./defaults";
 import {
-  makeInternationalAirDefaults,
-  makeInternationalOceanFclDefaults,
-  makeInternationalOceanLclDefaults,
-  makeServiceDetailsDefaults,
-} from "./defaults";
-import { FTL_ADDON_COMPAT, LTL_ADDON_COMPAT } from "./schema";
-import type { LogisticsQuoteSubmitValues } from "./schema";
+  FTL_ADDON_COMPAT,
+  LTL_ADDON_COMPAT,
+  logisticsQuoteSubmitSchema,
+  type LogisticsQuoteSubmitParsedValues,
+  type LogisticsQuoteSubmitValues,
+} from "./schema";
 import { NAV_OFFSET } from "@/constants/ui";
 
 export {
@@ -32,32 +31,6 @@ export {
 
 export function buildServiceDetailsOnPrimaryServiceChange(ps: ELogisticsPrimaryService) {
   return makeServiceDetailsDefaults(ps);
-}
-
-export function buildInternationalDetailsOnModeChange(mode: EInternationalMode) {
-  switch (mode) {
-    case EInternationalMode.AIR:
-      return makeInternationalAirDefaults();
-    case EInternationalMode.OCEAN:
-      return makeInternationalOceanLclDefaults();
-    default: {
-      const _x: never = mode;
-      throw new Error(`Unsupported international mode: ${_x}`);
-    }
-  }
-}
-
-export function buildInternationalDetailsOnOceanLoadTypeChange(loadType: EOceanLoadType) {
-  switch (loadType) {
-    case EOceanLoadType.LCL:
-      return makeInternationalOceanLclDefaults();
-    case EOceanLoadType.FCL:
-      return makeInternationalOceanFclDefaults();
-    default: {
-      const _x: never = loadType;
-      throw new Error(`Unsupported ocean load type: ${_x}`);
-    }
-  }
 }
 
 export function resetFtlAddonsOnEquipmentChange() {
@@ -114,66 +87,75 @@ function normalizePhone<T>(v: T): T {
   return `${hasPlus ? "+" : ""}${digits}` as T;
 }
 
-function normalizeAddress(a: unknown) {
-  if (!a || typeof a !== "object") return;
+function normalizeAddress(a: any) {
+  if (!a) return;
 
-  const addr = a as Record<string, unknown>;
-  addr.street1 = trim(addr.street1);
-  if (addr.street2 != null) addr.street2 = trim(addr.street2);
-  addr.city = trim(addr.city);
-  addr.region = trim(addr.region);
-  addr.postalCode = trim(addr.postalCode);
+  a.street1 = trim(a.street1);
+  if (a.street2 != null) a.street2 = trim(a.street2);
+  a.city = trim(a.city);
+  a.region = trim(a.region);
+  a.postalCode = trim(a.postalCode);
 
-  if (addr.countryCode != null) {
-    addr.countryCode = upperTrim(addr.countryCode);
+  if (a.countryCode != null) {
+    a.countryCode = upperTrim(a.countryCode);
   }
 }
 
-function normalizeDimensions(d: unknown) {
-  if (!d || typeof d !== "object") return;
+function normalizeCargoLine(line: any) {
+  if (!line) return line;
+
+  return {
+    ...line,
+    quantity: line.quantity,
+    length: line.length,
+    width: line.width,
+    height: line.height,
+    weightPerUnit: line.weightPerUnit,
+  };
 }
 
-function normalizeCargoLines(lines: unknown) {
-  if (!Array.isArray(lines)) return lines;
+function normalizeContainerLine(line: any) {
+  if (!line) return line;
 
-  return lines.map((line) => {
-    if (!line || typeof line !== "object") return line;
-    const next = { ...(line as Record<string, unknown>) };
-    return next;
-  });
+  return {
+    ...line,
+    quantity: line.quantity,
+    containerType: line.containerType != null ? trim(line.containerType) : line.containerType,
+  };
 }
 
-function normalizeContainerLines(lines: unknown) {
-  if (!Array.isArray(lines)) return lines;
+function sumCargoLineWeight(lines: any[] | undefined): number | undefined {
+  if (!Array.isArray(lines) || lines.length === 0) return undefined;
 
-  return lines.map((line) => {
-    if (!line || typeof line !== "object") return line;
-    const next = { ...(line as Record<string, unknown>) };
+  let total = 0;
 
-    if (next.containerType != null) {
-      next.containerType = trim(next.containerType);
+  for (const line of lines) {
+    const qty = Number(line?.quantity);
+    const weightPerUnit = Number(line?.weightPerUnit);
+
+    if (!Number.isFinite(qty) || !Number.isFinite(weightPerUnit)) {
+      return undefined;
     }
 
-    return next;
-  });
+    total += qty * weightPerUnit;
+  }
+
+  return total > 0 ? total : undefined;
 }
 
 export function normalizeBeforeSubmit(
   values: LogisticsQuoteSubmitValues,
 ): LogisticsQuoteSubmitValues {
-  const v = structuredClone(values) as LogisticsQuoteSubmitValues & {
-    [key: string]: unknown;
-  };
+  const v: any = structuredClone(values);
 
   v.turnstileToken = trim(v.turnstileToken);
   if (v.sourceLabel != null) v.sourceLabel = trim(v.sourceLabel);
 
   if (v.identification) {
-    if ("identity" in v.identification && v.identification.identity != null) {
+    if (v.identification.identity != null) {
       v.identification.identity = trim(v.identification.identity);
     }
-
-    if ("brokerType" in v.identification && v.identification.brokerType != null) {
+    if (v.identification.brokerType != null) {
       v.identification.brokerType = trim(v.identification.brokerType);
     }
   }
@@ -197,7 +179,7 @@ export function normalizeBeforeSubmit(
   if (v.finalNotes != null) v.finalNotes = trim(v.finalNotes);
 
   if (Array.isArray(v.attachments)) {
-    v.attachments = v.attachments.map((file) => ({
+    v.attachments = v.attachments.map((file: any) => ({
       ...file,
       url: trim(file.url),
       s3Key: trim(file.s3Key),
@@ -212,70 +194,97 @@ export function normalizeBeforeSubmit(
       case ELogisticsPrimaryService.FTL: {
         normalizeAddress(sd.origin);
         normalizeAddress(sd.destination);
-        sd.equipment = trim(sd.equipment);
+        sd.equipment = sd.equipment != null ? trim(sd.equipment) : sd.equipment;
         sd.pickupDate = trim(sd.pickupDate);
         sd.commodityDescription = trim(sd.commodityDescription);
-        if (sd.weightUnit != null) sd.weightUnit = trim(sd.weightUnit);
-        if (sd.dimensionUnit != null) sd.dimensionUnit = trim(sd.dimensionUnit);
-        if (sd.dimensions) normalizeDimensions(sd.dimensions);
-        if (Array.isArray(sd.addons)) sd.addons = sd.addons.map((x) => trim(x));
+        sd.weightUnit = sd.weightUnit != null ? trim(sd.weightUnit) : sd.weightUnit;
+        sd.dimensionUnit = sd.dimensionUnit != null ? trim(sd.dimensionUnit) : sd.dimensionUnit;
+
+        if (sd.addons) {
+          sd.addons = sd.addons.map((x: any) => trim(x));
+        }
+
+        if (sd.dimensions) {
+          const { length, width, height } = sd.dimensions;
+          const allBlank =
+            (length === "" || length == null) &&
+            (width === "" || width == null) &&
+            (height === "" || height == null);
+
+          if (allBlank) {
+            sd.dimensions = undefined;
+            sd.dimensionUnit = undefined;
+          }
+        }
+
         break;
       }
 
       case ELogisticsPrimaryService.LTL: {
         normalizeAddress(sd.origin);
         normalizeAddress(sd.destination);
-        sd.equipment = trim(sd.equipment);
+        sd.equipment = sd.equipment != null ? trim(sd.equipment) : sd.equipment;
         sd.pickupDate = trim(sd.pickupDate);
         sd.commodityDescription = trim(sd.commodityDescription);
-        sd.weightUnit = trim(sd.weightUnit);
-        sd.dimensionUnit = trim(sd.dimensionUnit);
+        sd.weightUnit = sd.weightUnit != null ? trim(sd.weightUnit) : sd.weightUnit;
+        sd.dimensionUnit = sd.dimensionUnit != null ? trim(sd.dimensionUnit) : sd.dimensionUnit;
 
         if (Array.isArray(sd.cargoLines)) {
-          sd.cargoLines = normalizeCargoLines(sd.cargoLines) as typeof sd.cargoLines;
+          sd.cargoLines = sd.cargoLines.map((line: any) => normalizeCargoLine(line));
         }
 
-        if (Array.isArray(sd.addons)) sd.addons = sd.addons.map((x) => trim(x));
+        sd.approximateTotalWeight = sumCargoLineWeight(sd.cargoLines);
+
+        if (Array.isArray(sd.addons)) {
+          sd.addons = sd.addons.map((x: any) => trim(x));
+        }
+
         break;
       }
 
       case ELogisticsPrimaryService.INTERNATIONAL: {
         normalizeAddress(sd.origin);
         normalizeAddress(sd.destination);
-        sd.mode = trim(sd.mode);
+
+        sd.mode = sd.mode != null ? trim(sd.mode) : sd.mode;
+        sd.oceanLoadType = sd.oceanLoadType != null ? trim(sd.oceanLoadType) : sd.oceanLoadType;
         sd.pickupDate = trim(sd.pickupDate);
         sd.commodityDescription = trim(sd.commodityDescription);
+        sd.weightUnit = sd.weightUnit != null ? trim(sd.weightUnit) : sd.weightUnit;
+        sd.dimensionUnit = sd.dimensionUnit != null ? trim(sd.dimensionUnit) : sd.dimensionUnit;
 
-        if (sd.mode === EInternationalMode.AIR) {
-          sd.weightUnit = trim(sd.weightUnit);
-          sd.dimensionUnit = trim(sd.dimensionUnit);
+        if (sd.mode === "") sd.mode = undefined;
+        if (sd.oceanLoadType === "") sd.oceanLoadType = undefined;
+        if (sd.weightUnit === "") sd.weightUnit = undefined;
+        if (sd.dimensionUnit === "") sd.dimensionUnit = undefined;
 
-          if (Array.isArray(sd.cargoLines)) {
-            sd.cargoLines = normalizeCargoLines(sd.cargoLines) as typeof sd.cargoLines;
-          }
+        if (Array.isArray(sd.cargoLines)) {
+          sd.cargoLines = sd.cargoLines.map((line: any) => normalizeCargoLine(line));
         }
 
-        if (sd.mode === EInternationalMode.OCEAN) {
-          if ("oceanLoadType" in sd && sd.oceanLoadType != null) {
-            sd.oceanLoadType = trim(sd.oceanLoadType);
-          }
+        if (Array.isArray(sd.containerLines)) {
+          sd.containerLines = sd.containerLines.map((line: any) => normalizeContainerLine(line));
+        }
 
+        if (sd.mode === EInternationalMode.AIR) {
+          sd.oceanLoadType = undefined;
+          sd.containerLines = undefined;
+          sd.approximateTotalWeight = sumCargoLineWeight(sd.cargoLines);
+        } else if (sd.mode === EInternationalMode.OCEAN) {
           if (sd.oceanLoadType === EOceanLoadType.LCL) {
-            sd.weightUnit = trim(sd.weightUnit);
-            sd.dimensionUnit = trim(sd.dimensionUnit);
-
-            if (Array.isArray(sd.cargoLines)) {
-              sd.cargoLines = normalizeCargoLines(sd.cargoLines) as typeof sd.cargoLines;
-            }
+            sd.containerLines = undefined;
+            sd.approximateTotalWeight = sumCargoLineWeight(sd.cargoLines);
+          } else if (sd.oceanLoadType === EOceanLoadType.FCL) {
+            sd.weightUnit = undefined;
+            sd.dimensionUnit = undefined;
+            sd.cargoLines = undefined;
+            sd.approximateTotalWeight = undefined;
+          } else {
+            sd.approximateTotalWeight = undefined;
           }
-
-          if (sd.oceanLoadType === EOceanLoadType.FCL) {
-            if (Array.isArray(sd.containerLines)) {
-              sd.containerLines = normalizeContainerLines(
-                sd.containerLines,
-              ) as typeof sd.containerLines;
-            }
-          }
+        } else {
+          sd.oceanLoadType = undefined;
+          sd.approximateTotalWeight = undefined;
         }
 
         break;
@@ -283,10 +292,15 @@ export function normalizeBeforeSubmit(
 
       case ELogisticsPrimaryService.WAREHOUSING: {
         normalizeAddress(sd.requiredLocation);
+
         if (sd.estimatedVolume?.volumeType != null) {
           sd.estimatedVolume.volumeType = trim(sd.estimatedVolume.volumeType);
         }
-        sd.expectedDuration = trim(sd.expectedDuration);
+
+        if (sd.expectedDuration != null) {
+          sd.expectedDuration = trim(sd.expectedDuration);
+        }
+
         break;
       }
 
@@ -295,24 +309,16 @@ export function normalizeBeforeSubmit(
     }
   }
 
-  return v;
+  return v as LogisticsQuoteSubmitValues;
 }
 
 /**
  * Exact API body structure expected by:
  * /api/v1/quotes/logistics/submit
  */
-export function toApiSubmitBody(values: LogisticsQuoteSubmitValues) {
-  const v = normalizeBeforeSubmit(values);
-
-  return {
-    turnstileToken: v.turnstileToken,
-    serviceDetails: v.serviceDetails,
-    identification: v.identification,
-    contact: v.contact,
-    finalNotes: v.finalNotes,
-    attachments: v.attachments,
-    marketingEmailConsent: v.marketingEmailConsent,
-    sourceLabel: v.sourceLabel,
-  };
+export function toApiSubmitBody(
+  values: LogisticsQuoteSubmitValues,
+): LogisticsQuoteSubmitParsedValues {
+  const normalized = normalizeBeforeSubmit(values);
+  return logisticsQuoteSubmitSchema.parse(normalized);
 }

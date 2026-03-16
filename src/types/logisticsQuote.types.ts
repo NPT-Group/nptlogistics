@@ -196,7 +196,7 @@ export type LogisticsAddress = {
   city: string;
   region: string; // State / Province
   postalCode: string;
-  countryCode: ICountry["code"]; // ISO-2
+  countryCode: ICountry["code"] | string; // ISO-2
 };
 
 /**

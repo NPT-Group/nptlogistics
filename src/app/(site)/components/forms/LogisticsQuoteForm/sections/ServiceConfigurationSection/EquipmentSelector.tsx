@@ -1,7 +1,7 @@
 // src/app/(site)/components/forms/LogisticsQuoteForm/sections/ServiceConfigurationSection/EquipmentSelector.tsx
 "use client";
 
-import { useFormContext, useWatch } from "react-hook-form";
+import { useController, useFormContext, useWatch } from "react-hook-form";
 import {
   Truck,
   Snowflake,
@@ -78,17 +78,20 @@ const LTL_EQUIPMENT_CARDS: readonly IconCardOption<ELTLEquipmentType>[] = [
 ];
 
 export function EquipmentSelector() {
-  const { control, setValue, getValues, clearErrors, formState } =
-    useFormContext<LogisticsQuoteSubmitValues>();
+  const { control } = useFormContext<LogisticsQuoteSubmitValues>();
 
-  const primaryService = useWatch({ control, name: "serviceDetails.primaryService" });
-
-  const selected = useWatch({
+  const primaryService = useWatch({
     control,
-    name: "serviceDetails.equipment",
+    name: "serviceDetails.primaryService",
   });
 
-  const error = (formState.errors.serviceDetails as any)?.equipment?.message as string | undefined;
+  const { field, fieldState } = useController({
+    control,
+    name: "serviceDetails.equipment" as any,
+  });
+
+  const selected = field.value as EFTLEquipmentType | ELTLEquipmentType | undefined;
+  const error = fieldState.error?.message;
 
   if (
     primaryService !== ELogisticsPrimaryService.FTL &&
@@ -98,16 +101,10 @@ export function EquipmentSelector() {
   }
 
   function choose(next: EFTLEquipmentType | ELTLEquipmentType) {
-    const prev = getValues("serviceDetails.equipment" as any);
-    if (prev === next) return;
+    if (field.value === next) return;
 
-    setValue("serviceDetails.equipment" as any, next as any, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true,
-    });
-
-    clearErrors("serviceDetails.equipment" as any);
+    field.onChange(next);
+    field.onBlur();
   }
 
   const options =
@@ -143,9 +140,10 @@ export function EquipmentSelector() {
         options={options as any}
         value={selected as any}
         onChange={choose as any}
+        onBlur={field.onBlur}
         invalid={Boolean(error)}
         errorId="serviceDetails.equipment-error"
-        name="serviceDetails.equipment"
+        name={field.name}
         variant="secondary"
         columnsClassName="grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-5"
         animateItems
