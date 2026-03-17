@@ -33,10 +33,10 @@ const SERVICE_LINKS: Record<string, string> = {
   "dry-van": "/services/truckload#section-dry-van",
   reefer: "/services/temperature-controlled",
   flatbed: "/services/truckload#section-flatbed",
-  "step-deck": "/services/truckload#section-rgn-oversize",
+  "step-deck": "/services/truckload#section-step-deck",
   "rgn-oversize": "/services/truckload#section-rgn-oversize",
   hazmat: "/services/hazmat",
-  intermodal: "/services/intermodal",
+  // intermodal: "/services/intermodal", // COMMENTED OUT - uncomment to restore
   "canada-us": "/services/cross-border#section-canada-us",
   "mexico-cross-border": "/services/cross-border#section-mexico-cross-border",
   "ocean-freight": "/services/cross-border#section-ocean-freight",

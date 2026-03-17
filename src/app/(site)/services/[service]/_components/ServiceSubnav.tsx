@@ -11,6 +11,7 @@ import { SERVICE_SUBNAV_TOP_PX } from "../../_constants";
 const EQUIPMENT_META = {
   "dry-van": { code: "DV", hint: "Enclosed standard freight" },
   flatbed: { code: "FB", hint: "Open-deck securement freight" },
+  "step-deck": { code: "SD", hint: "Drop-deck for tall cargo" },
   "rgn-oversize": { code: "RGN", hint: "Permit and heavy-haul freight" },
   "roll-tite-conestoga": { code: "CON", hint: "Covered-deck protection" },
   expedited: { code: "EXP", hint: "Priority timeline execution" },
@@ -195,7 +196,9 @@ export function ServiceSubnav({
   const subnavGridClass =
     model.key === "expedited-specialized"
       ? "relative grid gap-2 sm:grid-cols-2 lg:grid-cols-2"
-      : "relative grid gap-2 sm:grid-cols-2 lg:grid-cols-4";
+      : sections.length >= 5
+        ? "relative grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+        : "relative grid gap-2 sm:grid-cols-2 lg:grid-cols-4";
 
   return (
     <div

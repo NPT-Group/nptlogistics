@@ -28,6 +28,7 @@ type SortDir = "asc" | "desc";
 export const metadata = nptMetadata({
   title: "Careers",
   description: "Explore open roles at NPT Logistics and apply online.",
+  canonicalPath: "/careers",
 });
 
 export default async function CareersPage({

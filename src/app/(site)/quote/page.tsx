@@ -10,6 +10,9 @@ import { cn } from "@/lib/cn";
 export const metadata: Metadata = {
   title: "Request a quote",
   description: "Request a logistics quote from NPT Logistics.",
+  alternates: {
+    canonical: "/quote",
+  },
 };
 
 function QuoteHero() {

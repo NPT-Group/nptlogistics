@@ -7,13 +7,14 @@ export type ServiceKey =
   | "cross-border"
   | "value-added"
   | "ltl"
-  | "intermodal"
+  // | "intermodal" // COMMENTED OUT - uncomment to restore
   | "hazmat"
   | "temperature-controlled";
 
 export type SubServiceKey =
   | "dry-van"
   | "flatbed"
+  | "step-deck"
   | "rgn-oversize"
   | "roll-tite-conestoga"
   | "expedited"
@@ -282,7 +283,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
               condition: "Freight taller than enclosed dry van limits or oversized",
               description:
                 "If your freight exceeds enclosed trailer height constraints or requires top/side loading for safe handling.",
-              recommendation: "Flatbed / Step Deck (Oversize)",
+              recommendation: "Flatbed",
               serviceSlug: "flatbed",
             },
             {
@@ -320,13 +321,11 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
 
       {
         key: "flatbed",
-        label: "Flatbed / Step Deck (Oversize)",
+        label: "Flatbed",
         title:
-          "Flatbed / Step Deck (Oversize) | Open Deck Truckload for Industrial & Project Freight",
+          "Flatbed | Open Deck Truckload for Industrial & Project Freight",
         description:
-          "Flatbed and step deck are open-deck truckload solutions built for freight that exceeds standard trailer dimensions or requires crane, side-load, or top-load access. They support industrial and project-driven shipments where securement standards, route planning, and jobsite coordination directly impact schedule integrity. Common commodities include structural steel, lumber, construction materials, heavy equipment, machinery, and oversized industrial components moving across North America.",
-        detailParagraph:
-          'Flatbed trailers have a single-level deck and are the standard choice for most open-deck freight. Step deck (also called step-deck or drop-deck) trailers have a lower forward section—a "step down"—that reduces overall load height and allows taller cargo to stay within legal height limits. We match your load dimensions and route to the right equipment: flatbed when a single deck is sufficient, step deck when extra vertical clearance is needed.',
+          "Flatbed is the standard open-deck truckload solution for freight that exceeds standard trailer dimensions or requires crane, side-load, or top-load access. It supports industrial and project-driven shipments where securement standards, route planning, and jobsite coordination directly impact schedule integrity. Common commodities include structural steel, lumber, construction materials, heavy equipment, machinery, and oversized industrial components moving across North America.",
 
         image: "/_optimized/services/truckload/flatbed.webp",
         imageAlt: "Flatbed trailer hauling industrial freight with securement in place",
@@ -369,7 +368,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
 
         howToUse: {
           intro:
-            "Here’s how to use NPT’s Flatbed / Step Deck (Oversize) service from quote to delivery.",
+            "Here’s how to use NPT’s Flatbed service from quote to delivery.",
           items: [
             "Share exact dimensions, weight, and weight distribution or center-of-gravity so we can confirm deck fit and securement approach.",
             "Provide loading and unloading method, equipment on site (crane, forklift), and any access or height restrictions.",
@@ -394,9 +393,9 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         },
 
         freightFit: {
-          title: "Flatbed / Step Deck (Oversize) Freight Fit Guide",
+          title: "Flatbed Freight Fit Guide",
           intro:
-            "Flatbed and step deck trailers are built for freight that needs top, side, or crane access, or exceeds enclosed trailer dimensions. This guide helps determine if flatbed or step deck is the right fit for your load—and what to use instead when it isn't.",
+            "Flatbed trailers are built for freight that needs top, side, or crane access, or exceeds enclosed trailer dimensions. This guide helps determine if flatbed is the right fit for your load—and what to use instead when it isn't.",
           diagram: "/_optimized/equipment-diagrams/flatbed.webp",
           diagramAlt: "Flatbed trailer equipment diagram with dimensions and payload guidance",
           specs: {
@@ -443,7 +442,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
 
         ctas: {
           primary: {
-            label: "Request a Flatbed / Step Deck Quote",
+            label: "Request a Flatbed Quote",
             href: "/quote?service=truckload&mode=flatbed",
             ctaId: "service_truckload_flatbed_request_pricing",
           },
@@ -451,6 +450,130 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             label: "Talk to Open-Deck Team",
             href: "/contact?topic=truckload&mode=flatbed",
             ctaId: "service_truckload_flatbed_talk_team",
+          },
+        },
+      },
+
+      {
+        key: "step-deck",
+        label: "Step Deck",
+        title:
+          "Step Deck | Drop-Deck Truckload for Tall Cargo & Height-Sensitive Freight",
+        description:
+          "Step deck (drop-deck) trailers have a lower forward section that reduces overall load height, allowing taller cargo to stay within legal height limits. Ideal when flatbed cannot accommodate load height or when you need extra vertical clearance for machinery, equipment, or structural components. Common uses include construction equipment, manufacturing machinery, and oversized industrial freight moving across North America.",
+
+        image: "/_optimized/equipment-diagrams/stepDeck.webp",
+        imageAlt: "Step deck trailer with drop-deck configuration for tall cargo",
+        overlay: "blue",
+
+        highlights: [
+          {
+            title: "Height clearance optimization",
+            description:
+              "Lower deck section reduces overall height for taller loads while staying legal.",
+          },
+          {
+            title: "Equipment and route matching",
+            description:
+              "We match load dimensions and route constraints to the right step deck configuration.",
+          },
+          {
+            title: "Securement and handling",
+            description:
+              "Open-deck securement planning aligned to cargo profile and jobsite requirements.",
+          },
+        ],
+
+        trustSnippet: {
+          title: "Step deck when flatbed height won't work",
+          body: "Step deck adds vertical flexibility for loads that exceed flatbed height limits. We confirm deck fit, securement approach, and route feasibility before dispatch.",
+        },
+
+        whenToUse: {
+          intro:
+            "Choose step deck when load height exceeds flatbed capacity or when extra vertical clearance is needed.",
+          items: [
+            "Tall cargo that exceeds flatbed legal height limits",
+            "Machinery or equipment requiring lower deck for clearance",
+            "Loads where step-down configuration improves route feasibility",
+            "Industrial and construction freight with height-sensitive dimensions",
+          ],
+        },
+
+        howToUse: {
+          intro:
+            "Here's how to use NPT's Step Deck service from quote to delivery.",
+          items: [
+            "Share exact dimensions, weight, and center-of-gravity so we can confirm step deck fit.",
+            "Provide loading and unloading method and any height or access restrictions.",
+            "Specify securement requirements and handling constraints for the commodity.",
+            "Give appointment windows and jobsite protocols for delivery coordination.",
+            "Confirm milestone update cadence and on-site delivery confirmation.",
+          ],
+        },
+
+        capabilities: {
+          intro:
+            "Step deck operations combine height flexibility with open-deck securement discipline.",
+          items: [
+            "Drop-deck capacity for tall machinery and equipment",
+            "Height clearance optimization for legal compliance",
+            "Securement planning for industrial and project freight",
+            "Cross-border step deck support across CA–US–MX lanes",
+          ],
+        },
+
+        freightFit: {
+          title: "Step Deck Freight Fit Guide",
+          intro:
+            "Step deck trailers are built for freight that needs extra vertical clearance beyond flatbed limits. This guide helps determine if step deck is the right fit—and what to use instead when it isn't.",
+          diagram: "/_optimized/equipment-diagrams/stepDeck.webp",
+          diagramAlt: "Step deck trailer equipment diagram with dimensions and payload guidance",
+          specs: {
+            length: "48 ft or 53 ft typical; upper and lower deck sections",
+            width: "8.5 ft (102 in) deck width",
+            height: "Lower forward section reduces overall height; varies by configuration",
+            weight: "Varies by axle configuration; typical legal payload similar to flatbed",
+            pallets: "N/A — deck-loaded, not pallet-count driven",
+          },
+          rules: [
+            {
+              condition: "Freight fits on standard flatbed",
+              description:
+                "If your load fits on a 48–53 ft flatbed within legal dimensions and height.",
+              recommendation: "Flatbed",
+              serviceSlug: "flatbed",
+            },
+            {
+              condition: "Oversize, overweight, or permit-required",
+              description:
+                "If your load exceeds standard legal dimensions or requires permits or specialized equipment.",
+              recommendation: "RGN (Oversize)",
+              serviceSlug: "rgn-oversize",
+            },
+            {
+              condition: "Shipments under deck capacity",
+              description:
+                "If your shipment is under roughly 12 linear feet or 15,000 lbs and does not need open-deck access.",
+              recommendation: "LTL Freight",
+              serviceSlug: "ltl",
+            },
+          ],
+          disclaimer:
+            "Planning values only. Final legal fit depends on route, equipment, and applicable regulations; confirm at dispatch.",
+        },
+        showRelated: false,
+
+        ctas: {
+          primary: {
+            label: "Request a Step Deck Quote",
+            href: "/quote?service=truckload&mode=step-deck",
+            ctaId: "service_truckload_stepdeck_request_pricing",
+          },
+          secondary: {
+            label: "Talk to Open-Deck Team",
+            href: "/contact?topic=truckload&mode=step-deck",
+            ctaId: "service_truckload_stepdeck_talk_team",
           },
         },
       },
@@ -551,7 +674,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
               condition: "Freight that fits on standard flatbed",
               description:
                 "If your load fits on a 48–53 ft flatbed within legal dimensions and weight without permits or specialized equipment.",
-              recommendation: "Flatbed / Step Deck (Oversize)",
+              recommendation: "Flatbed",
               serviceSlug: "flatbed",
             },
             {
@@ -686,7 +809,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
               condition: "Freight that can be exposed to weather",
               description:
                 "If your cargo can tolerate rain, road spray, or open-deck transit and does not need full weather protection.",
-              recommendation: "Flatbed / Step Deck (Oversize)",
+              recommendation: "Flatbed",
               serviceSlug: "flatbed",
             },
             {
@@ -855,7 +978,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             {
               condition: "Standard lane with no urgency pressure",
               description:
-                "If your shipment can meet normal transit windows and cost is a priority, truckload or intermodal is usually more economical.",
+                "If your shipment can meet normal transit windows and cost is a priority, truckload is usually more economical.",
               recommendation: "Dry Van Truckload",
               serviceSlug: "dry-van",
             },
@@ -877,7 +1000,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
               condition: "Oversized or specialized equipment needs",
               description:
                 "If your load requires flatbed, RGN, or exotic/specialized vehicle equipment rather than standard expedited capacity.",
-              recommendation: "Flatbed / Step Deck (Oversize)",
+              recommendation: "Flatbed",
               serviceSlug: "flatbed",
             },
           ],
@@ -1144,7 +1267,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           diagram: "/_optimized/equipment-diagrams/crossBorderUSA_Canada.webp",
           diagramAlt: "Canada-USA cross-border freight and customs workflow diagram",
           specs: {
-            length: "Mode-dependent; truck, rail, or intermodal as lane requires",
+            length: "Mode-dependent; truck or rail as lane requires",
             width: "Standard equipment dimensions; load and border requirements apply",
             height: "Per equipment type and route",
             weight: "Legal and equipment limits; customs declaration aligned",
@@ -1400,8 +1523,8 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             {
               condition: "North American surface-only moves",
               description:
-                "If your freight moves within North America without international ocean legs, truckload, intermodal, or cross-border programs are typically a better fit.",
-              recommendation: "Truckload or Intermodal",
+                "If your freight moves within North America without international ocean legs, truckload or cross-border programs are typically a better fit.",
+              recommendation: "Truckload",
               serviceSlug: "truckload",
             },
             {
@@ -1526,7 +1649,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             {
               condition: "Non-urgent or high-volume international",
               description:
-                "If timing is flexible and volume supports containerized movement, ocean or intermodal may offer better value.",
+                "If timing is flexible and volume supports containerized movement, ocean may offer better value.",
               recommendation: "Ocean Freight",
               serviceSlug: "ocean-freight",
             },
@@ -2209,15 +2332,15 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
             condition: "Open-deck or oversized freight",
             description:
               "If your freight requires flatbed, step deck, or RGN equipment due to dimensions or handling.",
-            recommendation: "Flatbed / Step Deck (Oversize)",
+            recommendation: "Flatbed",
             serviceSlug: "flatbed",
           },
           {
             condition: "Long-haul lanes with cost focus",
             description:
-              "If your lane is long-haul and cost optimization is a priority, intermodal may offer better economics.",
-            recommendation: "Intermodal",
-            serviceSlug: "intermodal",
+              "If your lane is long-haul and cost optimization is a priority, truckload may offer better economics.",
+            recommendation: "Truckload",
+            serviceSlug: "truckload",
           },
         ],
         disclaimer:
@@ -2271,11 +2394,13 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
           href: "/services/truckload",
           reason: "For shipments that consistently outgrow LTL volume thresholds.",
         },
+        /* COMMENTED OUT - uncomment to restore intermodal
         {
           label: "Intermodal",
           href: "/services/intermodal",
           reason: "For predictable long-haul lanes with strong cost-optimization goals.",
         },
+        */
         {
           label: "Managed Capacity",
           href: "/services/value-added#section-managed-capacity",
@@ -2304,6 +2429,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       },
     },
   },
+  /* COMMENTED OUT - uncomment to restore intermodal
   intermodal: {
     key: "intermodal",
     slug: "intermodal",
@@ -2520,6 +2646,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       },
     },
   },
+  */
   hazmat: {
     key: "hazmat",
     slug: "hazmat",
@@ -2969,9 +3096,13 @@ export function buildServiceMetadata(model: ServicePageModel): Metadata {
   return {
     title: model.meta.title,
     description: model.meta.description,
+    alternates: {
+      canonical: `/services/${model.slug}`,
+    },
     openGraph: {
       title: model.meta.title,
       description: model.meta.description,
+      url: `/services/${model.slug}`,
       images: model.meta.ogImage ? [model.meta.ogImage] : undefined,
       type: "website",
     },

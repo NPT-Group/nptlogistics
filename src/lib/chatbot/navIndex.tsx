@@ -43,7 +43,7 @@ function keywordsFor(item: { label: string; description?: string; href: string }
     ["tl", "ftl", "truckload"].forEach((k) => words.add(k));
   if (l.includes("less-than-truckload") || l.includes("(ltl)"))
     ["ltl", "partial", "less-than-truckload"].forEach((k) => words.add(k));
-  if (l.includes("intermodal")) ["rail", "train", "intermodal"].forEach((k) => words.add(k));
+  // if (l.includes("intermodal")) ["rail", "train", "intermodal"].forEach((k) => words.add(k)); // COMMENTED OUT - uncomment to restore
   if (l.includes("expedited"))
     ["expedite", "rush", "priority", "expedited"].forEach((k) => words.add(k));
   if (l.includes("hazardous") || l.includes("hazmat"))

@@ -45,7 +45,7 @@ export const WHY_NPT_SECTION = {
   kicker: "Why NPT",
   title: "Built at the Center of the Supply Chain",
   description:
-    "Freight is won or lost in execution. We operate at the operational core - where precision, communication, and accountability turn risk into reliability.",
+    "We operate with precision, communication, accountability and discipline to turn risk into reliability.",
 } as const;
 
 export const WHY_NPT_CARDS: WhyNptCard[] = [
@@ -56,7 +56,7 @@ export const WHY_NPT_CARDS: WhyNptCard[] = [
     title: "Safety and documentation by design",
     value: "Audit-ready every move",
     description:
-      "Disciplined SOPs and clean handoffs protect cargo, reduce claims, and prevent surprises.",
+      "Standardized procedures and documented handoffs protect cargo, reduce claims, and ensure every shipment meets regulatory and audit requirements. We build compliance into the process—so you never have to chase paperwork or explain surprises.",
   },
   {
     id: "execution",
@@ -65,7 +65,7 @@ export const WHY_NPT_CARDS: WhyNptCard[] = [
     title: "Time is managed, not hoped for",
     value: "On-time under pressure",
     description:
-      "Lane planning, proactive recovery, and clear ownership keep shipments moving to plan.",
+      "Lane-level planning, proactive recovery protocols, and clear ownership keep shipments on plan. When timelines slip, we act before it becomes your problem. Our teams are trained to anticipate and resolve issues before they impact your operations.",
   },
   {
     id: "visibility",
@@ -73,7 +73,8 @@ export const WHY_NPT_CARDS: WhyNptCard[] = [
     eyebrow: "Visibility",
     title: "Clear shipment status at every milestone",
     value: "Signal you can trust",
-    description: "Real-time updates plus escalation workflows when reality shifts from plan.",
+    description:
+      "Real-time updates at pickup, in-transit, and delivery. When reality diverges from plan, escalation workflows ensure your team is informed and can respond. No black holes—you always know where your freight is and what it needs.",
   },
   {
     id: "comms",
@@ -81,7 +82,8 @@ export const WHY_NPT_CARDS: WhyNptCard[] = [
     eyebrow: "Communication",
     title: "Proactive communication, early and clear",
     value: "No chasing updates",
-    description: "We flag risk early so your team can make decisions with confidence, not urgency.",
+    description:
+      "We surface risk early so your team can make decisions with full context—not under pressure. No surprises, no last-minute scrambles. Our communication is proactive and transparent because your time is too valuable to spend chasing status.",
   },
   {
     id: "capacity",
@@ -89,7 +91,8 @@ export const WHY_NPT_CARDS: WhyNptCard[] = [
     eyebrow: "Capacity",
     title: "Equipment matched to lane and freight",
     value: "Right-fit capacity",
-    description: "Asset mix aligned to service level, shipment profile, and timeline requirements.",
+    description:
+      "Asset mix is matched to service level, shipment profile, and timeline. The right equipment on the right lane—no over-spec or under-spec. We align capacity to your actual needs so you get reliability without paying for what you don't need.",
   },
   {
     id: "xborder",
@@ -98,7 +101,7 @@ export const WHY_NPT_CARDS: WhyNptCard[] = [
     title: "North America execution, end to end",
     value: "CA ↔ US + MX",
     description:
-      "Structured cross-border workflows with customs-aware controls and disciplined handoffs.",
+      "Structured workflows with customs-aware controls and disciplined handoffs across Canada, the US, and Mexico. One team, one process, end to end. We handle the complexity so you get predictable cross-border execution.",
   },
   {
     id: "network",

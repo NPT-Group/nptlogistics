@@ -86,7 +86,8 @@ function WhyCardFace({ card }: { card: WhyNptCard }) {
       <div
         className="pointer-events-none absolute inset-0"
         style={{
-          background: "radial-gradient(520px 240px at 85% 95%, rgba(255,255,255,0.16), transparent 64%)",
+          background:
+            "radial-gradient(520px 240px at 85% 95%, rgba(255,255,255,0.16), transparent 64%)",
         }}
         aria-hidden="true"
       />
@@ -96,17 +97,6 @@ function WhyCardFace({ card }: { card: WhyNptCard }) {
           <div>
             <div className="text-[10px] font-semibold tracking-[0.08em] text-white/62 uppercase">
               {card.eyebrow}
-            </div>
-            <div
-              className="mt-1 text-[13px] leading-snug font-semibold text-white/92"
-              style={{
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-              }}
-            >
-              {card.title}
             </div>
           </div>
 
@@ -122,9 +112,8 @@ function WhyCardFace({ card }: { card: WhyNptCard }) {
         </div>
 
         <div className="mt-2">
-          <div className="text-[16px] font-bold tracking-tight text-white">{card.value}</div>
           <div
-            className="mt-1 text-[11px] leading-relaxed text-white/72"
+            className="text-[20px] leading-tight font-bold tracking-tight text-white"
             style={{
               display: "-webkit-box",
               WebkitLineClamp: 2,
@@ -132,9 +121,59 @@ function WhyCardFace({ card }: { card: WhyNptCard }) {
               overflow: "hidden",
             }}
           >
-            {card.description}
+            {card.value}
+          </div>
+          <div
+            className="mt-1 text-[11px] leading-relaxed text-white/70"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {card.title}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function WhyCardBack({ card }: { card: WhyNptCard }) {
+  return (
+    <div
+      className={cn(
+        "relative h-full w-full overflow-hidden rounded-2xl",
+        "border border-white/24",
+        "bg-[linear-gradient(140deg,rgba(255,255,255,0.17),rgba(255,255,255,0.06))]",
+        "shadow-[0_24px_56px_rgba(2,6,23,0.4),inset_0_1px_0_rgba(255,255,255,0.24)]",
+        "backdrop-blur-2xl",
+      )}
+    >
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(580px 220px at 16% 12%, rgba(220,38,38,0.15), transparent 60%)",
+        }}
+        aria-hidden="true"
+      />
+      <div className="relative flex h-full min-h-0 flex-col overflow-hidden p-4">
+        <div className="shrink-0 text-[10px] font-semibold tracking-[0.08em] text-white/62 uppercase">
+          {card.eyebrow}
+        </div>
+
+        <p
+          className="mt-3 min-h-0 flex-1 overflow-hidden text-[12px] leading-relaxed text-white/88"
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: 7,
+            WebkitBoxOrient: "vertical",
+          }}
+        >
+          {card.description}
+        </p>
       </div>
     </div>
   );
@@ -264,12 +303,18 @@ function OrbitCard({
   orbitX,
   orbitY,
   rotation,
+  isFlipped,
+  onFlipStart,
+  onFlipEnd,
 }: {
   card: WhyNptCard;
   baseAngleDeg: number;
   orbitX: number;
   orbitY: number;
   rotation: MotionValue<number>;
+  isFlipped: boolean;
+  onFlipStart: () => void;
+  onFlipEnd: () => void;
 }) {
   const depth = useTransform(rotation, (deg) => {
     const angleRad = ((deg + baseAngleDeg) * Math.PI) / 180;
@@ -284,10 +329,15 @@ function OrbitCard({
     return Math.sin(angleRad) * orbitY;
   });
   const scale = useTransform(depth, (d) => {
-    return WHY_NPT_TOKENS.orbit.scaleMin + d * (WHY_NPT_TOKENS.orbit.scaleMax - WHY_NPT_TOKENS.orbit.scaleMin);
+    return (
+      WHY_NPT_TOKENS.orbit.scaleMin +
+      d * (WHY_NPT_TOKENS.orbit.scaleMax - WHY_NPT_TOKENS.orbit.scaleMin)
+    );
   });
   const opacity = useTransform(depth, (d) => {
-    return WHY_NPT_TOKENS.orbit.cardGlassOpacityMin + d * WHY_NPT_TOKENS.orbit.cardGlassOpacityRange;
+    return (
+      WHY_NPT_TOKENS.orbit.cardGlassOpacityMin + d * WHY_NPT_TOKENS.orbit.cardGlassOpacityRange
+    );
   });
   const zIndex = useTransform(depth, (d) => 10 + Math.round(d * 30));
 
@@ -304,8 +354,32 @@ function OrbitCard({
         zIndex,
       }}
     >
-      <div className="-translate-x-1/2 -translate-y-1/2">
-        <WhyCardFace card={card} />
+      <div
+        className="-translate-x-1/2 -translate-y-1/2 cursor-pointer [transform-style:preserve-3d]"
+        onMouseEnter={onFlipStart}
+        onMouseLeave={onFlipEnd}
+        onFocus={onFlipStart}
+        onBlur={onFlipEnd}
+        role="button"
+        tabIndex={0}
+        aria-label={`${card.eyebrow} details`}
+      >
+        <motion.div
+          className="relative"
+          animate={{ rotateY: isFlipped ? 180 : 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          <div style={{ backfaceVisibility: "hidden" }}>
+            <WhyCardFace card={card} />
+          </div>
+          <div
+            className="absolute inset-0"
+            style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+          >
+            <WhyCardBack card={card} />
+          </div>
+        </motion.div>
       </div>
     </motion.div>
   );
@@ -315,19 +389,45 @@ export function WhyNPTOrbitVisualization() {
   const reduceMotion = useReducedMotion();
   const ellipse = useOrbitEllipse();
   const rotation = useMotionValue(0);
+  const [activeCardId, setActiveCardId] = React.useState<WhyNptCard["id"] | null>(null);
+  const baseDegPerMs = React.useMemo(() => 360 / (WHY_NPT_TOKENS.orbit.rotationSec * 1000), []);
+  const currentDegPerMsRef = React.useRef(baseDegPerMs);
+  const targetDegPerMsRef = React.useRef(baseDegPerMs);
+
+  React.useEffect(() => {
+    if (reduceMotion) {
+      targetDegPerMsRef.current = 0;
+      currentDegPerMsRef.current = 0;
+      return;
+    }
+    // Smoothly brake to 0 on hover and smoothly ramp back up on hover-out.
+    targetDegPerMsRef.current = activeCardId ? 0 : baseDegPerMs;
+  }, [activeCardId, baseDegPerMs, reduceMotion]);
 
   useAnimationFrame((_, delta) => {
     if (reduceMotion) return;
-    const degPerMs = 360 / (WHY_NPT_TOKENS.orbit.rotationSec * 1000);
-    const next = (rotation.get() + delta * degPerMs) % 360;
+
+    const dt = Math.max(0, delta);
+    const current = currentDegPerMsRef.current;
+    const target = targetDegPerMsRef.current;
+
+    // Decel slightly faster than accel for a premium intentional feel.
+    const tauMs = target < current ? 220 : 420;
+    const alpha = 1 - Math.exp(-dt / tauMs);
+    const nextDegPerMs = current + (target - current) * alpha;
+    currentDegPerMsRef.current = Math.abs(nextDegPerMs - target) < 0.000001 ? target : nextDegPerMs;
+
+    const next = (rotation.get() + dt * currentDegPerMsRef.current) % 360;
     rotation.set(next);
   });
 
   React.useEffect(() => {
     if (reduceMotion) {
       rotation.set(0);
+      currentDegPerMsRef.current = 0;
+      targetDegPerMsRef.current = 0;
     }
-  }, [reduceMotion, rotation]);
+  }, [reduceMotion, rotation, baseDegPerMs]);
 
   return (
     <div className="relative mx-auto">
@@ -335,7 +435,11 @@ export function WhyNPTOrbitVisualization() {
         className="relative mx-auto"
         style={{ height: WHY_NPT_TOKENS.solar.desktopStageHeight, perspective: "1200px" }}
       >
-        <SolarSystemBackdrop orbitX={ellipse.x} orbitY={ellipse.y} reduceMotion={Boolean(reduceMotion)} />
+        <SolarSystemBackdrop
+          orbitX={ellipse.x}
+          orbitY={ellipse.y}
+          reduceMotion={Boolean(reduceMotion)}
+        />
 
         <div className="absolute top-1/2 left-1/2 z-40 -translate-x-1/2 -translate-y-1/2">
           <div className="relative">
@@ -370,7 +474,9 @@ export function WhyNPTOrbitVisualization() {
                 height: WHY_NPT_TOKENS.solar.coreShellHeight,
               }}
               animate={reduceMotion ? undefined : { scale: [1, 1.008, 1] }}
-              transition={reduceMotion ? undefined : { duration: 10.5, repeat: Infinity, ease: "easeInOut" }}
+              transition={
+                reduceMotion ? undefined : { duration: 10.5, repeat: Infinity, ease: "easeInOut" }
+              }
             >
               <div
                 className="pointer-events-none absolute inset-0 rounded-full"
@@ -443,6 +549,9 @@ export function WhyNPTOrbitVisualization() {
                 orbitX={ellipse.x}
                 orbitY={ellipse.y}
                 rotation={rotation}
+                isFlipped={activeCardId === card.id}
+                onFlipStart={() => setActiveCardId(card.id)}
+                onFlipEnd={() => setActiveCardId((prev) => (prev === card.id ? null : prev))}
               />
             );
           })}

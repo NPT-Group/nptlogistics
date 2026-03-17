@@ -79,6 +79,12 @@ function MobileRowLink({
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {
       onNavigate();
+      trackCtaClick({
+        ctaId: `nav_mobile_menu_${label}`,
+        location: "nav_mobile:menu",
+        destination: href,
+        label,
+      });
 
       const [targetPath, targetHash = ""] = href.split("#");
       const isCareersOverviewTarget =
@@ -92,7 +98,7 @@ function MobileRowLink({
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
-    [href, onNavigate, pathname],
+    [href, label, onNavigate, pathname],
   );
 
   return (
@@ -414,7 +420,15 @@ export function MobileNav() {
 
                               <Link
                                 href={NAV.solutions.intro.ctaHref}
-                                onClick={closeAll}
+                                onClick={() => {
+                                  closeAll();
+                                  trackCtaClick({
+                                    ctaId: `nav_mobile_intro_${NAV.solutions.intro.ctaLabel}`,
+                                    location: "nav_mobile:intro",
+                                    destination: NAV.solutions.intro.ctaHref,
+                                    label: NAV.solutions.intro.ctaLabel,
+                                  });
+                                }}
                                 className={cn(
                                   "mt-5 inline-flex items-center gap-2 text-sm font-semibold",
                                   "text-[color:var(--color-menu-accent)] hover:text-[color:var(--color-menu-accent-hover)]",
@@ -477,7 +491,15 @@ export function MobileNav() {
 
                                   <Link
                                     href={section.intro.ctaHref}
-                                    onClick={closeAll}
+                                    onClick={() => {
+                                      closeAll();
+                                      trackCtaClick({
+                                        ctaId: `nav_mobile_intro_${section.intro.ctaLabel}`,
+                                        location: "nav_mobile:intro",
+                                        destination: section.intro.ctaHref,
+                                        label: section.intro.ctaLabel,
+                                      });
+                                    }}
                                     className={cn(
                                       "mt-5 inline-flex items-center gap-2 text-sm font-semibold",
                                       "text-[color:var(--color-menu-accent)] hover:text-[color:var(--color-menu-accent-hover)]",

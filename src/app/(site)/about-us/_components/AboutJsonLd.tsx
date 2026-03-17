@@ -1,28 +1,35 @@
+import { COMPANY_CONTACT, SITE_NAME, SITE_URL, toAbsoluteUrl } from "@/lib/seo/site";
+
 const jsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "NPT Logistics",
-    url: "https://nptlogistics.com",
-    logo: "https://nptlogistics.com/_optimized/brand/NPTlogo2.webp",
-    areaServed: ["Canada", "United States"],
+    "@id": `${SITE_URL}#organization`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: toAbsoluteUrl("/_optimized/brand/NPTlogo2.webp"),
+    email: COMPANY_CONTACT.email,
+    telephone: COMPANY_CONTACT.phoneE164,
+    areaServed: ["Canada", "United States", "Mexico"],
     description:
-      "NPT Logistics provides disciplined freight execution across Canada and the United States with a compliance-first operating model.",
+      "NPT Logistics provides disciplined freight execution across Canada, the United States, and Mexico with a compliance-first operating model.",
   },
   {
     "@context": "https://schema.org",
     "@type": "AboutPage",
     name: "About NPT Logistics",
-    url: "https://nptlogistics.com/about-us",
+    url: toAbsoluteUrl("/about-us"),
     isPartOf: {
       "@type": "WebSite",
-      name: "NPT Logistics",
-      url: "https://nptlogistics.com",
+      "@id": `${SITE_URL}#website`,
+      name: SITE_NAME,
+      url: SITE_URL,
     },
     about: {
       "@type": "Organization",
-      name: "NPT Logistics",
-      url: "https://nptlogistics.com",
+      "@id": `${SITE_URL}#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
     },
     description:
       "About NPT Logistics, our operating model, compliance standards, network coverage, and service philosophy.",
@@ -35,13 +42,13 @@ const jsonLd = [
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://nptlogistics.com/",
+        item: toAbsoluteUrl("/"),
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "About Us",
-        item: "https://nptlogistics.com/about-us",
+        item: toAbsoluteUrl("/about-us"),
       },
     ],
   },

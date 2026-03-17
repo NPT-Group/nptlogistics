@@ -9,15 +9,15 @@ import { trackCtaClick } from "@/lib/analytics/cta";
 const CULTURE_PILLARS = [
   {
     title: "Safety Before Speed",
-    desc: "Disciplined procedures and compliant execution protect people, freight, and customer outcomes.",
+    desc: "Procedures that are rigorous and executed in a compliant manner ensure the safety of people, freight, and customers.",
   },
   {
     title: "Ownership At Every Step",
-    desc: "From dispatch to final POD, each role has clear accountability and measurable standards.",
+    desc: "Every step of the process, from quote to delivery, is measured and accountable.",
   },
   {
     title: "Structured Growth",
-    desc: "High performers earn expanded scope through consistent execution, communication, and leadership.",
+    desc: "Execution, communication, and leadership are the hallmarks of high performers.",
   },
 ] as const;
 
@@ -138,10 +138,11 @@ export function CareersCultureSection() {
             >
               <div className="text-xs font-semibold tracking-wide text-white/62">Now Hiring</div>
               <div className="mt-2 text-2xl font-semibold text-white sm:text-[1.8rem]">
-                High-standard people for high-impact roles.
+                Exceptional individuals for roles that make a significant impact.
               </div>
               <p className="mt-3 text-sm leading-relaxed text-white/72">
-                Join an operations-first team where execution quality matters every day.
+                Join an operations-focused team where the quality of execution is a priority every
+                day.
               </p>
 
               <ul className="mt-6 space-y-2.5">

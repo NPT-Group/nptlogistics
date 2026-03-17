@@ -34,12 +34,14 @@ const SINGLE_THEME: Partial<
     veil: "bg-[radial-gradient(980px_500px_at_50%_-12%,rgba(220,38,38,0.045),transparent_68%)]",
     shell: "bg-white/70",
   },
+  /* COMMENTED OUT - uncomment to restore intermodal
   intermodal: {
     accent: "#2563eb",
     bg: "bg-[linear-gradient(180deg,rgba(248,251,255,0.99),rgba(243,248,255,0.97))]",
     veil: "bg-[radial-gradient(980px_500px_at_50%_-12%,rgba(37,99,235,0.045),transparent_68%)]",
     shell: "bg-white/72",
   },
+  */
   hazmat: {
     accent: "#b91c1c",
     bg: "bg-[linear-gradient(180deg,rgba(252,248,248,0.99),rgba(250,244,244,0.97))]",

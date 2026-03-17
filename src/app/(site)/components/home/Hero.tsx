@@ -141,7 +141,7 @@ export function Hero() {
                   "leading-relaxed tracking-wide",
                 )}
               >
-                Truckload, LTL, intermodal, and cross-border shipping with proactive updates,
+                Truckload, LTL, and cross-border shipping with proactive updates,
                 compliance-first execution, and clear handoffs from pickup to delivery.
               </p>
             </motion.div>

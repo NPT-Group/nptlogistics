@@ -1,363 +1,319 @@
 # Analytics + Cookie Consent Guide (NPT Logistics)
 
-This document explains the full analytics and cookie-consent setup in this codebase, what each part does, and how to operate it in production.
+This is a beginner-friendly guide to understand exactly what is implemented, how to verify it in the browser and GA4, how to read reports, and how to add tracking later without creating noisy data.
 
 ---
 
-## 1) What we set up
+## 1) What is implemented right now
 
-We implemented a consent-aware analytics system so tracking only runs when users allow analytics cookies.
+### Tracking model
 
-### Core pieces
+- Google Analytics 4 (GA4) is loaded site-wide on public pages.
+- Tracking is consent-aware:
+  - analytics is denied by default
+  - tracking starts only after user accepts analytics cookies
+- We track two core event types:
+  - `page_view` (manual, controlled by app)
+  - `cta_click` (for important links/buttons)
+
+### Source-of-truth files
 
 - `src/app/(site)/components/analytics/AnalyticsClient.tsx`
-  - Loads Google Analytics (GA4) scripts.
-  - Initializes Google Consent Mode with analytics **denied by default**.
-  - Shows cookie consent banner.
-  - Sends page view events after consent.
+  - loads GA scripts
+  - sets Consent Mode defaults
+  - renders cookie banner
+  - sends `page_view` when route changes after consent
 - `src/lib/analytics/consent.ts`
-  - Stores and reads cookie preferences.
-  - Applies consent updates to GA (`granted`/`denied`).
+  - reads consent from `localStorage`
+  - writes consent to `localStorage` and cookie
+  - updates GA consent state (`granted`/`denied`)
 - `src/lib/analytics/cta.ts`
-  - Tracks CTA clicks (`cta_click`) only when analytics consent is granted.
-- `src/app/layout.tsx`
-  - Mounts analytics globally across public routes (including `/tracking` and `/employee-portal`).
-  - Excludes admin routes from analytics/banner rendering.
-- Footer and legal pages:
-  - `src/components/layout/SiteFooter.tsx`
-  - `src/app/privacy/page.tsx`
-  - `src/app/terms/page.tsx`
-  - `src/app/cookies/page.tsx`
-  - `src/app/cookie-preferences/page.tsx`
-  - `src/app/accessibility/page.tsx`
+  - shared CTA tracking helper (`trackCtaClick`)
+  - normalizes IDs/locations
+  - dedupes accidental fast double clicks
+- `src/app/(site)/components/analytics/TrackedLink.tsx`
+  - reusable tracked `Link` for server-rendered pages
+  - used where direct client `onClick` tracking is needed
 
 ---
 
 ## 2) Environment variable required
 
-Analytics is enabled only when GA ID is provided:
-
 ```env
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-ZPCBWTGTH8
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
-Where to set:
+Set in:
 
-- Local: `.env.local`
-- Vercel: Project Settings -> Environment Variables
+- local: `.env.local`
+- production: Vercel project environment variables
 
-If this variable is missing, analytics scripts and the cookie banner are not rendered.
-
----
-
-## 3) Consent behavior (Accept / Reject / Manage)
-
-### A) User clicks **Accept all**
-
-- Saved preference:
-  - `analytics: true`
-- Stored in:
-  - `localStorage` key: `npt_cookie_consent`
-  - cookie key: `npt_cookie_consent`
-- GA consent updated to:
-  - `analytics_storage: granted`
-- Result:
-  - Page views are sent.
-  - CTA clicks are sent.
-  - Dashboard data starts collecting.
-
-### B) User clicks **Reject non-essential**
-
-- Saved preference:
-  - `analytics: false`
-- GA consent updated to:
-  - `analytics_storage: denied`
-- Result:
-  - No analytics page view events.
-  - No CTA click events in GA/dataLayer.
-  - Site still functions normally (necessary cookies remain).
-
-### C) User clicks **Manage preferences**
-
-- Banner opens preferences mode.
-- User can enable/disable analytics toggle.
-- Clicking **Save preferences** applies selected state immediately.
+If missing, analytics client does not run.
 
 ---
 
-## 4) What events are tracked
+## 3) Consent behavior (exactly what happens)
 
-### Page views
+### If user clicks Accept all
 
-Sent from `AnalyticsClient` after consent:
+- consent saved with `analytics: true`
+- analytics consent updated to `granted`
+- `page_view` and `cta_click` are sent
 
-- event: `page_view`
-- includes:
-  - `page_path`
-  - `page_location`
-  - `page_title`
+### If user clicks Reject non-essential
 
-### CTA clicks
+- consent saved with `analytics: false`
+- analytics consent updated to `denied`
+- `page_view` and `cta_click` are not sent to GA
 
-Sent from homepage/action buttons via `trackCtaClick()`:
+### If user clicks Manage preferences
 
-- event: `cta_click`
-- includes:
-  - `ctaId`
-  - `location`
-  - `destination`
-  - `label`
-  - `interaction_type` (`click`)
-  - `page_path`
-  - `page_title`
-  - timestamp (`ts`)
+- user can toggle analytics on/off
+- Save preferences applies immediately
 
-Examples:
+Storage keys used:
 
-- `hero_primary_quote`
-- `industries_desktop_explore_automotive`
-- `tracking_primary_track_shipment`
-- `final_cta_primary_request_quote`
+- localStorage: `npt_cookie_consent`
+- cookie: `npt_cookie_consent`
 
 ---
 
-## 5) Important compliance logic
+## 4) What events we send
 
-### Default privacy-safe behavior
+### `page_view`
 
-On first load:
+Sent from `AnalyticsClient` after consent on route change.
 
-- Consent mode defaults to denied for analytics/ad storage.
-- No analytics tracking happens until user opts in.
+Parameters:
 
-### Non-essential tracking is consent-gated
+- `page_path`
+- `page_location`
+- `page_title`
 
-`trackCtaClick()` checks consent before sending to:
+### `cta_click`
 
-- `window.dataLayer`
-- `window.gtag`
+Sent from `trackCtaClick()` after consent.
 
-If consent is denied, event is not sent to analytics providers.
+Parameters:
 
-### Event quality protections
+- `ctaId`
+- `location`
+- `destination`
+- `label`
+- `interaction_type` (`click`)
+- `page_path`
+- `page_title`
 
-- CTA payload values are normalized and length-limited before sending.
-- `destination` is reduced to canonical path/hash to avoid high-cardinality URL noise.
-- Duplicate click bursts on the same CTA (double-clicks) are deduped client-side.
-- Dynamic IDs/messages are avoided for production reporting consistency.
+Important quality controls:
 
----
-
-## 6) Cookie banner placement + live chat
-
-We positioned the cookie banner to avoid clashing with a bottom-right live chat widget:
-
-- Desktop: bottom-left
-- Mobile: safe full-width position above bottom area
-
-This helps prevent overlap with chat launchers.
+- `ctaId` and `location` are normalized and trimmed
+- `destination` is canonicalized to path/hash
+- rapid duplicate clicks are deduped
 
 ---
 
-## 7) How users can change choices later
+## 5) What was improved in this audit
 
-Users can reopen settings from:
+- Added tracked links for:
+  - lanes hub cards (`/lanes`)
+  - lane detail CTAs (`/lanes/[slug]`)
+  - locations hub cards (`/locations`)
+  - location detail CTAs (`/locations/[slug]`)
+  - footer navigation and quick-action links
+  - desktop and mobile nav dropdown link interactions
+- Hardened first-load reliability:
+  - pageview dispatch now waits for `window.gtag` readiness retry
 
-- Footer -> **Cookie Preferences**
-- Route: `/cookie-preferences`
-
-Both trigger/open the consent preference controls.
-
----
-
-## 8) How to validate after deploy
-
-1. Open site in incognito/private tab.
-2. Confirm banner appears.
-3. Click **Reject non-essential**.
-   - In GA Realtime: no session/page view should appear.
-4. Reload in fresh private tab, click **Accept all**.
-   - Navigate pages and click CTAs.
-   - In GA Realtime: see page views + events.
-
-Optional browser check:
-
-- DevTools -> Application -> Local Storage:
-  - verify `npt_cookie_consent` values.
+Result: higher coverage of high-intent interactions with cleaner reporting.
 
 ---
 
-## 9) Browser setup verification in GA4 (end-to-end)
+## 6) Browser + GA4 verification (baby steps)
 
-Use this to confirm the browser, website, and GA4 property are fully connected.
+Do this in order after each deployment.
 
-### A) GA4 property checks (Google Analytics UI)
+### Step A - Confirm stream setup in GA4
 
-1. Go to **Admin -> Data streams -> Web** and open your stream.
-2. Confirm stream URL is your production domain (for example: `https://nptlogistics.com`).
-3. Confirm the **Measurement ID** matches app env:
-   - GA UI: `G-XXXX...`
-   - App: `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXX...`
-4. In stream details, confirm **Enhanced measurement** is ON (keep defaults unless intentionally changed).
+1. Open GA4 -> Admin -> Data Streams -> Web.
+2. Open your stream.
+3. Confirm Measurement ID matches `NEXT_PUBLIC_GA_MEASUREMENT_ID`.
+4. Confirm stream domain is correct.
 
-### B) Browser network checks (your site)
+### Step B - Confirm scripts in browser
 
-1. Open the site in a fresh incognito tab.
-2. Open DevTools -> **Network**.
-3. Filter by `gtag/js` and confirm:
-   - request to `https://www.googletagmanager.com/gtag/js?id=G-...` is loaded.
-4. Filter by `collect?v=2` (GA4 hit endpoint).
-5. Before consent accept:
-   - there should be no meaningful `page_view`/`cta_click` collection traffic.
-6. Click **Accept all** in cookie banner.
-7. Navigate pages and click tracked CTAs.
-8. Confirm `collect?v=2` calls now appear consistently.
+1. Open a new Incognito window.
+2. Open DevTools (F12 or right‑click → Inspect) **before** loading the site.
+3. Go to the **Network** tab.
+4. In the filter box, type `gtag` (or `gtag/js`).
+5. Check **Preserve log** so the request is not cleared on navigation.
+6. Load or refresh the site (`nptlogistics-seo.vercel.app` or your domain).
+7. Confirm a request appears to `googletagmanager.com/gtag/js?id=G-...` (your Measurement ID, e.g. `G-ZPCBWTGTH8`).
 
-### C) Browser state checks (consent + storage)
+**If the list is empty:** The request was sent before you started recording. Refresh the page with DevTools already open and the filter applied.
 
-1. DevTools -> Application -> Local Storage:
-   - key `npt_cookie_consent` exists.
-   - contains `analytics: true` after accept.
-2. DevTools -> Application -> Cookies:
-   - cookie `npt_cookie_consent` exists with expected value.
-3. Reject flow retest:
-   - clear storage/cookies, reload, click **Reject non-essential**.
-   - verify no `cta_click`/`page_view` events are sent.
+### Step C - Test Reject flow
 
-### D) GA4 real-time confirmation
+1. Reload in clean Incognito.
+2. Click `Reject non-essential`.
+3. Navigate pages and click CTA buttons/links.
+4. In GA4 Realtime, you should not see your interactions as normal analytics events.
 
-1. In GA4 open **Reports -> Realtime**.
-2. Visit site and accept analytics.
-3. Confirm active user appears within ~5-30 seconds.
-4. Confirm event stream includes:
-   - `page_view`
-   - `cta_click`
-5. Click header CTAs and verify event count increments.
+### Step D - Test Accept flow
 
-### E) DebugView (recommended for final QA)
+1. Open clean Incognito again.
+2. Click `Accept all`.
+3. Navigate to a few pages.
+4. Click important CTAs (quote, nav links, lane/location links).
+5. In GA4 Realtime, confirm:
+   - `page_view` appears
+   - `cta_click` appears
 
-1. Install **Google Analytics Debugger** extension (Chrome) or use GTM preview if available.
-2. Open GA4 **Admin -> DebugView**.
-3. Trigger actions on site:
-   - page navigation
-   - CTA click
-4. Verify event parameters are present:
-   - `ctaId`
-   - `location`
-   - `destination`
-   - `label`
-   - `page_path`
-5. Ensure values are normalized and consistent (no random per-user strings).
+### Step E - Confirm consent storage
+
+1. DevTools -> Application -> Local Storage.
+2. Check `npt_cookie_consent`.
+3. DevTools -> Application -> Cookies.
+4. Check cookie `npt_cookie_consent`.
+
+### Step F - Optional DebugView deep test
+
+1. Open GA4 DebugView.
+2. Trigger page changes and CTA clicks.
+3. Inspect event params for consistency:
+   - `ctaId`, `location`, `destination`, `label`
 
 ---
 
-## 10) Operating checklist for production
+## 7) How to read GA4 reports for your presentation
 
-- [ ] `NEXT_PUBLIC_GA_MEASUREMENT_ID` set in Vercel Production
-- [ ] Redeploy completed
-- [ ] Banner appears for first-time visitors
-- [ ] Realtime GA validation done (accept/reject paths)
-- [ ] Confirm `/tracking` and `/employee-portal` appear in GA Realtime after consent
-- [ ] Legal text reviewed by legal counsel for jurisdiction-specific requirements
+Use this simple framework.
 
----
+### 1) Realtime report (health)
 
-## 11) How to read reports (what each means)
+Question answered: Is tracking working right now?
 
-This section maps your current instrumentation to GA4 report interpretation.
+- If no events: check consent + Measurement ID
+- If only `page_view`: traffic exists but CTA interactions are low/not triggered
+- If `page_view` + `cta_click`: full tracking pipeline healthy
 
-### A) Realtime report (operational health)
+### 2) Pages and screens report (attention)
 
-Use for quick validation that tracking is alive right now.
+Question answered: Where users spend time.
 
-- If users are active but no events appear:
-  - check consent acceptance and measurement ID.
-- If `page_view` appears but `cta_click` does not:
-  - CTA wiring issue or no tracked CTA interaction.
-- If both appear:
-  - pipeline is healthy.
+- identify top viewed pages
+- compare strategic pages vs support pages
+- find pages with high visits but low CTA engagement
 
-### B) Pages and screens report (content performance)
+### 3) Events report (intent)
 
-Primary dimension: page path.  
-Use it to understand where traffic lands and where users spend attention.
+Question answered: What users try to do.
 
-- High views + low CTA activity:
-  - content may be informative but weak at conversion.
-- Low views on strategic pages (industries/services):
-  - discoverability/internal linking issue.
-- Strong views on `/tracking` and `/employee-portal`:
-  - indicates high post-sale support intent from users.
+- monitor `cta_click` trend over time
+- break down by `ctaId` (exact CTA)
+- break down by `location` (where CTA sits in UI)
 
-### C) Events report (action performance)
+### 4) Useful KPIs to present
 
-Focus on:
+- **CTA Intent Rate** = `cta_click / page_view`
+- **Quote Intent Share** = quote-related CTA clicks / total CTA clicks
+- **Top CTA Locations** = strongest layout surfaces by `location`
+- **Top Destinations** = where users navigate after clicking CTAs
 
-- `page_view`: demand/engagement volume.
-- `cta_click`: conversion intent signal.
+### 5) How to explain business value
 
-How to read:
-
-- Rising `cta_click` with stable traffic:
-  - UX/copy improvements are working.
-- Rising traffic with flat `cta_click`:
-  - conversion rate pressure; improve CTA placement or value proposition.
-
-### D) Parameter-level analysis (quality insights)
-
-Use event parameter breakdowns for `cta_click`:
-
-- `ctaId`: exact action ID (what was clicked)
-- `location`: where on page it happened (header, hero, final_cta, etc.)
-- `destination`: intended path/hash/mailto target
-- `label`: human-readable CTA text
-
-Interpretation examples:
-
-- High clicks on `header_request_quote`:
-  - header CTA is a strong conversion surface.
-- High clicks on support/navigation CTAs but low quote CTAs:
-  - user intent is exploratory; strengthen quote intent messaging.
-
-### E) Suggested KPI reads for this setup
-
-1. **CTA Intent Rate** = `cta_click` / `page_view`
-   - Overall conversion intent quality.
-2. **Quote Intent Share**
-   - % of CTA clicks that are quote-related IDs.
-3. **Support Intent Share**
-   - % of CTA clicks to tracking/employee/support pathways.
-4. **Top CTA Locations**
-   - Highest-performing `location` values for design decisions.
-
-### F) Noise checks when reading reports
-
-If data looks suspicious, verify:
-
-- No sudden cardinality spikes in `ctaId` or `label`.
-- No duplicate bursts from accidental double-click patterns.
-- Consent mix is understood (rejected users are intentionally untracked).
+- We see where attention is high but action is low.
+- We can test CTA copy/placement and measure improvement.
+- We can identify top lanes/locations interest and prioritize sales/ops focus.
 
 ---
 
-## 12) FAQ
+## 8) How to add tracking when you add a new page or CTA
 
-### Do we need to paste GA script manually in Google UI?
+Use this checklist every time.
 
-No. Script injection is already implemented in `AnalyticsClient.tsx`.
+### For a client component button/link
 
-### Is this only for homepage?
+1. Import `trackCtaClick` from `src/lib/analytics/cta.ts`.
+2. Add `onClick={() => trackCtaClick({...})}`.
+3. Use stable values:
+   - `ctaId`: fixed ID (never dynamic timestamp/user text)
+   - `location`: fixed UI region name
+   - `destination`: route/hash target
+   - `label`: visible CTA text
 
-No. It is mounted in root layout, so it applies site-wide.
+Example:
 
-### What if user never chooses?
+```tsx
+onClick={() =>
+  trackCtaClick({
+    ctaId: "services_hero_request_quote",
+    location: "services:hero",
+    destination: "/quote",
+    label: "Request a Quote",
+  })
+}
+```
 
-Analytics remains denied by default.
+### For a server-rendered page link
+
+Use `TrackedLink` from `src/app/(site)/components/analytics/TrackedLink.tsx`.
+
+```tsx
+<TrackedLink
+  href="/quote"
+  ctaId="location_detail_quote_toronto_on"
+  location="location_detail:hero"
+  label="Request a freight quote"
+>
+  Request a freight quote
+</TrackedLink>
+```
+
+### Naming rules to avoid noisy reports
+
+- Good: `section_action_target` style IDs
+- Bad: IDs with random numbers, user names, timestamps
+- Keep `location` values consistent (`header`, `footer`, `lane_detail:hero`, etc.)
 
 ---
 
-If needed, we can add:
+## 9) Troubleshooting quick table
 
-- custom conversion events (quote form submit, contact submit)
-- GA dashboard spec with KPI definitions
-- GTM container integration (optional, if you want marketing tags managed in GTM)
+- Banner not showing:
+  - check if consent already saved in storage
+  - check `NEXT_PUBLIC_GA_MEASUREMENT_ID` exists
+- No events after Accept:
+  - check GA stream ID match
+  - check Realtime (can lag briefly)
+  - check console for JS errors
+- Duplicate events:
+  - verify CTA isn’t wired twice
+  - use one tracking call per click surface
+- Data looks messy:
+  - audit `ctaId`/`location` naming for consistency
+
+---
+
+## 10) Production checklist
+
+- [ ] `NEXT_PUBLIC_GA_MEASUREMENT_ID` set in production
+- [ ] Reject flow tested (no analytics events)
+- [ ] Accept flow tested (`page_view` and `cta_click`)
+- [ ] lanes/locations links verified in Realtime
+- [ ] Header + footer CTA tracking verified
+- [ ] Cookie preferences page retest completed
+
+---
+
+## 11) Cookie banner UI recommendation
+
+Current recommendation: keep compact on desktop and full-width only on mobile.
+
+Why:
+
+- lower visual disruption on large screens
+- avoids competing with primary page content
+- still easy to use and compliant
+- mobile full-width is better for tap accessibility
+
+If you want a wider desktop banner, use a medium-width card, not full-bleed full-width.

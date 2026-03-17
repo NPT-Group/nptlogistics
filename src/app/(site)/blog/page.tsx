@@ -19,6 +19,7 @@ function toNum(v: string | undefined, fallback: number) {
 export const metadata = nptMetadata({
   title: "Blog",
   description: "Insights, updates, and logistics knowledge from NPT.",
+  canonicalPath: "/blog",
 });
 
 export default async function BlogPage({ searchParams }: { searchParams: Promise<SearchParams> }) {

@@ -44,13 +44,14 @@ export const NAV = {
         title: "Core Freight Modes",
         links: [
           {
-            label: "Truckload (TL)",
+            label: "Truckload (FTL)",
             href: "/services/truckload",
             description: "Full truckload shipping for time-critical freight.",
             icon: "truck",
             children: [
               { label: "Dry Van", href: "/services/truckload#section-dry-van" },
-              { label: "Flatbed / Step Deck (Oversize)", href: "/services/truckload#section-flatbed" },
+              { label: "Flatbed", href: "/services/truckload#section-flatbed" },
+              { label: "Step Deck", href: "/services/truckload#section-step-deck" },
               { label: "RGN (Oversize)", href: "/services/truckload#section-rgn-oversize" },
               {
                 label: "Roll-Tite / Conestoga",
@@ -64,12 +65,14 @@ export const NAV = {
             description: "Cost-efficient LTL shipping across lanes.",
             icon: "package",
           },
+          /* COMMENTED OUT - uncomment to restore intermodal
           {
             label: "Intermodal",
             href: "/services/intermodal",
             description: "Rail + truck for balanced cost and capacity.",
             icon: "train",
           },
+          */
         ],
       },
       {

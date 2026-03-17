@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Container } from "@/app/(site)/components/layout/Container";
+import { TrackedLink } from "@/app/(site)/components/analytics/TrackedLink";
 import { NAV } from "@/config/navigation";
 import { cn } from "@/lib/cn";
 import { CookiePreferencesButton } from "./footer/CookiePreferencesButton";
@@ -34,9 +35,9 @@ function getSolutionsFooterLinks(): FooterLink[] {
   });
 
   const curatedOrder: FooterLink[] = [
-    { label: "Truckload (TL)", href: "/services/truckload" },
+    { label: "Truckload (FTL)", href: "/services/truckload" },
     { label: "Less-Than-Truckload (LTL)", href: "/services/ltl" },
-    { label: "Intermodal", href: "/services/intermodal" },
+    // { label: "Intermodal", href: "/services/intermodal" }, // COMMENTED OUT - uncomment to restore
     { label: "Expedited & Specialized (ES)", href: "/services/expedited-specialized" },
     { label: "Hazardous Materials (HAZMAT)", href: "/services/hazmat" },
     { label: "Temperature-Controlled", href: "/services/temperature-controlled" },
@@ -116,15 +117,27 @@ export function SiteFooter() {
               </h3>
               <ul className="mt-4 space-y-2.5">
                 <li>
-                  <Link href="/#solutions" className={footerLink}>
+                  <TrackedLink
+                    href="/#solutions"
+                    ctaId="footer_view_all_solutions"
+                    location="footer:solutions"
+                    label="View all solutions"
+                    className={footerLink}
+                  >
                     View all solutions →
-                  </Link>
+                  </TrackedLink>
                 </li>
                 {normalizeLinks(SOLUTIONS_LINKS).map((item) => (
                   <li key={item.href}>
-                    <Link href={item.href} className={footerLink}>
+                    <TrackedLink
+                      href={item.href}
+                      ctaId={`footer_solution_${item.label}`}
+                      location="footer:solutions"
+                      label={item.label}
+                      className={footerLink}
+                    >
                       {item.label}
-                    </Link>
+                    </TrackedLink>
                   </li>
                 ))}
               </ul>
@@ -137,15 +150,27 @@ export function SiteFooter() {
               </h3>
               <ul className="mt-4 space-y-2.5">
                 <li>
-                  <Link href="/#industries" className={footerLink}>
+                  <TrackedLink
+                    href="/#industries"
+                    ctaId="footer_view_all_industries"
+                    location="footer:industries"
+                    label="View all industries"
+                    className={footerLink}
+                  >
                     View all industries →
-                  </Link>
+                  </TrackedLink>
                 </li>
                 {normalizeLinks(NAV.industries.links).map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className={footerLink}>
+                    <TrackedLink
+                      href={l.href}
+                      ctaId={`footer_industry_${l.label}`}
+                      location="footer:industries"
+                      label={l.label}
+                      className={footerLink}
+                    >
                       {l.label}
-                    </Link>
+                    </TrackedLink>
                   </li>
                 ))}
               </ul>
@@ -159,9 +184,15 @@ export function SiteFooter() {
               <ul className="mt-4 space-y-2.5">
                 {normalizeLinks(NAV.company.links).map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className={footerLink}>
+                    <TrackedLink
+                      href={l.href}
+                      ctaId={`footer_company_${l.label}`}
+                      location="footer:company"
+                      label={l.label}
+                      className={footerLink}
+                    >
                       {l.label}
-                    </Link>
+                    </TrackedLink>
                   </li>
                 ))}
               </ul>
@@ -175,9 +206,15 @@ export function SiteFooter() {
               <ul className="mt-4 space-y-2.5">
                 {normalizeLinks(NAV.careers.links).map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className={footerLink}>
+                    <TrackedLink
+                      href={l.href}
+                      ctaId={`footer_careers_${l.label}`}
+                      location="footer:careers"
+                      label={l.label}
+                      className={footerLink}
+                    >
                       {l.label}
-                    </Link>
+                    </TrackedLink>
                   </li>
                 ))}
               </ul>
@@ -190,18 +227,55 @@ export function SiteFooter() {
               </h3>
               <ul className="mt-4 space-y-2.5">
                 <li>
-                  <Link href="/tracking" className={footerLink}>
+                  <TrackedLink
+                    href="/tracking"
+                    ctaId="footer_track_shipment"
+                    location="footer:quick_actions"
+                    label="Track Shipment"
+                    className={footerLink}
+                  >
                     Track Shipment
-                  </Link>
+                  </TrackedLink>
                 </li>
                 <li>
-                  <Link href="/employee-portal" className={footerLink}>
+                  <TrackedLink
+                    href="/locations"
+                    ctaId="footer_freight_by_location"
+                    location="footer:quick_actions"
+                    label="Freight by location"
+                    className={footerLink}
+                  >
+                    Freight by location
+                  </TrackedLink>
+                </li>
+                <li>
+                  <TrackedLink
+                    href="/lanes"
+                    ctaId="footer_freight_lanes"
+                    location="footer:quick_actions"
+                    label="Freight lanes"
+                    className={footerLink}
+                  >
+                    Freight lanes
+                  </TrackedLink>
+                </li>
+                <li>
+                  <TrackedLink
+                    href="/employee-portal"
+                    ctaId="footer_employee_portal"
+                    location="footer:quick_actions"
+                    label="Employee Portal"
+                    className={footerLink}
+                  >
                     Employee Portal
-                  </Link>
+                  </TrackedLink>
                 </li>
                 <li>
-                  <Link
+                  <TrackedLink
                     href="/quote"
+                    ctaId="footer_request_quote"
+                    location="footer:quick_actions"
+                    label="Request a Quote"
                     className={cn(
                       "inline-flex text-sm font-semibold text-[color:var(--color-brand-500)]",
                       "hover:text-[color:var(--color-brand-500)]",
@@ -209,7 +283,7 @@ export function SiteFooter() {
                     )}
                   >
                     Request a Quote →
-                  </Link>
+                  </TrackedLink>
                 </li>
               </ul>
             </div>
