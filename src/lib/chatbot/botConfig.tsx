@@ -2,6 +2,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { createChatBotMessage } from "react-chatbot-kit";
 
 import StartWidget from "./widgets/StartWidget";
@@ -33,10 +34,25 @@ type BotConfig = {
   botName: string;
   initialMessages: unknown[];
   customStyles?: Record<string, unknown>;
+  customComponents?: Record<string, unknown>;
   widgets: BotWidget[];
 };
 
 const botName = "NPT Assistant";
+
+function BotLogoAvatar() {
+  return (
+    <span className="npt-chatbot-logo-avatar" aria-hidden="true">
+      <Image
+        src="/_optimized/brand/NPTlogo2.webp"
+        alt="NPT"
+        fill
+        sizes="34px"
+        className="object-contain"
+      />
+    </span>
+  );
+}
 
 export const botConfig: BotConfig = {
   botName,
@@ -49,8 +65,11 @@ export const botConfig: BotConfig = {
     ),
   ],
   customStyles: {
-    botMessageBox: { backgroundColor: "#111827" },
-    chatButton: { backgroundColor: "#111827" },
+    botMessageBox: { backgroundColor: "#070a12" },
+    chatButton: { backgroundColor: "#070a12" },
+  },
+  customComponents: {
+    botAvatar: () => <BotLogoAvatar />,
   },
   widgets: [
     { widgetName: "startWidget", widgetFunc: (props) => <StartWidget {...props} /> },

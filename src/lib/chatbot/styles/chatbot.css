@@ -1,5 +1,4 @@
 /* src/lib/chatbot/styles/chatbot.css */
-
 /* --- react-chatbot-kit sizing fixes --- */
 .react-chatbot-kit-chat-container {
   width: 100% !important;
@@ -33,7 +32,7 @@
 }
 
 .npt-chatbot .react-chatbot-kit-chat-bot-message {
-  background: #111827 !important;
+  background: #070a12 !important;
   color: #ffffff !important;
 }
 
@@ -68,6 +67,14 @@
 .npt-chatbot .react-chatbot-kit-chat-input::placeholder {
   color: #6b7280 !important;
   opacity: 1;
+}
+
+.npt-chatbot .react-chatbot-kit-chat-btn-send {
+  background: #070a12 !important;
+}
+
+.npt-chatbot .react-chatbot-kit-chat-btn-send:hover {
+  background: #0b0f1a !important;
 }
 
 .npt-chatbot .react-chatbot-kit-chat-btn-send-icon {
@@ -119,4 +126,47 @@
 .npt-chatbot button,
 .npt-chatbot [role="button"] {
   cursor: pointer !important;
+}
+
+.npt-chatbot .react-chatbot-kit-chat-bot-message-container {
+  align-items: flex-start !important;
+}
+
+.npt-chatbot .react-chatbot-kit-chat-bot-avatar-container {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  margin-right: 10px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 9999px !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  overflow: visible !important;
+  padding: 0 !important;
+}
+
+.npt-chatbot .react-chatbot-kit-chat-bot-avatar-letter {
+  display: none !important;
+}
+
+.npt-chatbot-logo-avatar {
+  position: relative;
+  display: block;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  margin-top: 0;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+}
+
+.npt-chatbot-logo-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }

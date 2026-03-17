@@ -2,6 +2,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Chatbot from "react-chatbot-kit";
 import "react-chatbot-kit/build/main.css";
 import { Sparkles, X } from "lucide-react";
@@ -13,12 +14,25 @@ import { useChatActions } from "@/lib/chatbot/useChatActions";
 
 const TOOLTIP_KEY = "npt_chatbot_tooltip_dismissed";
 
+const PANEL_ANIMATION_MS = 480;
+const LAUNCHER_ANIMATION_MS = 100;
+const LAUNCHER_SHOW_DELAY_MS = 0;
+
 export default function GuidedChatbot() {
   const pageActions = useChatActions();
 
   const [open, setOpen] = React.useState(false);
+  const [closing, setClosing] = React.useState(false);
   const [showTooltip, setShowTooltip] = React.useState(false);
+  const [closingBodyHeight, setClosingBodyHeight] = React.useState<number>(420);
+  const [showLauncher, setShowLauncher] = React.useState(true);
+  const [launcherVisible, setLauncherVisible] = React.useState(true);
+
   const panelRef = React.useRef<HTMLDivElement | null>(null);
+  const bodyRef = React.useRef<HTMLDivElement | null>(null);
+  const closeTimerRef = React.useRef<number | null>(null);
+  const launcherShowTimerRef = React.useRef<number | null>(null);
+  const launcherEnterTimerRef = React.useRef<number | null>(null);
 
   React.useEffect(() => {
     const dismissed = typeof window !== "undefined" && sessionStorage.getItem(TOOLTIP_KEY) === "1";
@@ -44,28 +58,79 @@ export default function GuidedChatbot() {
 
   React.useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") window.setTimeout(() => setOpen(false), 120);
+      if (e.key === "Escape") {
+        window.setTimeout(() => closeChat(), 120);
+      }
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [open, closing]);
 
   React.useEffect(() => {
     function onMouseDown(e: MouseEvent) {
-      if (!open) return;
+      if (!open || closing) return;
       const el = panelRef.current;
       if (!el) return;
       if (e.target instanceof Node && !el.contains(e.target)) {
-        window.setTimeout(() => setOpen(false), 120);
+        window.setTimeout(() => closeChat(), 120);
       }
     }
 
     window.addEventListener("mousedown", onMouseDown);
     return () => window.removeEventListener("mousedown", onMouseDown);
-  }, [open]);
+  }, [open, closing]);
+
+  React.useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
+      if (launcherShowTimerRef.current) window.clearTimeout(launcherShowTimerRef.current);
+      if (launcherEnterTimerRef.current) window.clearTimeout(launcherEnterTimerRef.current);
+    };
+  }, []);
+
+  function hideLauncherImmediately() {
+    if (launcherShowTimerRef.current) {
+      window.clearTimeout(launcherShowTimerRef.current);
+      launcherShowTimerRef.current = null;
+    }
+    if (launcherEnterTimerRef.current) {
+      window.clearTimeout(launcherEnterTimerRef.current);
+      launcherEnterTimerRef.current = null;
+    }
+
+    setLauncherVisible(false);
+    setShowLauncher(false);
+  }
+
+  function scheduleLauncherReturn() {
+    if (launcherShowTimerRef.current) {
+      window.clearTimeout(launcherShowTimerRef.current);
+    }
+    if (launcherEnterTimerRef.current) {
+      window.clearTimeout(launcherEnterTimerRef.current);
+    }
+
+    launcherShowTimerRef.current = window.setTimeout(() => {
+      setShowLauncher(true);
+
+      launcherEnterTimerRef.current = window.setTimeout(() => {
+        setLauncherVisible(true);
+        launcherEnterTimerRef.current = null;
+      }, 16);
+
+      launcherShowTimerRef.current = null;
+    }, LAUNCHER_SHOW_DELAY_MS);
+  }
 
   function openChat() {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+
+    hideLauncherImmediately();
+    setClosing(false);
     setOpen(true);
     setShowTooltip(false);
 
@@ -74,6 +139,24 @@ export default function GuidedChatbot() {
     } catch {
       // Ignore
     }
+  }
+
+  function closeChat() {
+    if (!open || closing) return;
+
+    const measuredHeight = bodyRef.current?.getBoundingClientRect().height;
+    if (measuredHeight && Number.isFinite(measuredHeight)) {
+      setClosingBodyHeight(Math.ceil(measuredHeight));
+    }
+
+    setClosing(true);
+
+    closeTimerRef.current = window.setTimeout(() => {
+      setOpen(false);
+      setClosing(false);
+      closeTimerRef.current = null;
+      scheduleLauncherReturn();
+    }, PANEL_ANIMATION_MS);
   }
 
   function dismissTooltip() {
@@ -91,7 +174,7 @@ export default function GuidedChatbot() {
       ...pageActions,
       goTo: (href: string) => {
         pageActions.goTo(href);
-        window.setTimeout(() => setOpen(false), 120);
+        window.setTimeout(() => closeChat(), 120);
       },
     };
   }, [pageActions]);
@@ -101,55 +184,93 @@ export default function GuidedChatbot() {
     [pageActionsWithAutoClose],
   );
 
+  const showPanel = open || closing;
+  const panelEntering = open && !closing;
+  const showLiveBody = open && !closing;
+
   return (
-    <div
-      className={["fixed right-5 bottom-5 z-50", open ? "min-h-[420px] min-w-[360px]" : ""].join(
-        " ",
-      )}
-    >
-      <div
-        ref={panelRef}
-        className={[
-          "absolute right-0 bottom-0 w-[360px] max-w-[92vw] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl",
-          "origin-bottom-right transition-all duration-300 ease-out",
-          open
-            ? "pointer-events-auto visible translate-y-0 scale-100 opacity-100"
-            : "pointer-events-none invisible translate-y-3 scale-[0.97] opacity-0",
-        ].join(" ")}
-        role="dialog"
-        aria-label="Chatbot"
-        aria-hidden={!open}
-      >
-        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-white">
-              <Sparkles size={16} />
-            </span>
-            <div className="text-sm font-semibold text-gray-900">NPT Assistant</div>
+    <div className="fixed right-5 bottom-5 z-50">
+      {showPanel && (
+        <div
+          ref={panelRef}
+          className={[
+            "absolute right-0 bottom-0 w-[360px] max-w-[92vw] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl",
+            "origin-bottom-right transition-all",
+            panelEntering
+              ? "pointer-events-auto visible translate-y-0 scale-100 opacity-100"
+              : "pointer-events-none visible translate-y-3 scale-[0.975] opacity-0",
+          ].join(" ")}
+          style={{
+            transitionDuration: `${PANEL_ANIMATION_MS}ms`,
+            transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+            willChange: "transform, opacity",
+          }}
+          role="dialog"
+          aria-label="Chatbot"
+          aria-hidden={!panelEntering}
+        >
+          <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <span
+                className="relative inline-flex h-8 w-8 shrink-0 items-center justify-center"
+                aria-hidden="true"
+              >
+                <Image
+                  src="/_optimized/brand/NPTlogo2.webp"
+                  alt="NPT"
+                  fill
+                  sizes="32px"
+                  className="object-contain"
+                />
+              </span>
+              <div className="text-sm font-semibold text-gray-900">NPT Assistant</div>
+            </div>
+
+            <button
+              type="button"
+              onClick={closeChat}
+              className="rounded-md p-2 text-gray-600 hover:cursor-pointer hover:bg-gray-100"
+              aria-label="Close chat"
+            >
+              <X size={18} />
+            </button>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="rounded-md p-2 text-gray-600 hover:cursor-pointer hover:bg-gray-100"
-            aria-label="Close chat"
-          >
-            <X size={18} />
-          </button>
+          {showLiveBody ? (
+            <div ref={bodyRef} className="npt-chatbot">
+              <Chatbot
+                config={botConfig as never}
+                messageParser={MessageParser as never}
+                actionProvider={ActionProvider as never}
+                placeholderText="Ask about quotes, tracking, services, FAQs, or support…"
+              />
+            </div>
+          ) : (
+            <div
+              aria-hidden="true"
+              className="bg-white"
+              style={{ height: `${closingBodyHeight}px` }}
+            />
+          )}
         </div>
+      )}
 
-        <div className="npt-chatbot">
-          <Chatbot
-            config={botConfig as never}
-            messageParser={MessageParser as never}
-            actionProvider={ActionProvider as never}
-            placeholderText="Ask about quotes, tracking, services, FAQs, or support…"
-          />
-        </div>
-      </div>
-
-      {!open && (
-        <div className="relative flex items-end justify-end">
+      {showLauncher && (
+        <div
+          className={[
+            "relative flex items-end justify-end transition-all",
+            launcherVisible
+              ? "translate-y-0 scale-100 opacity-100"
+              : "translate-y-2 scale-95 opacity-0",
+          ].join(" ")}
+          style={{
+            transitionDuration: `${LAUNCHER_ANIMATION_MS}ms`,
+            transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+            willChange: "transform, opacity",
+            pointerEvents: launcherVisible ? "auto" : "none",
+          }}
+          aria-hidden={!launcherVisible}
+        >
           {showTooltip && (
             <div className="absolute right-0 bottom-16 w-[260px]">
               <div className="relative rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-xl">
