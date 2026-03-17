@@ -68,7 +68,7 @@ export const POST = async (req: NextRequest) => {
 
     const attachmentsFolder = makeEntityFinalPrefix(
       ES3Namespace.CONTACT_INQUIRIES,
-      inquiryId,
+      inquiryMongoId,
       ES3Folder.ATTACHMENTS,
     );
 

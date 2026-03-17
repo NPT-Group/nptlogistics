@@ -20,6 +20,7 @@ import { InquirySectionRouter } from "./components/InquirySectionRouter";
 import { SubmitSection } from "./sections/SubmitSection";
 import { TurnstileWidgetHandle } from "@/components/TurnstileWidget";
 import { toCtaSlug, trackCtaClick } from "@/lib/analytics/cta";
+import { NAV_OFFSET } from "@/constants/ui";
 
 export default function ContactForm() {
   const resolver = zodResolver(
@@ -47,23 +48,33 @@ export default function ContactForm() {
     const target = feedbackRef.current ?? cardRef.current;
     if (!target) return;
 
-    target.scrollIntoView({
+    const top = target.getBoundingClientRect().top + window.scrollY - (NAV_OFFSET + 24);
+
+    window.scrollTo({
+      top: Math.max(top, 0),
       behavior: "smooth",
-      block: "start",
-      inline: "nearest",
     });
 
     window.setTimeout(() => {
-      target.focus?.();
-    }, 250);
+      target.focus?.({ preventScroll: true });
+    }, 350);
   }, []);
+
+  React.useEffect(() => {
+    if (!feedback) return;
+
+    const id = window.setTimeout(() => {
+      scrollToTopArea();
+    }, 0);
+
+    return () => window.clearTimeout(id);
+  }, [feedback, scrollToTopArea]);
 
   const onSubmit: SubmitHandler<ContactFormSubmitValues> = async (values) => {
     setFeedback(null);
 
     try {
       const body = toApiSubmitBody(values);
-
       const category = body.inquiry?.category;
 
       const res = await fetch("/api/v1/contact/submit", {
@@ -114,10 +125,6 @@ export default function ContactForm() {
             ]
           : undefined,
       });
-
-      window.requestAnimationFrame(() => {
-        scrollToTopArea();
-      });
     } catch (err) {
       trackCtaClick({
         ctaId: "contact_form_submit_error",
@@ -143,10 +150,6 @@ export default function ContactForm() {
         shouldDirty: true,
         shouldTouch: true,
         shouldValidate: true,
-      });
-
-      window.requestAnimationFrame(() => {
-        scrollToTopArea();
       });
     }
   };
