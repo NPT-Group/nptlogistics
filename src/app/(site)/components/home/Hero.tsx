@@ -7,7 +7,7 @@ import { Container } from "@/app/(site)/components/layout/Container";
 import { cn } from "@/lib/cn";
 import { trackCtaClick } from "@/lib/analytics/cta";
 
-const VIDEO_DESKTOP = "/_optimized/hero/hero-desktop.mp4";
+const VIDEO_DESKTOP = "/_optimized/hero/hero-desktop2.mp4";
 const POSTER = "/_optimized/hero/hero-poster.webp";
 
 export function Hero() {
@@ -141,8 +141,8 @@ export function Hero() {
                   "leading-relaxed tracking-wide",
                 )}
               >
-                Truckload, LTL, and cross-border shipping with proactive updates,
-                compliance-first execution, and clear handoffs from pickup to delivery.
+                Truckload, LTL, and cross-border shipping with proactive updates, compliance-first
+                execution, and clear handoffs from pickup to delivery.
               </p>
             </motion.div>
 
