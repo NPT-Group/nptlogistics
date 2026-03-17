@@ -19,7 +19,6 @@ import { DepartmentSelector } from "./components/DepartmentSelector";
 import { InquirySectionRouter } from "./components/InquirySectionRouter";
 import { SubmitSection } from "./sections/SubmitSection";
 import { TurnstileWidgetHandle } from "@/components/TurnstileWidget";
-import { NAV_OFFSET } from "@/constants/ui";
 import { toCtaSlug, trackCtaClick } from "@/lib/analytics/cta";
 
 export default function ContactForm() {
@@ -36,40 +35,28 @@ export default function ContactForm() {
     reValidateMode: "onChange",
   });
 
-  const { handleSubmit, register, reset } = methods;
+  const { handleSubmit, register, reset, setValue } = methods;
 
   const [feedback, setFeedback] = React.useState<FeedbackBannerData | null>(null);
 
   const cardRef = React.useRef<HTMLDivElement | null>(null);
   const feedbackRef = React.useRef<HTMLDivElement | null>(null);
-  const feedbackAnchorRef = React.useRef<HTMLDivElement | null>(null);
   const turnstileRef = React.useRef<TurnstileWidgetHandle | null>(null);
 
   const scrollToTopArea = React.useCallback(() => {
-    const target = feedbackAnchorRef.current ?? cardRef.current;
+    const target = feedbackRef.current ?? cardRef.current;
     if (!target) return;
 
-    const rect = target.getBoundingClientRect();
-    const absoluteTop = rect.top + window.scrollY;
-    const top = Math.max(absoluteTop - (NAV_OFFSET + 24), 0);
-
-    window.scrollTo({
-      top,
+    target.scrollIntoView({
       behavior: "smooth",
+      block: "start",
+      inline: "nearest",
     });
 
     window.setTimeout(() => {
       target.focus?.();
-    }, 300);
+    }, 250);
   }, []);
-
-  const scrollAfterFeedbackRender = React.useCallback(() => {
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        scrollToTopArea();
-      });
-    });
-  }, [scrollToTopArea]);
 
   const onSubmit: SubmitHandler<ContactFormSubmitValues> = async (values) => {
     setFeedback(null);
@@ -128,7 +115,9 @@ export default function ContactForm() {
           : undefined,
       });
 
-      scrollAfterFeedbackRender();
+      window.requestAnimationFrame(() => {
+        scrollToTopArea();
+      });
     } catch (err) {
       trackCtaClick({
         ctaId: "contact_form_submit_error",
@@ -149,7 +138,16 @@ export default function ContactForm() {
             : "Something went wrong while submitting your inquiry. Please try again.",
       });
 
-      scrollAfterFeedbackRender();
+      turnstileRef.current?.reset();
+      setValue("turnstileToken", "", {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+
+      window.requestAnimationFrame(() => {
+        scrollToTopArea();
+      });
     }
   };
 
@@ -175,11 +173,7 @@ export default function ContactForm() {
               onSubmit={handleSubmit(onSubmit, onInvalid)}
               className="space-y-7 bg-white/95 px-5 pt-6 pb-7 sm:px-7 lg:px-8"
             >
-              {feedback ? (
-                <div ref={feedbackAnchorRef} tabIndex={-1}>
-                  <FeedbackBanner feedback={feedback} innerRef={feedbackRef} />
-                </div>
-              ) : null}
+              <FeedbackBanner feedback={feedback} innerRef={feedbackRef} />
 
               <InquirySectionRouter />
               <Divider />
