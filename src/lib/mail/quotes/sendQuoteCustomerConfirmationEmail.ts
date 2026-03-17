@@ -46,7 +46,7 @@ export async function sendQuoteCustomerConfirmationEmail(
     <p style="margin:0 0 12px 0;">Hi ${safeName},</p>
 
     <p style="margin:0 0 12px 0;">
-      Thanks for reaching out to NPT Logistics — we’ve received your quote request and our team will review it shortly.
+      Thanks for reaching out to NPT Logistics — we’ve received your quote request. Our team will review it and get back to you as soon as possible!.
     </p>
 
     <div style="margin:0 0 16px 0; padding:12px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px;">

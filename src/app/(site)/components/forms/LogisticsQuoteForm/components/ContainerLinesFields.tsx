@@ -78,7 +78,7 @@ export function ContainerLinesFields({
           }
           className={cn(
             "inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-neutral-900 transition",
-            "hover:border-neutral-300 hover:bg-neutral-50",
+            "hover:cursor-pointer hover:border-neutral-300 hover:bg-neutral-50",
           )}
         >
           <Plus className="h-4 w-4" />

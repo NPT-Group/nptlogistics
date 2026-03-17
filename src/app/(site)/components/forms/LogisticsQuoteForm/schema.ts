@@ -328,6 +328,17 @@ const internationalModeField = requiredEnumField(
 
 /* ───────────────────────────── Service Details ───────────────────────────── */
 
+/** FTL optional dimensions:
+ *  allow partial input at field level, then enforce all-or-nothing in parent superRefine
+ */
+const ftlOptionalDimensionsSchema = optionalObjectIfBlank(
+  z.object({
+    length: optionalPositiveNumber("Length"),
+    width: optionalPositiveNumber("Width"),
+    height: optionalPositiveNumber("Height"),
+  }),
+);
+
 export const ftlDetailsSchema = z
   .object({
     primaryService: z.literal(ELogisticsPrimaryService.FTL),
@@ -348,8 +359,11 @@ export const ftlDetailsSchema = z
       { message: "Estimated pallet count must be a whole number" },
     ),
 
-    dimensions: optionalObjectIfBlank(logisticsDimensionsSchema),
-    dimensionUnit: z.union([z.nativeEnum(EDimensionUnit), z.undefined()]).optional(),
+    dimensions: ftlOptionalDimensionsSchema,
+    dimensionUnit: z.preprocess(
+      (value) => (value === "" ? undefined : value),
+      z.union([z.nativeEnum(EDimensionUnit), z.undefined()]).optional(),
+    ),
 
     pickupDateFlexible: z.coerce.boolean().optional(),
 
@@ -372,12 +386,45 @@ export const ftlDetailsSchema = z
       });
     }
 
-    if (val.dimensions && !val.dimensionUnit) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["dimensionUnit"],
-        message: "Please select a dimension unit",
-      });
+    const hasAnyDimensionValue =
+      val.dimensions?.length !== undefined ||
+      val.dimensions?.width !== undefined ||
+      val.dimensions?.height !== undefined;
+
+    const hasDimensionUnit = val.dimensionUnit !== undefined;
+
+    if (hasAnyDimensionValue || hasDimensionUnit) {
+      if (val.dimensions?.length === undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["dimensions", "length"],
+          message: "Length is required",
+        });
+      }
+
+      if (val.dimensions?.width === undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["dimensions", "width"],
+          message: "Width is required",
+        });
+      }
+
+      if (val.dimensions?.height === undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["dimensions", "height"],
+          message: "Height is required",
+        });
+      }
+
+      if (!hasDimensionUnit) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["dimensionUnit"],
+          message: "Please select a dimension unit",
+        });
+      }
     }
 
     if (val.addons?.length && val.equipment) {
