@@ -2,31 +2,25 @@
 "use client";
 
 import { NAV } from "@/config/navigation";
+import type { WidgetComponentProps } from "../chatbot.types";
+import { LinkButton, ResponseButton } from "./_shared";
 
-export default function IndustriesWidget({ actionProvider, ...rest }: any) {
-  const viewAllHref =
-    rest?.payload?.viewAllHref ||
-    rest?.props?.viewAllHref ||
-    rest?.viewAllHref ||
-    NAV.industries.intro.ctaHref; // fallback
+type IndustriesPayload = {
+  viewAllHref?: string;
+};
+
+export default function IndustriesWidget({
+  actionProvider,
+  payload,
+  props,
+}: WidgetComponentProps<IndustriesPayload>) {
+  const viewAllHref = payload?.viewAllHref || props?.viewAllHref || NAV.industries.intro.ctaHref;
 
   return (
     <div className="flex flex-wrap gap-2">
-      <button
-        onClick={() => actionProvider.goTo(viewAllHref)}
-        className="rounded-full border px-3 py-1 text-sm"
-        type="button"
-      >
-        View Industries
-      </button>
+      <LinkButton onClick={() => actionProvider.goTo(viewAllHref)}>View industries</LinkButton>
 
-      <button
-        onClick={() => actionProvider.startQuote()}
-        className="rounded-full border px-3 py-1 text-sm"
-        type="button"
-      >
-        Get Industry-Specific Quote
-      </button>
+      <ResponseButton onClick={() => actionProvider.startQuote()}>Request a quote</ResponseButton>
     </div>
   );
 }

@@ -2,36 +2,36 @@
 "use client";
 
 import { NAV } from "@/config/navigation";
+import type { WidgetComponentProps } from "../chatbot.types";
+import { LinkButton } from "./_shared";
 
-export default function SolutionsWidget({ actionProvider }: any) {
-  const categories = (NAV.solutions as any).categories as Array<{
-    title: string;
-    links: Array<{ label: string; href: string; description?: string }>;
-  }>;
+type SolutionLink = {
+  label: string;
+  href: string;
+  description?: string;
+};
 
-  const topLinks = categories.flatMap((c) => c.links);
+export default function SolutionsWidget({ actionProvider }: WidgetComponentProps) {
+  const categories = (
+    NAV.solutions as unknown as {
+      categories: Array<{ title: string; links: SolutionLink[] }>;
+    }
+  ).categories;
+
+  const topLinks = categories.flatMap((category) => category.links);
 
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
-        {topLinks.map((l) => (
-          <button
-            key={l.href}
-            onClick={() => actionProvider.goTo(l.href)}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-            type="button"
-          >
-            {l.label}
-          </button>
+        {topLinks.map((link) => (
+          <LinkButton key={link.href} onClick={() => actionProvider.goTo(link.href)}>
+            {link.label}
+          </LinkButton>
         ))}
 
-        <button
-          onClick={() => actionProvider.goTo("/#solutions")}
-          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-          type="button"
-        >
+        <LinkButton onClick={() => actionProvider.goTo("/#solutions")}>
           View all solutions
-        </button>
+        </LinkButton>
       </div>
     </div>
   );

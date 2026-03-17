@@ -1,4 +1,6 @@
 // src/lib/chatbot/MessageParser.ts
+import type { ActionProviderShape } from "./chatbot.types";
+
 function normText(s: string) {
   return (s || "")
     .toLowerCase()
@@ -12,61 +14,47 @@ function tokensOf(s: string) {
   return normText(s).split(" ").filter(Boolean);
 }
 
-function hasAnyToken(tokens: string[], candidates: string[]) {
+function hasAnyToken(tokens: string[], candidates: readonly string[]) {
   const set = new Set(tokens);
-  return candidates.some((c) => set.has(c));
+  return candidates.some((candidate) => set.has(candidate));
 }
 
 export default class MessageParser {
-  actionProvider: any;
+  private actionProvider: ActionProviderShape;
 
-  constructor(actionProvider: any) {
+  constructor(actionProvider: ActionProviderShape) {
     this.actionProvider = actionProvider;
   }
 
   parse(message: string) {
     const tokens = tokensOf(message);
 
-    // 0) FAQ should win if user is asking an exact/near FAQ question
-    // (prevents keyword rules from hijacking intent)
-    if (this.actionProvider?.tryAnswerFaq?.(message)) return;
-
-    // Quote (token-based; prevents "opeRATE" => rate bug)
     if (
       hasAnyToken(tokens, ["quote", "quotes", "pricing", "price", "rate", "rates", "cost", "costs"])
     ) {
       return this.actionProvider.startQuote();
     }
 
-    // Tracking
+    if (this.actionProvider.tryAnswerFaq(message)) return;
+
     if (hasAnyToken(tokens, ["track", "tracking", "status"])) {
       return this.actionProvider.startTracking();
     }
 
-    // Careers
     if (hasAnyToken(tokens, ["career", "careers", "job", "jobs", "hiring"])) {
       return this.actionProvider.showCareers();
     }
-    if (tokens.includes("driver") || tokens.includes("drivers")) {
-      return this.actionProvider.suggestNavPage(
-        "Driver Opportunities",
-        "/careers#drive",
-        "Driver roles and requirements.",
-      );
-    }
 
-    // Industries
     if (hasAnyToken(tokens, ["industry", "industries"])) {
       return this.actionProvider.showIndustries();
     }
 
-    // Company / resources
     if (
       hasAnyToken(tokens, [
         "about",
         "company",
-        "locations",
         "location",
+        "locations",
         "network",
         "safety",
         "compliance",
@@ -75,36 +63,25 @@ export default class MessageParser {
       return this.actionProvider.showCompany();
     }
 
-    if (hasAnyToken(tokens, ["guide", "guides", "resources"])) {
+    if (hasAnyToken(tokens, ["guide", "guides", "resource", "resources"])) {
       return this.actionProvider.showResources();
     }
 
-    if (hasAnyToken(tokens, ["faq", "faqs"])) {
-      // If it's a generic "FAQ" ask, still show the page suggestion.
-      // (If they asked an actual FAQ question, tryAnswerFaq above would have answered it already.)
-      return this.actionProvider.suggestNavPage(
-        "FAQs",
-        "/resources/faqs",
-        "Fast answers to common questions.",
-      );
+    if (hasAnyToken(tokens, ["faq", "faqs", "question", "questions"])) {
+      return this.actionProvider.showResources();
     }
 
-    // Why NPT
-    if (hasAnyToken(tokens, ["why", "reliable", "reliability", "on", "ontime", "on-time"])) {
+    if (hasAnyToken(tokens, ["why", "reliable", "reliability", "ontime", "on-time"])) {
       return this.actionProvider.showWhyNpt();
     }
 
-    // Contact
-    if (hasAnyToken(tokens, ["contact", "email", "phone", "call"])) {
+    if (hasAnyToken(tokens, ["contact", "email", "support", "agent"])) {
       return this.actionProvider.showContact();
     }
 
-    // Solutions / services (broad)
     if (hasAnyToken(tokens, ["solution", "solutions", "service", "services"])) {
       return this.actionProvider.startSolutions();
     }
-
-    // --- Keyword rules -> Suggest, don't route --------------------------------
 
     if (tokens.includes("ltl")) {
       return this.actionProvider.suggestNavPage(
@@ -126,19 +103,19 @@ export default class MessageParser {
       return this.actionProvider.suggestNavPage(
         "Intermodal",
         "/services/intermodal",
-        "Rail + truck for balanced cost and capacity.",
+        "Rail and truck solutions for balanced cost and capacity.",
       );
     }
 
-    if (hasAnyToken(tokens, ["expedite", "expedited", "rush", "hot", "shot"])) {
+    if (hasAnyToken(tokens, ["expedite", "expedited", "rush", "hotshot", "specialized"])) {
       return this.actionProvider.suggestNavPage(
-        "Expedited & Specialized (ES)",
+        "Expedited & Specialized",
         "/services/expedited-specialized",
-        "Priority freight and specialized vehicle execution.",
+        "Priority freight and specialized equipment solutions.",
       );
     }
 
-    if (hasAnyToken(tokens, ["hazmat", "hazard", "tdg"])) {
+    if (hasAnyToken(tokens, ["hazmat", "hazardous", "regulated"])) {
       return this.actionProvider.suggestNavPage(
         "Hazardous Materials (HAZMAT)",
         "/services/hazmat",
@@ -146,37 +123,33 @@ export default class MessageParser {
       );
     }
 
-    if (hasAnyToken(tokens, ["temperature", "temp", "tempcontrolled", "reefer", "cold", "chain"])) {
+    if (hasAnyToken(tokens, ["temperature", "reefer", "cold", "temp"])) {
       return this.actionProvider.suggestNavPage(
         "Temperature-Controlled",
         "/services/temperature-controlled",
-        "Refrigerated and controlled-temperature freight.",
+        "Controlled-temperature freight solutions.",
       );
     }
 
-    if (hasAnyToken(tokens, ["cross", "border", "customs", "mexico", "canada", "usa"])) {
+    if (hasAnyToken(tokens, ["cross", "border", "customs", "canada", "usa", "mexico"])) {
       return this.actionProvider.suggestNavPage(
         "Cross-Border & Global",
         "/services/cross-border",
-        "Cross-border execution + global modes as needed.",
+        "Cross-border execution and global freight support.",
       );
     }
 
-    if (
-      hasAnyToken(tokens, ["warehouse", "warehousing", "distribution", "dedicated", "capacity"])
-    ) {
+    if (hasAnyToken(tokens, ["warehouse", "warehousing", "distribution", "storage"])) {
       return this.actionProvider.suggestNavPage(
         "Logistics & Value-Added",
         "/services/value-added",
-        "Warehousing, managed capacity, dedicated, and projects.",
+        "Warehousing, managed capacity, and value-added logistics.",
       );
     }
 
-    // --- Smart fallback: try NAV matching and suggest 1–3 pages --------------
     const suggested = this.actionProvider.suggestNavOptions(message, { limit: 3 });
     if (suggested) return;
 
-    // Final fallback: FAQ search (now safe, because tryAnswerFaq is robust)
     return this.actionProvider.searchFaq(message);
   }
 }

@@ -18,10 +18,8 @@ export default function GuidedChatbot() {
 
   const [open, setOpen] = React.useState(false);
   const [showTooltip, setShowTooltip] = React.useState(false);
-
   const panelRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Show tooltip once (per session) after a short delay
   React.useEffect(() => {
     const dismissed = typeof window !== "undefined" && sessionStorage.getItem(TOOLTIP_KEY) === "1";
     if (dismissed) return;
@@ -35,33 +33,34 @@ export default function GuidedChatbot() {
     return () => window.clearTimeout(t);
   }, []);
 
-  // Open chat when any CTA dispatches npt:open-live-chat
   React.useEffect(() => {
     function onOpenLiveChat() {
       openChat();
     }
+
     window.addEventListener("npt:open-live-chat", onOpenLiveChat);
     return () => window.removeEventListener("npt:open-live-chat", onOpenLiveChat);
   }, []);
 
-  // Close on Esc
   React.useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") window.setTimeout(() => setOpen(false), 120);
     }
+
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  // Click outside to close (optional)
   React.useEffect(() => {
     function onMouseDown(e: MouseEvent) {
       if (!open) return;
       const el = panelRef.current;
       if (!el) return;
-      if (e.target instanceof Node && !el.contains(e.target))
+      if (e.target instanceof Node && !el.contains(e.target)) {
         window.setTimeout(() => setOpen(false), 120);
+      }
     }
+
     window.addEventListener("mousedown", onMouseDown);
     return () => window.removeEventListener("mousedown", onMouseDown);
   }, [open]);
@@ -69,6 +68,7 @@ export default function GuidedChatbot() {
   function openChat() {
     setOpen(true);
     setShowTooltip(false);
+
     try {
       sessionStorage.setItem(TOOLTIP_KEY, "1");
     } catch {
@@ -78,6 +78,7 @@ export default function GuidedChatbot() {
 
   function dismissTooltip() {
     setShowTooltip(false);
+
     try {
       sessionStorage.setItem(TOOLTIP_KEY, "1");
     } catch {
@@ -85,10 +86,6 @@ export default function GuidedChatbot() {
     }
   }
 
-  /**
-   * Wrap pageActions so ANY navigation from the bot auto-closes the panel.
-   * This covers actionProvider.goTo(), goToFromNav(), prefillAndGoToQuote(), etc.
-   */
   const pageActionsWithAutoClose = React.useMemo(() => {
     return {
       ...pageActions,
@@ -110,7 +107,6 @@ export default function GuidedChatbot() {
         " ",
       )}
     >
-      {/* Chat panel (always mounted so conversation persists; animate open/close) */}
       <div
         ref={panelRef}
         className={[
@@ -124,7 +120,6 @@ export default function GuidedChatbot() {
         aria-label="Chatbot"
         aria-hidden={!open}
       >
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
           <div className="flex items-center gap-2">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-white">
@@ -143,21 +138,18 @@ export default function GuidedChatbot() {
           </button>
         </div>
 
-        {/* Body */}
         <div className="npt-chatbot">
           <Chatbot
-            config={botConfig as any}
-            messageParser={MessageParser as any}
-            actionProvider={ActionProvider as any}
-            placeholderText="Type your message…"
+            config={botConfig as never}
+            messageParser={MessageParser as never}
+            actionProvider={ActionProvider as never}
+            placeholderText="Ask about quotes, tracking, services, FAQs, or support…"
           />
         </div>
       </div>
 
-      {/* Launcher cluster (only when closed) */}
       {!open && (
         <div className="relative flex items-end justify-end">
-          {/* Tooltip bubble */}
           {showTooltip && (
             <div className="absolute right-0 bottom-16 w-[260px]">
               <div className="relative rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-xl">
@@ -178,7 +170,7 @@ export default function GuidedChatbot() {
                   <div className="text-sm">
                     <div className="font-semibold text-gray-900">Hi 👋</div>
                     <div className="mt-0.5 text-gray-600">
-                      Want help finding the right service or starting a quote?
+                      Need help with a quote, tracking, FAQs, or finding the right page?
                     </div>
 
                     <div className="mt-3 flex gap-2">
@@ -205,7 +197,6 @@ export default function GuidedChatbot() {
             </div>
           )}
 
-          {/* Circular launcher */}
           <button
             type="button"
             onClick={openChat}

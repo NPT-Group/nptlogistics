@@ -1,48 +1,35 @@
 // src/lib/chatbot/widgets/CompanyWidget.tsx
 "use client";
 
-export default function CompanyWidget({ actionProvider }: any) {
+import type { WidgetComponentProps } from "../chatbot.types";
+import { LinkButton } from "./_shared";
+
+export default function CompanyWidget({ actionProvider }: WidgetComponentProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      <button
-        onClick={() => actionProvider.goToFromNav("About NPT", "/company/about")}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
-      >
+      <LinkButton onClick={() => actionProvider.goToFromNav("About NPT", "/company/about")}>
         About NPT
-      </button>
+      </LinkButton>
 
-      <button
+      <LinkButton
         onClick={() => actionProvider.goToFromNav("Locations & Network", "/company/locations")}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
       >
         Locations & Network
-      </button>
+      </LinkButton>
 
-      <button
+      <LinkButton
         onClick={() => actionProvider.goToFromNav("Safety & Compliance", "/company/safety")}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
       >
         Safety & Compliance
-      </button>
+      </LinkButton>
 
-      <button
-        onClick={() => actionProvider.goToFromNav("Blog / Insights", "/blog")}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
-      >
+      <LinkButton onClick={() => actionProvider.goToFromNav("Blog / Insights", "/blog")}>
         Blog / Insights
-      </button>
+      </LinkButton>
 
-      <button
-        onClick={() => actionProvider.goToFromNav("Contact", "/contact")}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
-      >
+      <LinkButton onClick={() => actionProvider.goToFromNav("Contact", "/contact")}>
         Contact
-      </button>
+      </LinkButton>
     </div>
   );
 }

@@ -1,26 +1,15 @@
 // src/lib/chatbot/widgets/TrackingWidget.tsx
 "use client";
 
-export default function TrackingWidget(props: any) {
-  const { actionProvider } = props;
+import type { WidgetComponentProps } from "../chatbot.types";
+import { LinkButton, ResponseButton } from "./_shared";
 
+export default function TrackingWidget({ actionProvider }: WidgetComponentProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      <button
-        onClick={() => actionProvider.goTo("/tracking")}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
-      >
-        Open tracking
-      </button>
+      <LinkButton onClick={() => actionProvider.goTo("/tracking")}>Open tracking</LinkButton>
 
-      <button
-        onClick={() => actionProvider.showContact()}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
-      >
-        Contact support
-      </button>
+      <ResponseButton onClick={() => actionProvider.showContact()}>Contact support</ResponseButton>
     </div>
   );
 }

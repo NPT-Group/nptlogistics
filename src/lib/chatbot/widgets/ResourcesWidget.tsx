@@ -1,40 +1,25 @@
 // src/lib/chatbot/widgets/ResourcesWidget.tsx
 "use client";
 
-export default function ResourcesWidget({ actionProvider }: any) {
+import type { WidgetComponentProps } from "../chatbot.types";
+import { LinkButton, ResponseButton } from "./_shared";
+
+export default function ResourcesWidget({ actionProvider }: WidgetComponentProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      <button
+      <LinkButton
         onClick={() => actionProvider.goToFromNav("Shipping Guides", "/resources/guides")}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
       >
-        Shipping Guides
-      </button>
+        Shipping guides
+      </LinkButton>
 
-      <button
-        onClick={() => actionProvider.goToFromNav("FAQs", "/resources/faqs")}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
-      >
+      <LinkButton onClick={() => actionProvider.goToFromNav("FAQs", "/resources/faqs")}>
         FAQs
-      </button>
+      </LinkButton>
 
-      <button
-        onClick={() => actionProvider.startQuote()}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
-      >
-        Start a quote
-      </button>
+      <ResponseButton onClick={() => actionProvider.showCompany()}>Company info</ResponseButton>
 
-      <button
-        onClick={() => actionProvider.showContact()}
-        className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-        type="button"
-      >
-        Contact an agent
-      </button>
+      <ResponseButton onClick={() => actionProvider.showContact()}>Contact support</ResponseButton>
     </div>
   );
 }

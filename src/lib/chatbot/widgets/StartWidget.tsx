@@ -2,11 +2,11 @@
 "use client";
 
 import { START_REPLIES } from "../knowledgeBase";
+import type { BotIntentId, WidgetComponentProps } from "../chatbot.types";
+import { LinkButton, ResponseButton } from "./_shared";
 
-export default function StartWidget(props: any) {
-  const { actionProvider } = props;
-
-  const onPick = (intent: string) => {
+export default function StartWidget({ actionProvider }: WidgetComponentProps) {
+  const onPick = (intent: BotIntentId) => {
     switch (intent) {
       case "GET_QUOTE":
         return actionProvider.startQuote();
@@ -16,9 +16,6 @@ export default function StartWidget(props: any) {
 
       case "SOLUTIONS":
         return actionProvider.startSolutions();
-
-      case "SERVICES_HELP":
-        return actionProvider.startServicesHelp();
 
       case "INDUSTRIES":
         return actionProvider.showIndustries();
@@ -41,9 +38,6 @@ export default function StartWidget(props: any) {
       case "HUMAN_CONTACT":
         return actionProvider.showContact();
 
-      case "GENERAL_FAQ":
-        return actionProvider.searchFaq("services");
-
       default:
         return actionProvider.startOver();
     }
@@ -51,16 +45,20 @@ export default function StartWidget(props: any) {
 
   return (
     <div className="flex flex-wrap gap-2">
-      {START_REPLIES.map((r) => (
-        <button
-          key={r.intent}
-          onClick={() => onPick(r.intent)}
-          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50"
-          type="button"
-        >
-          {r.label}
-        </button>
-      ))}
+      {START_REPLIES.map((reply) => {
+        const isDirectLink =
+          reply.intent === "TRACKING" ||
+          reply.intent === "RESOURCES_FAQS" ||
+          reply.intent === "RESOURCES_GUIDES";
+
+        const Button = isDirectLink ? LinkButton : ResponseButton;
+
+        return (
+          <Button key={reply.intent} onClick={() => onPick(reply.intent)}>
+            {reply.label}
+          </Button>
+        );
+      })}
     </div>
   );
 }
