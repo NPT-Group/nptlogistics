@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Container } from "../components/layout/Container";
+import { TrackedLink } from "../components/analytics/TrackedLink";
 import { SEO_LANES, getSeoLanePriority, type SeoPriority } from "@/config/seoLanes";
 import { cn } from "@/lib/cn";
 
@@ -58,9 +58,12 @@ export default function LanesHubPage() {
             {sorted.map((lane) => {
               const priority = getSeoLanePriority(lane.slug);
               return (
-                <Link
+                <TrackedLink
                   key={lane.slug}
                   href={`/lanes/${lane.slug}`}
+                  ctaId={`lanes_hub_open_${lane.slug}`}
+                  location="lanes_hub:cards"
+                  label={`${lane.originLabel} to ${lane.destinationLabel}`}
                   className="group relative overflow-hidden rounded-2xl border border-[color:var(--color-border-light)] bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.06)] transition duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-text-light)] hover:shadow-[0_14px_30px_rgba(15,23,42,0.10)]"
                 >
                   <span
@@ -79,7 +82,7 @@ export default function LanesHubPage() {
                   <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-muted-light)]">
                     {lane.intro}
                   </p>
-                </Link>
+                </TrackedLink>
               );
             })}
           </div>

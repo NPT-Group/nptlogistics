@@ -86,7 +86,8 @@ function WhyCardFace({ card }: { card: WhyNptCard }) {
       <div
         className="pointer-events-none absolute inset-0"
         style={{
-          background: "radial-gradient(520px 240px at 85% 95%, rgba(255,255,255,0.16), transparent 64%)",
+          background:
+            "radial-gradient(520px 240px at 85% 95%, rgba(255,255,255,0.16), transparent 64%)",
         }}
         aria-hidden="true"
       />
@@ -328,10 +329,15 @@ function OrbitCard({
     return Math.sin(angleRad) * orbitY;
   });
   const scale = useTransform(depth, (d) => {
-    return WHY_NPT_TOKENS.orbit.scaleMin + d * (WHY_NPT_TOKENS.orbit.scaleMax - WHY_NPT_TOKENS.orbit.scaleMin);
+    return (
+      WHY_NPT_TOKENS.orbit.scaleMin +
+      d * (WHY_NPT_TOKENS.orbit.scaleMax - WHY_NPT_TOKENS.orbit.scaleMin)
+    );
   });
   const opacity = useTransform(depth, (d) => {
-    return WHY_NPT_TOKENS.orbit.cardGlassOpacityMin + d * WHY_NPT_TOKENS.orbit.cardGlassOpacityRange;
+    return (
+      WHY_NPT_TOKENS.orbit.cardGlassOpacityMin + d * WHY_NPT_TOKENS.orbit.cardGlassOpacityRange
+    );
   });
   const zIndex = useTransform(depth, (d) => 10 + Math.round(d * 30));
 
@@ -384,19 +390,44 @@ export function WhyNPTOrbitVisualization() {
   const ellipse = useOrbitEllipse();
   const rotation = useMotionValue(0);
   const [activeCardId, setActiveCardId] = React.useState<WhyNptCard["id"] | null>(null);
+  const baseDegPerMs = React.useMemo(() => 360 / (WHY_NPT_TOKENS.orbit.rotationSec * 1000), []);
+  const currentDegPerMsRef = React.useRef(baseDegPerMs);
+  const targetDegPerMsRef = React.useRef(baseDegPerMs);
+
+  React.useEffect(() => {
+    if (reduceMotion) {
+      targetDegPerMsRef.current = 0;
+      currentDegPerMsRef.current = 0;
+      return;
+    }
+    // Smoothly brake to 0 on hover and smoothly ramp back up on hover-out.
+    targetDegPerMsRef.current = activeCardId ? 0 : baseDegPerMs;
+  }, [activeCardId, baseDegPerMs, reduceMotion]);
 
   useAnimationFrame((_, delta) => {
-    if (reduceMotion || activeCardId) return;
-    const degPerMs = 360 / (WHY_NPT_TOKENS.orbit.rotationSec * 1000);
-    const next = (rotation.get() + delta * degPerMs) % 360;
+    if (reduceMotion) return;
+
+    const dt = Math.max(0, delta);
+    const current = currentDegPerMsRef.current;
+    const target = targetDegPerMsRef.current;
+
+    // Decel slightly faster than accel for a premium intentional feel.
+    const tauMs = target < current ? 220 : 420;
+    const alpha = 1 - Math.exp(-dt / tauMs);
+    const nextDegPerMs = current + (target - current) * alpha;
+    currentDegPerMsRef.current = Math.abs(nextDegPerMs - target) < 0.000001 ? target : nextDegPerMs;
+
+    const next = (rotation.get() + dt * currentDegPerMsRef.current) % 360;
     rotation.set(next);
   });
 
   React.useEffect(() => {
     if (reduceMotion) {
       rotation.set(0);
+      currentDegPerMsRef.current = 0;
+      targetDegPerMsRef.current = 0;
     }
-  }, [reduceMotion, rotation]);
+  }, [reduceMotion, rotation, baseDegPerMs]);
 
   return (
     <div className="relative mx-auto">
@@ -404,7 +435,11 @@ export function WhyNPTOrbitVisualization() {
         className="relative mx-auto"
         style={{ height: WHY_NPT_TOKENS.solar.desktopStageHeight, perspective: "1200px" }}
       >
-        <SolarSystemBackdrop orbitX={ellipse.x} orbitY={ellipse.y} reduceMotion={Boolean(reduceMotion)} />
+        <SolarSystemBackdrop
+          orbitX={ellipse.x}
+          orbitY={ellipse.y}
+          reduceMotion={Boolean(reduceMotion)}
+        />
 
         <div className="absolute top-1/2 left-1/2 z-40 -translate-x-1/2 -translate-y-1/2">
           <div className="relative">
@@ -439,7 +474,9 @@ export function WhyNPTOrbitVisualization() {
                 height: WHY_NPT_TOKENS.solar.coreShellHeight,
               }}
               animate={reduceMotion ? undefined : { scale: [1, 1.008, 1] }}
-              transition={reduceMotion ? undefined : { duration: 10.5, repeat: Infinity, ease: "easeInOut" }}
+              transition={
+                reduceMotion ? undefined : { duration: 10.5, repeat: Infinity, ease: "easeInOut" }
+              }
             >
               <div
                 className="pointer-events-none absolute inset-0 rounded-full"

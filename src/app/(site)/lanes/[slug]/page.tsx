@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, CheckCircle2, MapPin, Package } from "lucide-react";
 import { Container } from "../../components/layout/Container";
+import { TrackedLink } from "../../components/analytics/TrackedLink";
 import { getSeoLaneBySlug, getSeoLaneSlugs } from "@/config/seoLanes";
 import { SITE_NAME, toAbsoluteUrl } from "@/lib/seo/site";
 
@@ -120,13 +120,16 @@ export default async function LanePage({ params }: { params: Params | Promise<Pa
               {lane.intro}
             </p>
             <div className="mt-6">
-              <Link
+              <TrackedLink
                 href="/quote"
+                ctaId={`lane_detail_quote_${lane.slug}`}
+                location="lane_detail:hero"
+                label="Request a quote for this lane"
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[color:var(--color-brand-600)] px-6 text-sm font-semibold text-white shadow-[0_8px_22px_rgba(220,38,38,0.25)] transition hover:bg-[color:var(--color-brand-700)]"
               >
                 Request a quote for this lane
                 <ArrowRight className="h-4 w-4" />
-              </Link>
+              </TrackedLink>
             </div>
           </div>
         </Container>
@@ -173,14 +176,17 @@ export default async function LanePage({ params }: { params: Params | Promise<Pa
               </div>
               <div className="mt-4 flex flex-col gap-2">
                 {lane.relatedServices.map((service) => (
-                  <Link
+                  <TrackedLink
                     key={service.href}
                     href={service.href}
+                    ctaId={`lane_detail_related_service_${lane.slug}_${service.label}`}
+                    location="lane_detail:related_services"
+                    label={service.label}
                     className="group flex items-center justify-between rounded-xl border border-[color:var(--color-border-light)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--color-text-light)] transition hover:border-[color:var(--color-text-light)] hover:shadow-[0_4px_12px_rgba(15,23,42,0.06)]"
                   >
                     {service.label}
                     <ArrowRight className="h-4 w-4 shrink-0 opacity-60 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
-                  </Link>
+                  </TrackedLink>
                 ))}
               </div>
             </div>
@@ -194,14 +200,17 @@ export default async function LanePage({ params }: { params: Params | Promise<Pa
               </div>
               <div className="mt-4 flex flex-col gap-2">
                 {lane.relatedLocations.map((location) => (
-                  <Link
+                  <TrackedLink
                     key={location.href}
                     href={location.href}
+                    ctaId={`lane_detail_related_location_${lane.slug}_${location.label}`}
+                    location="lane_detail:related_locations"
+                    label={location.label}
                     className="group flex items-center justify-between rounded-xl border border-[color:var(--color-border-light)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--color-text-light)] transition hover:border-[color:var(--color-text-light)] hover:shadow-[0_4px_12px_rgba(15,23,42,0.06)]"
                   >
                     {location.label}
                     <ArrowRight className="h-4 w-4 shrink-0 opacity-60 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
-                  </Link>
+                  </TrackedLink>
                 ))}
               </div>
             </div>

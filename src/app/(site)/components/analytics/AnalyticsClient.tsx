@@ -145,6 +145,7 @@ export function AnalyticsClient() {
   const routeExcluded = ANALYTICS_EXCLUDED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
   const [consent, setConsent] = React.useState<ConsentPreferences | null>(null);
   const [initialized, setInitialized] = React.useState(false);
+  const [gtagReady, setGtagReady] = React.useState(false);
   const trackedPathRef = React.useRef<string>("");
 
   React.useEffect(() => {
@@ -157,10 +158,42 @@ export function AnalyticsClient() {
   }, []);
 
   React.useEffect(() => {
+    if (!initialized || !gaId || routeExcluded) return;
+    if (typeof window.gtag === "function") {
+      setGtagReady(true);
+      return;
+    }
+
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 24;
+
+    const check = () => {
+      if (cancelled) return;
+      if (typeof window.gtag === "function") {
+        setGtagReady(true);
+        return;
+      }
+      attempts += 1;
+      if (attempts < maxAttempts) {
+        window.setTimeout(check, 150);
+      }
+    };
+
+    setGtagReady(false);
+    check();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [gaId, initialized, routeExcluded]);
+
+  React.useEffect(() => {
     if (
       routeExcluded ||
       !initialized ||
       !gaId ||
+      !gtagReady ||
       !consent?.analytics ||
       typeof window.gtag !== "function"
     ) {
@@ -177,7 +210,7 @@ export function AnalyticsClient() {
       page_title: document.title,
       transport_type: "beacon",
     });
-  }, [consent?.analytics, gaId, initialized, pathname, routeExcluded, searchParams]);
+  }, [consent?.analytics, gaId, gtagReady, initialized, pathname, routeExcluded, searchParams]);
 
   const saveConsent = React.useCallback((analytics: boolean) => {
     const next = createConsentPreferences(analytics);

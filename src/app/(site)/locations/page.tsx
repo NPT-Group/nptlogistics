@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Container } from "../components/layout/Container";
+import { TrackedLink } from "../components/analytics/TrackedLink";
 import { SEO_LOCATIONS, getSeoLocationPriority, type SeoPriority } from "@/config/seoLocations";
 import { cn } from "@/lib/cn";
 
@@ -58,9 +58,12 @@ export default function LocationsHubPage() {
             {sorted.map((location) => {
               const priority = getSeoLocationPriority(location.slug);
               return (
-                <Link
+                <TrackedLink
                   key={location.slug}
                   href={`/locations/${location.slug}`}
+                  ctaId={`locations_hub_open_${location.slug}`}
+                  location="locations_hub:cards"
+                  label={`${location.city}, ${location.region}`}
                   className="group relative rounded-2xl border border-[color:var(--color-border-light)] bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.06)] transition duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-text-light)] hover:shadow-[0_14px_30px_rgba(15,23,42,0.10)]"
                 >
                   <span
@@ -80,7 +83,7 @@ export default function LocationsHubPage() {
                   <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-muted-light)]">
                     {location.intro}
                   </p>
-                </Link>
+                </TrackedLink>
               );
             })}
           </div>

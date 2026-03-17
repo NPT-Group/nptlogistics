@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { NAV, type NavLink } from "@/config/navigation";
+import { trackCtaClick } from "@/lib/analytics/cta";
 import {
   Truck,
   Package,
@@ -74,8 +75,14 @@ function MenuLink({
 }: NavLink & { onNavigate?: () => void }) {
   const pathname = usePathname();
   const handleLinkClick = React.useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement>, targetHref: string) => {
+    (event: React.MouseEvent<HTMLAnchorElement>, targetHref: string, targetLabel: string) => {
       onNavigate?.();
+      trackCtaClick({
+        ctaId: `nav_desktop_menu_${targetLabel}`,
+        location: "nav_desktop:menu",
+        destination: targetHref,
+        label: targetLabel,
+      });
 
       const [targetPath, targetHash = ""] = targetHref.split("#");
       const isCareersOverviewTarget =
@@ -97,7 +104,7 @@ function MenuLink({
       <NavigationMenu.Link asChild>
         <Link
           href={href}
-          onClick={(event) => handleLinkClick(event, href)}
+          onClick={(event) => handleLinkClick(event, href, label)}
           className={cn(
             "group block cursor-pointer rounded-2xl p-3 transition",
             "border border-transparent",
@@ -139,7 +146,7 @@ function MenuLink({
             <NavigationMenu.Link key={child.href} asChild>
               <Link
                 href={child.href}
-                onClick={(event) => handleLinkClick(event, child.href)}
+                onClick={(event) => handleLinkClick(event, child.href, child.label)}
                 className={cn(
                   "group block cursor-pointer rounded-xl px-3 py-2 text-sm transition",
                   "text-[color:var(--color-menu-muted)]",
@@ -316,7 +323,15 @@ export function SolutionsMegaMenu({
                 <div className="mt-auto pt-6">
                   <Link
                     href={NAV.solutions.intro.ctaHref}
-                    onClick={closeMenu}
+                    onClick={() => {
+                      closeMenu();
+                      trackCtaClick({
+                        ctaId: `nav_desktop_intro_${NAV.solutions.intro.ctaLabel}`,
+                        location: "nav_desktop:intro",
+                        destination: NAV.solutions.intro.ctaHref,
+                        label: NAV.solutions.intro.ctaLabel,
+                      });
+                    }}
                     className={cn(
                       "inline-flex cursor-pointer items-center gap-2 text-sm font-semibold",
                       "text-[color:var(--color-menu-accent)] hover:text-[color:var(--color-menu-accent-hover)]",
@@ -442,7 +457,15 @@ export function DesktopRichDropdown({
                 <div className="mt-auto pt-6">
                   <Link
                     href={section.intro.ctaHref}
-                    onClick={closeMenu}
+                    onClick={() => {
+                      closeMenu();
+                      trackCtaClick({
+                        ctaId: `nav_desktop_intro_${section.intro.ctaLabel}`,
+                        location: "nav_desktop:intro",
+                        destination: section.intro.ctaHref,
+                        label: section.intro.ctaLabel,
+                      });
+                    }}
                     className={cn(
                       "inline-flex cursor-pointer items-center gap-2 text-sm font-semibold",
                       "text-[color:var(--color-menu-accent)] hover:text-[color:var(--color-menu-accent-hover)]",

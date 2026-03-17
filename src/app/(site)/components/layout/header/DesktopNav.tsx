@@ -12,7 +12,7 @@ import { cn } from "@/lib/cn";
 import { focusRingNav } from "./constants";
 
 const NAV_OPEN_DELAY_MS = 180;
-const NAV_CLOSE_DELAY_MS = 560;
+const NAV_CLOSE_DELAY_MS = 245;
 
 export function DesktopNav() {
   const [value, setValue] = React.useState<string>("");

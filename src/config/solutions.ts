@@ -107,7 +107,7 @@ export const SOLUTIONS_DATA = {
         description: "Fast-track delivery for urgent shipments.",
         icon: "zap",
         bestFor: "Time-sensitive freight",
-        image: "/_optimized/solutions/card-expedited.webp",
+        image: "/_optimized/solutions/card-expeditedd.webp",
       },
       {
         analyticsId: "specialized_vehicle_transport",

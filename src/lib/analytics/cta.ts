@@ -46,7 +46,6 @@ export function trackCtaClick(payload: CtaClickPayload) {
     interaction_type: "click",
     page_path: window.location.pathname,
     page_title: document.title,
-    ts: now,
   };
   if (destination) eventPayload.destination = destination;
   if (label) eventPayload.label = label;

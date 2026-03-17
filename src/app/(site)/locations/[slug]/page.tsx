@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Container } from "../../components/layout/Container";
+import { TrackedLink } from "../../components/analytics/TrackedLink";
 import { getSeoLocationBySlug, getSeoLocationSlugs } from "@/config/seoLocations";
 import { SITE_NAME, toAbsoluteUrl } from "@/lib/seo/site";
 
@@ -124,13 +124,16 @@ export default async function LocationPage({ params }: { params: Params | Promis
               {location.intro}
             </p>
             <div className="mt-6">
-              <Link
+              <TrackedLink
                 href="/quote"
+                ctaId={`location_detail_quote_${location.slug}`}
+                location="location_detail:hero"
+                label="Request a freight quote"
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[color:var(--color-brand-600)] px-6 text-sm font-semibold text-white shadow-[0_8px_22px_rgba(220,38,38,0.25)] transition hover:bg-[color:var(--color-brand-700)]"
               >
                 Request a freight quote
                 <ArrowRight className="h-4 w-4" />
-              </Link>
+              </TrackedLink>
             </div>
           </div>
         </Container>
@@ -160,13 +163,16 @@ export default async function LocationPage({ params }: { params: Params | Promis
             </h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {location.topLanes.map((lane) => (
-                <Link
+                <TrackedLink
                   key={lane.href}
                   href={lane.href}
+                  ctaId={`location_detail_lane_${location.slug}_${lane.label}`}
+                  location="location_detail:top_lanes"
+                  label={lane.label}
                   className="rounded-xl border border-[color:var(--color-border-light)] bg-white px-4 py-3 text-sm font-medium text-[color:var(--color-text-light)] transition hover:border-[color:var(--color-text-light)]"
                 >
                   {lane.label}
-                </Link>
+                </TrackedLink>
               ))}
             </div>
           </section>
