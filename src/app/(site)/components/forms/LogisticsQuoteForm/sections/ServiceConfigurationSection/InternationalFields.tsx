@@ -25,6 +25,7 @@ import { AddressFields } from "../../components/AddressFields";
 import { CargoLinesFields } from "../../components/CargoLinesFields";
 import { ContainerLinesFields } from "../../components/ContainerLinesFields";
 import { ShipmentDetailsBlock } from "./ShipmentDetailsSection";
+import { toCtaSlug, trackCtaClick } from "@/lib/analytics/cta";
 
 const MODE_OPTIONS: readonly IconCardOption<EInternationalMode>[] = [
   {
@@ -143,6 +144,12 @@ export function InternationalFields() {
   function handleModeChange(next: EInternationalMode) {
     if (next === mode) return;
 
+    trackCtaClick({
+      ctaId: "quote_international_mode_selected",
+      location: "logistics_quote_form_international",
+      label: toCtaSlug(String(next)),
+    });
+
     modeField.onChange(next);
     modeField.onBlur();
 
@@ -159,6 +166,12 @@ export function InternationalFields() {
 
   function handleOceanLoadTypeChange(next: EOceanLoadType) {
     if (next === oceanLoadType) return;
+
+    trackCtaClick({
+      ctaId: "quote_ocean_load_type_selected",
+      location: "logistics_quote_form_international",
+      label: toCtaSlug(String(next)),
+    });
 
     oceanLoadTypeField.onChange(next);
     oceanLoadTypeField.onBlur();

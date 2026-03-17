@@ -43,6 +43,7 @@ import {
   type FeedbackBannerData,
 } from "@/app/(site)/components/forms/components/FeedbackBanner";
 import { FormCardShell } from "../components/FormCardShell";
+import { toCtaSlug, trackCtaClick } from "@/lib/analytics/cta";
 
 function ServiceResetEffects({
   control,
@@ -203,6 +204,27 @@ export default function LogisticsQuoteForm() {
         throw new Error(msg);
       }
 
+      trackCtaClick({
+        ctaId: "logistics_quote_submit_success",
+        location: "logistics_quote_form",
+        destination: "/api/v1/quotes/logistics/submit",
+        label: [
+          normalizedValues.serviceDetails?.primaryService,
+          normalizedValues.serviceDetails?.primaryService === ELogisticsPrimaryService.INTERNATIONAL
+            ? normalizedValues.serviceDetails?.mode
+            : undefined,
+          normalizedValues.serviceDetails?.primaryService ===
+            ELogisticsPrimaryService.INTERNATIONAL &&
+          normalizedValues.serviceDetails?.mode === EInternationalMode.OCEAN
+            ? normalizedValues.serviceDetails?.oceanLoadType
+            : undefined,
+          normalizedValues.identification?.identity,
+          normalizedValues.identification?.brokerType,
+        ]
+          .filter(Boolean)
+          .map((value) => toCtaSlug(String(value)))
+          .join("|"),
+      });
       reset(LOGISTICS_QUOTE_SUBMIT_DEFAULTS);
       turnstileRef.current?.reset();
 
@@ -233,6 +255,12 @@ export default function LogisticsQuoteForm() {
         scrollToTopArea();
       });
     } catch (err) {
+      trackCtaClick({
+        ctaId: "logistics_quote_submit_error",
+        location: "logistics_quote_form",
+        destination: "/api/v1/quotes/logistics/submit",
+        label: err instanceof Error && err.message ? err.message.slice(0, 120) : "submission_error",
+      });
       setFeedback({
         tone: "error",
         title: "Unable to submit quote request",

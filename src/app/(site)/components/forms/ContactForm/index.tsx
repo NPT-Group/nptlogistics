@@ -20,6 +20,7 @@ import { InquirySectionRouter } from "./components/InquirySectionRouter";
 import { SubmitSection } from "./sections/SubmitSection";
 import { TurnstileWidgetHandle } from "@/components/TurnstileWidget";
 import { NAV_OFFSET } from "@/constants/ui";
+import { toCtaSlug, trackCtaClick } from "@/lib/analytics/cta";
 
 export default function ContactForm() {
   const resolver = zodResolver(
@@ -76,6 +77,8 @@ export default function ContactForm() {
     try {
       const body = toApiSubmitBody(values);
 
+      const category = body.inquiry?.category;
+
       const res = await fetch("/api/v1/contact/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -91,6 +94,13 @@ export default function ContactForm() {
           "Something went wrong while submitting your inquiry. Please try again.";
         throw new Error(msg);
       }
+
+      trackCtaClick({
+        ctaId: "contact_form_submit_success",
+        location: "contact_form",
+        destination: "/api/v1/contact/submit",
+        label: category ? toCtaSlug(String(category)) : "unknown_category",
+      });
 
       reset(CONTACT_FORM_SUBMIT_DEFAULTS);
       turnstileRef.current?.reset();
@@ -120,6 +130,16 @@ export default function ContactForm() {
 
       scrollAfterFeedbackRender();
     } catch (err) {
+      trackCtaClick({
+        ctaId: "contact_form_submit_error",
+        location: "contact_form",
+        destination: "/api/v1/contact/submit",
+        label:
+          values.inquiry?.category != null
+            ? toCtaSlug(String(values.inquiry.category))
+            : "unknown_category",
+      });
+
       setFeedback({
         tone: "error",
         title: "Unable to submit inquiry",

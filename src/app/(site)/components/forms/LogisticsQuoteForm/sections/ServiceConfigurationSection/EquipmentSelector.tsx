@@ -20,6 +20,7 @@ import {
 import type { LogisticsQuoteSubmitValues } from "../../schema";
 import { FTL_EQUIPMENT_LABEL, LTL_EQUIPMENT_LABEL } from "@/lib/utils/enums/logisticsLabels";
 import { IconCardSelector, type IconCardOption } from "../../components/IconCardSelector";
+import { toCtaSlug, trackCtaClick } from "@/lib/analytics/cta";
 
 const FTL_EQUIPMENT_CARDS: readonly IconCardOption<EFTLEquipmentType>[] = [
   {
@@ -102,6 +103,15 @@ export function EquipmentSelector() {
 
   function choose(next: EFTLEquipmentType | ELTLEquipmentType) {
     if (field.value === next) return;
+
+    trackCtaClick({
+      ctaId: "quote_equipment_selected",
+      location:
+        primaryService === ELogisticsPrimaryService.FTL
+          ? "logistics_quote_form_ftl_equipment"
+          : "logistics_quote_form_ltl_equipment",
+      label: toCtaSlug(String(next)),
+    });
 
     field.onChange(next);
     field.onBlur();

@@ -12,6 +12,7 @@ import {
 import type { LogisticsQuoteSubmitValues } from "../schema";
 import { buildServiceDetailsOnPrimaryServiceChange } from "../helpers";
 import { IconCardSelector, type IconCardOption } from "../components/IconCardSelector";
+import { toCtaSlug, trackCtaClick } from "@/lib/analytics/cta";
 
 const SERVICES: readonly IconCardOption<PrimaryService>[] = [
   {
@@ -57,6 +58,12 @@ export function ServiceSelectionSection() {
   function selectService(next: PrimaryService) {
     const prev = getValues("serviceDetails.primaryService");
     if (prev === next) return;
+
+    trackCtaClick({
+      ctaId: "quote_service_selected",
+      location: "logistics_quote_form_service_selection",
+      label: toCtaSlug(String(next)),
+    });
 
     const nextDefaults = buildServiceDetailsOnPrimaryServiceChange(next);
     const allValues = getValues();

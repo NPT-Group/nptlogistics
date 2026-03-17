@@ -19,6 +19,7 @@ import { EContactInquiryCategory } from "@/types/contactInquiry.types";
 
 import type { ContactFormSubmitValues } from "../schema";
 import { buildInquiryOnCategoryChange } from "../helpers";
+import { toCtaSlug, trackCtaClick } from "@/lib/analytics/cta";
 
 export type DepartmentOption = {
   value: EContactInquiryCategory;
@@ -96,6 +97,12 @@ export function DepartmentSelector({ onDepartmentChange }: DepartmentSelectorPro
   function selectDepartment(next: EContactInquiryCategory) {
     const prev = getValues("inquiry.category");
     if (prev === next) return;
+
+    trackCtaClick({
+      ctaId: "contact_department_selected",
+      location: "contact_form_department_selector",
+      label: toCtaSlug(String(next)),
+    });
 
     const nextInquiry = buildInquiryOnCategoryChange(next);
     const allValues = getValues();

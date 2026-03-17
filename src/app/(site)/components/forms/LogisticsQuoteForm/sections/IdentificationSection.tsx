@@ -7,6 +7,7 @@ import { User, Briefcase, Building2, ShieldCheck } from "lucide-react";
 import type { LogisticsQuoteSubmitValues } from "../schema";
 import { EBrokerType, ECustomerIdentity } from "@/types/logisticsQuote.types";
 import { IconCardSelector, type IconCardOption } from "../components/IconCardSelector";
+import { toCtaSlug, trackCtaClick } from "@/lib/analytics/cta";
 
 const CUSTOMER_TYPE_OPTIONS: readonly IconCardOption<ECustomerIdentity>[] = [
   {
@@ -122,6 +123,14 @@ export function IdentificationSection() {
   const brokerTypeError = brokerTypeState.error?.message;
 
   function handleIdentityChange(next: ECustomerIdentity) {
+    if (identity !== next) {
+      trackCtaClick({
+        ctaId: "quote_customer_type_selected",
+        location: "logistics_quote_form_identification",
+        label: toCtaSlug(String(next)),
+      });
+    }
+
     identityField.onChange(next);
     identityField.onBlur();
 
@@ -137,6 +146,13 @@ export function IdentificationSection() {
   }
 
   function handleBrokerTypeChange(next: EBrokerType) {
+    if (brokerTypeField.value !== next) {
+      trackCtaClick({
+        ctaId: "quote_broker_type_selected",
+        location: "logistics_quote_form_identification",
+        label: toCtaSlug(String(next)),
+      });
+    }
     brokerTypeField.onChange(next);
     brokerTypeField.onBlur();
   }
