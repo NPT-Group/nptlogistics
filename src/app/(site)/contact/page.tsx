@@ -67,14 +67,8 @@ function ContactHero() {
 
 function ContactSupportSection() {
   return (
-    <section className="relative overflow-hidden bg-[#070b14] py-14 sm:py-16">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 [background-image:linear-gradient(to_right,rgba(255,255,255,0.85)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.85)_1px,transparent_1px)] [background-size:72px_72px] opacity-[0.03]" />
-        <div className="absolute inset-0 bg-[radial-gradient(700px_320px_at_18%_18%,rgba(220,38,38,0.14),transparent_58%)]" />
-        <div className="absolute inset-x-0 top-0 h-px bg-white/10" />
-      </div>
-
-      <Container className="site-page-container relative">
+    <section className="py-8 sm:py-10">
+      <Container className="site-page-container">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mx-auto mb-3 h-[2px] w-12 bg-[color:var(--color-brand-500)]" />
           <p className="text-[10.5px] font-semibold tracking-[0.14em] text-[color:var(--color-brand-500)] uppercase">
@@ -93,34 +87,38 @@ function ContactSupportSection() {
               <div
                 key={item.title}
                 className={cn(
-                  "group relative overflow-hidden rounded-[24px] p-[1px]",
-                  "bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.05))]",
-                  "shadow-[0_18px_50px_rgba(0,0,0,0.26)] transition duration-300",
-                  "hover:-translate-y-[2px] hover:shadow-[0_22px_60px_rgba(0,0,0,0.32)]",
+                  "group relative overflow-hidden rounded-[24px] border p-5 sm:p-6",
+                  "border-[color:var(--color-border-light)] bg-white/88 backdrop-blur-sm",
+                  "shadow-[0_10px_30px_rgba(15,23,42,0.05)] transition duration-300",
+                  "hover:-translate-y-[1px] hover:shadow-[0_14px_36px_rgba(15,23,42,0.08)]",
                 )}
               >
-                <div className="relative h-full rounded-[23px] border border-white/6 bg-[linear-gradient(180deg,rgba(10,14,24,0.88),rgba(7,11,20,0.96))] p-5 sm:p-6">
+                <div
+                  aria-hidden
+                  className="absolute top-0 left-0 h-16 w-16 rounded-br-[22px]"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(220,38,38,0.10) 0%, rgba(220,38,38,0.04) 55%, transparent 100%)",
+                  }}
+                />
+
+                <div className="relative flex items-start gap-4">
                   <div
-                    aria-hidden
-                    className="absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.12),transparent_55%)]"
-                  />
+                    className={cn(
+                      "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl",
+                      "border border-[color:var(--color-brand-100)] bg-white",
+                      "shadow-[0_4px_12px_rgba(15,23,42,0.05)]",
+                    )}
+                  >
+                    <Icon className="h-5.5 w-5.5 text-[color:var(--color-brand-600)]" />
+                  </div>
 
-                  <div className="relative">
-                    <div
-                      className={cn(
-                        "inline-flex h-11 w-11 items-center justify-center rounded-2xl",
-                        "border border-white/10 bg-white/[0.045] backdrop-blur-sm",
-                        "shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
-                      )}
-                    >
-                      <Icon className="h-5 w-5 text-[color:var(--color-brand-500)]" />
-                    </div>
-
-                    <h3 className="mt-5 text-[1.02rem] font-semibold tracking-tight text-white">
+                  <div className="min-w-0">
+                    <h3 className="text-[1.05rem] font-semibold tracking-tight text-[color:var(--color-text-light)]">
                       {item.title}
                     </h3>
 
-                    <p className="mt-2 max-w-[30ch] text-sm leading-6 text-white/64">
+                    <p className="mt-2 max-w-[24ch] text-sm leading-6 text-[color:var(--color-muted-light)]">
                       {item.description}
                     </p>
                   </div>
