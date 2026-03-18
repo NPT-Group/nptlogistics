@@ -322,8 +322,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       {
         key: "flatbed",
         label: "Flatbed",
-        title:
-          "Flatbed | Open Deck Truckload for Industrial & Project Freight",
+        title: "Flatbed | Open Deck Truckload for Industrial & Project Freight",
         description:
           "Flatbed is the standard open-deck truckload solution for freight that exceeds standard trailer dimensions or requires crane, side-load, or top-load access. It supports industrial and project-driven shipments where securement standards, route planning, and jobsite coordination directly impact schedule integrity. Common commodities include structural steel, lumber, construction materials, heavy equipment, machinery, and oversized industrial components moving across North America.",
 
@@ -367,8 +366,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         },
 
         howToUse: {
-          intro:
-            "Here’s how to use NPT’s Flatbed service from quote to delivery.",
+          intro: "Here’s how to use NPT’s Flatbed service from quote to delivery.",
           items: [
             "Share exact dimensions, weight, and weight distribution or center-of-gravity so we can confirm deck fit and securement approach.",
             "Provide loading and unloading method, equipment on site (crane, forklift), and any access or height restrictions.",
@@ -457,8 +455,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       {
         key: "step-deck",
         label: "Step Deck",
-        title:
-          "Step Deck | Drop-Deck Truckload for Tall Cargo & Height-Sensitive Freight",
+        title: "Step Deck | Drop-Deck Truckload for Tall Cargo & Height-Sensitive Freight",
         description:
           "Step deck (drop-deck) trailers have a lower forward section that reduces overall load height, allowing taller cargo to stay within legal height limits. Ideal when flatbed cannot accommodate load height or when you need extra vertical clearance for machinery, equipment, or structural components. Common uses include construction equipment, manufacturing machinery, and oversized industrial freight moving across North America.",
 
@@ -501,8 +498,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         },
 
         howToUse: {
-          intro:
-            "Here's how to use NPT's Step Deck service from quote to delivery.",
+          intro: "Here's how to use NPT's Step Deck service from quote to delivery.",
           items: [
             "Share exact dimensions, weight, and center-of-gravity so we can confirm step deck fit.",
             "Provide loading and unloading method and any height or access restrictions.",
@@ -857,7 +853,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       ],
       primary: {
         label: "Call Us",
-        href: "tel:+15199683632",
+        href: "tel:+281-607-0001",
         ctaId: "service_truckload_final_call_us",
       },
       secondary: {
@@ -1156,7 +1152,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       ],
       primary: {
         label: "Call Us",
-        href: "tel:+15199683632",
+        href: "tel:+281-607-0001",
         ctaId: "service_es_final_call_us",
       },
       secondary: {
@@ -1691,7 +1687,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       ],
       primary: {
         label: "Call Us",
-        href: "tel:+15199683632",
+        href: "tel:+281-607-0001",
         ctaId: "service_crossborder_final_call_us",
       },
       secondary: {
@@ -2200,7 +2196,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       ],
       primary: {
         label: "Call Us",
-        href: "tel:+15199683632",
+        href: "tel:+281-607-0001",
         ctaId: "service_valueadded_final_call_us",
       },
       secondary: {
@@ -2419,7 +2415,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       ],
       primary: {
         label: "Call Us",
-        href: "tel:+15199683632",
+        href: "tel:+281-607-0001",
         ctaId: "service_ltl_final_call_us",
       },
       secondary: {
@@ -2636,7 +2632,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       ],
       primary: {
         label: "Call Us",
-        href: "tel:+15199683632",
+        href: "tel:+281-607-0001",
         ctaId: "service_intermodal_final_call_us",
       },
       secondary: {
@@ -2853,7 +2849,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       ],
       primary: {
         label: "Call Us",
-        href: "tel:+15199683632",
+        href: "tel:+281-607-0001",
         ctaId: "service_hazmat_final_call_us",
       },
       secondary: {
@@ -2958,8 +2954,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
         intro:
           "Temperature-controlled service is for cargo whose quality or compliance depends on maintaining a defined thermal range in transit. This guide helps determine if temperature-controlled is the right fit for your load—and what to use instead when it isn't.",
         diagram: "/_optimized/equipment-diagrams/tempCntrl.webp",
-        diagramAlt:
-          "Temperature-controlled equipment diagram with setpoint and capacity guidance",
+        diagramAlt: "Temperature-controlled equipment diagram with setpoint and capacity guidance",
         specs: {
           length: "Temperature-controlled trailer; 48 ft or 53 ft typical",
           width: "Standard temperature-controlled width; dockable",
@@ -3072,7 +3067,7 @@ export const SERVICES: Record<ServiceKey, ServicePageModel> = {
       ],
       primary: {
         label: "Call Us",
-        href: "tel:+15199683632",
+        href: "tel:+281-607-0001",
         ctaId: "service_tempcontrolled_final_call_us",
       },
       secondary: {
