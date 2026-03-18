@@ -18,7 +18,6 @@ type AppJWT = {
 async function resolveAdmin(
   req: NextRequest,
 ): Promise<{ isAdmin: boolean; hasInvalidAuthCookie: boolean }> {
-  // Dev escape hatch (optional env)
   if (DISABLE_AUTH) {
     return { isAdmin: true, hasInvalidAuthCookie: false };
   }
@@ -32,7 +31,6 @@ async function resolveAdmin(
     cookieName: AUTH_COOKIE_NAME,
   })) as AppJWT | null;
 
-  // Cookie exists but token is not valid → treat as invalid so we can clear it
   if (!token?.email || !token?.name) {
     return { isAdmin: false, hasInvalidAuthCookie: hasAuthCookie };
   }
@@ -41,7 +39,6 @@ async function resolveAdmin(
 
   return {
     isAdmin: isAllowed,
-    // Cookie exists but user is NOT allowed admin → clear it
     hasInvalidAuthCookie: hasAuthCookie && !isAllowed,
   };
 }
@@ -51,7 +48,15 @@ async function resolveAdmin(
 export async function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
-  // Only enforce on /admin routes
+  // 1) Canonical host redirect: www -> non-www
+  const host = req.headers.get("host");
+  if (host === "www.nptlogistics.com") {
+    const url = req.nextUrl.clone();
+    url.host = "nptlogistics.com";
+    return NextResponse.redirect(url, 308);
+  }
+
+  // 2) Only enforce admin auth logic on /admin routes
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }
@@ -61,7 +66,6 @@ export async function proxy(req: NextRequest) {
     const { isAdmin, hasInvalidAuthCookie } = await resolveAdmin(req);
 
     if (isAdmin) {
-      // Authenticated admins land on /admin/blog
       const res = NextResponse.redirect(new URL("/admin/blog", req.url));
       if (hasInvalidAuthCookie) res.cookies.delete(AUTH_COOKIE_NAME);
       return res;
@@ -106,7 +110,7 @@ export async function proxy(req: NextRequest) {
     return res;
   }
 
-  // Admin allowed → continue
+  // Admin allowed -> continue
   const res = NextResponse.next();
   if (hasInvalidAuthCookie) {
     res.cookies.delete(AUTH_COOKIE_NAME);
@@ -115,5 +119,10 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [
+    /*
+     * Run on all app routes except Next internals and common static assets.
+     */
+    "/((?!_next|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|api).*)",
+  ],
 };
