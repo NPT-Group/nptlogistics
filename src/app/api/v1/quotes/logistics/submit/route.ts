@@ -88,7 +88,7 @@ export const POST = async (req: NextRequest) => {
 
     const attachmentsFolder = makeEntityFinalPrefix(
       ES3Namespace.QUOTES,
-      quoteId,
+      quoteMongoId,
       ES3Folder.ATTACHMENTS,
     );
 
