@@ -57,10 +57,10 @@ function CookieConsentBanner({
   if (!visible) return null;
 
   return (
-    <div className="fixed right-3 bottom-3 left-3 z-[120] w-auto pb-[env(safe-area-inset-bottom)] sm:right-auto sm:bottom-5 sm:left-5 sm:w-[min(92vw,430px)]">
+    <div className="fixed left-0 right-0 bottom-0 z-[120] w-full pb-[env(safe-area-inset-bottom)] sm:right-auto sm:bottom-5 sm:left-5 sm:w-[min(92vw,430px)]">
       <div
         className={cn(
-          "rounded-2xl border border-[color:var(--color-border-light)] bg-white p-4 shadow-[0_20px_50px_rgba(2,6,23,0.18)]",
+          "rounded-t-2xl rounded-b-none sm:rounded-2xl border border-[color:var(--color-border-light)] bg-white p-4 shadow-[0_20px_50px_rgba(2,6,23,0.18)]",
           "backdrop-blur",
         )}
       >
