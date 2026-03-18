@@ -13,6 +13,7 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Container } from "@/app/(site)/components/layout/Container";
 import { Section } from "@/app/(site)/components/layout/Section";
 import { NAV_OFFSET } from "@/constants/ui";
+import { trackCtaClick } from "@/lib/analytics/cta";
 
 type CategoryItem = {
   id: string;
@@ -908,6 +909,14 @@ export default function BlogIndexClient({
                       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                         <Link
                           href="/quote"
+                          onClick={() =>
+                            trackCtaClick({
+                              ctaId: "request_quote",
+                              location: "blog_sidebar_cta",
+                              destination: "/quote",
+                              label: "Request a quote",
+                            })
+                          }
                           className={cn(
                             "inline-flex h-9 items-center justify-center gap-2 rounded-md px-4 text-xs font-semibold",
                             "border border-[color:var(--color-brand-600)] bg-[linear-gradient(180deg,var(--color-brand-600),var(--color-brand-700))] text-white shadow-[0_8px_20px_rgba(220,38,38,0.25)] transition hover:-translate-y-[2px] hover:shadow-[0_12px_28px_rgba(220,38,38,0.32)]",
@@ -918,6 +927,14 @@ export default function BlogIndexClient({
                         </Link>
                         <Link
                           href="/contact"
+                          onClick={() =>
+                            trackCtaClick({
+                              ctaId: "contact_us",
+                              location: "blog_sidebar_cta",
+                              destination: "/contact",
+                              label: "Contact us",
+                            })
+                          }
                           className={cn(
                             "inline-flex h-9 items-center justify-center gap-2 rounded-md px-4 text-xs font-semibold",
                             "border border-[rgba(255,255,255,0.22)] bg-[rgba(255,255,255,0.10)] text-[color:var(--color-muted-strong)] shadow-sm backdrop-blur transition hover:-translate-y-[2px] hover:border-[rgba(255,255,255,0.38)] hover:text-white",

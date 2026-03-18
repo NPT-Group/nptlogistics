@@ -442,12 +442,6 @@ export default function CareersClient({
                 <button
                   type="button"
                   onClick={() => {
-                    trackCtaClick({
-                      ctaId: "careers_view_job_listings",
-                      location: "careers_hero",
-                      destination: "/careers#jobs",
-                      label: "View Open Roles",
-                    });
                     scrollToId("jobs");
                   }}
                   className={cn(
@@ -462,12 +456,6 @@ export default function CareersClient({
                 <button
                   type="button"
                   onClick={() => {
-                    trackCtaClick({
-                      ctaId: "careers_driver_opportunities",
-                      location: "careers_hero",
-                      destination: "/careers#drive",
-                      label: "Driver Opportunities",
-                    });
                     scrollToId("drive");
                   }}
                   className={cn(
@@ -696,10 +684,10 @@ export default function CareersClient({
                   rel="noreferrer"
                   onClick={() =>
                     trackCtaClick({
-                      ctaId: "careers_apply_drivedock",
+                      ctaId: "apply_now",
                       location: "careers_drive_card",
                       destination: "https://drivedock.ssp4you.com",
-                      label: "Apply via Drivedock",
+                      label: "Start your application",
                     })
                   }
                   className={cn(
@@ -1051,10 +1039,10 @@ export default function CareersClient({
                           target="_blank"
                           onClick={() =>
                             trackCtaClick({
-                              ctaId: "careers_open_job_listing",
+                              ctaId: "apply_now",
                               location: "careers_jobs_list",
                               destination: jobHref,
-                              label: "Open job listing",
+                              label: j.title || "Open job listing",
                             })
                           }
                           className={cn(
@@ -1185,12 +1173,6 @@ export default function CareersClient({
                 <button
                   type="button"
                   onClick={() => {
-                    trackCtaClick({
-                      ctaId: "careers_driver_opportunities_footer",
-                      location: "careers_jobs_footer",
-                      destination: "/careers#drive",
-                      label: "Driver Opportunities",
-                    });
                     scrollToId("drive");
                   }}
                   className={cn(
