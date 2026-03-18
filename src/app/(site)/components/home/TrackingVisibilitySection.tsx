@@ -212,6 +212,8 @@ export function TrackingVisibilitySection() {
             <div className={TRACKING_VISIBILITY_TOKENS.ctaRowClass}>
               <Link
                 href="/tracking"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() =>
                   trackCtaClick({
                     ctaId: "tracking_primary_track_shipment",

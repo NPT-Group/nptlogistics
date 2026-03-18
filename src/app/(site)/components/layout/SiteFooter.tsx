@@ -232,6 +232,8 @@ export function SiteFooter() {
                     ctaId="footer_track_shipment"
                     location="footer:quick_actions"
                     label="Track Shipment"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={footerLink}
                   >
                     Track Shipment
@@ -265,6 +267,8 @@ export function SiteFooter() {
                     ctaId="footer_employee_portal"
                     location="footer:quick_actions"
                     label="Employee Portal"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={footerLink}
                   >
                     Employee Portal

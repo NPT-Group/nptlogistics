@@ -301,6 +301,8 @@ export function MobileNav() {
                     <div className="grid grid-cols-2 gap-3">
                       <Link
                         href="/tracking"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         onClick={() => {
                           closeAll();
                           trackCtaClick({
@@ -322,6 +324,8 @@ export function MobileNav() {
 
                       <Link
                         href="/employee-portal"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         onClick={() => {
                           closeAll();
                           trackCtaClick({

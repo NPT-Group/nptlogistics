@@ -183,6 +183,8 @@ export function AudienceSection() {
                 </p>
                 <Link
                   href={card.href}
+                  target={card.href === "/tracking" ? "_blank" : undefined}
+                  rel={card.href === "/tracking" ? "noopener noreferrer" : undefined}
                   onClick={() =>
                     trackCtaClick({
                       ctaId: `audience_${card.id}`,

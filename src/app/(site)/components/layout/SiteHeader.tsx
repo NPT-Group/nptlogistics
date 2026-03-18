@@ -76,6 +76,8 @@ export function SiteHeader() {
               {/* Track Shipment */}
               <Link
                 href="/tracking"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() =>
                   trackCtaClick({
                     ctaId: "header_track_shipment",
@@ -98,6 +100,8 @@ export function SiteHeader() {
               {/* Employee Portal */}
               <Link
                 href="/employee-portal"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() =>
                   trackCtaClick({
                     ctaId: "header_employee_portal",
