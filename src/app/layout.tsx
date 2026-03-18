@@ -21,6 +21,10 @@ export const metadata: Metadata = {
     template: "%s | NPT Logistics",
   },
   description: SITE_DEFAULT_DESCRIPTION,
+  verification: {
+    google: "D-dUnuwfGKaeF63Wazk_bFAucGVV2QX3HXLeBgzJb_s",
+  },
+
   applicationName: "NPT Logistics",
   icons: {
     icon: [
