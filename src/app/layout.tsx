@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     template: "%s | NPT Logistics",
   },
   description: SITE_DEFAULT_DESCRIPTION,
+  alternates: {
+    canonical: "/",
+  },
   verification: {
     google: "D-dUnuwfGKaeF63Wazk_bFAucGVV2QX3HXLeBgzJb_s",
   },
