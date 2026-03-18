@@ -12,6 +12,36 @@ const nextConfig: NextConfig = {
       hostname,
     })),
   },
+
+  async redirects() {
+    return [
+      {
+        source: "/who-we-are",
+        destination: "/about-us",
+        permanent: true,
+      },
+
+      // Legacy service URLs from old site
+      {
+        source: "/service/road-freight",
+        destination: "/services/truckload",
+        permanent: true,
+      },
+      {
+        source: "/service/train-freight",
+        destination: "/services/cross-border",
+        permanent: true,
+      },
+      {
+        source: "/service/ocean-freight",
+        destination: "/services/cross-border",
+        permanent: true,
+      },
+
+      // Optional: support old singular prefix generally if you know exact mappings later
+      // Add more one-by-one as you discover them in Google/Search Console.
+    ];
+  },
 };
 
 export default nextConfig;
