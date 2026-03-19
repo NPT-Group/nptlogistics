@@ -28,6 +28,7 @@ import { Section } from "@/app/(site)/components/layout/Section";
 import { Select } from "@/app/(site)/components/ui/Select";
 import { HeroImage } from "@/components/media/HeroImage";
 import { cn } from "@/lib/cn";
+import { NEXT_PUBLIC_NPT_HR_EMAIL } from "@/config/env";
 
 type SortBy = "publishedAt" | "title" | "createdAt";
 type SortDir = "asc" | "desc";
@@ -671,23 +672,22 @@ export default function CareersClient({
                 </div>
 
                 <h3 className="mb-2 text-xl font-bold tracking-tight text-white">
-                  Drivedock Portal
+                  Driver Applications
                 </h3>
-                <p className="mb-8 text-sm leading-relaxed text-[rgba(255,255,255,0.65)]">
-                  Driver opportunities are managed through our exclusive external platform,
-                  engineered for a transparent, fast-tracked application process.
+                <p className="mb-6 text-sm leading-relaxed text-[rgba(255,255,255,0.65)]">
+                  Driver opportunities are currently handled directly through our HR team. To apply
+                  or ask about available driver roles, please email us and we’ll guide you through
+                  the next steps.
                 </p>
 
                 <a
-                  href="https://drivedock.ssp4you.com"
-                  target="_blank"
-                  rel="noreferrer"
+                  href={`mailto:${NEXT_PUBLIC_NPT_HR_EMAIL}`}
                   onClick={() =>
                     trackCtaClick({
-                      ctaId: "apply_now",
+                      ctaId: "email_hr",
                       location: "careers_drive_card",
-                      destination: "https://drivedock.ssp4you.com",
-                      label: "Start your application",
+                      destination: `mailto:${NEXT_PUBLIC_NPT_HR_EMAIL}`,
+                      label: "Email HR about driver opportunities",
                     })
                   }
                   className={cn(
@@ -697,10 +697,16 @@ export default function CareersClient({
                     "focus-ring-light",
                   )}
                 >
-                  <span className="font-semibold tracking-wide text-white">
-                    Start your application
+                  <span className="min-w-0">
+                    <span className="block font-semibold tracking-wide text-white">
+                      Email HR to apply
+                    </span>
+                    <span className="block truncate text-xs text-white/80">
+                      {NEXT_PUBLIC_NPT_HR_EMAIL}
+                    </span>
                   </span>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 backdrop-blur-md transition-all duration-300 group-hover/btn:bg-white group-hover/btn:text-[color:var(--color-brand-700)]">
+
+                  <div className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 backdrop-blur-md transition-all duration-300 group-hover/btn:bg-white group-hover/btn:text-[color:var(--color-brand-700)]">
                     <ArrowRight className="h-4 w-4 text-white transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:text-[color:var(--color-brand-700)]" />
                   </div>
                 </a>
@@ -711,7 +717,7 @@ export default function CareersClient({
                     Accepting applications
                   </div>
                   <div className="text-[10px] tracking-wider text-[rgba(255,255,255,0.3)] uppercase">
-                    Secure link
+                    Direct contact
                   </div>
                 </div>
               </div>
