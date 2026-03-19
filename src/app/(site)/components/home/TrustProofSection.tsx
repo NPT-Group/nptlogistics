@@ -431,8 +431,10 @@ export function TrustProofSection() {
         {/* Carousel */}
         <motion.div
           className="mt-10 select-none"
-          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          // Critical section content must be visible even if whileInView fails.
+          // Visible-first motion: keep opacity readable, animate small lift + scale.
+          initial={reduceMotion ? false : { opacity: 1, y: 12, scale: 0.985 }}
+          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
         >
@@ -501,7 +503,12 @@ export function TrustProofSection() {
                     <motion.div
                       key={`left-${orderedItems[leftIndex].id}`}
                       className="w-[250px] shrink-0"
-                      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -16, scale: 0.9 }}
+                      // Side cards are readable; never start fully transparent.
+                      initial={
+                        reduceMotion
+                          ? { opacity: 0.68, x: 0, scale: 0.92 }
+                          : { opacity: 0.68, x: -16, scale: 0.9 }
+                      }
                       animate={
                         reduceMotion ? { opacity: 0.68 } : { opacity: 0.68, x: 0, scale: 0.92 }
                       }
@@ -541,7 +548,12 @@ export function TrustProofSection() {
                     <motion.div
                       key={`right-${orderedItems[rightIndex].id}`}
                       className="w-[250px] shrink-0"
-                      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 16, scale: 0.9 }}
+                      // Side cards are readable; never start fully transparent.
+                      initial={
+                        reduceMotion
+                          ? { opacity: 0.68, x: 0, scale: 0.92 }
+                          : { opacity: 0.68, x: 16, scale: 0.9 }
+                      }
                       animate={
                         reduceMotion ? { opacity: 0.68 } : { opacity: 0.68, x: 0, scale: 0.92 }
                       }

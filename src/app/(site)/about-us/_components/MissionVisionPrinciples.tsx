@@ -25,7 +25,12 @@ export function MissionVisionPrinciples({ data }: { data: Data }) {
 
   const fadeUp: Variants = reduceMotion
     ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } }
-    : { hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } } };
+    : {
+        // Critical content must not be hidden if whileInView never triggers.
+        // Visible-first motion: animate small lift + scale, but keep opacity readable.
+        hidden: { opacity: 1, y: 14, scale: 0.985 },
+        show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: "easeOut" } },
+      };
 
   const stagger: Variants = reduceMotion
     ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
