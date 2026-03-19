@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
       protocol: "https",
       hostname,
     })),
+    qualities: [70, 74, 75, 84, 90],
   },
 
   async redirects() {
