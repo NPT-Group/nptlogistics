@@ -87,8 +87,9 @@ export function LocationsNetwork({ data }: Readonly<{ data: Data }>) {
   const fadeUp: Variants = React.useMemo(() => {
     if (reduceMotion) return { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } };
     return {
-      hidden: { opacity: 0, y: 14 },
-      show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+      // Critical content must never rely on whileInView to become visible.
+      hidden: { opacity: 1, y: 14, scale: 0.985 },
+      show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: "easeOut" } },
     };
   }, [reduceMotion]);
 

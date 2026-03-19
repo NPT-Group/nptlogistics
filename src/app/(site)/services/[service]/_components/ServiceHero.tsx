@@ -79,8 +79,10 @@ export function ServiceHero({ model }: { model: ServicePageModel }) {
 
       <Container className="site-page-container relative py-14 sm:py-18 lg:py-22">
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          // Critical hero copy must remain visible even if whileInView fails.
+          // Visible-first motion: keep opacity readable, animate small lift + scale.
+          initial={reduceMotion ? false : { opacity: 1, y: 12, scale: 0.985 }}
+          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, amount: 0.35 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
           className={cn(

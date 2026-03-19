@@ -34,15 +34,27 @@ export function OperatingModel({ data }: { data: Data }) {
 
   const fadeUp: Variants = reduceMotion
     ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } }
-    : { hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } } };
+    : {
+        // Visible-first motion: keep opacity readable, animate subtle lift + scale.
+        hidden: { opacity: 1, y: 14, scale: 0.985 },
+        show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: "easeOut" } },
+      };
 
   const fadeDown: Variants = reduceMotion
     ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } }
-    : { hidden: { opacity: 0, y: -14 }, show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } } };
+    : {
+        // Visible-first motion: keep opacity readable, animate subtle lift + scale (from below).
+        hidden: { opacity: 1, y: -14, scale: 0.985 },
+        show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: "easeOut" } },
+      };
 
   const fadeLeft: Variants = reduceMotion
     ? { hidden: { opacity: 1, x: 0 }, show: { opacity: 1, x: 0 } }
-    : { hidden: { opacity: 0, x: -12 }, show: { opacity: 1, x: 0, transition: { duration: 0.45, ease: "easeOut" } } };
+    : {
+        // Visible-first motion: keep opacity readable, animate subtle drift + scale.
+        hidden: { opacity: 1, x: -12, scale: 0.985 },
+        show: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.45, ease: "easeOut" } },
+      };
 
   const stagger: Variants = reduceMotion
     ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
@@ -51,7 +63,8 @@ export function OperatingModel({ data }: { data: Data }) {
   const nodePop: Variants = reduceMotion
     ? { hidden: { opacity: 1, scale: 1 }, show: { opacity: 1, scale: 1 } }
     : {
-        hidden: { opacity: 0, scale: 0.5 },
+        // Never make the operation-model content unreadable if the in-view trigger fails.
+        hidden: { opacity: 1, scale: 0.95 },
         show: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 20 } },
       };
 

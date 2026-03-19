@@ -29,11 +29,19 @@ export function WhoWeAre({ data }: { data: Data }) {
 
   const fadeUp: Variants = reduceMotion
     ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } }
-    : { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
+    : {
+        // Visible-first motion: animate small lift + scale, but keep opacity readable.
+        hidden: { opacity: 1, y: 12, scale: 0.985 },
+        show: { opacity: 1, y: 0, scale: 1 },
+      };
 
   const fadeLeft: Variants = reduceMotion
     ? { hidden: { opacity: 1, x: 0 }, show: { opacity: 1, x: 0 } }
-    : { hidden: { opacity: 0, x: -12 }, show: { opacity: 1, x: 0 } };
+    : {
+        // Visible-first motion: animate subtle horizontal drift + scale, but keep opacity readable.
+        hidden: { opacity: 1, x: -12, scale: 0.985 },
+        show: { opacity: 1, x: 0, scale: 1 },
+      };
 
   return (
     <Section

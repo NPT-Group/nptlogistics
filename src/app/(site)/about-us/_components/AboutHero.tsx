@@ -40,8 +40,10 @@ export function AboutHero({ data }: { data: HeroData }) {
         <div className="grid items-center gap-6 sm:gap-8 lg:grid-cols-[0.93fr_1.07fr] lg:gap-8">
           {/* Left — text content */}
           <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            // Critical text must never be hidden behind whileInView.
+            // Visible-first motion: keep opacity readable, animate small lift + scale.
+            initial={reduceMotion ? false : { opacity: 1, y: 12, scale: 0.985 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, amount: 0.25 }}
             transition={{ duration: 0.45, ease: "easeOut" }}
             className="py-10 sm:py-14 lg:py-16"
@@ -116,7 +118,8 @@ export function AboutHero({ data }: { data: HeroData }) {
 
           {/* Right — truck image integrated into hero (same grid + soft fades so it feels one canvas) */}
           <motion.div
-            initial={reduceMotion ? false : { opacity: 0, x: 12, scale: 0.98 }}
+            // Keep hero media visible even if in-view detection fails (visible-first).
+            initial={reduceMotion ? false : { opacity: 1, x: 8, scale: 0.985 }}
             whileInView={reduceMotion ? undefined : { opacity: 1, x: 0, scale: 1 }}
             viewport={{ once: true, amount: 0.25 }}
             transition={{ duration: 0.45, ease: "easeOut" }}

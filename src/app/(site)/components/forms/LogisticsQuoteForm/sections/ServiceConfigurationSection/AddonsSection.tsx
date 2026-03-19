@@ -92,7 +92,8 @@ export function AddonsSection() {
   return (
     <motion.section
       key={`${primaryService.toLowerCase()}-addons-${String(equipment)}`}
-      initial={{ opacity: 0, y: 8 }}
+      // Visible-first: keep add-ons section readable at first paint.
+      initial={{ opacity: 1, y: 8, scale: 0.995 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.22, ease: "easeOut" }}
     >

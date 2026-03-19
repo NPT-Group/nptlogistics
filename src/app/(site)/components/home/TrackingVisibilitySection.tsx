@@ -115,8 +115,10 @@ export function TrackingVisibilitySection() {
           {/* Map (right on desktop) */}
           <motion.div
             className={TRACKING_VISIBILITY_TOKENS.mapMotionClass}
-            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            // Critical content must never depend on whileInView to become visible.
+            // Visible-first motion: keep opacity readable, animate small lift + scale.
+            initial={reduceMotion ? false : { opacity: 1, y: 10, scale: 0.985 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, amount: 0.25 }}
             transition={{ duration: 0.45, ease: "easeOut" }}
           >
@@ -169,8 +171,10 @@ export function TrackingVisibilitySection() {
           {/* Copy (left on desktop) */}
           <motion.div
             className={TRACKING_VISIBILITY_TOKENS.copyMotionClass}
-            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            // Critical content must never depend on whileInView to become visible.
+            // Visible-first motion: keep opacity readable, animate small lift + scale.
+            initial={reduceMotion ? false : { opacity: 1, y: 10, scale: 0.985 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, amount: 0.25 }}
             transition={{ duration: 0.45, ease: "easeOut", delay: reduceMotion ? 0 : 0.05 }}
           >
