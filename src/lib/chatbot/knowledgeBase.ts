@@ -1,6 +1,6 @@
 // src/lib/chatbot/knowledgeBase.ts
 import { FAQ_CATEGORIES, SHIPPING_GUIDES, FAQ_FINAL_CTA } from "@/config/faqs";
-import { NEXT_PUBLIC_NPT_CS_EMAIL } from "@/config/env";
+import { NEXT_PUBLIC_NPT_CS_EMAIL, NEXT_PUBLIC_NPT_PHONE } from "@/config/env";
 import type { BotIntentId, FlatFaqItem, QuickReply } from "./chatbot.types";
 
 function normText(s: string) {
@@ -27,7 +27,8 @@ function uniqueWords(parts: readonly string[]) {
 }
 
 export const CONTACT_INFO = {
-  email: NEXT_PUBLIC_NPT_CS_EMAIL || "support@nptlogistics.com",
+  email: NEXT_PUBLIC_NPT_CS_EMAIL || "cs@nptlogistics.com",
+  phone: NEXT_PUBLIC_NPT_PHONE || "+1 (281) 607-0001",
 } as const;
 
 export const COMPANY_FACTS = {

@@ -47,6 +47,9 @@ export const NEXT_PUBLIC_NPT_CS_EMAIL = process.env.NEXT_PUBLIC_NPT_CS_EMAIL!;
 export const NEXT_PUBLIC_NPT_HR_EMAIL = process.env.NEXT_PUBLIC_NPT_HR_EMAIL!;
 export const NEXT_PUBLIC_NPT_IT_EMAIL = process.env.NEXT_PUBLIC_NPT_IT_EMAIL!;
 
+// NPT Phone Number
+export const NEXT_PUBLIC_NPT_PHONE = process.env.NEXT_PUBLIC_NPT_PHONE!;
+
 // Application Environment
 export const isProd = process.env.NODE_ENV === "production";
-export const PORT = process.env.PORT! ?? 3000;
+export const PORT = process.env.PORT ?? 3000;

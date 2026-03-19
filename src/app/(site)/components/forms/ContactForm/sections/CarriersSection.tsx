@@ -112,7 +112,16 @@ export function CarriersSection() {
           Carrier inquiry details
         </h3>
         <p className="text-sm leading-6 text-slate-600">
-          Share your carrier information and tell us what you need help with.
+          Share your carrier information and tell us what you need help with. Already registered?{" "}
+          <a
+            href="https://nptlogisticscarriers.rmissecure.com/_s/client/UserClientLogin.aspx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-slate-900 underline hover:text-slate-700"
+          >
+            Log in to the carrier portal
+          </a>
+          .
         </p>
       </div>
 

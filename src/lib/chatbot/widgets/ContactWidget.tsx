@@ -14,6 +14,12 @@ export default function ContactWidget(_: BaseWidgetProps) {
           {CONTACT_INFO.email}
         </a>
       </div>
+      <div className="text-gray-600">
+        Phone:{" "}
+        <a className="font-medium text-gray-900 underline" href={`tel:${CONTACT_INFO.phone}`}>
+          {CONTACT_INFO.phone}
+        </a>
+      </div>
     </div>
   );
 }
