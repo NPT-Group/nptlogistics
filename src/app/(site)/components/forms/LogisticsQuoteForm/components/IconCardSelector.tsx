@@ -261,7 +261,8 @@ export function IconCardSelector<T extends string>({
       <motion.div
         key={opt.value}
         className="w-full"
-        initial={{ opacity: 0, y: 6 }}
+        // Visible-first: options should remain readable if animation timing fails.
+        initial={{ opacity: 1, y: 6, scale: 0.995 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
           duration: 0.18,

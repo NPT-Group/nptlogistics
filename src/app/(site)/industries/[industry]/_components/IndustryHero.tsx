@@ -226,8 +226,9 @@ export function IndustryHero({ model }: { model: IndustryPageModel }) {
 
       <Container className="site-page-container relative">
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          // Visible-first: hero copy is readable at first paint.
+          initial={reduceMotion ? false : { opacity: 1, y: 12, scale: 0.985 }}
+          animate={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
           className="mx-auto max-w-3xl py-10 text-center sm:py-12 lg:py-14"
         >

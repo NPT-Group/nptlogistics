@@ -26,7 +26,8 @@ function SectionTransition({
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={sectionKey}
-        initial={{ opacity: 0, y: 14, filter: "blur(4px)" }}
+        // Visible-first: section content is readable even if motion is interrupted.
+        initial={{ opacity: 1, y: 14, filter: "blur(2px)", scale: 0.995 }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         exit={{ opacity: 0, y: -10, filter: "blur(2px)" }}
         transition={{

@@ -355,7 +355,11 @@ export default function CareersClient({
 
   const fadeUp: Variants = reduceMotion
     ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } }
-    : { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
+    : {
+        // Visible-first motion: keep opacity readable, animate subtle lift + scale.
+        hidden: { opacity: 1, y: 12, scale: 0.985 },
+        show: { opacity: 1, y: 0, scale: 1 },
+      };
 
   return (
     <>

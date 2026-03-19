@@ -46,8 +46,10 @@ export function CareersCultureSection() {
 
       <Container className={cn("relative py-16 sm:py-20 lg:py-24", "site-home-container")}>
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          // Critical text must never be hidden behind whileInView.
+          // Visible-first motion: keep opacity readable, animate small lift + scale.
+          initial={reduceMotion ? false : { opacity: 1, y: 12, scale: 0.985 }}
+          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
           className="mx-auto max-w-3xl text-center"
@@ -69,8 +71,10 @@ export function CareersCultureSection() {
               {CULTURE_PILLARS.map((item, idx) => (
                 <motion.div
                   key={item.title}
-                  initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-                  whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                  // Keep cards readable by default even if in-view detection fails.
+                  // Use scale-only to avoid conflicting transforms with hover translate.
+                  initial={reduceMotion ? false : { opacity: 1, y: 0, scale: 0.985 }}
+                  whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{
                     duration: 0.4,
@@ -121,8 +125,10 @@ export function CareersCultureSection() {
           </div>
 
           <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            // Critical sidebar content must always be visible.
+            // Visible-first motion: keep opacity readable, animate small lift + scale.
+            initial={reduceMotion ? false : { opacity: 1, y: 12, scale: 0.985 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.45, ease: "easeOut" }}
             className="lg:col-span-5"

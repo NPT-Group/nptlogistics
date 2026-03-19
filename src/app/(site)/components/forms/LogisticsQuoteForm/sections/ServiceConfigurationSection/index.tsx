@@ -40,7 +40,8 @@ export function ServiceConfigurationSection() {
       <div className="mb-10" key="ftl-config">
         <motion.div
           key="ftl"
-          initial={{ opacity: 0, y: 6 }}
+          // Visible-first: keep section content readable while still adding polish.
+          initial={{ opacity: 1, y: 6, scale: 0.995 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
           className="space-y-6"
@@ -61,7 +62,8 @@ export function ServiceConfigurationSection() {
       <div className="mb-10" key="ltl-config">
         <motion.div
           key="ltl"
-          initial={{ opacity: 0, y: 6 }}
+          // Visible-first: keep section content readable while still adding polish.
+          initial={{ opacity: 1, y: 6, scale: 0.995 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
           className="space-y-6"
@@ -82,7 +84,8 @@ export function ServiceConfigurationSection() {
       <div className="mb-10" key="international-config">
         <motion.div
           key="international"
-          initial={{ opacity: 0, y: 6 }}
+          // Visible-first: keep section content readable while still adding polish.
+          initial={{ opacity: 1, y: 6, scale: 0.995 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
           className="space-y-6"
@@ -98,7 +101,8 @@ export function ServiceConfigurationSection() {
       <div className="mb-10" key="warehousing-config">
         <motion.div
           key="warehousing"
-          initial={{ opacity: 0, y: 6 }}
+          // Visible-first: keep section content readable while still adding polish.
+          initial={{ opacity: 1, y: 6, scale: 0.995 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
           className="space-y-6"
