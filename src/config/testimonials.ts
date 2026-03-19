@@ -39,8 +39,8 @@ export const TRUST_PROOF_ITEMS: TestimonialItem[] = [
     eyebrow: "Featured Testimonial",
     title: "Watch NPT in Action",
     description: "A quick look at how our team executes with speed, control, and consistency.",
-    youtubeUrl: "https://www.youtube.com/watch?v=mQv-1GA-HYo",
-    channelUrl: "https://www.youtube.com/@SSPGroupofCompanies",
+    youtubeUrl: "https://www.youtube.com/watch?v=TFn2RSY_XBM",
+    channelUrl: "https://www.youtube.com/@NPT-Youtube",
   },
   {
     type: "testimonial",
