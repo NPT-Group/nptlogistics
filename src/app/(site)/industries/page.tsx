@@ -18,7 +18,7 @@ export default function IndustriesHubPage() {
     .filter(Boolean);
 
   return (
-    <main className="bg-[color:var(--color-surface-0)] py-12 sm:py-14">
+    <div className="bg-[color:var(--color-surface-0)] py-12 sm:py-14">
       <Container className="site-page-container max-w-5xl">
         <h1 className="text-2xl font-semibold tracking-tight text-[color:var(--color-text-light)] sm:text-3xl">
           Industry Logistics Solutions
@@ -45,7 +45,6 @@ export default function IndustriesHubPage() {
           ))}
         </div>
       </Container>
-    </main>
+    </div>
   );
 }
-

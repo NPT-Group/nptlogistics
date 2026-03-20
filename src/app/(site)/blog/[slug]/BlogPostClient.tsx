@@ -419,9 +419,6 @@ export default function BlogPostClient({
                     <div className="text-sm font-semibold text-slate-900">
                       {initialPost?.author?.name ?? "Author"}
                     </div>
-                    <div className="mt-1 text-xs text-slate-500">
-                      {initialPost?.author?.email ?? ""}
-                    </div>
                     <div className="mt-3 text-sm text-slate-600">
                       Logistics professional sharing insights on transportation, cross-border supply
                       chains, and operational excellence.

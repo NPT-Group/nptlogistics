@@ -5,7 +5,6 @@ import { Container } from "@/app/(site)/components/layout/Container";
 import { TrackedLink } from "@/app/(site)/components/analytics/TrackedLink";
 import { NAV } from "@/config/navigation";
 import { cn } from "@/lib/cn";
-import { CookiePreferencesButton } from "./footer/CookiePreferencesButton";
 import { FooterLegalLane } from "./footer/FooterLegalLane";
 
 const footerLink = cn(
@@ -330,7 +329,9 @@ export function SiteFooter() {
             <Link href="/cookies" className={cn(footerLink, "text-sm")}>
               Cookie Policy
             </Link>
-            <CookiePreferencesButton className={cn(footerLink, "text-sm")} />
+            <Link href="/cookie-preferences" className={cn(footerLink, "text-sm")}>
+              Cookie Preferences
+            </Link>
             <Link href="/accessibility" className={cn(footerLink, "text-sm")}>
               Accessibility
             </Link>

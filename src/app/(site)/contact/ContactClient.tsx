@@ -201,7 +201,7 @@ function ContactSupportSection() {
 
 export default function ContactClient() {
   return (
-    <main className="bg-[color:var(--color-surface-0)]">
+    <div className="bg-[color:var(--color-surface-0)]">
       <ContactHero />
 
       <section id="contact-form" className="relative py-10 sm:py-12 lg:py-14">
@@ -233,6 +233,6 @@ export default function ContactClient() {
       </section>
 
       <ContactSupportSection />
-    </main>
+    </div>
   );
 }
