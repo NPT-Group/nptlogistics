@@ -207,7 +207,7 @@ function QuoteAssurance() {
 
 export default function QuoteClient() {
   return (
-    <main className="bg-[color:var(--color-surface-0)]">
+    <div className="bg-[color:var(--color-surface-0)]">
       <QuoteHero />
 
       <section id="quote-form" className="relative py-10 sm:py-12 lg:py-14">
@@ -239,6 +239,6 @@ export default function QuoteClient() {
       </section>
 
       <QuoteAssurance />
-    </main>
+    </div>
   );
 }

@@ -25,7 +25,7 @@ export default function AdminLoginClient({
   const nextUrl = callbackUrl?.trim() ? callbackUrl : "/admin";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4">
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4">
       <div className="w-full max-w-md">
         <div className="mb-6 flex flex-col items-center">
           <LogoImage
@@ -66,6 +66,6 @@ export default function AdminLoginClient({
           © NPT Group {new Date().getFullYear()}
         </footer>
       </div>
-    </div>
+    </main>
   );
 }

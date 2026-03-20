@@ -12,9 +12,8 @@ export const metadata: Metadata = {
 
 export default function ServicesHubPage() {
   return (
-    <main className="bg-[color:var(--color-surface-0)]">
+    <div className="bg-[color:var(--color-surface-0)]">
       <SolutionsOverview />
-    </main>
+    </div>
   );
 }
-

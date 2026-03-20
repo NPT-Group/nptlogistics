@@ -94,7 +94,7 @@ export default async function LocationPage({ params }: { params: Params | Promis
   if (!location) notFound();
 
   return (
-    <main className="bg-[color:var(--color-surface-0)]">
+    <div className="bg-[color:var(--color-surface-0)]">
       <LocationJsonLd
         slug={location.slug}
         city={location.city}
@@ -106,7 +106,7 @@ export default async function LocationPage({ params }: { params: Params | Promis
 
       <section className="relative overflow-hidden bg-[color:var(--color-surface-0)] py-10 sm:py-12">
         <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 opacity-[0.04] [background-image:linear-gradient(to_right,rgba(255,255,255,0.9)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.9)_1px,transparent_1px)] [background-size:80px_80px]" />
+          <div className="absolute inset-0 [background-image:linear-gradient(to_right,rgba(255,255,255,0.9)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.9)_1px,transparent_1px)] [background-size:80px_80px] opacity-[0.04]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_900px_440px_at_70%_24%,rgba(30,64,175,0.16),transparent_58%)]" />
           <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[rgba(2,6,23,0.7)] to-transparent" />
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#070a12] to-transparent" />
@@ -114,10 +114,10 @@ export default async function LocationPage({ params }: { params: Params | Promis
         <Container className="site-page-container relative max-w-6xl">
           <div className="py-6 sm:py-8">
             <div className="mb-2.5 h-[2px] w-12 bg-[color:var(--color-brand-500)] sm:w-14" />
-            <p className="text-[10.5px] font-semibold tracking-[0.14em] uppercase text-[color:var(--color-brand-500)]">
+            <p className="text-[10.5px] font-semibold tracking-[0.14em] text-[color:var(--color-brand-500)] uppercase">
               Freight hub
             </p>
-            <h1 className="mt-2.5 max-w-4xl text-[1.9rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.3rem]">
+            <h1 className="mt-2.5 max-w-4xl text-[1.9rem] leading-tight font-semibold tracking-tight text-white sm:text-[2.3rem]">
               {location.title}
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[color:var(--color-muted)] sm:text-[15px]">
@@ -178,7 +178,6 @@ export default async function LocationPage({ params }: { params: Params | Promis
           </section>
         </Container>
       </section>
-    </main>
+    </div>
   );
 }
-
