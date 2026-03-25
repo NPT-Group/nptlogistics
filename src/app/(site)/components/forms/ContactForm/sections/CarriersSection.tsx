@@ -114,7 +114,7 @@ export function CarriersSection() {
         <p className="text-sm leading-6 text-slate-600">
           Share your carrier information and tell us what you need help with. Already registered?{" "}
           <a
-            href="https://nptlogisticscarriers.rmissecure.com/_s/client/UserClientLogin.aspx"
+            href="https://sspglobalcarriers.rmissecure.com/_s/reg/GeneralRequirementsV2.aspx"
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-slate-900 underline hover:text-slate-700"
